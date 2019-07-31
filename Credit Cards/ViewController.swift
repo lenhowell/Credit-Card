@@ -10,38 +10,55 @@ import Cocoa
 
 class ViewController: NSViewController {
     
+    //MARK:- Instance Variables
+    
+    var getCatagory = [String: String]() //String: is the Key 2nd String is the value
     var myCrdType = ""
     var myFileName = ""
+    let descLength = 8
+    
+    //MARK:- Overrides
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        loadCatagories() // Build Catagories Dictionary
+        txtCrdType.stringValue = "C1V"
+        txtDteRng.stringValue  = "1904"
     }
-
+    
     override var representedObject: Any? {
         didSet {
         // Update the view, if already loaded.
         }
     }
 
+    //MARK:- @IBActions
+    
     @IBAction func btnStart(_ sender: Any) {
         main()
-        
     }
-    @IBOutlet weak var txtDteRng: NSTextField!
     
+    //MARK:- @IBOutlets
+    
+    @IBOutlet weak var txtDteRng: NSTextField!
     @IBOutlet weak var txtCrdType: NSTextField!
-
     @IBOutlet weak var lblErrMsg: NSTextField!
+    @IBOutlet weak var lblResults: NSTextField!
+    
+    //MARK:- Main Program
+    
     func main(){
         lblErrMsg.stringValue = ""
+        var fileContents = ""
+        
         let mytxtDteRng = txtDteRng.stringValue
         let strMM = mytxtDteRng.suffix(2)
         let strYY = mytxtDteRng.prefix(2)
+        
         let numMM = Int(strMM) ?? 0
         let numYY = Int(strYY) ?? 0
-        var fileContents = ""
 
         if mytxtDteRng.count != 4 {
             badDate()
@@ -57,15 +74,12 @@ class ViewController: NSViewController {
             return
         }
         myCrdType = txtCrdType.stringValue.uppercased()
-        let myFileName =  "\(myCrdType)-20\(strYY)-\(strMM).csv"
+        myFileName =  "\(myCrdType)-20\(strYY)-\(strMM).csv"
 
-        
-        
         if let downloadsPath = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first {
             
             let fileURL = downloadsPath.appendingPathComponent(myFileName)
             
- 
             //— reading —    // macOSRoman is more forgiving than utf8
             do {
                 fileContents = try String(contentsOf: fileURL, encoding: .macOSRoman)
@@ -75,7 +89,7 @@ class ViewController: NSViewController {
             }
         } else {
             lblErrMsg.stringValue = "Directory Path to Target File Does Not Exist!!!!"
-
+            return
         }
 
         let crdArray = fileContents.components(separatedBy: "\n")
@@ -92,12 +106,83 @@ class ViewController: NSViewController {
             lblErrMsg.stringValue = "Unknown Credit Card Type!!!! \(txtCrdType.stringValue)"
         }
     }//end func Main
+  
     
-    func hndleC1v(crdArray: [String]) {
-        print(crdArray[0])
-        print(crdArray[1])
-        print(crdArray[2])
-       print()
+    //MARK:- Support Functions
+    
+    func hndleC1v(crdArray: [String])
+    {
+        let transactions = crdArray.dropFirst()
+        var lineItemArray = [LineItem]()
+        
+        var countWithCat = 0
+        for tran in transactions{
+            var transaction = tran
+            if tran != tran.uppercased() {
+                print()
+            }
+            //Add comma discriminator
+            var inQuote = false
+            var tranArray = Array(tran)
+            for (i,char) in tranArray.enumerated() {
+                if char == "\"" {
+                    inQuote = !inQuote
+                }
+                if inQuote && char == "," {
+                    tranArray[i] = ";"
+                }
+            }
+            transaction = String(tranArray).uppercased()
+          
+            let columns = transaction.components(separatedBy: ",")
+            var lineitem = LineItem()
+            lineitem.tranDate = columns[0]
+            if columns[1].contains("STARLANDER") {
+                print (columns[1])
+            }
+            lineitem.desc = columns[1]
+            let debit = Double(columns[2]) ?? 0
+            let credit = Double(columns[3]) ?? 0
+            lineitem.amount = credit-debit
+            lineitem.cardType = "C1V"
+            lineitem.genCat = ""
+            
+            // if lineitem.desc.uppercased().contains("PALM BEACH TAN") {lineitem.genCat = "Tanning"}
+            // Creting The Key for Dictionary
+            var key = String(lineitem.desc.uppercased().replacingOccurrences(of: " ", with: "").prefix(descLength)) // uppercase and compress Description
+                key = key.replacingOccurrences(of: ";", with: "") // Remove commas from Key
+           if let value = getCatagory[key] {
+                lineitem.genCat = value
+                countWithCat += 1
+            }
+            lineitem.rawCat = ""
+            lineItemArray.append(lineitem)
+            print(lineitem)
+        }// End of FOR loop
+        
+        lblResults.stringValue = "\(lineItemArray.count) transactions.\n \(countWithCat) given a catagory."
+        
+        
+        var outPutStr = "Card Type,TranDate,Desc,Amount,Catagory,CardCat\n"
+        for xX in lineItemArray {
+            let text = "\(xX.cardType),\(xX.tranDate),\(xX.desc),\(xX.amount),\(xX.genCat),\(xX.rawCat)\n"
+            outPutStr += text
+        }
+        
+        if let desktopPathUrl = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first {
+            let myFileNameOut =  String(myFileName.dropLast(4)+"-Out.csv")
+            let fileUrl = desktopPathUrl.appendingPathComponent(myFileNameOut)
+
+            do    {
+                try outPutStr.write(to: fileUrl, atomically: false, encoding: .utf8)
+            } catch {
+                lblErrMsg.stringValue = "Write Failed!!!! \(fileUrl.path)"
+            }
+
+            print()
+        } else {
+            lblErrMsg.stringValue = "Directory Path to Output File Does Not Exist!!!!"
+        }
     }
     
     func hndleC1r(crdArray: [String]) {
@@ -112,10 +197,25 @@ class ViewController: NSViewController {
     func badDate() {
         lblErrMsg.stringValue = "Date must be in YYMM Format, \(txtDteRng.stringValue ) is Wrong!!"
     }
+    func loadCatagories() {
+        guard let catagories = Bundle.main.path(forResource: "CatagoryLookup", ofType: "txt") else {
+            return
+        }
+        let contentof = (try? String(contentsOfFile: catagories)) ?? ""
+        let lines = contentof.components(separatedBy: "\n")
+        for line in lines{
+            if line == "" {
+                continue
+            }
+            let catagoryArray = line.components(separatedBy: ",")
+            let description = String(catagoryArray[0].replacingOccurrences(of: " ", with: "").uppercased().prefix(descLength))
+            let catagory = catagoryArray[1].trimmingCharacters(in: .whitespaces) //drop leading and trailing white space
+            getCatagory[description] = catagory
+        }
+        print(getCatagory)
+    }
     
 }//end class
 
-//— writing —
-//            do    { try text.write(to: fileURL, atomically: false, encoding: .utf8)}
-//            catch { /* error handling here */ }
+
 
