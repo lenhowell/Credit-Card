@@ -10,8 +10,10 @@ import Foundation
 public struct LineItem {
     var cardType = ""
     var tranDate = ""
-    var desc = ""
-    var amount = 0.0
-    var genCat = ""
-    var rawCat = ""
+    var postDate = ""
+    var cardNum  = ""
+    var desc     = ""
+    var amount   = 0.0
+    var genCat   = ""
+    var rawCat   = ""
 }

@@ -25,7 +25,7 @@ class ViewController: NSViewController {
         // Do any additional setup after loading the view.
         loadCatagories() // Build Catagories Dictionary
         txtCrdType.stringValue = "C1V"
-        txtDteRng.stringValue  = "1904"
+        txtDteRng.stringValue  = "1905"
     }
     
     override var representedObject: Any? {
@@ -78,7 +78,8 @@ class ViewController: NSViewController {
 
         if let downloadsPath = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first {
             
-            let fileURL = downloadsPath.appendingPathComponent(myFileName)
+            let dir = downloadsPath.appendingPathComponent("Credit Card Trans")
+            let fileURL = dir.appendingPathComponent(myFileName)
             
             //— reading —    // macOSRoman is more forgiving than utf8
             do {
@@ -117,6 +118,7 @@ class ViewController: NSViewController {
         
         var countWithCat = 0
         for tran in transactions{
+            if tran.trim.isEmpty { continue }
             var transaction = tran
             if tran != tran.uppercased() {
                 print()
@@ -137,13 +139,14 @@ class ViewController: NSViewController {
             let columns = transaction.components(separatedBy: ",")
             var lineitem = LineItem()
             lineitem.tranDate = columns[0]
-            if columns[1].contains("STARLANDER") {
-                print (columns[1])
-            }
-            lineitem.desc = columns[1]
-            let debit = Double(columns[2]) ?? 0
-            let credit = Double(columns[3]) ?? 0
-            lineitem.amount = credit-debit
+            lineitem.postDate = columns[1]
+            lineitem.cardNum  = columns[2]
+            lineitem.desc     = columns[3]
+            lineitem.rawCat   = columns[4]
+            lineitem.amount   = Double(columns[5]) ?? 0
+  //          let debit  = Double(columns[5]) ?? 0
+  //          let credit = Double(columns[6]) ?? 0
+  //          lineitem.amount = credit-debit
             lineitem.cardType = "C1V"
             lineitem.genCat = ""
             
@@ -155,7 +158,6 @@ class ViewController: NSViewController {
                 lineitem.genCat = value
                 countWithCat += 1
             }
-            lineitem.rawCat = ""
             lineItemArray.append(lineitem)
             print(lineitem)
         }// End of FOR loop
@@ -163,9 +165,9 @@ class ViewController: NSViewController {
         lblResults.stringValue = "\(lineItemArray.count) transactions.\n \(countWithCat) given a catagory."
         
         
-        var outPutStr = "Card Type,TranDate,Desc,Amount,Catagory,CardCat\n"
+        var outPutStr = "Card Type\tTranDate\tDesc\tAmount\tCatagory\tRaw Catagory\n"
         for xX in lineItemArray {
-            let text = "\(xX.cardType),\(xX.tranDate),\(xX.desc),\(xX.amount),\(xX.genCat),\(xX.rawCat)\n"
+            let text = "\(xX.cardType)\t\(xX.tranDate)\t\(xX.desc)\t\(xX.amount)\t\(xX.genCat)\t\(xX.rawCat)\n"
             outPutStr += text
         }
         
@@ -173,6 +175,7 @@ class ViewController: NSViewController {
             let myFileNameOut =  String(myFileName.dropLast(4)+"-Out.csv")
             let fileUrl = desktopPathUrl.appendingPathComponent(myFileNameOut)
 
+            copyStringToClipBoard(textToCopy: outPutStr)
             do    {
                 try outPutStr.write(to: fileUrl, atomically: false, encoding: .utf8)
             } catch {
@@ -214,7 +217,13 @@ class ViewController: NSViewController {
         }
         print(getCatagory)
     }
-    
+    //MARK:- copyStringToClipBoard
+    public func copyStringToClipBoard(textToCopy: String) {
+        let pasteBoard = NSPasteboard.general
+        pasteBoard.clearContents()
+        pasteBoard.setString(textToCopy, forType: NSPasteboard.PasteboardType.string)
+    }
+
 }//end class
 
 
