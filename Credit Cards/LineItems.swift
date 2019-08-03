@@ -13,7 +13,8 @@ public struct LineItem {
     var postDate = ""
     var cardNum  = ""
     var desc     = ""
-    var amount   = 0.0
+    var debit    = 0.0
+    var credit   = 0.0
     var genCat   = ""
     var rawCat   = ""
 }
