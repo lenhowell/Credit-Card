@@ -10,12 +10,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Credit Cards/ViewController.swift"
-            timestampString = "586492893.169387"
+            timestampString = "586722670.882411"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "229"
-            endingLineNumber = "229"
-            landmarkName = "loadCatagories()"
+            startingLineNumber = "267"
+            endingLineNumber = "267"
+            landmarkName = "handleCards(fileName:cardArray:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -26,12 +26,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Credit Cards/ViewController.swift"
-            timestampString = "586492893.169876"
+            timestampString = "586722670.8828779"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "208"
-            endingLineNumber = "208"
-            landmarkName = "loadCatagories()"
+            startingLineNumber = "273"
+            endingLineNumber = "273"
+            landmarkName = "handleCards(fileName:cardArray:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -42,12 +42,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Credit Cards/ViewController.swift"
-            timestampString = "586492893.170236"
+            timestampString = "586722670.883171"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "227"
-            endingLineNumber = "227"
-            landmarkName = "loadCatagories()"
+            startingLineNumber = "276"
+            endingLineNumber = "276"
+            landmarkName = "handleCards(fileName:cardArray:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -58,12 +58,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Credit Cards/ViewController.swift"
-            timestampString = "586492893.170558"
+            timestampString = "586722670.8834471"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "182"
-            endingLineNumber = "182"
-            landmarkName = "hndleC1v(crdArray:)"
+            startingLineNumber = "279"
+            endingLineNumber = "279"
+            landmarkName = "handleCards(fileName:cardArray:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -74,12 +74,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Credit Cards/ViewController.swift"
-            timestampString = "586492893.170881"
+            timestampString = "586722670.883719"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "154"
-            endingLineNumber = "154"
-            landmarkName = "hndleC1v(crdArray:)"
+            startingLineNumber = "294"
+            endingLineNumber = "294"
+            landmarkName = "handleCards(fileName:cardArray:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -90,12 +90,60 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Credit Cards/ViewController.swift"
-            timestampString = "586492893.171176"
+            timestampString = "586722670.884002"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "179"
-            endingLineNumber = "179"
-            landmarkName = "hndleC1v(crdArray:)"
+            startingLineNumber = "270"
+            endingLineNumber = "270"
+            landmarkName = "handleCards(fileName:cardArray:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Credit Cards/ViewController.swift"
+            timestampString = "586722670.8842731"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "38"
+            endingLineNumber = "38"
+            landmarkName = "windowShouldClose(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Credit Cards/ViewController.swift"
+            timestampString = "586722670.884541"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "196"
+            endingLineNumber = "196"
+            landmarkName = "outputTranactions(lineItemArray:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Credit Cards/ViewController.swift"
+            timestampString = "586722670.884818"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "306"
+            endingLineNumber = "306"
+            landmarkName = "handleCards(fileName:cardArray:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

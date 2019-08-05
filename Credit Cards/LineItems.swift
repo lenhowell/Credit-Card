@@ -17,4 +17,5 @@ public struct LineItem {
     var credit   = 0.0
     var genCat   = ""
     var rawCat   = ""
+    var catSource = ""
 }
