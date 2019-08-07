@@ -6,6 +6,8 @@
 //  Copyright © 2019 Lenard Howell. All rights reserved.
 //
 
+//TODO: Show Alert and/or terminate program on certain errors. (handleError)
+
 import Cocoa
 
 class ViewController: NSViewController, NSWindowDelegate {
@@ -16,15 +18,19 @@ class ViewController: NSViewController, NSWindowDelegate {
     var myFileNameOut = "Combined-Creditcard-Master.csv"
     let descLength = 8
     var countWithCat = 0
-    let suppressionList = "& \";"
+    let suppressionList = "& \";'#*-"
     var desktopPathUrl = URL(fileURLWithPath: "")
     
-    //MARK:- Overrides
+    //MARK:- Overrides & Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         loadCategories() // Build Categories Dictionary
+    }
+    
+    override func viewDidAppear() {
+        self.view.window?.delegate = self
     }
     
     override var representedObject: Any? {
@@ -33,7 +39,6 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
     }
     
-    //FIXME: windowShouldClose never called.
     func windowShouldClose(_ sender: NSWindow) -> Bool {
         NSApplication.shared.terminate(self)
         return true
@@ -60,6 +65,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         var lineItemArray = [LineItem]()
         var fileCount = 0
         var junkFileCount = 0
+        countWithCat = 0
         guard let downloadsPath = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first else {
             // Here if Path to Input File is NOT valid, Put Out Error Message and Exit Program
             lblErrMsg.stringValue = "Directory Path to Target File Does Not Exist!!!!"
@@ -68,6 +74,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         
         // We are here if Path is Valid
         let dir = downloadsPath.appendingPathComponent("Credit Card Trans") // Append FileName To Path
+        if !FileManager.default.fileExists(atPath: dir.path) {
+            handleError(codeFile: "ViewController", codeLineNum: #line, fileName: dir.path, dataLineNum: 0, lineText: "", errorMsg: "Directory does not exist")
+        }
         let fileURLs = getContentsOf(dirURL: dir)
         
         for fileURL in fileURLs {
@@ -88,26 +97,17 @@ class ViewController: NSViewController, NSWindowDelegate {
             
             // Check which Credit Card Transactions we are currently processing
             switch cardType {
-            case "C1V":
-                lineItemArray += handleCards(fileName: fileName, cardArray: cardArray)
-                fileCount += 1
-            case "C1R":
-                lineItemArray += handleCards(fileName: fileName, cardArray: cardArray)
-                fileCount += 1
-            case "DIS":
-                lineItemArray += handleCards(fileName: fileName, cardArray: cardArray)
-                fileCount += 1
-            case "CIT":
+            case "C1V", "C1R", "DIS", "CIT":
                 lineItemArray += handleCards(fileName: fileName, cardArray: cardArray)
                 fileCount += 1
             default:
                 junkFileCount += 1
             }
-        }//loop
+        }//next fileURL
         
         outputTranactions(lineItemArray: lineItemArray)
-        print (dictCategory)
-        writeCategoriesToBundle(dictCat: dictCategory)
+        //print (dictCategory)
+        writeCategoriesToFile(dictCat: dictCategory)
         lblResults.stringValue = "\(fileCount) Files Processed.\n\(junkFileCount) NOT Recognized as a Credit Card Transaction\n \(lineItemArray.count) CREDIT CARD Transactions PROCESSED.\n \(countWithCat) Were Assigned a category."
         
 
@@ -121,58 +121,52 @@ class ViewController: NSViewController, NSWindowDelegate {
         lblErrMsg.stringValue = "Date must be in YYMM Format, \(txtDteRng.stringValue ) is Wrong!!"
     }
     
-    func loadCategories()
-    {     // Check "Bundle" to see if "CategoryLookup.txt" Entry exists.
-        guard let filePath = Bundle.main.path(forResource: "CategoryLookup", ofType: "txt") else {
-            return              // Not in the "Bundle", EXIT Program
+    func loadCategories() {         // Check .desktop to see if "CategoryLookup.txt" Entry exists.
+
+        let startTime = CFAbsoluteTimeGetCurrent()
+        let myFileName =  "CategoryLookup.txt"
+        
+        guard let desktopPathUrl = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first else {
+            return
         }
-        let fileCategoriesURL =  URL(fileURLWithPath: filePath)
+        let fileCategoriesURL = desktopPathUrl.appendingPathComponent(myFileName)
+        
         // Get data in "CategoryLookup" if there is any. If NIL set to Empty.
         //let contentof = (try? String(contentsOfFile: filePathCategories)) ?? ""
         let contentof = (try? String(contentsOf: fileCategoriesURL)) ?? ""
         let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
         
         // For each line in "CategoryLookup"
-        for line in lines
-        {
+        var lineNum = 0
+        for line in lines {
+            lineNum += 1
             if line == ""{
                 continue
             }
             // Create an Array of ech line components the seperator being a ","
             let categoryArray = line.components(separatedBy: ",")
-            
+            if categoryArray.count != 3 {
+                handleError(codeFile: "ViewController", codeLineNum: #line, fileName: myFileName, dataLineNum: lineNum, lineText: line, errorMsg: "Expected 2 commas per line")
+                continue
+            }
             // Create a var "description" containing the first "descLength" charcters of column 0 after having compressed out spaces. This will be the KEY into the CategoryLookup Table/Dictionary.
-//            let description = String(categoryArray[0].replacingOccurrences(of: " ", with: "").uppercased().prefix(descLength))
-
+            //            let description = String(categoryArray[0].replacingOccurrences(of: " ", with: "").uppercased().prefix(descLength))
+            
             let description = String(categoryArray[0].replacingOccurrences(of: "["+suppressionList+"]", with: "", options: .regularExpression, range: nil).uppercased().prefix(descLength))
 
             let category = categoryArray[1].trimmingCharacters(in: .whitespaces) //drop leading and trailing white space
             let source = categoryArray[2].trim.replacingOccurrences(of: "\"", with: "")
             let categoryItem = CategoryItem(category: category, source: source)
             dictCategory[description] = categoryItem
+            
+        }
+        print("\(dictCategory.count) Items Read from Catagory dictionary\n\\from: \(lines[0])\nto:  \(lines[dictCategory.count-1]))\\")
 
-        }
-        print(dictCategory)
-    }
-    //MARK:- copyStringToClipBoard
-    public func copyStringToClipBoard(textToCopy: String) {
-        let pasteBoard = NSPasteboard.general
-        pasteBoard.clearContents()
-        pasteBoard.setString(textToCopy, forType: NSPasteboard.PasteboardType.string)
-    }
-    
-    //------ getContentsOf(directoryURL:)
-    ///Get URLs for Contents Of DirectoryURL
-    /// - Parameter dirURL: DirectoryURL (URL)
-    /// - Returns:  Array of URLs
-    func getContentsOf(dirURL: URL) -> [URL] {
-        do {
-            let urls = try FileManager.default.contentsOfDirectory(at: dirURL, includingPropertiesForKeys: [], options:  [.skipsHiddenFiles, .skipsSubdirectoryDescendants])
-            return urls
-        } catch {
-            return []
-        }
-    }
+        let endTime   = CFAbsoluteTimeGetCurrent()
+        print(endTime-startTime, " sec")
+        print()
+
+    }//end func loadCategories
     
     // Write Output File
     func outputTranactions(lineItemArray: [LineItem]) {
@@ -183,7 +177,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             outPutStr += text
         }
         
-        // Verify that the PATh to "Desktop" and the
+        // Verify that the Path to "Desktop" and the
         if let desktopPathUrl = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first {
             let fileUrl = desktopPathUrl.appendingPathComponent(myFileNameOut)
             
@@ -191,47 +185,66 @@ class ViewController: NSViewController, NSWindowDelegate {
             copyStringToClipBoard(textToCopy: outPutStr)
             
             // Write to Output File
-            do    {
+            do {
                 try outPutStr.write(to: fileUrl, atomically: false, encoding: .utf8)
             } catch {
-                lblErrMsg.stringValue = "Write Failed!!!! \(fileUrl.path)"
+                handleError(codeFile: "ViewController", codeLineNum: #line, fileName: fileUrl.path, dataLineNum: 0, lineText: "", errorMsg: "Write Failed!!!! \(fileUrl.path)")
             }
             
- //           print()
+            //           print()
         } else {
             lblErrMsg.stringValue = "Directory Path or Output File Does Not Exist!!!!"
         }
-
+        
     }//end func
     
     
-    func recordCorruptedData(fileName: String, lineNum: Int, lineText: String, errorText: String) {
+    func handleError(codeFile: String, codeLineNum: Int, fileName: String, dataLineNum: Int, lineText: String, errorMsg: String) {
+        let numberText = dataLineNum==0 ? "" : " Line#\(dataLineNum) "
+        print("\n😡 Error \(codeFile)#\(codeLineNum) \(fileName) \(numberText) \"\(lineText)\"\n😡😡 \(errorMsg)")
+        lblErrMsg.stringValue = fileName + " " + errorMsg
         //TODO: Append to Error File
     }
     
-    
+    // uses Instance Vars: dictCategory, descLength, countWithCat, suppressionList
     func handleCards(fileName: String, cardArray: [String]) -> [LineItem]{
         let cardType = String(fileName.prefix(3).uppercased())
-        let transactions = cardArray.dropFirst()         // Drop "first" Line from Input Stream(Headers)
         var lineItemArray = [LineItem]()                // Create Array variable(lineItemArray) Type lineItem.
+        let cardArrayCount = cardArray.count
         
         // Derive a Dictionary of Column Numbers from header
-        let headers = cardArray[0].components(separatedBy: ",")
+        var lineNum = 0
+        var headers = [String]()
+        while lineNum < cardArrayCount {
+            let components = cardArray[lineNum].components(separatedBy: ",")
+            lineNum += 1
+            if components.count > 2  {
+                headers = components
+                //print (lineNum, cardArray[lineNum])
+                break
+            }
+        }
+        if headers.isEmpty {
+            handleError(codeFile: "ViewController", codeLineNum: #line, fileName: fileName, dataLineNum: lineNum, lineText: "", errorMsg: "Headers not found.")
+            return lineItemArray
+        }
         let expectedColumnCount = headers.count
         var dictColNums = [String: Int]()
         for colNum in 0..<expectedColumnCount {
             let rawKey = headers[colNum].uppercased().trim
             let key: String
             if rawKey == "DATE" {
-                 key = "TRAN"
+                key = "TRAN"
+            } else if rawKey.hasPrefix("ORIG") && rawKey.hasSuffix("DESCRIPTION") {
+                key = "DESC"
             } else {
-                key = String(rawKey.prefix(4))
+                key = String(rawKey.replacingOccurrences(of: "\"", with: "").prefix(4))
             }
             dictColNums[key] = colNum
         }//next colNum
         
-        var lineNum = 1
-        for tran in transactions {
+        while lineNum < cardArrayCount {
+            let tran = cardArray[lineNum]
             lineNum += 1
             if tran.trim.isEmpty { continue }
             var transaction = tran
@@ -253,16 +266,19 @@ class ViewController: NSViewController, NSWindowDelegate {
             let columns = transaction.components(separatedBy: ",")  // Isolate columns within this transaction
             if columns.count != expectedColumnCount {
                 let msg = "\(columns.count) in transaction; should be \(expectedColumnCount)"
-                recordCorruptedData(fileName: fileName, lineNum: lineNum, lineText: tran, errorText: msg)
+                handleError(codeFile: "ViewController", codeLineNum: #line, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: msg)
             }
             var lineitem = LineItem()
-            // Building the Output record
+            // Building the lineitem record
             lineitem.tranDate = columns[dictColNums["TRAN"]!]
             if let colNum = dictColNums["POST"] {
                 lineitem.postDate = columns[colNum]
             }
             if let colNum = dictColNums["DESC"] {
                 lineitem.desc = columns[colNum].replacingOccurrences(of: "\"", with: "")
+                if lineitem.desc.trim.isEmpty {
+                    print("\(#line)\n\(transaction)")
+                }
             }
             if let colNum = dictColNums["CARD"] {
                 lineitem.cardNum = columns[colNum]
@@ -286,51 +302,70 @@ class ViewController: NSViewController, NSWindowDelegate {
             //            key = key.replacing Occurrences(of:  ";", with: "")    // Remove semi-colons from Key
             key = key.replacingOccurrences(of: "["+suppressionList+"]", with: "", options: .regularExpression, range: nil)
             key = String(key.prefix(descLength))    // Truncate
-            if let catItem = dictCategory[key] {      // Here if Lookup of KEY was successfull
-                lineitem.genCat = catItem.category
-                lineitem.catSource = catItem.source
-                countWithCat += 1
-//                print("Found ", mykey)
-            } else {
-                let source = "PG"
-                if cardType == "DIS"{
-                    print("          Did Not Find ",key)
-                    let catItem = CategoryItem(category: lineitem.rawCat, source: source)
-                    dictCategory[key] = catItem
-                    print("Category that was inserted = Key==> \(key) Value ==> \(lineitem.rawCat) Source ==> \(source)")
-                    //                outPutStr += text
+            if !key.isEmpty {
+                if let catItem = dictCategory[key] {      // Here if Lookup of KEY was successfull
+                    lineitem.genCat = catItem.category
+                    lineitem.catSource = catItem.source
+                    countWithCat += 1
+                    //                print("Found ", mykey)
+                } else {
+                    let source = "PG"
+                    if cardType == "DIS"{
+                        print("          Did Not Find ",key)
+                        let catItem = CategoryItem(category: lineitem.rawCat, source: source)
+                        dictCategory[key] = catItem
+                        print("Category that was inserted = Key==> \(key) Value ==> \(lineitem.rawCat) Source ==> \(source)")
+                        //                outPutStr += text
+                    }
                 }
+                lineItemArray.append(lineitem)          // Add new output Record to be output
             }
-            lineItemArray.append(lineitem)          // Add new output Record to be output
             //            print(lineitem)
         }// End of FOR loop
         return lineItemArray
-
-    }// End Func handleCards
+    }//end func handleCards
     
-    func writeCategoriesToBundle(dictCat: [String: CategoryItem]) {
+    func writeCategoriesToFile(dictCat: [String: CategoryItem]) {
         var text = ""
-        let myFileNameOut =  "CategoryLookup.txt"
-
-        if let desktopPathUrl = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first {
-        let fileCategoriesURLout = desktopPathUrl.appendingPathComponent(myFileNameOut)
-
+        let myFileName =  "CategoryLookup.txt"
+        
+        guard let desktopPathUrl = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first else {
+            return
+        }
+        let fileCategoriesURLout = desktopPathUrl.appendingPathComponent(myFileName)
+        
         for catItem in dictCat {
             text += "\(catItem.key), \(catItem.value.category),  \(catItem.value.source)\n"
         }
         
         //— writing —
-        do    { try text.write(to: fileCategoriesURLout, atomically: false, encoding: .utf8) }
-        catch {
-            /* error handling here */
-            print()
+        do {
+            try text.write(to: fileCategoriesURLout, atomically: false, encoding: .utf8)
+            print("\n😀 Successfully wrote \(dictCat.count) items to: \(fileCategoriesURLout.path)")
+        } catch {
+            let msg = "Could not write new CategoryLookup file."
+            handleError(codeFile: "ViewController", codeLineNum: #line, fileName: myFileName, dataLineNum: 0, lineText: "", errorMsg: msg)
         }
-            print("\n😀 Successful write to: \(fileCategoriesURLout.path)")
-        }
-
+    }//end func writeCategoriesToFile
+    
+    //MARK:- General purpose funcs
+    public func copyStringToClipBoard(textToCopy: String) {
+        let pasteBoard = NSPasteboard.general
+        pasteBoard.clearContents()
+        pasteBoard.setString(textToCopy, forType: NSPasteboard.PasteboardType.string)
     }
     
-}//end class
+    //------ getContentsOf(directoryURL:)
+    ///Get URLs for Contents Of DirectoryURL
+    /// - Parameter dirURL: DirectoryURL (URL)
+    /// - Returns:  Array of URLs
+    func getContentsOf(dirURL: URL) -> [URL] {
+        do {
+            let urls = try FileManager.default.contentsOfDirectory(at: dirURL, includingPropertiesForKeys: [], options:  [.skipsHiddenFiles, .skipsSubdirectoryDescendants])
+            return urls
+        } catch {
+            return []
+        }
+    }
 
-
-
+}//end class ViewController
