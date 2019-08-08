@@ -15,13 +15,14 @@ class ViewController: NSViewController, NSWindowDelegate {
     //MARK:- Instance Variables
 
     // Constants
-    let suppressionList = "& \";'`.#*-"     //Const used in: loadCategories, handleCards
-    let descLength      = 8                 //Const used in: loadCategories, handleCards
+    let suppressionList = "& \";'`.#*-"                     //Const used in: loadCategories, handleCards
+    let descLength      = 8                                 //Const used in: loadCategories, handleCards
 
     // Variables
-    var dictCategory    = [String: CategoryItem]()          // String: is the Key 2nd String is the value
+    var dictCategory            = [String: CategoryItem]()  // String: is the Key 2nd String is the value
+    var uniqueCategoryCounts    = [String: Int]()           // Value is unique occurence counter
     var myFileNameOut   = "Combined-Creditcard-Master.csv"  // Only used in outputTranactions
-    var countWithCat    = 0                                 // Used in: main, handleCards
+    var succesfullLookupCount    = 0                        // Used in: main, handleCards
     var addedCatCount   = 0                                 // Number of Catagories added by program.
     var workingFolderUrl = URL(fileURLWithPath: "")
     
@@ -77,7 +78,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         var lineItemArray   = [LineItem]()
         var fileCount       = 0
         var junkFileCount   = 0
-        countWithCat        = 0
+        succesfullLookupCount        = 0
         addedCatCount       = 0
         lblErrMsg.stringValue = ""
         
@@ -121,9 +122,14 @@ class ViewController: NSViewController, NSWindowDelegate {
         }//next fileURL
         
         outputTranactions(lineItemArray: lineItemArray)
-        //print (dictCategory)
+        let uniqueCategoryCountsSorted = uniqueCategoryCounts.sorted(by: <)
+        print("\nuniqueCategoryCountsSorted by key")
+        print (uniqueCategoryCountsSorted)
+        print("\nuniqueCategoryCounts.sorted by value")
+        print (uniqueCategoryCounts.sorted {$0.value > $1.value})
+
         writeCategoriesToFile(dictCat: dictCategory)
-        lblResults.stringValue = "\(fileCount) Files Processed.\n\(junkFileCount) NOT Recognized as a Credit Card Transaction\n \(lineItemArray.count) CREDIT CARD Transactions PROCESSED.\n \(countWithCat) Were Assigned a category."
+        lblResults.stringValue = "\(fileCount) Files Processed.\n\(junkFileCount) NOT Recognized as a Credit Card Transaction\n \(lineItemArray.count) CREDIT CARD Transactions PROCESSED.\n Of These:\n   (a) \(succesfullLookupCount) were found in Category File.\n  (b) \(addedCatCount) were inserted into Category File."
         
     }// End of func main
     
@@ -182,7 +188,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         //TODO: Append to Error File
     }
     
-    //---- handleCards - uses Instance Vars: dictCategory(I/O), countWithCat(I/O), addedCatCount(I/O),
+    //---- handleCards - uses Instance Vars: dictCategory(I/O), succesfullLookupCount(I/O), addedCatCount(I/O),
     //                                       descLength(const), suppressionList(const)
     func handleCards(fileName: String, cardArray: [String]) -> [LineItem] {
         let cardType = String(fileName.prefix(3).uppercased())
@@ -285,9 +291,10 @@ class ViewController: NSViewController, NSWindowDelegate {
                 if let catItem = dictCategory[key] {      // Here if Lookup of KEY was successfull
                     lineitem.genCat = catItem.category
                     lineitem.catSource = catItem.source
-                    countWithCat += 1
-                    //                print("Found ", mykey)
-                } else {
+                    succesfullLookupCount += 1
+  // uniqueCategoryCounts[key] = (uniqueCategoryCounts[key] ?? 0) + 1 Another way to do following line
+                    uniqueCategoryCounts[key, default: 0] += 1
+                } else {    //Here if Lookup in Category Dictionary NOT Successfull
                     let source = "PG"
                     if cardType == "DIS" {
                         print("          Did Not Find ",key)

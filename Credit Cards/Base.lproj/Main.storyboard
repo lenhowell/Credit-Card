@@ -706,12 +706,27 @@
             <objects>
                 <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="Credit_Cards" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="m2S-Jp-Qdl">
-                        <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                        <rect key="frame" x="0.0" y="0.0" width="480" height="300"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="D0v-vZ-h7M">
-                                <rect key="frame" x="186" y="133" width="83" height="32"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TDc-PY-HdN">
+                                <rect key="frame" x="6" y="8" width="468" height="17"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Error Messages will appear here" id="7yH-yg-M81">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="systemRedColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="749" translatesAutoresizingMaskIntoConstraints="NO" id="ud1-Xt-qfO">
+                                <rect key="frame" x="8" y="37" width="464" height="214"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" borderStyle="border" alignment="center" id="mVW-Ja-dVe">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="D0v-vZ-h7M">
+                                <rect key="frame" x="199" y="252" width="83" height="32"/>
                                 <buttonCell key="cell" type="push" title="Submit" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="54a-kX-c6i">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -723,25 +738,20 @@ DQ
                                     <action selector="btnStartClick:" target="XfG-lQ-9wD" id="w7y-FJ-TqH"/>
                                 </connections>
                             </button>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TDc-PY-HdN">
-                                <rect key="frame" x="18" y="20" width="444" height="17"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" id="7yH-yg-M81">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="systemRedColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ud1-Xt-qfO">
-                                <rect key="frame" x="30" y="45" width="432" height="82"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" id="mVW-Ja-dVe">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
                         </subviews>
+                        <constraints>
+                            <constraint firstItem="TDc-PY-HdN" firstAttribute="top" secondItem="ud1-Xt-qfO" secondAttribute="bottom" constant="12" id="5Uy-8y-kJx"/>
+                            <constraint firstItem="ud1-Xt-qfO" firstAttribute="trailing" secondItem="TDc-PY-HdN" secondAttribute="trailing" id="CWM-Ua-45I"/>
+                            <constraint firstAttribute="trailing" secondItem="TDc-PY-HdN" secondAttribute="trailing" constant="8" id="Ggb-41-9LR"/>
+                            <constraint firstItem="ud1-Xt-qfO" firstAttribute="leading" secondItem="TDc-PY-HdN" secondAttribute="leading" id="JNX-IL-9tw"/>
+                            <constraint firstItem="ud1-Xt-qfO" firstAttribute="top" secondItem="D0v-vZ-h7M" secondAttribute="bottom" constant="8" id="QWb-Kx-CkA"/>
+                            <constraint firstItem="D0v-vZ-h7M" firstAttribute="centerX" secondItem="ud1-Xt-qfO" secondAttribute="centerX" id="UqL-QB-rDc"/>
+                            <constraint firstItem="D0v-vZ-h7M" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="20" id="UsO-m4-YhC"/>
+                            <constraint firstItem="TDc-PY-HdN" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="8" id="fsP-lV-86O"/>
+                            <constraint firstItem="ud1-Xt-qfO" firstAttribute="top" secondItem="D0v-vZ-h7M" secondAttribute="bottom" constant="8" symbolic="YES" id="ke3-ni-sOC"/>
+                            <constraint firstAttribute="bottom" secondItem="TDc-PY-HdN" secondAttribute="bottom" constant="8" id="nRx-G5-AOt"/>
+                            <constraint firstAttribute="bottom" secondItem="D0v-vZ-h7M" secondAttribute="bottom" constant="259" id="qMt-Tk-HTW"/>
+                        </constraints>
                     </view>
                     <connections>
                         <outlet property="btnStart" destination="D0v-vZ-h7M" id="pu9-yt-ERf"/>
@@ -751,7 +761,7 @@ DQ
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="655"/>
+            <point key="canvasLocation" x="75" y="919"/>
         </scene>
     </scenes>
 </document>
