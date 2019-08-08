@@ -720,7 +720,7 @@ DQ
 </string>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="btnStart:" target="XfG-lQ-9wD" id="w7y-FJ-TqH"/>
+                                    <action selector="btnStartClick:" target="XfG-lQ-9wD" id="w7y-FJ-TqH"/>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TDc-PY-HdN">
@@ -744,6 +744,7 @@ DQ
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="btnStart" destination="D0v-vZ-h7M" id="pu9-yt-ERf"/>
                         <outlet property="lblErrMsg" destination="TDc-PY-HdN" id="hgE-qK-RAf"/>
                         <outlet property="lblResults" destination="ud1-Xt-qfO" id="w7R-1s-rYd"/>
                     </connections>
