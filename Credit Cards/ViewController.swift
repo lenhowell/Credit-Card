@@ -19,8 +19,11 @@ class ViewController: NSViewController, NSWindowDelegate {
     let descLength      = 8                                 //Const used in: loadCategories, handleCards
 
     // Variables
+    // Define Hash For Category Lookup
     var dictCategory            = [String: CategoryItem]()  // String: is the Key 2nd String is the value
+    // Define Hash For Unique Category Counts
     var uniqueCategoryCounts    = [String: Int]()           // Value is unique occurence counter
+    var containsDictionary = [String: String]()             // String: is the Key - Generted Category
     var myFileNameOut   = "Combined-Creditcard-Master.csv"  // Only used in outputTranactions
     var succesfullLookupCount    = 0                        // Used in: main, handleCards
     var addedCatCount   = 0                                 // Number of Catagories added by program.
@@ -253,35 +256,40 @@ class ViewController: NSViewController, NSWindowDelegate {
                 let msg = "\(columns.count) in transaction; should be \(expectedColumnCount)"
                 handleError(codeFile: "ViewController", codeLineNum: #line, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: msg)
             }
-            var lineitem = LineItem()
+            var lineItem = LineItem()
             // Building the lineitem record
-            lineitem.tranDate = columns[dictColNums["TRAN"]!]
+            lineItem.tranDate = columns[dictColNums["TRAN"]!]
             if let colNum = dictColNums["POST"] {
-                lineitem.postDate = columns[colNum]
+                lineItem.postDate = columns[colNum]
             }
             if let colNum = dictColNums["DESC"] {
-                lineitem.desc = columns[colNum].replacingOccurrences(of: "\"", with: "")
-                if lineitem.desc.trim.isEmpty {
+                lineItem.desc = columns[colNum].replacingOccurrences(of: "\"", with: "")
+                if lineItem.desc.trim.isEmpty {
                     print("\(#line)\n\(transaction)")
                 }
             }
             if let colNum = dictColNums["CARD"] {
-                lineitem.cardNum = columns[colNum]
+                lineItem.cardNum = columns[colNum]
             }
             if let colNum = dictColNums["CATE"] {
-                lineitem.rawCat = columns[colNum]
+                lineItem.rawCat = columns[colNum]
             }
             if let colNum = dictColNums["AMOU"] {
                 let amount = Double(columns[colNum].trim) ?? 0
                 if amount < 0 {
-                    lineitem.credit = -amount
+                    lineItem.credit = -amount
                 } else {
-                    lineitem.debit = amount
+                    lineItem.debit = amount
                 }
             }
-            lineitem.cardType = cardType
-            lineitem.genCat = ""                          // Initialze the Generated Category
-            var key = lineitem.desc.uppercased()
+//            print("Description is \(lineItem.desc)\n")
+        if lineItem.desc.uppercased().contains("STOP & SHOP")
+            {
+//                print("Key Word SHELL found in \(lineItem.desc.uppercased())")
+            }
+            lineItem.cardType = cardType
+            lineItem.genCat = ""                          // Initialze the Generated Category
+            var key = lineItem.desc.uppercased()
             //            key = key.replacingOccurrences(of: "\"", with: "")    // Remove Single Quotes from Key
             //            key = key.replacingOccurrences(of:  " ", with: "")    // Compress key
             //            key = key.replacing Occurrences(of:  ";", with: "")    // Remove semi-colons from Key
@@ -289,27 +297,32 @@ class ViewController: NSViewController, NSWindowDelegate {
             key = String(key.prefix(descLength))    // Truncate
             if !key.isEmpty {
                 if let catItem = dictCategory[key] {      // Here if Lookup of KEY was successfull
-                    lineitem.genCat = catItem.category
-                    lineitem.catSource = catItem.source
+                    lineItem.genCat = catItem.category
+                    lineItem.catSource = catItem.source
                     succesfullLookupCount += 1
-  // uniqueCategoryCounts[key] = (uniqueCategoryCounts[key] ?? 0) + 1 Another way to do following line
                     uniqueCategoryCounts[key, default: 0] += 1
                 } else {    //Here if Lookup in Category Dictionary NOT Successfull
                     let source = "PG"
                     if cardType == "DIS" {
                         print("          Did Not Find ",key)
-                        let catItem = CategoryItem(category: lineitem.rawCat, source: source)
+                        let catItem = CategoryItem(category: lineItem.rawCat, source: source)
                         let rawCat = catItem.category
                         if rawCat.count >= 3 {
                             dictCategory[key] = catItem
                             addedCatCount += 1
-                            print("Category that was inserted = Key==> \(key) Value ==> \(lineitem.rawCat) Source ==> \(source)")
+                            print("Category that was inserted = Key==> \(key) Value ==> \(lineItem.rawCat) Source ==> \(source)")
+                            
                         } else {
                             handleError(codeFile: "ViewController", codeLineNum: #line, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: "Category too short to be legit.")
                         }
                     }
-                }
-                lineItemArray.append(lineitem)          // Add new output Record to be output
+                    // Contains Key Word processing goes here
+                    if lineItem.desc.uppercased().contains(" SHELL ")
+                    {
+                        print("Key Word SHELL found in \(lineItem.desc.uppercased())")
+                    }
+               }
+                lineItemArray.append(lineItem)          // Add new output Record to be output
             }
             //            print(lineitem)
         }// End of FOR loop
