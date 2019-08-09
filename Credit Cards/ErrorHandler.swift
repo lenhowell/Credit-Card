@@ -8,9 +8,15 @@
 
 import Foundation
 
+public enum ErrAction {
+    case printOnly, display, alert, alertAndDisplay
+}
+public enum ErrType {
+    case codeFatal, dataFatal, codeError, dataError, codeWarning, dataWarning
+}
 
 //---- handleError - Must remain in ViewController because it sets lblErrMsg.stringValue
-func handleError(codeFile: String, codeLineNum: Int, fileName: String = "", dataLineNum: Int = 0, lineText: String = "", errorMsg: String) {
+func handleError(codeFile: String, codeLineNum: Int, type: ErrType, action: ErrAction, fileName: String = "", dataLineNum: Int = 0, lineText: String = "", errorMsg: String) {
     let numberText = dataLineNum==0 ? "" : " Line#\(dataLineNum) "
     print("\n😡 Error \(codeFile)#\(codeLineNum) \(fileName) \(numberText) \"\(lineText)\"\n😡😡 \(errorMsg)")
 

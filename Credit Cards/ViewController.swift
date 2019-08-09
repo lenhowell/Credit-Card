@@ -107,7 +107,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         // We are here if Path is Valid
         let dir = downloadsPath.appendingPathComponent("Credit Card Trans") // Append FileName To Path
         if !FileManager.default.fileExists(atPath: dir.path) {
-            handleError(codeFile: "ViewController", codeLineNum: #line, fileName: dir.path, dataLineNum: 0, lineText: "", errorMsg: "Directory does not exist")
+            handleError(codeFile: "ViewController", codeLineNum: #line, type: .codeError, action: .alertAndDisplay,  fileName: dir.path, dataLineNum: 0, lineText: "", errorMsg: "Directory does not exist")
         }
         let fileURLs = getContentsOf(dirURL: dir)
         

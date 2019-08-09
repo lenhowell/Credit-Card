@@ -9,8 +9,8 @@
 import Foundation
 
 //---- handleCards -
-// uses Global  Vars:  descKeyLength(const), descKeysuppressionList(const)
-// uses Instance Vars: dictCategory(I/O), successfulLookupCount(I/O), addedCatCount(I/O)
+// uses Global Vars: descKeyLength(const), descKeysuppressionList(const)
+//                   dictCategory(I/O), successfulLookupCount(I/O), addedCatCount(I/O)
 func handleCards(fileName: String, cardArray: [String]) -> [LineItem] {
     let cardType = String(fileName.prefix(3).uppercased())
     var lineItemArray = [LineItem]()                // Create Array variable(lineItemArray) Type lineItem.
@@ -29,7 +29,7 @@ func handleCards(fileName: String, cardArray: [String]) -> [LineItem] {
         }
     }
     if headers.isEmpty {
-        handleError(codeFile: "ViewController", codeLineNum: #line, fileName: fileName, dataLineNum: lineNum, lineText: "", errorMsg: "Headers not found.")
+        handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataError, action: .alertAndDisplay,  fileName: fileName, dataLineNum: lineNum, lineText: "", errorMsg: "Headers not found.")
         return lineItemArray
     }
     let expectedColumnCount = headers.count
@@ -72,7 +72,7 @@ func handleCards(fileName: String, cardArray: [String]) -> [LineItem] {
         let columns = transaction.components(separatedBy: ",")  // Isolate columns within this transaction
         if columns.count != expectedColumnCount {
             let msg = "\(columns.count) in transaction; should be \(expectedColumnCount)"
-            handleError(codeFile: "ViewController", codeLineNum: #line, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: msg)
+            handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataError, action: .display,  fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: msg)
         }
         var lineItem = LineItem()
         // Building the lineitem record
@@ -130,7 +130,7 @@ func handleCards(fileName: String, cardArray: [String]) -> [LineItem] {
                     print("Category that was inserted = Key==> \(key) Value ==> \(lineItem.rawCat) Source ==> \(source)")
                     
                 } else {
-                    handleError(codeFile: "ViewController", codeLineNum: #line, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: "Category too short to be legit.")
+                    handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .printOnly, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: "Category too short to be legit.")
                 }
             }
             lineItemArray.append(lineItem)          // Add new output Record to be output

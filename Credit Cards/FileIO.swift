@@ -30,7 +30,7 @@ func loadCategories(workingFolderUrl: URL, fileName: String) -> [String: Categor
         // Create an Array of line components the seperator being a ","
         let categoryArray = line.components(separatedBy: ",")
         if categoryArray.count != 3 {
-            handleError(codeFile: "ViewController", codeLineNum: #line, fileName: fileName, dataLineNum: lineNum, lineText: line, errorMsg: "Expected 2 commas per line")
+            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .display, fileName: fileName, dataLineNum: lineNum, lineText: line, errorMsg: "Expected 2 commas per line")
             continue
         }
         // Create a var "description" containing the first "descKeyLength" charcters of column 0 after having compressed out spaces. This will be the KEY into the CategoryLookup Table/Dictionary.
@@ -70,7 +70,7 @@ func writeCategoriesToFile(workingFolderUrl: URL, fileName: String, dictCat: [St
         print("\n😀 Successfully wrote \(dictCat.count) items to: \(fileCategoriesURLout.path)")
     } catch {
         let msg = "Could not write new CategoryLookup file."
-        handleError(codeFile: "ViewController", codeLineNum: #line, fileName: myFileName, errorMsg: msg)
+        handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: myFileName, errorMsg: msg)
     }
 }//end func writeCategoriesToFile
 
@@ -92,7 +92,7 @@ func outputTranactions(workingFolderUrl: URL, fileName: String, lineItemArray: [
     do {
         try outPutStr.write(to: fileUrl, atomically: false, encoding: .utf8)
     } catch {
-        handleError(codeFile: "ViewController", codeLineNum: #line, fileName: fileUrl.path, errorMsg: "Write Failed!!!! \(fileUrl.path)")
+        handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: fileUrl.path, errorMsg: "Write Failed!!!! \(fileUrl.path)")
     }
  
 }//end func outputTranactions
