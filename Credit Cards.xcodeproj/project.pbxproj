@@ -17,6 +17,8 @@
 		BF9DD30A22F1370200C22E41 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9DD30922F1370200C22E41 /* StringExtension.swift */; };
 		BF9DD30C22F793EA00C22E41 /* CategoryItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9DD30B22F793EA00C22E41 /* CategoryItem.swift */; };
 		BFA770DF22FD10BE00BA15B6 /* ErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */; };
+		BFECDEDF22FDBC2F00F1BF5E /* FreeFuncs.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFECDEDE22FDBC2F00F1BF5E /* FreeFuncs.swift */; };
+		BFECDEE122FDBED400F1BF5E /* FileIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFECDEE022FDBED400F1BF5E /* FileIO.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +57,8 @@
 		BF9DD30922F1370200C22E41 /* StringExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		BF9DD30B22F793EA00C22E41 /* CategoryItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryItem.swift; sourceTree = "<group>"; };
 		BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorHandler.swift; sourceTree = "<group>"; };
+		BFECDEDE22FDBC2F00F1BF5E /* FreeFuncs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeFuncs.swift; sourceTree = "<group>"; };
+		BFECDEE022FDBED400F1BF5E /* FileIO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileIO.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,7 +113,9 @@
 				BF992C4722EE56410089DAB8 /* AppDelegate.swift */,
 				BF992C4922EE56410089DAB8 /* ViewController.swift */,
 				BF9DD30922F1370200C22E41 /* StringExtension.swift */,
+				BFECDEE022FDBED400F1BF5E /* FileIO.swift */,
 				BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */,
+				BFECDEDE22FDBC2F00F1BF5E /* FreeFuncs.swift */,
 				BF5D549B22EF458500111875 /* LineItems.swift */,
 				BF9DD30B22F793EA00C22E41 /* CategoryItem.swift */,
 				BF992C4B22EE56420089DAB8 /* Assets.xcassets */,
@@ -279,6 +285,8 @@
 				BFA770DF22FD10BE00BA15B6 /* ErrorHandler.swift in Sources */,
 				BF9DD30C22F793EA00C22E41 /* CategoryItem.swift in Sources */,
 				BF5D549C22EF458500111875 /* LineItems.swift in Sources */,
+				BFECDEDF22FDBC2F00F1BF5E /* FreeFuncs.swift in Sources */,
+				BFECDEE122FDBED400F1BF5E /* FileIO.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

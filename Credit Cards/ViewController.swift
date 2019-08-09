@@ -10,24 +10,28 @@
 
 import Cocoa
 
+//MARK:- Global Variables
+
+// Constants
+let suppressionList = "& \";'`.#*-"                     //Const used in: loadCategories, handleCards
+let descLength      = 8                                 //Const used in: loadCategories, handleCards
+
+//MARK:- ViewController
 class ViewController: NSViewController, NSWindowDelegate {
     
     //MARK:- Instance Variables
-
+    
     // Constants
-    let suppressionList = "& \";'`.#*-"                     //Const used in: loadCategories, handleCards
-    let descLength      = 8                                 //Const used in: loadCategories, handleCards
+    let myFileNameOut    = "Combined-Creditcard-Master.csv" // Only used in outputTranactions
+    let catagoryFilename = "CategoryLookup.txt"
 
     // Variables
-    // Define Hash For Category Lookup
-    var dictCategory            = [String: CategoryItem]()  // String: is the Key 2nd String is the value
-    // Define Hash For Unique Category Counts
-    var uniqueCategoryCounts    = [String: Int]()           // Value is unique occurence counter
-    var containsDictionary = [String: String]()             // String: is the Key - Generted Category
-    var myFileNameOut   = "Combined-Creditcard-Master.csv"  // Only used in outputTranactions
-    var succesfullLookupCount    = 0                        // Used in: main, handleCards
-    var addedCatCount   = 0                                 // Number of Catagories added by program.
-    var workingFolderUrl = URL(fileURLWithPath: "")
+    var dictCategory            = [String: CategoryItem]()  // Hash For Category Lookup
+    var uniqueCategoryCounts    = [String: Int]()           // Hash For Unique Category Counts
+    var containsDictionary      = [String: String]()        // String: is the Key - Generted Category
+    var succesfullLookupCount   = 0                         // Used in: main, handleCards
+    var addedCatCount           = 0                         // Number of Catagories added by program.
+    var workingFolderUrl        = URL(fileURLWithPath: "")
     
     //MARK:- Overrides & Lifecycle
     
@@ -37,7 +41,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         
         // Create NotificationCenter Observer to listen for post from handleError
         NotificationCenter.default.addObserver( self,
-                                                selector: #selector(self.errorPosted(_:)),
+                                                selector: #selector(self.errorPostedFromNotification(_:)),
                                                 name:     NSNotification.Name(rawValue: "ErrorPosted"),
                                                 object:   nil
         )
@@ -55,7 +59,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             return
         }
         workingFolderUrl = desktopUrl
-        loadCategories() // Build Categories Dictionary
+        dictCategory = loadCategories(workingFolderUrl: workingFolderUrl, fileName: catagoryFilename) // Build Categories Dictionary
     }
     
     override var representedObject: Any? {
@@ -131,14 +135,14 @@ class ViewController: NSViewController, NSWindowDelegate {
             }
         }//next fileURL
         
-        outputTranactions(lineItemArray: lineItemArray)
+        outputTranactions(workingFolderUrl: workingFolderUrl, fileName: myFileNameOut, lineItemArray: lineItemArray)
         let uniqueCategoryCountsSorted = uniqueCategoryCounts.sorted(by: <)
         print("\nuniqueCategoryCountsSorted by key")
         print (uniqueCategoryCountsSorted)
         print("\nuniqueCategoryCounts.sorted by value")
         print (uniqueCategoryCounts.sorted {$0.value > $1.value})
 
-        writeCategoriesToFile(dictCat: dictCategory)
+        writeCategoriesToFile(workingFolderUrl: workingFolderUrl, fileName: catagoryFilename, dictCat: dictCategory)
         lblResults.stringValue = "\(fileCount) Files Processed.\n\(junkFileCount) NOT Recognized as a Credit Card Transaction\n \(lineItemArray.count) CREDIT CARD Transactions PROCESSED.\n Of These:\n   (a) \(succesfullLookupCount) were found in Category File.\n  (b) \(addedCatCount) were inserted into Category File."
         
     }// End of func main
@@ -146,60 +150,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     
     //MARK:- Support Functions
     
-    func loadCategories() {         // Check .desktop to see if "CategoryLookup.txt" Entry exists.
-
-        let startTime = CFAbsoluteTimeGetCurrent()
-        let myFileName =  "CategoryLookup.txt"
-        
-        let fileCategoriesURL = workingFolderUrl.appendingPathComponent(myFileName)
-        
-        // Get data in "CategoryLookup" if there is any. If NIL set to Empty.
-        //let contentof = (try? String(contentsOfFile: filePathCategories)) ?? ""
-        let contentof = (try? String(contentsOf: fileCategoriesURL)) ?? ""
-        let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
-        
-        // For each line in "CategoryLookup"
-        var lineNum = 0
-        for line in lines {
-            lineNum += 1
-            if line == "" {
-                continue
-            }
-            // Create an Array of line components the seperator being a ","
-            let categoryArray = line.components(separatedBy: ",")
-            if categoryArray.count != 3 {
-                handleError(codeFile: "ViewController", codeLineNum: #line, fileName: myFileName, dataLineNum: lineNum, lineText: line, errorMsg: "Expected 2 commas per line")
-                continue
-            }
-            // Create a var "description" containing the first "descLength" charcters of column 0 after having compressed out spaces. This will be the KEY into the CategoryLookup Table/Dictionary.
-            //            let description = String(categoryArray[0].replacingOccurrences(of: " ", with: "").uppercased().prefix(descLength))
-            
-            let description = String(categoryArray[0].replacingOccurrences(of: "["+suppressionList+"]", with: "", options: .regularExpression, range: nil).uppercased().prefix(descLength))
-
-            let category = categoryArray[1].trimmingCharacters(in: .whitespaces) //drop leading and trailing white space
-            let source = categoryArray[2].trim.replacingOccurrences(of: "\"", with: "")
-            let categoryItem = CategoryItem(category: category, source: source)
-            dictCategory[description] = categoryItem
-            
-        }
-        print("\(dictCategory.count) Items Read into Category dictionary")
-
-        let endTime   = CFAbsoluteTimeGetCurrent()
-        print(endTime-startTime, " sec")
-        print()
-
-    }//end func loadCategories
-    
-//    //---- handleError - Must remain in ViewController because it sets lblErrMsg.stringValue
-//    func handleError(codeFile: String, codeLineNum: Int, fileName: String = "", dataLineNum: Int = 0, lineText: String = "", errorMsg: String) {
-//        let numberText = dataLineNum==0 ? "" : " Line#\(dataLineNum) "
-//        print("\n😡 Error \(codeFile)#\(codeLineNum) \(fileName) \(numberText) \"\(lineText)\"\n😡😡 \(errorMsg)")
-//        lblErrMsg.stringValue = fileName + " " + errorMsg
-//        //TODO: Append to Error File
-//    }
-    
-    //---- handleCards - uses Instance Vars: dictCategory(I/O), succesfullLookupCount(I/O), addedCatCount(I/O),
-    //                                       descLength(const), suppressionList(const)
+    //---- handleCards - uses Instance Vars: dictCategory(I/O), succesfullLookupCount(I/O), addedCatCount(I/O), descLength(const), suppressionList(const)
     func handleCards(fileName: String, cardArray: [String]) -> [LineItem] {
         let cardType = String(fileName.prefix(3).uppercased())
         var lineItemArray = [LineItem]()                // Create Array variable(lineItemArray) Type lineItem.
@@ -290,10 +241,10 @@ class ViewController: NSViewController, NSWindowDelegate {
                 }
             }
 //            print("Description is \(lineItem.desc)\n")
-        if lineItem.desc.uppercased().contains("STOP & SHOP")
-            {
+//        if lineItem.desc.uppercased().contains("STOP & SHOP")
+//            {
 //                print("Key Word SHELL found in \(lineItem.desc.uppercased())")
-            }
+//            }
             lineItem.cardType = cardType
             lineItem.genCat = ""                          // Initialze the Generated Category
             var key = lineItem.desc.uppercased()
@@ -309,104 +260,31 @@ class ViewController: NSViewController, NSWindowDelegate {
                     succesfullLookupCount += 1
                     uniqueCategoryCounts[key, default: 0] += 1
                 } else {    //Here if Lookup in Category Dictionary NOT Successfull
-                    let source = "PG"
-                    if cardType == "DIS" {
+                    let source = cardType
                         print("          Did Not Find ",key)
                         let catItem = CategoryItem(category: lineItem.rawCat, source: source)
                         let rawCat = catItem.category
                         if rawCat.count >= 3 {
-                            dictCategory[key] = catItem
+                            dictCategory[key] = catItem //Do Actual Insert
                             addedCatCount += 1
                             print("Category that was inserted = Key==> \(key) Value ==> \(lineItem.rawCat) Source ==> \(source)")
                             
                         } else {
                             handleError(codeFile: "ViewController", codeLineNum: #line, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: "Category too short to be legit.")
                         }
-                    }
-                    // Contains Key Word processing goes here
-                    if lineItem.desc.uppercased().contains(" SHELL ")
-                    {
-                        print("Key Word SHELL found in \(lineItem.desc.uppercased())")
-                    }
                }
                 lineItemArray.append(lineItem)          // Add new output Record to be output
             }
-            //            print(lineitem)
         }// End of FOR loop
         return lineItemArray
     }//end func handleCards
 
-    //---- writeCategoriesToFile - uses workingFolderUrl(I), handleError(F)
-    func writeCategoriesToFile(dictCat: [String: CategoryItem]) {
-        var text = ""
-        let myFileName =  "CategoryLookup.txt"
-        
-        let fileCategoriesURLout = workingFolderUrl.appendingPathComponent(myFileName)
-        
-        for catItem in dictCat {
-            text += "\(catItem.key), \(catItem.value.category),  \(catItem.value.source)\n"
-        }
-        
-        //— writing —
-        do {
-            try text.write(to: fileCategoriesURLout, atomically: false, encoding: .utf8)
-            print("\n😀 Successfully wrote \(dictCat.count) items to: \(fileCategoriesURLout.path)")
-        } catch {
-            let msg = "Could not write new CategoryLookup file."
-            handleError(codeFile: "ViewController", codeLineNum: #line, fileName: myFileName, errorMsg: msg)
-        }
-    }//end func writeCategoriesToFile
     
-    //---- outputTranactions - uses: handleError(F), workingFolderUrl(I)
-    func outputTranactions(lineItemArray: [LineItem]) {
-        
-        var outPutStr = "Card Type\tTranDate\tDesc\tDebit\tCredit\tCategory\tRaw Category\tCategory Source\n"
-        for xX in lineItemArray {
-            let text = "\(xX.cardType)\t\(xX.tranDate)\t\(xX.desc)\t\(xX.debit)\t\(xX.credit)\t\(xX.genCat)\t\(xX.rawCat)\t\(xX.catSource)\n"
-            outPutStr += text
-        }
-        
-        let fileUrl = workingFolderUrl.appendingPathComponent(myFileNameOut)
-        
-        // Copy Entire Output File To Clipboard. This will be used to INSERT INTO EXCEL
-        copyStringToClipBoard(textToCopy: outPutStr)
-        
-        // Write to Output File
-        do {
-            try outPutStr.write(to: fileUrl, atomically: false, encoding: .utf8)
-        } catch {
-            handleError(codeFile: "ViewController", codeLineNum: #line, fileName: fileUrl.path, errorMsg: "Write Failed!!!! \(fileUrl.path)")
-        }
-        
-    }//end func
-    
-    
-    // Called by NotificationCenter Observer getting post from handleError
-    @objc func errorPosted(_ notification: Notification) {
+    // Called by NotificationCenter Observer getting post from handleError. Sets lblErrMsg
+    @objc func errorPostedFromNotification(_ notification: Notification) {
         guard let msg = notification.userInfo?["ErrMsg"] as? String else { return }
         lblErrMsg.stringValue = msg
         print ("ErrMsg: \"\(msg)\" received from ErrorHandler via NotificationCenter")
-    }
-
-//MARK:- General purpose funcs
-
-    public func copyStringToClipBoard(textToCopy: String) {
-        let pasteBoard = NSPasteboard.general
-        pasteBoard.clearContents()
-        pasteBoard.setString(textToCopy, forType: NSPasteboard.PasteboardType.string)
-    }
-    
-    //------ getContentsOf(directoryURL:)
-    ///Get URLs for Contents Of DirectoryURL
-    /// - Parameter dirURL: DirectoryURL (URL)
-    /// - Returns:  Array of URLs
-    func getContentsOf(dirURL: URL) -> [URL] {
-        do {
-            let urls = try FileManager.default.contentsOfDirectory(at: dirURL, includingPropertiesForKeys: [], options:  [.skipsHiddenFiles, .skipsSubdirectoryDescendants])
-            return urls
-        } catch {
-            return []
-        }
     }
 
 }//end class ViewController
