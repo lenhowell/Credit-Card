@@ -16,6 +16,7 @@
 		BF992C6622EE56430089DAB8 /* Credit_CardsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF992C6522EE56430089DAB8 /* Credit_CardsUITests.swift */; };
 		BF9DD30A22F1370200C22E41 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9DD30922F1370200C22E41 /* StringExtension.swift */; };
 		BF9DD30C22F793EA00C22E41 /* CategoryItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9DD30B22F793EA00C22E41 /* CategoryItem.swift */; };
+		BFA770DF22FD10BE00BA15B6 /* ErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +54,7 @@
 		BF992C6722EE56430089DAB8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BF9DD30922F1370200C22E41 /* StringExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		BF9DD30B22F793EA00C22E41 /* CategoryItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryItem.swift; sourceTree = "<group>"; };
+		BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorHandler.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +109,7 @@
 				BF992C4722EE56410089DAB8 /* AppDelegate.swift */,
 				BF992C4922EE56410089DAB8 /* ViewController.swift */,
 				BF9DD30922F1370200C22E41 /* StringExtension.swift */,
+				BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */,
 				BF5D549B22EF458500111875 /* LineItems.swift */,
 				BF9DD30B22F793EA00C22E41 /* CategoryItem.swift */,
 				BF992C4B22EE56420089DAB8 /* Assets.xcassets */,
@@ -273,6 +276,7 @@
 				BF9DD30A22F1370200C22E41 /* StringExtension.swift in Sources */,
 				BF992C4A22EE56410089DAB8 /* ViewController.swift in Sources */,
 				BF992C4822EE56410089DAB8 /* AppDelegate.swift in Sources */,
+				BFA770DF22FD10BE00BA15B6 /* ErrorHandler.swift in Sources */,
 				BF9DD30C22F793EA00C22E41 /* CategoryItem.swift in Sources */,
 				BF5D549C22EF458500111875 /* LineItems.swift in Sources */,
 			);

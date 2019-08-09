@@ -34,6 +34,13 @@ class ViewController: NSViewController, NSWindowDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        // Create NotificationCenter Observer to listen for post from handleError
+        NotificationCenter.default.addObserver( self,
+                                                selector: #selector(self.errorPosted(_:)),
+                                                name:     NSNotification.Name(rawValue: "ErrorPosted"),
+                                                object:   nil
+        )
     }
     
     override func viewDidAppear() {
@@ -183,13 +190,13 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     }//end func loadCategories
     
-    //---- handleError - Must remain in ViewController because it sets lblErrMsg.stringValue
-    func handleError(codeFile: String, codeLineNum: Int, fileName: String = "", dataLineNum: Int = 0, lineText: String = "", errorMsg: String) {
-        let numberText = dataLineNum==0 ? "" : " Line#\(dataLineNum) "
-        print("\n😡 Error \(codeFile)#\(codeLineNum) \(fileName) \(numberText) \"\(lineText)\"\n😡😡 \(errorMsg)")
-        lblErrMsg.stringValue = fileName + " " + errorMsg
-        //TODO: Append to Error File
-    }
+//    //---- handleError - Must remain in ViewController because it sets lblErrMsg.stringValue
+//    func handleError(codeFile: String, codeLineNum: Int, fileName: String = "", dataLineNum: Int = 0, lineText: String = "", errorMsg: String) {
+//        let numberText = dataLineNum==0 ? "" : " Line#\(dataLineNum) "
+//        print("\n😡 Error \(codeFile)#\(codeLineNum) \(fileName) \(numberText) \"\(lineText)\"\n😡😡 \(errorMsg)")
+//        lblErrMsg.stringValue = fileName + " " + errorMsg
+//        //TODO: Append to Error File
+//    }
     
     //---- handleCards - uses Instance Vars: dictCategory(I/O), succesfullLookupCount(I/O), addedCatCount(I/O),
     //                                       descLength(const), suppressionList(const)
@@ -373,6 +380,14 @@ class ViewController: NSViewController, NSWindowDelegate {
         
     }//end func
     
+    
+    // Called by NotificationCenter Observer getting post from handleError
+    @objc func errorPosted(_ notification: Notification) {
+        guard let msg = notification.userInfo?["ErrMsg"] as? String else { return }
+        lblErrMsg.stringValue = msg
+        print ("ErrMsg: \"\(msg)\" received from ErrorHandler via NotificationCenter")
+    }
+
 //MARK:- General purpose funcs
 
     public func copyStringToClipBoard(textToCopy: String) {
