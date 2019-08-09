@@ -19,6 +19,7 @@
 		BFA770DF22FD10BE00BA15B6 /* ErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */; };
 		BFECDEDF22FDBC2F00F1BF5E /* FreeFuncs.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFECDEDE22FDBC2F00F1BF5E /* FreeFuncs.swift */; };
 		BFECDEE122FDBED400F1BF5E /* FileIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFECDEE022FDBED400F1BF5E /* FileIO.swift */; };
+		BFECDEE322FDCBCD00F1BF5E /* HandleCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFECDEE222FDCBCD00F1BF5E /* HandleCards.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +60,7 @@
 		BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorHandler.swift; sourceTree = "<group>"; };
 		BFECDEDE22FDBC2F00F1BF5E /* FreeFuncs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeFuncs.swift; sourceTree = "<group>"; };
 		BFECDEE022FDBED400F1BF5E /* FileIO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileIO.swift; sourceTree = "<group>"; };
+		BFECDEE222FDCBCD00F1BF5E /* HandleCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandleCards.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,12 +114,13 @@
 				BF5D549A22EF1EFF00111875 /* Credit Cards.entitlements */,
 				BF992C4722EE56410089DAB8 /* AppDelegate.swift */,
 				BF992C4922EE56410089DAB8 /* ViewController.swift */,
-				BF9DD30922F1370200C22E41 /* StringExtension.swift */,
 				BFECDEE022FDBED400F1BF5E /* FileIO.swift */,
-				BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */,
 				BFECDEDE22FDBC2F00F1BF5E /* FreeFuncs.swift */,
+				BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */,
+				BFECDEE222FDCBCD00F1BF5E /* HandleCards.swift */,
 				BF5D549B22EF458500111875 /* LineItems.swift */,
 				BF9DD30B22F793EA00C22E41 /* CategoryItem.swift */,
+				BF9DD30922F1370200C22E41 /* StringExtension.swift */,
 				BF992C4B22EE56420089DAB8 /* Assets.xcassets */,
 				BF992C4D22EE56420089DAB8 /* Main.storyboard */,
 				BF992C5022EE56420089DAB8 /* Info.plist */,
@@ -280,6 +283,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF9DD30A22F1370200C22E41 /* StringExtension.swift in Sources */,
+				BFECDEE322FDCBCD00F1BF5E /* HandleCards.swift in Sources */,
 				BF992C4A22EE56410089DAB8 /* ViewController.swift in Sources */,
 				BF992C4822EE56410089DAB8 /* AppDelegate.swift in Sources */,
 				BFA770DF22FD10BE00BA15B6 /* ErrorHandler.swift in Sources */,

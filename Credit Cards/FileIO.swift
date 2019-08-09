@@ -33,10 +33,10 @@ func loadCategories(workingFolderUrl: URL, fileName: String) -> [String: Categor
             handleError(codeFile: "ViewController", codeLineNum: #line, fileName: fileName, dataLineNum: lineNum, lineText: line, errorMsg: "Expected 2 commas per line")
             continue
         }
-        // Create a var "description" containing the first "descLength" charcters of column 0 after having compressed out spaces. This will be the KEY into the CategoryLookup Table/Dictionary.
-        //            let description = String(categoryArray[0].replacingOccurrences(of: " ", with: "").uppercased().prefix(descLength))
+        // Create a var "description" containing the first "descKeyLength" charcters of column 0 after having compressed out spaces. This will be the KEY into the CategoryLookup Table/Dictionary.
+        //            let description = String(categoryArray[0].replacingOccurrences(of: " ", with: "").uppercased().prefix(descKeyLength))
         
-        let description = String(categoryArray[0].replacingOccurrences(of: "["+suppressionList+"]", with: "", options: .regularExpression, range: nil).uppercased().prefix(descLength))
+        let description = String(categoryArray[0].replacingOccurrences(of: "["+descKeysuppressionList+"]", with: "", options: .regularExpression, range: nil).uppercased().prefix(descKeyLength))
         
         let category = categoryArray[1].trimmingCharacters(in: .whitespaces) //drop leading and trailing white space
         let source = categoryArray[2].trim.replacingOccurrences(of: "\"", with: "")
