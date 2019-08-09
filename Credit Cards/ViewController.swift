@@ -103,7 +103,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             lblErrMsg.stringValue = "Directory Path to Target File Does Not Exist!!!!"
             return
         }
-        
+
         // We are here if Path is Valid
         let dir = downloadsPath.appendingPathComponent("Credit Card Trans") // Append FileName To Path
         if !FileManager.default.fileExists(atPath: dir.path) {
