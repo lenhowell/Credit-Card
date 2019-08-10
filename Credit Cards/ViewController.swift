@@ -2,7 +2,7 @@
 //  ViewController.swift
 //  Credit Cards
 //
-//  Created by Lenard 🤪 Howell on 7/28/19.
+//  Created by Lenard 🤪😂 Howell on 7/28/19.
 //  Copyright © 2019 Lenard Howell. All rights reserved.
 //
 
