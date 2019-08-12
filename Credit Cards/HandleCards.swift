@@ -77,6 +77,13 @@ func handleCards(fileName: String, cardArray: [String]) -> [LineItem] {
         var lineItem = LineItem()
         // Building the lineitem record
         lineItem.tranDate = columns[dictColNums["TRAN"]!]
+        if let colNum = dictColNums["DEBI"] {
+            lineItem.credit = Double(columns[colNum].trim) ?? 0
+        }
+        if let colNum = dictColNums["CRED"] {
+            lineItem.debit = Double(columns[colNum].trim) ?? 0
+        }
+
         if let colNum = dictColNums["POST"] {
             lineItem.postDate = columns[colNum]
         }
