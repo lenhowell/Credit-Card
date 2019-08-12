@@ -9,10 +9,8 @@
 import Foundation
 
 func loadCategories(workingFolderUrl: URL, fileName: String) -> [String: CategoryItem]  {
-    var dictCategory            = [String: CategoryItem]()
-    let startTime = CFAbsoluteTimeGetCurrent()
-//    let myFileName =  "CategoryLookup.txt"
-    
+    var dictCat   = [String: CategoryItem]()
+
     let fileCategoriesURL = workingFolderUrl.appendingPathComponent(fileName)
     
     // Get data in "CategoryLookup" if there is any. If NIL set to Empty.
@@ -41,15 +39,12 @@ func loadCategories(workingFolderUrl: URL, fileName: String) -> [String: Categor
         let category = categoryArray[1].trimmingCharacters(in: .whitespaces) //drop leading and trailing white space
         let source = categoryArray[2].trim.replacingOccurrences(of: "\"", with: "")
         let categoryItem = CategoryItem(category: category, source: source)
-        dictCategory[description] = categoryItem
+        dictCat[description] = categoryItem
         
     }
-    print("\(dictCategory.count) Items Read into Category dictionary")
+    print("\(dictCat.count) Items Read into Category dictionary")
     
-    let endTime   = CFAbsoluteTimeGetCurrent()
-    print(endTime-startTime, " sec")
-    print()
-    return dictCategory
+    return dictCat
 }//end func loadCategories
 
 

@@ -6,21 +6,19 @@
 //  Copyright © 2019 Lenard Howell. All rights reserved.
 //
 
-//TODO: Show Alert and/or terminate program on certain errors. (handleError)
+// TODO: Check for overlaps & gaps in card transaction file list.
 
 import Cocoa
 
 //MARK:- Global Variables
 
-// Constants
+// Global Constants
 let descKeysuppressionList = "& \";'`.#*-"      //Const used in: loadCategories, handleCards
 let descKeyLength          = 8                  //Const used in: loadCategories, handleCards
 
-// Variables
+// Global Variables
 var dictCategory            = [String: CategoryItem]()  // Hash For Category Lookup
 var uniqueCategoryCounts    = [String: Int]()           // Hash For Unique Category Counts
-var successfulLookupCount   = 0                         // Used in: main, handleCards
-var addedCatCount           = 0                         // Number of Catagories added by program.
 
 //MARK:- ViewController
 class ViewController: NSViewController, NSWindowDelegate {
@@ -90,12 +88,9 @@ class ViewController: NSViewController, NSWindowDelegate {
     //MARK:- Main Program
     
     func main() {
+        Stats.clearAll()
         var fileContents    = ""                        // Where All Transactions in a File go
         var lineItemArray   = [LineItem]()
-        var fileCount       = 0
-        var junkFileCount   = 0
-        addedCatCount       = 0
-        successfulLookupCount = 0
         lblErrMsg.stringValue = ""
         
         guard let downloadsPath = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first else {
@@ -131,9 +126,9 @@ class ViewController: NSViewController, NSWindowDelegate {
             switch cardType {
             case "C1V", "C1R", "DIS", "CIT":
                 lineItemArray += handleCards(fileName: fileName, cardArray: cardArray)
-                fileCount += 1
+                Stats.transFileCount += 1
             default:
-                junkFileCount += 1
+                Stats.junkFileCount += 1
             }
         }//next fileURL
         
@@ -145,7 +140,15 @@ class ViewController: NSViewController, NSWindowDelegate {
         print (uniqueCategoryCounts.sorted {$0.value > $1.value})
 
         writeCategoriesToFile(workingFolderUrl: workingFolderUrl, fileName: catagoryFilename, dictCat: dictCategory)
-        lblResults.stringValue = "\(fileCount) Files Processed.\n\(junkFileCount) NOT Recognized as a Credit Card Transaction\n \(lineItemArray.count) CREDIT CARD Transactions PROCESSED.\n Of These:\n   (a) \(successfulLookupCount) were found in Category File.\n  (b) \(addedCatCount) were inserted into Category File."
+        var statString = ""
+        statString += "\(Stats.transFileCount) Files Processed."
+        statString += "\n\(Stats.junkFileCount) NOT Recognized as a Credit Card Transaction"
+        statString += "\n \(lineItemArray.count) CREDIT CARD Transactions PROCESSED."
+        statString += "\n Of These:"
+        statString += "\n(a) \(Stats.successfulLookupCount) were found in Category File."
+        statString += "\n      (b) \(Stats.addedCatCount) were inserted into Category File."
+        statString += "\n     (c) \(Stats.descWithNoCat) still have no Catagory assigned."
+        lblResults.stringValue = statString
         
     }// End of func main
     
@@ -156,7 +159,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     @objc func errorPostedFromNotification(_ notification: Notification) {
         guard let msg = notification.userInfo?["ErrMsg"] as? String else { return }
         lblErrMsg.stringValue = msg
-        print ("ErrMsg: \"\(msg)\" received from ErrorHandler via NotificationCenter")
+        //print ("ErrMsg: \"\(msg)\" received from ErrorHandler via NotificationCenter")
     }
 
 }//end class ViewController

@@ -12,15 +12,19 @@ import Foundation
 // uses Global Vars: descKeyLength(const), descKeysuppressionList(const)
 //                   dictCategory(I/O), successfulLookupCount(I/O), addedCatCount(I/O)
 func handleCards(fileName: String, cardArray: [String]) -> [LineItem] {
+    let startTime = CFAbsoluteTimeGetCurrent()
     let cardType = String(fileName.prefix(3).uppercased())
-    var lineItemArray = [LineItem]()                // Create Array variable(lineItemArray) Type lineItem.
     let cardArrayCount = cardArray.count
-    
+    var lineItemArray = [LineItem]()                // Create Array variable(lineItemArray) Type lineItem.
+
+    //MARK: Read Header
     // Derive a Dictionary of Column Numbers from header
     var lineNum = 0
+    var headerLine = ""
     var headers = [String]()
     while lineNum < cardArrayCount {
-        let components = cardArray[lineNum].components(separatedBy: ",")
+        headerLine = cardArray[lineNum]
+        let components = headerLine.components(separatedBy: ",")
         lineNum += 1
         if components.count > 2  {
             headers = components
@@ -48,7 +52,18 @@ func handleCards(fileName: String, cardArray: [String]) -> [LineItem] {
         }
         dictColNums[key] = colNum
     }//next colNum
-    
+
+    let hasCatHeader: Bool
+    if dictColNums["CATE"] == nil {
+        hasCatHeader = false
+        let msg = "No \"Catagory\" in Headers"
+        handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .display, fileName: fileName, dataLineNum: lineNum, lineText: headerLine, errorMsg: msg)
+    } else {
+        hasCatHeader = true
+    }
+
+    //MARK: Read Transactions
+    // Read Transctions
     while lineNum < cardArrayCount {
         let tran = cardArray[lineNum]
         lineNum += 1
@@ -107,41 +122,44 @@ func handleCards(fileName: String, cardArray: [String]) -> [LineItem] {
             lineItem.debit = Double(columns[colNum].trim) ?? 0
         }
 
-        //            print("Description is \(lineItem.desc)\n")
-        //        if lineItem.desc.uppercased().contains("STOP & SHOP")
-        //            {
-        //                print("Key Word SHELL found in \(lineItem.desc.uppercased())")
-        //            }
         lineItem.cardType = cardType
-        lineItem.genCat = ""                          // Initialze the Generated Category
+        lineItem.genCat = ""                            // Initialze the Generated Category
         var key = lineItem.desc.uppercased()
-        //            key = key.replacingOccurrences(of: "\"", with: "")    // Remove Single Quotes from Key
-        //            key = key.replacingOccurrences(of:  " ", with: "")    // Compress key
-        //            key = key.replacing Occurrences(of:  ";", with: "")    // Remove semi-colons from Key
         key = key.replacingOccurrences(of: "["+descKeysuppressionList+"]", with: "", options: .regularExpression, range: nil)
-        key = String(key.prefix(descKeyLength))    // Truncate
+        key = String(key.prefix(descKeyLength))         // Truncate
         if !key.isEmpty {
-            if let catItem = dictCategory[key] {      // Here if Lookup of KEY was successfull
-                lineItem.genCat = catItem.category
+            if let catItem = dictCategory[key] {
+                lineItem.genCat = catItem.category      // Here if Lookup of KEY was successful
                 lineItem.catSource = catItem.source
-                successfulLookupCount += 1
+                Stats.successfulLookupCount += 1
                 uniqueCategoryCounts[key, default: 0] += 1
-            } else {    //Here if Lookup in Category Dictionary NOT Successfull
-                let source = cardType
-                print("          Did Not Find ",key)
-                let catItem = CategoryItem(category: lineItem.rawCat, source: source)
-                let rawCat = catItem.category
-                if rawCat.count >= 3 {
-                    dictCategory[key] = catItem //Do Actual Insert
-                    addedCatCount += 1
-                    print("Category that was inserted = Key==> \(key) Value ==> \(lineItem.rawCat) Source ==> \(source)")
-                    
+            } else {
+                let source = cardType                   // Here if NOT in Category Dictionary
+                //print("          Did Not Find ",key)
+
+                if hasCatHeader {
+                    let catItem = CategoryItem(category: lineItem.rawCat, source: source)
+                    let rawCat = catItem.category
+
+                    if rawCat.count >= 3 {
+                        dictCategory[key] = catItem //Do Actual Insert
+                        Stats.addedCatCount += 1
+                        // print("Category that was inserted = Key==> \(key) Value ==> \(lineItem.rawCat) Source ==> \(source)")
+                    } else {
+                        Stats.descWithNoCat += 1
+                        handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .printOnly, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: "Raw Category too short to be legit: \"\(rawCat)\"")
+                    }
                 } else {
-                    handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .printOnly, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: "Category too short to be legit.")
+                    Stats.descWithNoCat += 1
                 }
             }
             lineItemArray.append(lineItem)          // Add new output Record to be output
         }
     }// End of FOR loop
+
+    let endTime   = CFAbsoluteTimeGetCurrent()
+    print(String(format: "handleCards runtime %5.02f sec", endTime-startTime))
+    print()
+
     return lineItemArray
 }//end func handleCards
