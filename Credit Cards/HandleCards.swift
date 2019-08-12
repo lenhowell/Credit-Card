@@ -107,6 +107,13 @@ func handleCards(fileName: String, cardArray: [String]) -> [LineItem] {
                 lineItem.debit = amount
             }
         }
+        if let colNum = dictColNums["CRED"] {
+            lineItem.credit = Double(columns[colNum].trim) ?? 0
+        }
+        if let colNum = dictColNums["DEBI"] {
+            lineItem.debit = Double(columns[colNum].trim) ?? 0
+        }
+
         //            print("Description is \(lineItem.desc)\n")
         //        if lineItem.desc.uppercased().contains("STOP & SHOP")
         //            {
