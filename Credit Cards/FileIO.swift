@@ -8,6 +8,62 @@
 
 import Foundation
 
+//------ getContentsOf(directoryURL:)
+///Get URLs for Contents Of DirectoryURL
+/// - Parameter dirURL: DirectoryURL (URL)
+/// - Returns:  Array of URLs
+func getContentsOf(dirURL: URL) -> [URL] {
+    do {
+        let urls = try FileManager.default.contentsOfDirectory(at: dirURL, includingPropertiesForKeys: [], options:  [.skipsHiddenFiles, .skipsSubdirectoryDescendants])
+        return urls
+    } catch {
+        return []
+    }
+}//end func
+
+//????? incorporate both getFileInfo() funcs into struct as inits
+public struct FileAttributes: Equatable {
+    let url:            URL?
+    var name        = "????"
+    var creationDate:     Date?
+    var modificationDate: Date?
+    var size        = 0
+    var isDir       = false
+
+    //------ getFileInfo - returns attributes of fileName (file or folder) as a FileAttributes struct
+    ///Get file info for a file path
+    /// - Parameter str: file path
+    /// - Returns:  FileAttributes instance
+    static func getFileInfo(_ str: String) -> FileAttributes {
+        let url = URL(fileURLWithPath: str)
+        return getFileInfo(url: url)
+    }
+
+    //------ getFileInfo - returns attributes of url (file or folder) as a FileAttributes struct
+    ///Get file info for a URL
+    /// - Parameter url: file URL
+    /// - Returns:  FileAttributes instance
+    static func getFileInfo(url: URL?) -> FileAttributes {
+        if let url = url {
+            do {
+                let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
+                let name             = url.lastPathComponent
+                let creationDate     = attributes[FileAttributeKey(rawValue: "NSFileCreationDate")]     as? Date
+                let modificationDate = attributes[FileAttributeKey(rawValue: "NSFileModificationDate")] as? Date
+                let size             = attributes[FileAttributeKey(rawValue: "NSFileSize")]             as? Int ?? 0
+                let fileType         = attributes[FileAttributeKey(rawValue: "NSFileType")] as? String
+                let isDir            = (fileType?.contains("Dir")) ?? false
+                return FileAttributes(url: url, name: name, creationDate: creationDate, modificationDate: modificationDate, size: size, isDir: isDir)
+            } catch {   // FileManager error
+                return FileAttributes(url: nil, name: "???", creationDate: nil, modificationDate: nil, size: 0, isDir: false)
+            }
+        } else {   // url = nil
+            return FileAttributes(url: nil, name: "???", creationDate: nil, modificationDate: nil, size: 0, isDir: false)
+        }
+    }
+}// end struct FileAttributes
+
+
 func loadCategories(workingFolderUrl: URL, fileName: String) -> [String: CategoryItem]  {
     var dictCat   = [String: CategoryItem]()
 

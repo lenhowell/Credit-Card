@@ -110,12 +110,14 @@ class ViewController: NSViewController, NSWindowDelegate {
             let fileName = fileURL.lastPathComponent
             let cardType = fileName.prefix(3).uppercased()
             //— reading —    // macOSRoman is more forgiving than utf8
-            // If File exists/Readable is checked in the "DO" Loop
+            // If File exists/isReadable is checked in the "do/catch" block
+            let fileAttributes = FileAttributes.getFileInfo(url: fileURL)
+            if fileAttributes.isDir { continue }
             do {
                 fileContents = try String(contentsOf: fileURL, encoding: .macOSRoman)
                 // File Exists if we are here and Entire file is now in "fileContents" variable
             } catch {
-                // Here if file does NOT exists/Readable. Put out an Error Message and Exit Program
+                // Here if file does NOT exist or is unreadable. Put out an Error Message and Continue
                 lblErrMsg.stringValue = "File Does NOT Exist, \(fileURL.path)!!!!"
                 continue
             }
@@ -142,7 +144,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         writeCategoriesToFile(workingFolderUrl: workingFolderUrl, fileName: catagoryFilename, dictCat: dictCategory)
         var statString = ""
         statString += "\(Stats.transFileCount) Files Processed."
-        statString += "\n\(Stats.junkFileCount) NOT Recognized as a Credit Card Transaction"
+        if Stats.junkFileCount > 0 {
+            statString += "\n\(Stats.junkFileCount) NOT Recognized as a Credit Card Transaction"
+        }
         statString += "\n \(lineItemArray.count) CREDIT CARD Transactions PROCESSED."
         statString += "\n Of These:"
         statString += "\n(a) \(Stats.successfulLookupCount) were found in Category File."

@@ -15,16 +15,3 @@ public func copyStringToClipBoard(textToCopy: String) {
     pasteBoard.clearContents()
     pasteBoard.setString(textToCopy, forType: NSPasteboard.PasteboardType.string)
 }
-
-//------ getContentsOf(directoryURL:)
-///Get URLs for Contents Of DirectoryURL
-/// - Parameter dirURL: DirectoryURL (URL)
-/// - Returns:  Array of URLs
-func getContentsOf(dirURL: URL) -> [URL] {
-    do {
-        let urls = try FileManager.default.contentsOfDirectory(at: dirURL, includingPropertiesForKeys: [], options:  [.skipsHiddenFiles, .skipsSubdirectoryDescendants])
-        return urls
-    } catch {
-        return []
-    }
-}
