@@ -15,3 +15,13 @@ public func copyStringToClipBoard(textToCopy: String) {
     pasteBoard.clearContents()
     pasteBoard.setString(textToCopy, forType: NSPasteboard.PasteboardType.string)
 }
+
+public func getStringFromClipBoard() -> String {
+    let pasteboard = NSPasteboard.general
+    var string = ""
+    if let str = pasteboard.string(forType: NSPasteboard.PasteboardType.string) {
+        string = str
+    }
+    pasteboard.clearContents()
+    return string
+}
