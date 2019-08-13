@@ -20,6 +20,6 @@ struct Stats {
         junkFileCount           = 0
         successfulLookupCount   = 0
         addedCatCount           = 0
-
+        descWithNoCat           = 0
     }
 }
