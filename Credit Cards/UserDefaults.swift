@@ -8,6 +8,12 @@
 
 import Foundation
 
-//enum UDKeys {
-//    static let case transactionFolder
-//}
+public enum UDKey {
+    static let transactionFolder = "CCTransactionFolder"
+    static let categoryFolder    = "CCCategoryFolder"
+    static let outputFolder      = "CCOoutputFolder"
+}
+
+func saveUserDefaults() {
+    UserDefaults.standard.set("TEST", forKey: UDKey.transactionFolder)     //setObject
+}

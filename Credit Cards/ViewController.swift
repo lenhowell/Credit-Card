@@ -26,16 +26,14 @@ class ViewController: NSViewController, NSWindowDelegate {
     //MARK:- Instance Variables
     
     // Constants
+    let myFileNameOut       = "Combined-Creditcard-Master.csv" // Only used in outputTranactions
+    let categoryFilename    = "CategoryLookup.txt"
 
     // Variables
-    var containsDictionary      = [String: String]()        // String: is the Key - Generated Category
-    //var workingFolderUrl        = URL(fileURLWithPath: "")
+    var containsDictionary  = [String: String]()        // String: is the Key - Generated Category
     var pathTransactionDir  = "Downloads/Credit Card Trans"
     var pathCategoryDir     = "Desktop/Credit Card Files"
     var pathOutputDir       = "Desktop/Credit Card Files"
-
-    let myFileNameOut       = "Combined-Creditcard-Master.csv" // Only used in outputTranactions
-    let categoryFilename    = "CategoryLookup.txt"
 
     var transactionDirURL   = FileManager.default.homeDirectoryForCurrentUser
     var categoryFileURL     = FileManager.default.homeDirectoryForCurrentUser
@@ -53,6 +51,15 @@ class ViewController: NSViewController, NSWindowDelegate {
                                                 name:     NSNotification.Name(rawValue: "ErrorPosted"),
                                                 object:   nil
         )
+
+        pathTransactionDir  = UserDefaults.standard.string(forKey: UDKey.transactionFolder) ?? pathTransactionDir
+        if let dir = UserDefaults.standard.string(forKey: UDKey.categoryFolder) {
+            pathCategoryDir = dir
+        }
+        pathOutputDir       = UserDefaults.standard.string(forKey: UDKey.outputFolder) ?? pathOutputDir
+
+
+        // Show on Screen
         txtOutputFolder.stringValue     = pathOutputDir
         txtCategoryFolder.stringValue   = pathCategoryDir
         txtTransationFolder.stringValue = pathTransactionDir
@@ -95,22 +102,30 @@ class ViewController: NSViewController, NSWindowDelegate {
     func main() {
         var errURL = ""
 
-        (errURL, transactionDirURL)  = makeFileURL(pathFileDir: txtTransationFolder.stringValue, fileName: "")
+        pathTransactionDir = txtTransationFolder.stringValue
+        (errURL, transactionDirURL)  = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
         if !errURL.isEmpty {
             lblErrMsg.stringValue = "Transaction" + errURL
             return
         }
 
-        (errURL,  outputFileURL)  = makeFileURL(pathFileDir: txtOutputFolder.stringValue, fileName: myFileNameOut)
+        pathOutputDir = txtOutputFolder.stringValue
+        (errURL,  outputFileURL)  = makeFileURL(pathFileDir: pathOutputDir, fileName: myFileNameOut)
         if !errURL.isEmpty {
             lblErrMsg.stringValue = "Output" + errURL
             return
         }
-        (errURL,  categoryFileURL)  = makeFileURL(pathFileDir: txtCategoryFolder.stringValue, fileName: categoryFilename)
+        pathCategoryDir = txtCategoryFolder.stringValue
+        (errURL,  categoryFileURL)  = makeFileURL(pathFileDir: pathCategoryDir, fileName: categoryFilename)
         if !errURL.isEmpty {
             lblErrMsg.stringValue = "Category" + errURL
             return
         }
+
+        // Save UserDefaults
+        UserDefaults.standard.set(pathTransactionDir, forKey: UDKey.transactionFolder)
+        UserDefaults.standard.set(pathCategoryDir, forKey: UDKey.categoryFolder)
+        UserDefaults.standard.set(pathOutputDir, forKey: UDKey.outputFolder)
 
         Stats.clearAll()
         var fileContents    = ""                        // Where All Transactions in a File go
