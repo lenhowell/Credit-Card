@@ -26,13 +26,21 @@ class ViewController: NSViewController, NSWindowDelegate {
     //MARK:- Instance Variables
     
     // Constants
-    let myFileNameOut    = "Combined-Creditcard-Master.csv" // Only used in outputTranactions
-    let catagoryFilename = "CategoryLookup.txt"
 
     // Variables
     var containsDictionary      = [String: String]()        // String: is the Key - Generated Category
-    var workingFolderUrl        = URL(fileURLWithPath: "")
-    
+    //var workingFolderUrl        = URL(fileURLWithPath: "")
+    var pathTransactionDir  = "Downloads/Credit Card Trans"
+    var pathCategoryDir     = "Desktop/Credit Card Files"
+    var pathOutputDir       = "Desktop/Credit Card Files"
+
+    let myFileNameOut       = "Combined-Creditcard-Master.csv" // Only used in outputTranactions
+    let categoryFilename    = "CategoryLookup.txt"
+
+    var transactionDirURL   = FileManager.default.homeDirectoryForCurrentUser
+    var categoryFileURL     = FileManager.default.homeDirectoryForCurrentUser
+    var outputFileURL       = FileManager.default.homeDirectoryForCurrentUser
+
     //MARK:- Overrides & Lifecycle
     
     override func viewDidLoad() {
@@ -45,21 +53,15 @@ class ViewController: NSViewController, NSWindowDelegate {
                                                 name:     NSNotification.Name(rawValue: "ErrorPosted"),
                                                 object:   nil
         )
+        txtOutputFolder.stringValue     = pathOutputDir
+        txtCategoryFolder.stringValue   = pathCategoryDir
+        txtTransationFolder.stringValue = pathTransactionDir
     }
     
     override func viewDidAppear() {
-
         self.view.window?.delegate = self
 
-        guard let desktopUrl = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first else {
-            let msg = "⛔️ Could not find Working Folder!! (Desktop)"
-            print("\n\(msg)\n")
-            lblErrMsg.stringValue = msg
-            btnStart.isEnabled = false
-            return
-        }
-        workingFolderUrl = desktopUrl
-        dictCategory = loadCategories(workingFolderUrl: workingFolderUrl, fileName: catagoryFilename) // Build Categories Dictionary
+        dictCategory = loadCategories(categoryFileURL: categoryFileURL) // Build Categories Dictionary
     }
     
     override var representedObject: Any? {
@@ -84,10 +86,32 @@ class ViewController: NSViewController, NSWindowDelegate {
     @IBOutlet weak var lblErrMsg:  NSTextField!
     @IBOutlet weak var lblResults: NSTextField!
     @IBOutlet weak var btnStart:   NSButton!
-
+    @IBOutlet var txtTransationFolder: NSTextField!
+    @IBOutlet var txtCategoryFolder: NSTextField!
+    @IBOutlet var txtOutputFolder: NSTextField!
+    
     //MARK:- Main Program
     
     func main() {
+        var errURL = ""
+
+        (errURL, transactionDirURL)  = makeFileURL(pathFileDir: txtTransationFolder.stringValue, fileName: "")
+        if !errURL.isEmpty {
+            lblErrMsg.stringValue = "Transaction" + errURL
+            return
+        }
+
+        (errURL,  outputFileURL)  = makeFileURL(pathFileDir: txtOutputFolder.stringValue, fileName: myFileNameOut)
+        if !errURL.isEmpty {
+            lblErrMsg.stringValue = "Output" + errURL
+            return
+        }
+        (errURL,  categoryFileURL)  = makeFileURL(pathFileDir: txtCategoryFolder.stringValue, fileName: categoryFilename)
+        if !errURL.isEmpty {
+            lblErrMsg.stringValue = "Category" + errURL
+            return
+        }
+
         Stats.clearAll()
         var fileContents    = ""                        // Where All Transactions in a File go
         var lineItemArray   = [LineItem]()
@@ -134,14 +158,14 @@ class ViewController: NSViewController, NSWindowDelegate {
             }
         }//next fileURL
         
-        outputTranactions(workingFolderUrl: workingFolderUrl, fileName: myFileNameOut, lineItemArray: lineItemArray)
+        outputTranactions(outputFileURL: outputFileURL, lineItemArray: lineItemArray)
         let uniqueCategoryCountsSorted = uniqueCategoryCounts.sorted(by: <)
         print("\nuniqueCategoryCountsSorted by key")
         print (uniqueCategoryCountsSorted)
         print("\nuniqueCategoryCounts.sorted by value")
         print (uniqueCategoryCounts.sorted {$0.value > $1.value})
 
-        writeCategoriesToFile(workingFolderUrl: workingFolderUrl, fileName: catagoryFilename, dictCat: dictCategory)
+        writeCategoriesToFile(categoryFileURL: categoryFileURL, dictCat: dictCategory)
         var statString = ""
         statString += "\(Stats.transFileCount) Files Processed."
         if Stats.junkFileCount > 0 {
@@ -151,7 +175,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         statString += "\n Of These:"
         statString += "\n(a) \(Stats.successfulLookupCount) were found in Category File."
         statString += "\n      (b) \(Stats.addedCatCount) were inserted into Category File."
-        statString += "\n     (c) \(Stats.descWithNoCat) still have no Catagory assigned."
+        statString += "\n     (c) \(Stats.descWithNoCat) still have no Category assigned."
         lblResults.stringValue = statString
         
     }// End of func main

@@ -8,6 +8,26 @@
 
 import Foundation
 
+//MARK:- Globals
+
+//MARK:- Functions
+
+// Creates FileURL or returns an error message
+func makeFileURL(pathFileDir: String, fileName: String) -> (String, URL) {
+    let fileManager = FileManager.default
+    let homeURL = fileManager.homeDirectoryForCurrentUser
+    let dirURL = homeURL.appendingPathComponent(pathFileDir)
+
+    var isDirectory: ObjCBool = false
+    if fileManager.fileExists(atPath: dirURL.path, isDirectory: &isDirectory) {
+        print("😀 \(dirURL.path) exists")
+        let fileURL = dirURL.appendingPathComponent(fileName)
+        return ("", fileURL)
+    }
+    print("⛔️ \(dirURL.path) does NOT exist!")
+    return (" Folder \"\(dirURL.path)\" does NOT exist!", dirURL)
+}
+
 //------ getContentsOf(directoryURL:)
 ///Get URLs for Contents Of DirectoryURL
 /// - Parameter dirURL: DirectoryURL (URL)
@@ -64,14 +84,12 @@ public struct FileAttributes: Equatable {
 }// end struct FileAttributes
 
 
-func loadCategories(workingFolderUrl: URL, fileName: String) -> [String: CategoryItem]  {
+func loadCategories(categoryFileURL: URL) -> [String: CategoryItem]  {
     var dictCat   = [String: CategoryItem]()
 
-    let fileCategoriesURL = workingFolderUrl.appendingPathComponent(fileName)
-    
     // Get data in "CategoryLookup" if there is any. If NIL set to Empty.
     //let contentof = (try? String(contentsOfFile: filePathCategories)) ?? ""
-    let contentof = (try? String(contentsOf: fileCategoriesURL)) ?? ""
+    let contentof = (try? String(contentsOf: categoryFileURL)) ?? ""
     let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
     
     // For each line in "CategoryLookup"
@@ -84,7 +102,7 @@ func loadCategories(workingFolderUrl: URL, fileName: String) -> [String: Categor
         // Create an Array of line components the seperator being a ","
         let categoryArray = line.components(separatedBy: ",")
         if categoryArray.count != 3 {
-            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .display, fileName: fileName, dataLineNum: lineNum, lineText: line, errorMsg: "Expected 2 commas per line")
+            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .display, fileName: categoryFileURL.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "Expected 2 commas per line")
             continue
         }
         // Create a var "description" containing the first "descKeyLength" charcters of column 0 after having compressed out spaces. This will be the KEY into the CategoryLookup Table/Dictionary.
@@ -105,28 +123,25 @@ func loadCategories(workingFolderUrl: URL, fileName: String) -> [String: Categor
 
 
 //---- writeCategoriesToFile - uses workingFolderUrl(I), handleError(F)
-func writeCategoriesToFile(workingFolderUrl: URL, fileName: String, dictCat: [String: CategoryItem]) {
+func writeCategoriesToFile(categoryFileURL: URL, dictCat: [String: CategoryItem]) {
     var text = ""
-    let myFileName =  "CategoryLookup.txt"
-    
-    let fileCategoriesURLout = workingFolderUrl.appendingPathComponent(myFileName)
-    
+
     for catItem in dictCat {
         text += "\(catItem.key), \(catItem.value.category),  \(catItem.value.source)\n"
     }
     
     //— writing —
     do {
-        try text.write(to: fileCategoriesURLout, atomically: false, encoding: .utf8)
-        print("\n😀 Successfully wrote \(dictCat.count) items to: \(fileCategoriesURLout.path)")
+        try text.write(to: categoryFileURL, atomically: false, encoding: .utf8)
+        print("\n😀 Successfully wrote \(dictCat.count) items to: \(categoryFileURL.path)")
     } catch {
         let msg = "Could not write new CategoryLookup file."
-        handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: myFileName, errorMsg: msg)
+        handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: categoryFileURL.lastPathComponent, errorMsg: msg)
     }
 }//end func writeCategoriesToFile
 
 //---- outputTranactions - uses: handleError(F), workingFolderUrl(I)
-func outputTranactions(workingFolderUrl: URL, fileName: String, lineItemArray: [LineItem]) {
+func outputTranactions(outputFileURL: URL, lineItemArray: [LineItem]) {
     
     var outPutStr = "Card Type\tTranDate\tDesc\tDebit\tCredit\tCategory\tRaw Category\tCategory Source\n"
     for xX in lineItemArray {
@@ -134,16 +149,14 @@ func outputTranactions(workingFolderUrl: URL, fileName: String, lineItemArray: [
         outPutStr += text
     }
     
-    let fileUrl = workingFolderUrl.appendingPathComponent(fileName)
-    
     // Copy Entire Output File To Clipboard. This will be used to INSERT INTO EXCEL
     copyStringToClipBoard(textToCopy: outPutStr)
     
     // Write to Output File
     do {
-        try outPutStr.write(to: fileUrl, atomically: false, encoding: .utf8)
+        try outPutStr.write(to: outputFileURL, atomically: false, encoding: .utf8)
     } catch {
-        handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: fileUrl.path, errorMsg: "Write Failed!!!! \(fileUrl.path)")
+        handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: outputFileURL.lastPathComponent, errorMsg: "Write Failed!!!! \(outputFileURL.path)")
     }
  
 }//end func outputTranactions
