@@ -741,7 +741,7 @@ DQ
                                     <action selector="btnStartClick:" target="XfG-lQ-9wD" id="w7y-FJ-TqH"/>
                                 </connections>
                             </button>
-                            <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MPH-cH-q8h">
+                            <textField verticalHuggingPriority="750" fixedFrame="YES" tag="101" translatesAutoresizingMaskIntoConstraints="NO" id="MPH-cH-q8h">
                                 <rect key="frame" x="164" y="334" width="628" height="22"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="ynX-51-PsY">
@@ -750,7 +750,7 @@ DQ
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="v27-pq-HHL">
+                            <textField verticalHuggingPriority="750" fixedFrame="YES" tag="102" translatesAutoresizingMaskIntoConstraints="NO" id="v27-pq-HHL">
                                 <rect key="frame" x="164" y="302" width="628" height="22"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="ubX-g8-xOS">
@@ -759,7 +759,7 @@ DQ
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="J1U-oB-kQd">
+                            <textField verticalHuggingPriority="750" fixedFrame="YES" tag="103" translatesAutoresizingMaskIntoConstraints="NO" id="J1U-oB-kQd">
                                 <rect key="frame" x="164" y="270" width="628" height="22"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="Jt4-Xq-oyq">

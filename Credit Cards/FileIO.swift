@@ -13,7 +13,7 @@ import Foundation
 //MARK:- Functions
 
 // Creates FileURL or returns an error message
-func makeFileURL(pathFileDir: String, fileName: String) -> (String, URL) {
+func makeFileURL(pathFileDir: String, fileName: String) -> (URL, String) {
     let fileManager = FileManager.default
     let homeURL = fileManager.homeDirectoryForCurrentUser
     let dirURL = homeURL.appendingPathComponent(pathFileDir)
@@ -22,10 +22,10 @@ func makeFileURL(pathFileDir: String, fileName: String) -> (String, URL) {
     if fileManager.fileExists(atPath: dirURL.path, isDirectory: &isDirectory) {
         //print("😀 \(#line) \(dirURL.path) exists")
         let fileURL = dirURL.appendingPathComponent(fileName)
-        return ("", fileURL)
+        return (fileURL, "")
     }
     //print("⛔️ \(#line) \(dirURL.path) does NOT exist!")
-    return (" Folder \"\(dirURL.path)\" does NOT exist!", dirURL)
+    return (dirURL, " Folder \"\(dirURL.path)\" does NOT exist!")
 }
 
 //------ getContentsOf(directoryURL:)
@@ -105,18 +105,18 @@ func loadCategories(categoryFileURL: URL) -> [String: CategoryItem]  {
             handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .display, fileName: categoryFileURL.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "Expected 2 commas per line")
             continue
         }
-        // Create a var "description" containing the first "descKeyLength" charcters of column 0 after having compressed out spaces. This will be the KEY into the CategoryLookup Table/Dictionary.
-        //            let description = String(categoryArray[0].replacingOccurrences(of: " ", with: "").uppercased().prefix(descKeyLength))
+        // Create a var "descKey" containing the first "descKeyLength" charcters of column 0 after having compressed out spaces. This will be the KEY into the CategoryLookup Table/Dictionary.
+        //            let descKey = String(categoryArray[0].replacingOccurrences(of: " ", with: "").uppercased().prefix(descKeyLength))
         
-        let description = String(categoryArray[0].replacingOccurrences(of: "["+descKeysuppressionList+"]", with: "", options: .regularExpression, range: nil).uppercased().prefix(descKeyLength))
-        
+        //let descKey = String(categoryArray[0].replacingOccurrences(of: "["+descKeysuppressionList+"]", with: "", options: .regularExpression, range: nil).uppercased().prefix(descKeyLength))
+        let descKey = makeDescKey(from: categoryArray[0])
         let category = categoryArray[1].trimmingCharacters(in: .whitespaces) //drop leading and trailing white space
         let source = categoryArray[2].trim.replacingOccurrences(of: "\"", with: "")
         let categoryItem = CategoryItem(category: category, source: source)
-        dictCat[description] = categoryItem
+        dictCat[descKey] = categoryItem
         
     }
-    print("\(dictCat.count) Items Read into Category dictionary")
+    print("\(dictCat.count) Items Read into Category dictionary from: \(categoryFileURL.path)")
     
     return dictCat
 }//end func loadCategories

@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+// struct for handling counts
 struct Stats {
     static var transFileCount        = 0    // Transaction files read
     static var junkFileCount         = 0    // Files in folder not read

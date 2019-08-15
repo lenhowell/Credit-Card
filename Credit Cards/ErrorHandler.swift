@@ -12,6 +12,13 @@
 
 import Foundation
 
+public enum notificationName {
+    static let errPosted = "ErrorPosted"
+}
+public enum notificationKey {
+    static let errMsg = "ErrMsg"
+}
+
 public enum ErrAction {
     case printOnly, display, alert, alertAndDisplay
 }
@@ -45,7 +52,7 @@ func handleError(codeFile: String, codeLineNum: Int, type: ErrType, action: ErrA
     //print("ErrMsg: \"\(errMsg)\" sent by ErrorHandler to NotificationCenter")
     //Note: it is preferable to define your notification names as static strings in an enum or struct to avoid typos.
 
-    NotificationCenter.default.post(name: NSNotification.Name("ErrorPosted"), object: nil, userInfo: ["ErrMsg": errMsg])
+    NotificationCenter.default.post(name: NSNotification.Name(notificationName.errPosted), object: nil, userInfo: [notificationKey.errMsg: errMsg])
 
 }
 

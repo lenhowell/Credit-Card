@@ -41,3 +41,10 @@ public func getTransFileList(transDirURL: URL) -> [URL] {
     }
     return []
 }
+
+// Uses Globals: descKeysuppressionList, descKeyLength, descKeySeparator
+public func makeDescKey(from desc: String) -> String {
+    let descKeyLong = desc.replacingOccurrences(of: "["+descKeysuppressionList+"]", with: "", options: .regularExpression, range: nil)
+    let descKey = String(descKeyLong.prefix(descKeyLength))         // Truncate
+    return descKey
+}

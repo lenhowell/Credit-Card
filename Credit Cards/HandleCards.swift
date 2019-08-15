@@ -123,15 +123,17 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
 
         lineItem.cardType = cardType
         lineItem.genCat = ""                            // Initialze the Generated Category
-        var key = lineItem.desc.uppercased()
-        key = key.replacingOccurrences(of: "["+descKeysuppressionList+"]", with: "", options: .regularExpression, range: nil)
-        key = String(key.prefix(descKeyLength))         // Truncate
-        if !key.isEmpty {
-            if let catItem = dictCategory[key] {
+        var descKey = lineItem.desc.uppercased()
+//        descKey = descKey.replacingOccurrences(of: "["+descKeysuppressionList+"]", with: "", options: .regularExpression, range: nil)
+//        descKey = String(descKey.prefix(descKeyLength))         // Truncate
+        descKey = makeDescKey(from: descKey)
+
+        if !descKey.isEmpty {
+            if let catItem = dictCategory[descKey] {
                 lineItem.genCat = catItem.category      // Here if Lookup of KEY was successful
                 lineItem.catSource = catItem.source
                 Stats.successfulLookupCount += 1
-                uniqueCategoryCounts[key, default: 0] += 1
+                uniqueCategoryCounts[descKey, default: 0] += 1
             } else {
                 let source = cardType                   // Here if NOT in Category Dictionary
                 //print("          Did Not Find ",key)
@@ -141,7 +143,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
                     let rawCat = catItem.category
 
                     if rawCat.count >= 3 {
-                        dictCategory[key] = catItem //Do Actual Insert
+                        dictCategory[descKey] = catItem //Do Actual Insert
                         Stats.addedCatCount += 1
                         // print("Category that was inserted = Key==> \(key) Value ==> \(lineItem.rawCat) Source ==> \(source)")
                     } else {

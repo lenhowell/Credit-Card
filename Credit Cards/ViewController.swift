@@ -15,6 +15,7 @@ import Cocoa
 // Global Constants
 let descKeysuppressionList = "& \";'`.#*-"      //Const used in: loadCategories, handleCards
 let descKeyLength          = 8                  //Const used in: loadCategories, handleCards
+let descKeySeparator       = ""                 //Const used in: loadCategories, handleCards
 
 // Global Variables
 var dictCategory            = [String: CategoryItem]()  // Hash For Category Lookup
@@ -48,34 +49,40 @@ class ViewController: NSViewController, NSWindowDelegate {
         // Create NotificationCenter Observer to listen for post from handleError
         NotificationCenter.default.addObserver( self,
                                                 selector: #selector(self.errorPostedFromNotification(_:)),
-                                                name:     NSNotification.Name(rawValue: "ErrorPosted"),
+                                                name:     NSNotification.Name(notificationName.errPosted),
                                                 object:   nil
         )
 
         if let dir = UserDefaults.standard.string(forKey: UDKey.categoryFolder) {
-            pathCategoryDir = dir
+            if !dir.isEmpty { pathCategoryDir = dir }
         }
         pathOutputDir       = UserDefaults.standard.string(forKey: UDKey.outputFolder) ?? pathOutputDir
         pathTransactionDir  = UserDefaults.standard.string(forKey: UDKey.transactionFolder) ?? pathTransactionDir
 
-        var errURL = ""
-        (errURL, transactionDirURL)  = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
-        if !errURL.isEmpty {
-            lblErrMsg.stringValue = "Transaction" + errURL
-            return
+        var errTxt = ""
+        (transactionDirURL, errTxt)  = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
+        if !errTxt.isEmpty {
+            lblErrMsg.stringValue = "Transaction" + errTxt
         }
+
+        (categoryFileURL, errTxt)  = makeFileURL(pathFileDir: pathCategoryDir, fileName: categoryFilename)
+        if !errTxt.isEmpty {
+            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Category" + errTxt)
+        }
+        dictCategory = loadCategories(categoryFileURL: categoryFileURL) // Build Categories Dictionary
+
         getTransFileList(transDirURL: transactionDirURL)
 
         // Show on Screen
         txtOutputFolder.stringValue     = pathOutputDir
         txtCategoryFolder.stringValue   = pathCategoryDir
         txtTransationFolder.stringValue = pathTransactionDir
+
+        txtTransationFolder.delegate = self         // Allow ViewController to see when txtTransationFolder changes.
     }
     
     override func viewDidAppear() {
         self.view.window?.delegate = self
-
-        dictCategory = loadCategories(categoryFileURL: categoryFileURL) // Build Categories Dictionary
     }
     
     override var representedObject: Any? {
@@ -83,10 +90,19 @@ class ViewController: NSViewController, NSWindowDelegate {
             // Update the view, if already loaded.
         }
     }
-    
+
     func windowShouldClose(_ sender: NSWindow) -> Bool {
         NSApplication.shared.terminate(self)
         return true
+    }
+
+    //MARK:- Notification Center functions
+
+    // Called by NotificationCenter Observer getting post from handleError. Sets lblErrMsg
+    @objc func errorPostedFromNotification(_ notification: Notification) {
+        guard let msg = notification.userInfo?[notificationKey.errMsg] as? String else { return }
+        lblErrMsg.stringValue = msg
+        //print ("ErrMsg: \"\(msg)\" received from ErrorHandler via NotificationCenter")
     }
 
     //MARK:- @IBActions
@@ -107,25 +123,25 @@ class ViewController: NSViewController, NSWindowDelegate {
     //MARK:- Main Program
     
     func main() {
-        var errURL = ""
+        var errTxt = ""
 
         pathTransactionDir = txtTransationFolder.stringValue
-        (errURL, transactionDirURL)  = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
-        if !errURL.isEmpty {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Transaction" + errURL)
+        (transactionDirURL, errTxt)  = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
+        if !errTxt.isEmpty {
+            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Transaction" + errTxt)
             return
         }
 
         pathOutputDir = txtOutputFolder.stringValue
-        (errURL,  outputFileURL)  = makeFileURL(pathFileDir: pathOutputDir, fileName: myFileNameOut)
-        if !errURL.isEmpty {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Output" + errURL)
+        (outputFileURL, errTxt)  = makeFileURL(pathFileDir: pathOutputDir, fileName: myFileNameOut)
+        if !errTxt.isEmpty {
+            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Output" + errTxt)
             return
         }
         pathCategoryDir = txtCategoryFolder.stringValue
-        (errURL,  categoryFileURL)  = makeFileURL(pathFileDir: pathCategoryDir, fileName: categoryFilename)
-        if !errURL.isEmpty {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Category" + errURL)
+        (categoryFileURL, errTxt)  = makeFileURL(pathFileDir: pathCategoryDir, fileName: categoryFilename)
+        if !errTxt.isEmpty {
+            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Category" + errTxt)
             return
         }
 
@@ -202,15 +218,29 @@ class ViewController: NSViewController, NSWindowDelegate {
         lblResults.stringValue = statString
         
     }// End of func main
-    
-    
-    //MARK:- Support Functions
-    
-    // Called by NotificationCenter Observer getting post from handleError. Sets lblErrMsg
-    @objc func errorPostedFromNotification(_ notification: Notification) {
-        guard let msg = notification.userInfo?["ErrMsg"] as? String else { return }
-        lblErrMsg.stringValue = msg
-        //print ("ErrMsg: \"\(msg)\" received from ErrorHandler via NotificationCenter")
-    }
 
 }//end class ViewController
+
+// Allow ViewController to see when a TextField changes.
+extension ViewController: NSTextFieldDelegate {
+
+    //---- controlTextDidChange - Called when a textField (with ViewController as its delegate) changes.
+    func controlTextDidChange(_ obj: Notification) {
+        guard let textView = obj.object as? NSTextField else {
+            return
+        }
+        var errText = ""
+        pathTransactionDir = txtTransationFolder.stringValue
+        (transactionDirURL, errText)  = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
+        if errText.isEmpty {
+            lblErrMsg.stringValue = ""
+            btnStart.isEnabled = true
+            //TODO: Add code here to list trans files
+        } else {
+            lblErrMsg.stringValue = txtTransationFolder.stringValue + " does not exist!"
+            btnStart.isEnabled = false
+        }
+        print("Trans Folder changed to: \"\(textView.stringValue)\"")
+    }
+
+}//end extension ViewController: NSTextFieldDelegate
