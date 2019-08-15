@@ -11,9 +11,8 @@ import Foundation
 //---- handleCards -
 // uses Global Vars: descKeyLength(const), descKeysuppressionList(const)
 //                   dictCategory(I/O), successfulLookupCount(I/O), addedCatCount(I/O)
-func handleCards(fileName: String, cardArray: [String]) -> [LineItem] {
+func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [LineItem] {
     let startTime = CFAbsoluteTimeGetCurrent()
-    let cardType = String(fileName.prefix(3).uppercased())
     let cardArrayCount = cardArray.count
     var lineItemArray = [LineItem]()                // Create Array variable(lineItemArray) Type lineItem.
 

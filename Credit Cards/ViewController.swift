@@ -52,12 +52,19 @@ class ViewController: NSViewController, NSWindowDelegate {
                                                 object:   nil
         )
 
-        pathTransactionDir  = UserDefaults.standard.string(forKey: UDKey.transactionFolder) ?? pathTransactionDir
         if let dir = UserDefaults.standard.string(forKey: UDKey.categoryFolder) {
             pathCategoryDir = dir
         }
         pathOutputDir       = UserDefaults.standard.string(forKey: UDKey.outputFolder) ?? pathOutputDir
+        pathTransactionDir  = UserDefaults.standard.string(forKey: UDKey.transactionFolder) ?? pathTransactionDir
 
+        var errURL = ""
+        (errURL, transactionDirURL)  = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
+        if !errURL.isEmpty {
+            lblErrMsg.stringValue = "Transaction" + errURL
+            return
+        }
+        getTransFileList(transDirURL: transactionDirURL)
 
         // Show on Screen
         txtOutputFolder.stringValue     = pathOutputDir
@@ -147,7 +154,8 @@ class ViewController: NSViewController, NSWindowDelegate {
         
         for fileURL in fileURLs {
             let fileName = fileURL.lastPathComponent
-            let cardType = fileName.prefix(3).uppercased()
+            let nameComps = fileName.components(separatedBy: "-")
+            let cardType = nameComps[0].uppercased()
             //— reading —    // macOSRoman is more forgiving than utf8
             // If File exists/isReadable is checked in the "do/catch" block
             let fileAttributes = FileAttributes.getFileInfo(url: fileURL)
@@ -165,8 +173,8 @@ class ViewController: NSViewController, NSWindowDelegate {
             
             // Check which Credit Card Transactions we are currently processing
             switch cardType {
-            case "C1V", "C1R", "DIS", "CIT":
-                lineItemArray += handleCards(fileName: fileName, cardArray: cardArray)
+            case "C1V", "C1R", "DIS", "CIT", "BACT":
+                lineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray)
                 Stats.transFileCount += 1
             default:
                 Stats.junkFileCount += 1
