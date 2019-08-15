@@ -16,7 +16,7 @@ public enum ErrAction {
     case printOnly, display, alert, alertAndDisplay
 }
 public enum ErrType {
-    case codeFatal, dataFatal, codeError, dataError, codeWarning, dataWarning
+    case codeFatal, dataFatal, codeError, dataError, codeWarning, dataWarning, note
 }
 
 //---- handleError - Must remain in ViewController because it sets lblErrMsg.stringValue
@@ -26,20 +26,25 @@ func handleError(codeFile: String, codeLineNum: Int, type: ErrType, action: ErrA
     let icon: String
     if type == .codeWarning || type == .dataWarning {
         icon = "⚠️ Warning"
+    } else if type == .note {
+        icon = "➡️ Note"
     } else {
         icon = "⛔️ Error"
     }
 
     print("\n\(icon) @\(codeFile)#\(codeLineNum): \(errorMsg)")
     if !fileName.isEmpty {
-        print("       \(fileName) \(numberText) \"\(lineText)\"")
+        var text = "      \(fileName) \(numberText): "
+        if lineText.count > 120 { text += "\n      "}
+        text += "\(lineText)\""
+        print("\(text)")
     }
-    //lblErrMsg.stringValue = fileName + " " + errorMsg
+    print()
 
     let errMsg = fileName + " " + errorMsg
     //print("ErrMsg: \"\(errMsg)\" sent by ErrorHandler to NotificationCenter")
-    //Note: it is preferable to define your notification names as static strings that belong
-    //to a class or struct or other global form, so that you don't make a typo and introduce bugs.
+    //Note: it is preferable to define your notification names as static strings in an enum or struct to avoid typos.
+
     NotificationCenter.default.post(name: NSNotification.Name("ErrorPosted"), object: nil, userInfo: ["ErrMsg": errMsg])
 
 }

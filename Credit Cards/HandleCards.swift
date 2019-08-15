@@ -97,7 +97,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
         if let colNum = dictColNums["DESC"] {
             lineItem.desc = columns[colNum].replacingOccurrences(of: "\"", with: "")
             if lineItem.desc.trim.isEmpty {
-                print("\(#line)\n\(transaction)")
+                print("HandleCards #\(#line) - Empty Description\n\(transaction)")
             }
         }
         if let colNum = dictColNums["CARD"] {

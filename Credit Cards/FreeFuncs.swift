@@ -27,11 +27,14 @@ public func getStringFromClipBoard() -> String {
 }
 
 public func getTransFileList(transDirURL: URL) -> [URL] {
+    print("\nFreeFuncs.getTransFileList \(#line)")
     do {
         let fileURLs = try FileManager.default.contentsOfDirectory(at: transDirURL, includingPropertiesForKeys: [], options:  [.skipsHiddenFiles, .skipsSubdirectoryDescendants])
         let csvURLs = fileURLs.filter{ $0.pathExtension.lowercased() == "csv" }
         let transURLs = csvURLs.filter{ $0.lastPathComponent.components(separatedBy: "-")[0].count <= 6 }
+        print("\(transURLs.count) Transaction Files found.")
         print(transURLs)
+        print()
         return transURLs
     } catch {
         print(error)

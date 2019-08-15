@@ -20,11 +20,11 @@ func makeFileURL(pathFileDir: String, fileName: String) -> (String, URL) {
 
     var isDirectory: ObjCBool = false
     if fileManager.fileExists(atPath: dirURL.path, isDirectory: &isDirectory) {
-        print("😀 \(dirURL.path) exists")
+        //print("😀 \(#line) \(dirURL.path) exists")
         let fileURL = dirURL.appendingPathComponent(fileName)
         return ("", fileURL)
     }
-    print("⛔️ \(dirURL.path) does NOT exist!")
+    //print("⛔️ \(#line) \(dirURL.path) does NOT exist!")
     return (" Folder \"\(dirURL.path)\" does NOT exist!", dirURL)
 }
 

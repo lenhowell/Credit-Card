@@ -112,20 +112,20 @@ class ViewController: NSViewController, NSWindowDelegate {
         pathTransactionDir = txtTransationFolder.stringValue
         (errURL, transactionDirURL)  = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
         if !errURL.isEmpty {
-            lblErrMsg.stringValue = "Transaction" + errURL
+            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Transaction" + errURL)
             return
         }
 
         pathOutputDir = txtOutputFolder.stringValue
         (errURL,  outputFileURL)  = makeFileURL(pathFileDir: pathOutputDir, fileName: myFileNameOut)
         if !errURL.isEmpty {
-            lblErrMsg.stringValue = "Output" + errURL
+            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Output" + errURL)
             return
         }
         pathCategoryDir = txtCategoryFolder.stringValue
         (errURL,  categoryFileURL)  = makeFileURL(pathFileDir: pathCategoryDir, fileName: categoryFilename)
         if !errURL.isEmpty {
-            lblErrMsg.stringValue = "Category" + errURL
+            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Category" + errURL)
             return
         }
 
@@ -183,9 +183,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         
         outputTranactions(outputFileURL: outputFileURL, lineItemArray: lineItemArray)
         let uniqueCategoryCountsSorted = uniqueCategoryCounts.sorted(by: <)
-        print("\nuniqueCategoryCountsSorted by key")
+        print("\nuniqueCategoryCountsSorted by description (vendor)")
         print (uniqueCategoryCountsSorted)
-        print("\nuniqueCategoryCounts.sorted by value")
+        print("\nuniqueCategoryCounts.sorted by count")
         print (uniqueCategoryCounts.sorted {$0.value > $1.value})
 
         writeCategoriesToFile(categoryFileURL: categoryFileURL, dictCat: dictCategory)
