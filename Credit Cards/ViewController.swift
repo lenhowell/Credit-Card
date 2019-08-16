@@ -130,10 +130,14 @@ class ViewController: NSViewController, NSWindowDelegate {
     @IBOutlet var txtOutputFolder: NSTextField!
     @IBOutlet var lblTranFileCount: NSTextField!
     @IBOutlet var cboFiles: NSComboBox!
+    @IBOutlet var lblRunTime: NSTextField!
     
     //MARK:- Main Program
     
     func main() {
+        lblRunTime.stringValue = ""
+        let startTime = CFAbsoluteTimeGetCurrent()
+
         var errTxt = ""
 
         pathTransactionDir = txtTransationFolder.stringValue
@@ -208,7 +212,7 @@ class ViewController: NSViewController, NSWindowDelegate {
                 Stats.junkFileCount += 1
             }
         }//next fileURL
-        
+
         outputTranactions(outputFileURL: outputFileURL, lineItemArray: lineItemArray)
         let uniqueCategoryCountsSorted = uniqueCategoryCounts.sorted(by: <)
         print("\n\(uniqueCategoryCounts.count) uniqueCategoryCountsSorted by description (vendor)")
@@ -229,6 +233,12 @@ class ViewController: NSViewController, NSWindowDelegate {
         statString += "\n     (c) \(Stats.descWithNoCat) still have no Category assigned."
         lblResults.stringValue = statString
         
+        let endTime   = CFAbsoluteTimeGetCurrent()
+        let runtime = endTime - startTime
+        print(String(format: "Runtime %5.02f sec", runtime))
+        lblRunTime.stringValue = String(format: "Runtime %5.02f sec", runtime)
+        print()
+
     }// End of func main
 
     //------ loadComboBoxFiles - Read Trk filenames and load ComboBoxFiles with Recent, Not-done, & Outdated files

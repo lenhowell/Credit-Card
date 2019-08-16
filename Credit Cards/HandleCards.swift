@@ -12,7 +12,6 @@ import Foundation
 // uses Global Vars: descKeyLength(const), descKeysuppressionList(const)
 //                   dictCategory(I/O), successfulLookupCount(I/O), addedCatCount(I/O)
 func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [LineItem] {
-    let startTime = CFAbsoluteTimeGetCurrent()
     let cardArrayCount = cardArray.count
     var lineItemArray = [LineItem]()                // Create Array variable(lineItemArray) Type lineItem.
 
@@ -157,10 +156,6 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
             lineItemArray.append(lineItem)          // Add new output Record to be output
         }
     }// End of FOR loop
-
-    let endTime   = CFAbsoluteTimeGetCurrent()
-    print(String(format: "handleCards runtime %5.02f sec", endTime-startTime))
-    print()
 
     return lineItemArray
 }//end func handleCards
