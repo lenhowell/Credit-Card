@@ -795,6 +795,29 @@ DQ
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZKE-KE-nfA">
+                                <rect key="frame" x="562" y="237" width="232" height="17"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" placeholderString="xxxx Tranaction files" id="XUt-Ta-5bs">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <comboBox verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bRm-TN-6sx">
+                                <rect key="frame" x="564" y="205" width="231" height="26"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="fileName.csv" drawsBackground="YES" completes="NO" numberOfVisibleItems="5" id="Nqw-uu-5Go">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <objectValues>
+                                        <string>Item 1</string>
+                                        <string>Item 2</string>
+                                        <string>Item 3</string>
+                                    </objectValues>
+                                </comboBoxCell>
+                            </comboBox>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="TDc-PY-HdN" secondAttribute="trailing" constant="8" id="Ggb-41-9LR"/>
@@ -809,8 +832,10 @@ DQ
                     </view>
                     <connections>
                         <outlet property="btnStart" destination="D0v-vZ-h7M" id="pu9-yt-ERf"/>
+                        <outlet property="cboFiles" destination="bRm-TN-6sx" id="4AR-IO-NWm"/>
                         <outlet property="lblErrMsg" destination="TDc-PY-HdN" id="hgE-qK-RAf"/>
                         <outlet property="lblResults" destination="ud1-Xt-qfO" id="w7R-1s-rYd"/>
+                        <outlet property="lblTranFileCount" destination="ZKE-KE-nfA" id="SDp-c9-hE7"/>
                         <outlet property="txtCategoryFolder" destination="v27-pq-HHL" id="W73-Zr-6Qo"/>
                         <outlet property="txtOutputFolder" destination="J1U-oB-kQd" id="9tC-BW-XFl"/>
                         <outlet property="txtTransationFolder" destination="MPH-cH-q8h" id="8F2-kM-GWD"/>

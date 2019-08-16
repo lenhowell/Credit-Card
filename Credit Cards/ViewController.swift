@@ -32,6 +32,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     // Variables
     var containsDictionary  = [String: String]()        // String: is the Key - Generated Category
+    var transFileURLs       = [URL]()
     var pathTransactionDir  = "Downloads/Credit Card Trans"
     var pathCategoryDir     = "Desktop/Credit Card Files"
     var pathOutputDir       = "Desktop/Credit Card Files"
@@ -61,7 +62,17 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         var errTxt = ""
         (transactionDirURL, errTxt)  = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
-        if !errTxt.isEmpty {
+        if errTxt.isEmpty {
+            transFileURLs = getTransFileList(transDirURL: transactionDirURL)
+            cboFiles.isHidden = false
+            loadComboBoxFiles(fileURLs: transFileURLs)
+            lblTranFileCount.stringValue = "\(transFileURLs.count) Transaction \("file".pluralize(transFileURLs.count))"
+            lblErrMsg.stringValue = ""
+        } else {
+            transFileURLs = []
+            cboFiles.isHidden = true
+            loadComboBoxFiles(fileURLs: transFileURLs)
+            lblTranFileCount.stringValue = "---"
             lblErrMsg.stringValue = "Transaction" + errTxt
         }
 
@@ -70,8 +81,6 @@ class ViewController: NSViewController, NSWindowDelegate {
             handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Category" + errTxt)
         }
         dictCategory = loadCategories(categoryFileURL: categoryFileURL) // Build Categories Dictionary
-
-        getTransFileList(transDirURL: transactionDirURL)
 
         // Show on Screen
         txtOutputFolder.stringValue     = pathOutputDir
@@ -119,6 +128,8 @@ class ViewController: NSViewController, NSWindowDelegate {
     @IBOutlet var txtTransationFolder: NSTextField!
     @IBOutlet var txtCategoryFolder: NSTextField!
     @IBOutlet var txtOutputFolder: NSTextField!
+    @IBOutlet var lblTranFileCount: NSTextField!
+    @IBOutlet var cboFiles: NSComboBox!
     
     //MARK:- Main Program
     
@@ -155,19 +166,20 @@ class ViewController: NSViewController, NSWindowDelegate {
         var lineItemArray   = [LineItem]()
         lblErrMsg.stringValue = ""
         
-        guard let downloadsPath = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first else {
-            // Here if Path to Input File is NOT valid, Put Out Error Message and Exit Program
-            lblErrMsg.stringValue = "Directory Path to Target File Does Not Exist!!!!"
-            return
+        if !FileManager.default.fileExists(atPath: transactionDirURL.path) {
+            handleError(codeFile: "ViewController", codeLineNum: #line, type: .codeError, action: .alertAndDisplay,  fileName: transactionDirURL.path, dataLineNum: 0, lineText: "", errorMsg: "Directory does not exist")
         }
 
-        // We are here if Path is Valid
-        let dir = downloadsPath.appendingPathComponent("Credit Card Trans") // Append FileName To Path
-        if !FileManager.default.fileExists(atPath: dir.path) {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .codeError, action: .alertAndDisplay,  fileName: dir.path, dataLineNum: 0, lineText: "", errorMsg: "Directory does not exist")
+        let fileURLs: [URL]
+        let shown = cboFiles.stringValue.trim
+        if shown == "-all-" {
+            fileURLs = transFileURLs
+        } else {
+            let nameWithExt = shown + ".csv"
+            let fileURL = transactionDirURL.appendingPathComponent(nameWithExt)
+            fileURLs = [fileURL]
         }
-        let fileURLs = getContentsOf(dirURL: dir)
-        
+
         for fileURL in fileURLs {
             let fileName = fileURL.lastPathComponent
             let nameComps = fileName.components(separatedBy: "-")
@@ -189,7 +201,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             
             // Check which Credit Card Transactions we are currently processing
             switch cardType {
-            case "C1V", "C1R", "DIS", "CIT", "BACT":
+            case "C1V", "C1R", "DIS", "CIT", "BACT", "ML":
                 lineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray)
                 Stats.transFileCount += 1
             default:
@@ -199,9 +211,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         
         outputTranactions(outputFileURL: outputFileURL, lineItemArray: lineItemArray)
         let uniqueCategoryCountsSorted = uniqueCategoryCounts.sorted(by: <)
-        print("\nuniqueCategoryCountsSorted by description (vendor)")
+        print("\n\(uniqueCategoryCounts.count) uniqueCategoryCountsSorted by description (vendor)")
         print (uniqueCategoryCountsSorted)
-        print("\nuniqueCategoryCounts.sorted by count")
+        print("\n\(uniqueCategoryCounts.count) uniqueCategoryCounts.sorted by count")
         print (uniqueCategoryCounts.sorted {$0.value > $1.value})
 
         writeCategoriesToFile(categoryFileURL: categoryFileURL, dictCat: dictCategory)
@@ -219,6 +231,17 @@ class ViewController: NSViewController, NSWindowDelegate {
         
     }// End of func main
 
+    //------ loadComboBoxFiles - Read Trk filenames and load ComboBoxFiles with Recent, Not-done, & Outdated files
+    private func loadComboBoxFiles(fileURLs: [URL]) {          // 555-637 = 82 lines
+        let fileNames = fileURLs.map { $0.deletingPathExtension().lastPathComponent }
+        cboFiles.removeAllItems()
+        cboFiles.stringValue = "-all-"
+        cboFiles.addItem(withObjectValue: "-all-")
+        cboFiles.addItems(withObjectValues: fileNames)
+
+        print("🤣cboFiles has \(cboFiles.numberOfItems) items.")
+    }//end func loadComboBoxFiles
+
 }//end class ViewController
 
 // Allow ViewController to see when a TextField changes.
@@ -233,12 +256,20 @@ extension ViewController: NSTextFieldDelegate {
         pathTransactionDir = txtTransationFolder.stringValue
         (transactionDirURL, errText)  = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
         if errText.isEmpty {
-            lblErrMsg.stringValue = ""
             btnStart.isEnabled = true
-            //TODO: Add code here to list trans files
+            transFileURLs = getTransFileList(transDirURL: transactionDirURL)
+            loadComboBoxFiles(fileURLs: transFileURLs)
+            cboFiles.isHidden = false
+            lblTranFileCount.stringValue = "\(transFileURLs.count) Transaction \("file".pluralize(transFileURLs.count))"
+            lblErrMsg.stringValue = ""
+
         } else {
-            lblErrMsg.stringValue = txtTransationFolder.stringValue + " does not exist!"
             btnStart.isEnabled = false
+            transFileURLs = []
+            loadComboBoxFiles(fileURLs: transFileURLs)
+            cboFiles.isHidden = true
+            lblTranFileCount.stringValue = "----"
+            lblErrMsg.stringValue = txtTransationFolder.stringValue + " does not exist!"
         }
         print("Trans Folder changed to: \"\(textView.stringValue)\"")
     }

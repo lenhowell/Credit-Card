@@ -54,5 +54,9 @@ func handleError(codeFile: String, codeLineNum: Int, type: ErrType, action: ErrA
 
     NotificationCenter.default.post(name: NSNotification.Name(notificationName.errPosted), object: nil, userInfo: [notificationKey.errMsg: errMsg])
 
+    if action == .alert || action == .alertAndDisplay {
+        _ = GBox.alert(errMsg, style: .information)
+    }
+
 }
 
