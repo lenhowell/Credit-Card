@@ -13,9 +13,6 @@ import Cocoa
 //MARK:- Global Variables
 
 // Global Constants
-let descKeysuppressionList = "& \";'`.#*-"      //Const used in: loadCategories, handleCards
-let descKeyLength          = 8                  //Const used in: loadCategories, handleCards
-let descKeySeparator       = ""                 //Const used in: loadCategories, handleCards
 
 // Global Variables
 var dictCategory            = [String: CategoryItem]()  // Hash For Category Lookup
@@ -219,8 +216,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         print (uniqueCategoryCountsSorted)
         print("\n\(uniqueCategoryCounts.count) uniqueCategoryCounts.sorted by count")
         print (uniqueCategoryCounts.sorted {$0.value > $1.value})
-
-        writeCategoriesToFile(categoryFileURL: categoryFileURL, dictCat: dictCategory)
+        if Stats.addedCatCount > 0 {
+            writeCategoriesToFile(categoryFileURL: categoryFileURL, dictCat: dictCategory)
+        }
         var statString = ""
         statString += "\(Stats.transFileCount) Files Processed."
         if Stats.junkFileCount > 0 {

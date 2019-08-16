@@ -105,11 +105,7 @@ func loadCategories(categoryFileURL: URL) -> [String: CategoryItem]  {
             handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .display, fileName: categoryFileURL.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "Expected 2 commas per line")
             continue
         }
-        // Create a var "descKey" containing the first "descKeyLength" charcters of column 0 after having compressed out spaces. This will be the KEY into the CategoryLookup Table/Dictionary.
-        //            let descKey = String(categoryArray[0].replacingOccurrences(of: " ", with: "").uppercased().prefix(descKeyLength))
-        
-        //let descKey = String(categoryArray[0].replacingOccurrences(of: "["+descKeysuppressionList+"]", with: "", options: .regularExpression, range: nil).uppercased().prefix(descKeyLength))
-        let descKey = makeDescKey(from: categoryArray[0])
+        let descKey = categoryArray[0]      // make-DescKey(from: categoryArray[0])
         let category = categoryArray[1].trimmingCharacters(in: .whitespaces) //drop leading and trailing white space
         let source = categoryArray[2].trim.replacingOccurrences(of: "\"", with: "")
         let categoryItem = CategoryItem(category: category, source: source)
@@ -124,10 +120,33 @@ func loadCategories(categoryFileURL: URL) -> [String: CategoryItem]  {
 
 //---- writeCategoriesToFile - uses workingFolderUrl(I), handleError(F)
 func writeCategoriesToFile(categoryFileURL: URL, dictCat: [String: CategoryItem]) {
+
+    let fileAttributes = FileAttributes.getFileInfo(url: categoryFileURL)
+    let modDate = fileAttributes.modificationDate
+    let oldNameWithExt = categoryFileURL.lastPathComponent
+    let adder = modDate?.ToString("yyyy-MM-dd hhmm") ?? "BU"
+    let nameComps = oldNameWithExt.components(separatedBy: ".")
+    let oldName = nameComps[0]
+    let ext = "." + nameComps[1]
+    let newName = oldName + " " + adder + ext
+    let newPath = categoryFileURL.deletingLastPathComponent().path + "/" + newName
+    do {
+        try FileManager.default.moveItem(atPath: categoryFileURL.path, toPath: newPath)
+    } catch {
+        // print("Error: \(error.localizedDescription)")
+    }
+
+
     var text = ""
 
-    for catItem in dictCat {
+    var prevCat = ""
+    for catItem in dictCat.sorted(by: {$0.key < $1.key}) {
         text += "\(catItem.key), \(catItem.value.category),  \(catItem.value.source)\n"
+        let first8 = String(catItem.key.prefix(8))
+        if first8 == prevCat.prefix(8) {
+            print("😡 \"\(prevCat)\"     \"\(catItem.key)\"")
+        }
+        prevCat = catItem.key
     }
     
     //— writing —

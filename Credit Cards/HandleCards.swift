@@ -9,8 +9,7 @@
 import Foundation
 
 //---- handleCards -
-// uses Global Vars: descKeyLength(const), descKeysuppressionList(const)
-//                   dictCategory(I/O), successfulLookupCount(I/O), addedCatCount(I/O)
+// uses Global Vars: dictCategory(I/O), Stats(I/O)
 func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [LineItem] {
     let cardArrayCount = cardArray.count
     var lineItemArray = [LineItem]()                // Create Array variable(lineItemArray) Type lineItem.
@@ -79,7 +78,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
                 tranArray[i] = ";"      // Comma within a quoted string found, replace with a ";".
             }
         }
-        transaction = String(tranArray).uppercased()    // Covert the Parsed "Array" Item Back to a string
+        transaction = String(tranArray) //.uppercased()    // Covert the Parsed "Array" Item Back to a string
         transaction = transaction.replacingOccurrences(of: "\"", with: "")
         transaction = transaction.replacingOccurrences(of: "\r", with: "")
         let columns = transaction.components(separatedBy: ",")  // Isolate columns within this transaction
@@ -122,9 +121,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
 
         lineItem.cardType = cardType
         lineItem.genCat = ""                            // Initialze the Generated Category
-        var descKey = lineItem.desc.uppercased()
-//        descKey = descKey.replacingOccurrences(of: "["+descKeysuppressionList+"]", with: "", options: .regularExpression, range: nil)
-//        descKey = String(descKey.prefix(descKeyLength))         // Truncate
+        var descKey = lineItem.desc
         descKey = makeDescKey(from: descKey)
 
         if !descKey.isEmpty {
