@@ -7,6 +7,7 @@
 //
 
 import XCTest
+@testable import Credit_Cards
 
 class Credit_CardsUITests: XCTestCase {
 

@@ -121,6 +121,7 @@ func loadCategories(categoryFileURL: URL) -> [String: CategoryItem]  {
 //---- writeCategoriesToFile - uses workingFolderUrl(I), handleError(F)
 func writeCategoriesToFile(categoryFileURL: URL, dictCat: [String: CategoryItem]) {
 
+    // Rename the existing file to "CategoryLookup yyyy-MM-dd hhmm.txt"
     let fileAttributes = FileAttributes.getFileInfo(url: categoryFileURL)
     let modDate = fileAttributes.modificationDate
     let oldNameWithExt = categoryFileURL.lastPathComponent
@@ -135,7 +136,6 @@ func writeCategoriesToFile(categoryFileURL: URL, dictCat: [String: CategoryItem]
     } catch {
         // print("Error: \(error.localizedDescription)")
     }
-
 
     var text = ""
 

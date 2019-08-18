@@ -24,6 +24,7 @@
 		CE5B1E022304E03C00337C2F /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5B1E012304E03C00337C2F /* UserDefaults.swift */; };
 		CE9FFEBB2302F3DF00261390 /* Thoughts.rtf in Resources */ = {isa = PBXBuildFile; fileRef = CE9FFEBA2302F3DF00261390 /* Thoughts.rtf */; };
 		CEA62D302306232C00160DEB /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA62D2F2306232C00160DEB /* Alerts.swift */; };
+		CEB84F282308EB20001485C5 /* Credit_Cards_UnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB84F272308EB20001485C5 /* Credit_Cards_UnitTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +36,13 @@
 			remoteInfo = "Credit Cards";
 		};
 		BF992C6222EE56430089DAB8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF992C3C22EE56410089DAB8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BF992C4322EE56410089DAB8;
+			remoteInfo = "Credit Cards";
+		};
+		CEB84F2A2308EB20001485C5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BF992C3C22EE56410089DAB8 /* Project object */;
 			proxyType = 1;
@@ -69,6 +77,9 @@
 		CE5B1E012304E03C00337C2F /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		CE9FFEBA2302F3DF00261390 /* Thoughts.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Thoughts.rtf; sourceTree = "<group>"; };
 		CEA62D2F2306232C00160DEB /* Alerts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alerts.swift; sourceTree = "<group>"; };
+		CEB84F252308EB20001485C5 /* Credit Cards UnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Credit Cards UnitTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CEB84F272308EB20001485C5 /* Credit_Cards_UnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Credit_Cards_UnitTests.swift; sourceTree = "<group>"; };
+		CEB84F292308EB20001485C5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +104,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CEB84F222308EB20001485C5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -102,6 +120,7 @@
 				BF992C4622EE56410089DAB8 /* Credit Cards */,
 				BF992C5922EE56420089DAB8 /* Credit CardsTests */,
 				BF992C6422EE56430089DAB8 /* Credit CardsUITests */,
+				CEB84F262308EB20001485C5 /* Credit Cards UnitTests */,
 				BF992C4522EE56410089DAB8 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -112,6 +131,7 @@
 				BF992C4422EE56410089DAB8 /* Credit Cards.app */,
 				BF992C5622EE56420089DAB8 /* Credit CardsTests.xctest */,
 				BF992C6122EE56430089DAB8 /* Credit CardsUITests.xctest */,
+				CEB84F252308EB20001485C5 /* Credit Cards UnitTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -157,6 +177,15 @@
 				BF992C6722EE56430089DAB8 /* Info.plist */,
 			);
 			path = "Credit CardsUITests";
+			sourceTree = "<group>";
+		};
+		CEB84F262308EB20001485C5 /* Credit Cards UnitTests */ = {
+			isa = PBXGroup;
+			children = (
+				CEB84F272308EB20001485C5 /* Credit_Cards_UnitTests.swift */,
+				CEB84F292308EB20001485C5 /* Info.plist */,
+			);
+			path = "Credit Cards UnitTests";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -215,6 +244,24 @@
 			productReference = BF992C6122EE56430089DAB8 /* Credit CardsUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		CEB84F242308EB20001485C5 /* Credit Cards UnitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CEB84F2E2308EB20001485C5 /* Build configuration list for PBXNativeTarget "Credit Cards UnitTests" */;
+			buildPhases = (
+				CEB84F212308EB20001485C5 /* Sources */,
+				CEB84F222308EB20001485C5 /* Frameworks */,
+				CEB84F232308EB20001485C5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CEB84F2B2308EB20001485C5 /* PBXTargetDependency */,
+			);
+			name = "Credit Cards UnitTests";
+			productName = "Credit Cards UnitTests";
+			productReference = CEB84F252308EB20001485C5 /* Credit Cards UnitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -241,6 +288,10 @@
 						CreatedOnToolsVersion = 10.3;
 						TestTargetID = BF992C4322EE56410089DAB8;
 					};
+					CEB84F242308EB20001485C5 = {
+						CreatedOnToolsVersion = 10.3;
+						TestTargetID = BF992C4322EE56410089DAB8;
+					};
 				};
 			};
 			buildConfigurationList = BF992C3F22EE56410089DAB8 /* Build configuration list for PBXProject "Credit Cards" */;
@@ -259,6 +310,7 @@
 				BF992C4322EE56410089DAB8 /* Credit Cards */,
 				BF992C5522EE56420089DAB8 /* Credit CardsTests */,
 				BF992C6022EE56430089DAB8 /* Credit CardsUITests */,
+				CEB84F242308EB20001485C5 /* Credit Cards UnitTests */,
 			);
 		};
 /* End PBXProject section */
@@ -282,6 +334,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		BF992C5F22EE56430089DAB8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CEB84F232308EB20001485C5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -326,6 +385,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CEB84F212308EB20001485C5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CEB84F282308EB20001485C5 /* Credit_Cards_UnitTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -338,6 +405,11 @@
 			isa = PBXTargetDependency;
 			target = BF992C4322EE56410089DAB8 /* Credit Cards */;
 			targetProxy = BF992C6222EE56430089DAB8 /* PBXContainerItemProxy */;
+		};
+		CEB84F2B2308EB20001485C5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BF992C4322EE56410089DAB8 /* Credit Cards */;
+			targetProxy = CEB84F2A2308EB20001485C5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -586,6 +658,46 @@
 			};
 			name = Release;
 		};
+		CEB84F2C2308EB20001485C5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = XD8UZ6484B;
+				INFOPLIST_FILE = "Credit Cards UnitTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.georgebauer.Credit-Cards-UnitTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Credit Cards.app/Contents/MacOS/Credit Cards";
+			};
+			name = Debug;
+		};
+		CEB84F2D2308EB20001485C5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = XD8UZ6484B;
+				INFOPLIST_FILE = "Credit Cards UnitTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.georgebauer.Credit-Cards-UnitTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Credit Cards.app/Contents/MacOS/Credit Cards";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -621,6 +733,15 @@
 			buildConfigurations = (
 				BF992C7122EE56430089DAB8 /* Debug */,
 				BF992C7222EE56430089DAB8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CEB84F2E2308EB20001485C5 /* Build configuration list for PBXNativeTarget "Credit Cards UnitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CEB84F2C2308EB20001485C5 /* Debug */,
+				CEB84F2D2308EB20001485C5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

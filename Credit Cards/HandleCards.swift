@@ -122,7 +122,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
         lineItem.cardType = cardType
         lineItem.genCat = ""                            // Initialze the Generated Category
         var descKey = lineItem.desc
-        descKey = makeDescKey(from: descKey)
+        descKey = makeDescKey(from: descKey, fileName: fileName)
 
         if !descKey.isEmpty {
             if let catItem = dictCategory[descKey] {

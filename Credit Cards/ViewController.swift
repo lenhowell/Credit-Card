@@ -75,7 +75,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         (categoryFileURL, errTxt)  = makeFileURL(pathFileDir: pathCategoryDir, fileName: categoryFilename)
         if !errTxt.isEmpty {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Category" + errTxt)
+            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "Category" + errTxt)
         }
         dictCategory = loadCategories(categoryFileURL: categoryFileURL) // Build Categories Dictionary
 
@@ -185,17 +185,17 @@ class ViewController: NSViewController, NSWindowDelegate {
             let fileName = fileURL.lastPathComponent
             let nameComps = fileName.components(separatedBy: "-")
             let cardType = nameComps[0].uppercased()
-            //— reading —    // macOSRoman is more forgiving than utf8
-            // If File exists/isReadable is checked in the "do/catch" block
             let fileAttributes = FileAttributes.getFileInfo(url: fileURL)
             if fileAttributes.isDir { continue }
+            // If File exists/isReadable is checked in the "do/catch" block
             do {
+                //— reading —    // macOSRoman is more forgiving than utf8
                 fileContents = try String(contentsOf: fileURL, encoding: .macOSRoman)
                 // File Exists if we are here and Entire file is now in "fileContents" variable
             } catch {
                 // Here if file does NOT exist or is unreadable. Put out an Error Message and Continue
                 lblErrMsg.stringValue = "File Does NOT Exist, \(fileURL.path)!!!!"
-                continue
+                continue    // try the next file
             }
             
             let cardArray = fileContents.components(separatedBy: "\n")

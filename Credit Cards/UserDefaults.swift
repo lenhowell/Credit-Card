@@ -14,6 +14,6 @@ public enum UDKey {
     static let outputFolder      = "CCOoutputFolder"
 }
 
-func saveUserDefaults() {
-    UserDefaults.standard.set("TEST", forKey: UDKey.transactionFolder)     //setObject
-}
+//func saveUserDefaults() {
+//    UserDefaults.standard.set("TEST", forKey: UDKey.transactionFolder)     //setObject
+//}
