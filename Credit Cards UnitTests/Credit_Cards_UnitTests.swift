@@ -45,6 +45,10 @@ class Credit_Cards_UnitTests: XCTestCase {
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "MCDONALDS")
 
+        desc = "MCDONALD'S  Fx3620       NORTH MYRTLE SC"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "MCDONALDS")
+
         //CIT-07-2-2017 - 08-11-2019.csv
         desc = "APL*ITUNES.COM/BILL 866-712-7753 CA"
         desc = "Ref*Formulyst.com 18889218458 GBR"
@@ -62,38 +66,38 @@ class Credit_Cards_UnitTests: XCTestCase {
 
         //C1R-09-02-2018 - 08-10-2019.csv
         let C1R09022018 = [
-            "BEACH COVE RESORT F&B",
-            "DENNY'S #7851",
-            "UNIVERSITY OF WISCONSI",
-            "SQU*SQ *GOLD STAR COAC",
-            "RITE AID STORE - 3744",
-            "GULF OIL 92063634",
-            "Cap 1 ElectronicPhonePmt",
-            "BIG Y 84 STRATFORD",
-            "ATK GOLF @ TASHUA KNOL",
-            "CARALUZZI'S GEORGETO",
-            "BP#9493677CIRCLE K QPS",
-            "EXXONMOBIL    42311712",
-            "VILLAGE-INN-REST #923",
-            "TOOJAY'S  OCOEE",
             "AAA ORLANDO TOW #393",
-            "STOP & SHOP 0620",
+            "ATK GOLF @ TASHUA KNOL",
+            "BEACH COVE RESORT F&B",
+            "BIG Y 84 STRATFORD",
+            "BP#9493677CIRCLE K QPS",
+            "Cap 1 ElectronicPhonePmt",
+            "CARALUZZI'S GEORGETO",
             "CIRCLE B 10",
+            "DENNY'S #7851",
+            "EXXONMOBIL    42311712",
+            "GULF OIL 92063634",
+            "KFC J235016",
             "LAKE & MAIN SERV CENTE",
-            "TLF*CITY LINE FLORIST",
-            "VERIZON WRLS D2587-01",
+            "RITE AID STORE - 3744",
+            "SQU*SQ *GOLD STAR COAC",
+            "STOP & SHOP 0620",
             "STP&SHPFUEL0663",
+            "TLF*CITY LINE FLORIST",
             "THE HOME DEPOT #6236",
+            "TOOJAY'S  OCOEE",
             "TRUMBULL NAILS & SPA",
-            "KFC J235016"
+            "UNIVERSITY OF WISCONSI",
+            "VERIZON WRLS D2587-01",
+            "VILLAGE-INN-REST #923",
 
         ]
         // C1R-10-01-2017 - 09-01-2018.csv
-        let xx = [
-                "WOLFEBORO GARAGE IRVIN",
-                "MR. GAS PLUS",
-                "HARVERST MARKET WOLF",
-                "BURGER KING 4NJ44"
+        let C1R10012017 = [
+            "BURGER KING 4NJ44",
+            "HARVERST MARKET WOLF",
+            "MR. GAS PLUS",
+            "WOLFEBORO GARAGE IRVIN",
         ]
 
     }//end func
@@ -139,10 +143,13 @@ class Credit_Cards_UnitTests: XCTestCase {
          "ALLSTATE    *PAYMENT     xxx-xxx-7828 IL"
          "BED BATH&BEYOND #xxx   xxx-xxx-4333 NJ"
          "LONGHORN STEAKxxxx3264   WINTER GARDENFL"
+
+         "MCDONALD'S  Fx3620       NORTH MYRTLE SC"
          
          problems
-         "BB&T PUCKETT SCHEETZ AND xxx-xxx8122  SC" => "BB&T PUCKETT SCHEETZ&xxx-xxx8122  SC"
          "ALG*AIR     7BN2JZ       xxx-xxx-8888 NV" => "AIR     7BN2JZ       xxx-xxx-8888 NV"
+
+         "BB&T PUCKETT SCHEETZ AND xxx-xxx8122  SC" => "BB&T PUCKETT SCHEETZ&xxx-xxx8122  SC"
          "APPLEBEES NEIxxxx6818   BOYNTON BEACHFL"
          "BP#xxx5702CIRCLE K ST 27 NORTH MYRTLE SC"
          "IHOP #xx-092             GAINESVILLE  FL"
@@ -154,7 +161,9 @@ class Credit_Cards_UnitTests: XCTestCase {
          "PP*WHIRLWIND SUN N FUN   CLEARWATER   FL"
          "RACETRAC465   xxxx4655   CLERMONT     FL"
          "SUNPASS*ACCxx7622        xxx-xxx-5352 FL"
+
          "SWA*EARLYBRDxxxxxxxxxxxxxxxx-xxx-9792 TX"
+
          "UBER TECHNOLOGIES INC    xxx-xxx-1039 CA"
          "VERIZON WRLS Pxxx7-01    WINTER GARDENFL"   -> [VERIZON WRLS P]
          "WAWA xxxx     xxxx2241   SARASOTA     FL"
@@ -164,38 +173,37 @@ class Credit_Cards_UnitTests: XCTestCase {
 
         //C1V-10-01-2017 - 09-01-2018.csv
         let xxxx = [
-            "INTEREST CHARGE:PURCHASES",
-            "PALM BEACH TAN CNT003",
-            "SUPER 8",
-            "MOTEL 6 YOUNGSTOWN #4553",
-            "HARVERST MARKET WOL",
-            "EBC SECURITY, LLC",
-            "INDEPENDENT IMAGING,",
-            "OPC TAX*SERVICE FEE 024",
-            "WM SUPERCENTER #942",
-            "MARATHON PETRO149260",
-            "ZIPS #9",
+            "ABC FINE WINE/SPIRITS 156",
             "APPLEBEE'S NEI98696818",
-            "YULEE 10",
             "DROPBOX*7YNSFZ4JM6FQ",
+            "E & J PACKAGE STORE",
+            "EBC SECURITY, LLC",
+            "HARVERST MARKET WOL",
+            "INTEREST CHARGE:PURCHASES",
+            "INDEPENDENT IMAGING,",
+            "KFC J235017",
+            "MARATHON PETRO149260",
+            "MOTEL 6 YOUNGSTOWN #4553",
+            "NH LIQUOR STORE #66",
+            "NINETY 9 BOTTLES TRUMBULL",
+            "OPC TAX*SERVICE FEE 024",
+            "PALM BEACH TAN CNT003",
+            "PARKER STEAKS & SCOTCH",
+            "STARLANDER BECK, INC",
+            "SUPER 8",
             "TINAS NAIL AND SKIN",
             "TRUMBULL NAILS & SPA",
-            "NINETY 9 BOTTLES TRUMBULL",
-            "KFC J235017",
-            "E & J PACKAGE STORE",
-            "ABC FINE WINE/SPIRITS 156",
-            "UBER   US OCT30 JAHQC",
-            "\"STARLANDER BECK, INC\"",
             "TACO BELL# 29310",
-            "NH LIQUOR STORE #66",
-            "PARKER STEAKS & SCOTCH",
-            "E & J PACKAGE STORE"
+            "UBER   US OCT30 JAHQC",
+            "WM SUPERCENTER #942",
+            "YULEE 10",
+            "ZIPS #9",
         ]
 
 
         for (key, value) in C1V {
             result = makeDescKey(from: key)
-            XCTAssertEqual(result, String(value.prefix(18)))
+            XCTAssertEqual(result, String(value.prefix(descKeyLength)))
         }
 
 
@@ -219,74 +227,62 @@ class Credit_Cards_UnitTests: XCTestCase {
         "VAZZYS OSTERIA MONROE CT",
     ]
 
-
-    let sampleDesc = [
-        "SQ *SQ *FOREFLIGHT",
-        "SQ *RETHREADS"
-    ]
-
-    /*
-     "RACETRAC465"          "RACETRAC599"        ok to 8
+    /* Same at 1st 8 chars
      "APPLEBEES"            "APPLEBEES NEI"      ok to 9
-     "SPEEDWAY X6462"       "SPEEDWAY X6757"     ok to 9
      "AMAZON COM"           "AMAZON COM AMZ"     ok to 10
+     "GOLDEN CORRAL 08"     "GOLDEN CORRAL 26"   ok to 14
+     "BOSTON MARKET 01"     "BOSTON MARKET 09"   ok to 14
+     "INTEREST CHARGE"     "INTEREST CHARGED"    ok to 15
      "MCDONALDS F3625"      "MCDONALDS F4902"    ok to 10
      "MCDONALDS F7973"      "MCDONALDS FX2025"   ok to 10
-     "BOSTON MARKET 01"     "BOSTON MARKET 09"   ok to 14
-     "GOLDEN CORRAL 08"     "GOLDEN CORRAL 26"   ok to 14
      "PROMO PRICING CR"     "PROMO PRICING DE"   ok to 14
-     "INTEREST CHARGE"     "INTEREST CHARGED"    ok to 15
+     "RACETRAC465"          "RACETRAC599"        ok to 8
+     "SPEEDWAY X6462"       "SPEEDWAY X6757"     ok to 9
 
-     "VERIZON WRL MY A"     "VERIZON WRLS P"
      "COUNTRY CORNER C"     "COUNTRY HOUSE RE"   needs 9 or 10
      "ORLANDO APOPKA A"     "ORLANDO CLEANERS"   needs 9 or 10
+     "VERIZON WRL MY A"     "VERIZON WRLS P"
 
-     "SQ *SQ *FOREFLIGHT"
-     "SQ *RETHREADS"
-     SQ *WAKEMANS WHITE
-     SQ *THE ADVENTURE P
-     SQ *UCBC BAKERY CAF
-     SQU*SQ *GOLD STAR COAC
 
-     TLF*CITY LINE FLORIST
-     TST* WINDMILL TAVERN
-     PHR*CONNECTICUTORTHOP
-     PHR*ConnecticutOrthopaedi
-     MTA*MNR STATION TIX
-     BB *SAVE THE CHILDREN
-     BB *SHRINERS HOSPITALS
      APL*APPLE ONLINE STORE
      APL*ITUNES.COM/BILL
+     EMS*TACGLASSES
+     BB *SAVE THE CHILDREN
+     BB *SHRINERS HOSPITALS
+     GLT*GOLF TAILOR
+     IPM*INVESTORPLACE MED
+     MTA*MNR STATION TIX
+     OPC*CONNECTICUT DEPT REV
      PSV* Momentum Alert
      PAY*THE BARNARD HOUSE BED
-     OPC*CONNECTICUT DEPT REV
-     SR *Stansberry Research
+     PHR*CONNECTICUTORTHOP
+     PHR*ConnecticutOrthopaedi
      Ref*Formulyst.com
-     GLT*GOLF TAILOR
      SP * BLACKBOXDEALZ
-     IPM*INVESTORPLACE MED
-     EMS*TACGLASSES
+     SR *Stansberry Research
+     TLF*CITY LINE FLORIST
+     TST* WINDMILL TAVERN
 
+     CLKBANK*ORGANIFI (7)
+     CLKBANK*COM_5GFZUFBM (7)
      DROPBOX*6J696N7MMMSW (7)
-     SPRINT *WIRELESS (7)
-     OPC TAX*SERVICE FEE (7)
      HEALTHY*BACK INSTITUTE (7)
      LIFELOC*STANDARD (7)
-     CLKBANK*COM_5GFZUFBM (7)
+     OPC TAX*SERVICE FEE (7)
      PAYPAL *TAJSBLUES02 (7)
      PAYPAL *DLM1130 (7)
-     CLKBANK*ORGANIFI (7)
+     SPRINT *WIRELESS (7)
 
      REVERSE EMS*TACGLASSES(11)
-     SECURITY CREDIT-EMS*TACGLASSES(19)
      REVERSE PAYPAL *DLM1130(15)
+     SECURITY CREDIT-EMS*TACGLASSES(19)
      SECURITY CREDIT-PAYPAL *DLM1130 (23)
 
-     FOOD BAZAAR #36
      APPLE STORE  #R102
-     ZIPS #9
-     TACO BELL#
+     FOOD BAZAAR #36
      NH LIQUOR STORE #66
+     TACO BELL#
+     ZIPS #9
 
      */
 

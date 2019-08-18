@@ -8,9 +8,7 @@
 
 import Foundation
 
-//MARK:- Globals
-
-//MARK:- Functions
+//MARK:- General Purpose
 
 // Creates FileURL or returns an error message
 func makeFileURL(pathFileDir: String, fileName: String) -> (URL, String) {
@@ -83,6 +81,7 @@ public struct FileAttributes: Equatable {
     }
 }// end struct FileAttributes
 
+//MARK:- Categories
 
 func loadCategories(categoryFileURL: URL) -> [String: CategoryItem]  {
     var dictCat   = [String: CategoryItem]()
@@ -96,7 +95,7 @@ func loadCategories(categoryFileURL: URL) -> [String: CategoryItem]  {
     var lineNum = 0
     for line in lines {
         lineNum += 1
-        if line == "" {
+        if line == "" || line.hasPrefix("//") {
             continue
         }
         // Create an Array of line components the seperator being a ","
@@ -105,9 +104,9 @@ func loadCategories(categoryFileURL: URL) -> [String: CategoryItem]  {
             handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .display, fileName: categoryFileURL.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "Expected 2 commas per line")
             continue
         }
-        let descKey = categoryArray[0]      // make-DescKey(from: categoryArray[0])
-        let category = categoryArray[1].trimmingCharacters(in: .whitespaces) //drop leading and trailing white space
-        let source = categoryArray[2].trim.replacingOccurrences(of: "\"", with: "")
+        let descKey  = categoryArray[0].trimmingCharacters(in: .whitespaces)  // make-DescKey(from: categoryArray[0])
+        let category = categoryArray[1].trimmingCharacters(in: .whitespaces)  //drop leading and trailing white space
+        let source   = categoryArray[2].trim.replacingOccurrences(of: "\"", with: "")
         let categoryItem = CategoryItem(category: category, source: source)
         dictCat[descKey] = categoryItem
         
@@ -137,11 +136,15 @@ func writeCategoriesToFile(categoryFileURL: URL, dictCat: [String: CategoryItem]
         // print("Error: \(error.localizedDescription)")
     }
 
-    var text = ""
-
+    var text = "// Category keys are up to \(descKeyLength) chars long.\n"
+    text += "// Apostrophies are removed, and other extraneous punctuation changed to spaces.\n"
+    text += "// When a phone number or \"xxx...\" or other multi-digit number is reached the rest is truncated.\n"
+    text += "\n// Description Key        Category              Source\n"
     var prevCat = ""
+    print("\n Different Descs that have the same 8-chars")
     for catItem in dictCat.sorted(by: {$0.key < $1.key}) {
-        text += "\(catItem.key), \(catItem.value.category),  \(catItem.value.source)\n"
+        text += "\(catItem.key.PadRight(descKeyLength)), \(catItem.value.category.PadRight(26)),  \(catItem.value.source)\n"
+
         let first8 = String(catItem.key.prefix(8))
         if first8 == prevCat.prefix(8) {
             print("😡 \"\(prevCat)\"     \"\(catItem.key)\"")
@@ -152,12 +155,14 @@ func writeCategoriesToFile(categoryFileURL: URL, dictCat: [String: CategoryItem]
     //— writing —
     do {
         try text.write(to: categoryFileURL, atomically: false, encoding: .utf8)
-        print("\n😀 Successfully wrote \(dictCat.count) items to: \(categoryFileURL.path)")
+        print("\n😀 Successfully wrote \(dictCat.count) items, using \(descKeyLength) keys, to: \(categoryFileURL.path)")
     } catch {
         let msg = "Could not write new CategoryLookup file."
         handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: categoryFileURL.lastPathComponent, errorMsg: msg)
     }
 }//end func writeCategoriesToFile
+
+//MARK:- Transactions
 
 //---- outputTranactions - uses: handleError(F), workingFolderUrl(I)
 func outputTranactions(outputFileURL: URL, lineItemArray: [LineItem]) {
@@ -179,3 +184,20 @@ func outputTranactions(outputFileURL: URL, lineItemArray: [LineItem]) {
     }
  
 }//end func outputTranactions
+
+public func getTransFileList(transDirURL: URL) -> [URL] {
+    print("\nFreeFuncs.getTransFileList \(#line)")
+    do {
+        let fileURLs = try FileManager.default.contentsOfDirectory(at: transDirURL, includingPropertiesForKeys: [], options:  [.skipsHiddenFiles, .skipsSubdirectoryDescendants])
+        let csvURLs = fileURLs.filter{ $0.pathExtension.lowercased() == "csv" }
+        let transURLs = csvURLs.filter{ $0.lastPathComponent.components(separatedBy: "-")[0].count <= 6 }
+        print("\(transURLs.count) Transaction Files found.")
+        print(transURLs)
+        print()
+        return transURLs
+    } catch {
+        print(error)
+    }
+    return []
+}//end func
+

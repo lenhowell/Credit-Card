@@ -202,7 +202,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             
             // Check which Credit Card Transactions we are currently processing
             switch cardType {
-            case "C1V", "C1R", "DIS", "CIT", "BACT", "ML":
+            case "C1V", "C1R", "DIS", "CIT", "BACT", "BAPR", "ML":
                 lineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray)
                 Stats.transFileCount += 1
             default:
