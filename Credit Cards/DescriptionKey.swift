@@ -9,7 +9,7 @@
 import Foundation
 
 //MARK:- Globals
-let descKeysuppressionList = " \";_/,#*-"
+let descKeysuppressionList = " \";_@/,#*-"
 let descKeyLength          = 18   //         16->195 14->191 12->187 11->180 10->179 9->
 
 /*
@@ -127,16 +127,16 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
     regexp = #" #?\d\d.*"#
     if let range = descKeyLong.range(of:regexp, options: .regularExpression) {
         key2 = descKeyLong.replacingCharacters(in: range, with: "").trim
-        descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove bare number")
         //let result = descKeyLong[range]
         //print("[\(key2)] = [\(descKeyLong)] - [\(result)]")
+        descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove bare number")
     }
 
     // Truncate at  embedded Number(>=3 digits) [#123...] (must be done before removing "#")
     regexp = #"#\d\d\d.*"#
     if let range = descKeyLong.range(of:regexp, options: .regularExpression) {
-        //let result = descKeyLong[range]
         key2 = descKeyLong.replacingCharacters(in: range, with: "").trim
+        //let result = descKeyLong[range]
         //print("[\(key2)] = [\(descKeyLong)] - [\(result)]")
         descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove embedded number")
     }
@@ -144,8 +144,8 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
     // Truncate at [ Fx123...] Spc 0orMore Caps 0orMore x's
     regexp = #" [A-Z]*x*\d\d+.*"#
     if let range = descKeyLong.range(of:regexp, options: .regularExpression) {
-        let result = descKeyLong[range]
         key2 = descKeyLong.replacingCharacters(in: range, with: "").trim
+        //let result = descKeyLong[range]
         //print("[\(key2)] = [\(descKeyLong)] - [\(result)]")
         descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove [ Fx123]")
     }
@@ -160,7 +160,7 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
             key2 = String(descKeyLong.prefix(posX))
             descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove \"xxx...\"")
         } else {
-            let x=1 // Debug Trap
+            //let x=1 // Debug Trap
         }
     }
 
@@ -176,7 +176,7 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
             key2 = String(descKeyLong.prefix(posHash))
             descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove \"#...\"")
         } else {
-            let x=1 // Debug Trap
+            //let x=1 // Debug Trap
         }
     }
 
@@ -189,7 +189,7 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
             key2 = String(descKeyLong.prefix(posStar))
             descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove \"*...\"")
         } else {
-            let x=1 // Debug Trap
+            //let x=1 // Debug Trap
         }
     }
 

@@ -78,7 +78,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "Category" + errTxt)
         }
         dictCategory = loadCategories(categoryFileURL: categoryFileURL) // Build Categories Dictionary
-
+        Stats.origCatCount = dictCategory.count
         // Show on Screen
         txtOutputFolder.stringValue     = pathOutputDir
         txtCategoryFolder.stringValue   = pathCategoryDir
@@ -163,6 +163,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         UserDefaults.standard.set(pathOutputDir, forKey: UDKey.outputFolder)
 
         Stats.clearAll()
+        dictCategory = loadCategories(categoryFileURL: categoryFileURL) // Re-read Categories Dictionary
+        Stats.origCatCount = dictCategory.count
+
         var fileContents    = ""                        // Where All Transactions in a File go
         var lineItemArray   = [LineItem]()
         lblErrMsg.stringValue = ""
@@ -187,7 +190,8 @@ class ViewController: NSViewController, NSWindowDelegate {
             let cardType = nameComps[0].uppercased()
             let fileAttributes = FileAttributes.getFileInfo(url: fileURL)
             if fileAttributes.isDir { continue }
-            // If File exists/isReadable is checked in the "do/catch" block
+
+            // FileExists/isReadable is checked in the "do/catch" block
             do {
                 //— reading —    // macOSRoman is more forgiving than utf8
                 fileContents = try String(contentsOf: fileURL, encoding: .macOSRoman)
@@ -220,6 +224,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             writeCategoriesToFile(categoryFileURL: categoryFileURL, dictCat: dictCategory)
         }
         var statString = ""
+        statString += "Category File started with \(Stats.origCatCount) items.\n"
         statString += "\(Stats.transFileCount) Files Processed."
         if Stats.junkFileCount > 0 {
             statString += "\n\(Stats.junkFileCount) NOT Recognized as a Credit Card Transaction"

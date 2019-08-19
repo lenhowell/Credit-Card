@@ -33,9 +33,53 @@ class Credit_Cards_UnitTests: XCTestCase {
         var result = ""
         var desc = ""
 
+        desc = "APL*ITUNES.COM/BILL 866-712-7753 CA"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "ITUNES.COM BILL")
+
+        desc = "APPLEBEE'S NEI98696818"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "APPLEBEES")
+
+        desc = "ATK GOLF @ TASHUA KNOL"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "ATK GOLF TASHUA KN")
+
+        desc = "AUTOPAY 221152216034323RAUTOPAY AUTO-PMT"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "AUTOPAY")
+
+        desc =  "BIG Y 84 STRATFORD"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "BIG Y")
+
+        desc = "SP * BLACKBOXDEALZ 5033957597 WA"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "BLACKBOXDEALZ")
+
+        desc = "BURGER KING 4NJ44"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "BURGER KING")
+
+        desc = "CLKBANK*COM_5GFZUFBM 800-390-6035 ID"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "CLKBANK")
+
         desc = "SQ *SQ *FOREFLIGHT"
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "FOREFLIGHT")
+
+        desc = "Ref*Formulyst.com 18889218458 GBR"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "FORMULYST.COM")
+
+        desc = "HARRYS 888-212-6855 8882126855 NY"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "HARRYS")
+
+        desc = "KFC J235016"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "KFC")
 
         desc = "MCDONALD'S F3625"
         result = makeDescKey(from: desc)
@@ -49,55 +93,43 @@ class Credit_Cards_UnitTests: XCTestCase {
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "MCDONALDS")
 
-        //CIT-07-2-2017 - 08-11-2019.csv
-        desc = "APL*ITUNES.COM/BILL 866-712-7753 CA"
-        desc = "Ref*Formulyst.com 18889218458 GBR"
+        desc = "NEOGENISHUMAN855636404 855-6364040 TX"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "NEOGENISHUMAN")
+
+        desc = "STOP & SHOP 0620"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "STOP&SHOP")
+
+        desc = "STP&SHPFUEL0663"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "STP&SHPFUEL")
+
+        // ************** PROBLEMS!! ****************
         desc = "HEALTHY*BACK INSTITUTE 800-216-4908 TX"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "HEALTHY")
+
         desc = "OFFER 04 PROMOTIONAL APR ENDED 07/01/19"
-        desc = "HARRYS 888-212-6855 8882126855 NY"
-        desc = "AUTOPAY 221152216034323RAUTOPAY AUTO-PMT"
-        desc = "SP * BLACKBOXDEALZ 5033957597 WA"
-        desc = "CLKBANK*COM_5GFZUFBM 800-390-6035 ID"
-        desc = "NEST LABS 8554696378 CA"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "OFFER")
+
         desc = "GOOGLE*DIGIBITES G.CO HELPPAY# CA"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "GOOGLE")
+
+
+        //CIT-07-2-2017 - 08-11-2019.csv
         desc = "SECURITY CREDIT-LPI*LITTLE PASSPORTS"
         desc = "LPI*LITTLE PASSPORTS CONTACTLP.COM CA"
-        desc = "NEOGENISHUMAN855636404 855-6364040 TX"
 
         //C1R-09-02-2018 - 08-10-2019.csv
-        let C1R09022018 = [
-            "AAA ORLANDO TOW #393",
-            "ATK GOLF @ TASHUA KNOL",
-            "BEACH COVE RESORT F&B",
-            "BIG Y 84 STRATFORD",
-            "BP#9493677CIRCLE K QPS",
+        _ = [
             "Cap 1 ElectronicPhonePmt",
-            "CARALUZZI'S GEORGETO",
             "CIRCLE B 10",
-            "DENNY'S #7851",
-            "EXXONMOBIL    42311712",
-            "GULF OIL 92063634",
-            "KFC J235016",
-            "LAKE & MAIN SERV CENTE",
             "RITE AID STORE - 3744",
-            "SQU*SQ *GOLD STAR COAC",
-            "STOP & SHOP 0620",
-            "STP&SHPFUEL0663",
             "TLF*CITY LINE FLORIST",
-            "THE HOME DEPOT #6236",
-            "TOOJAY'S  OCOEE",
-            "TRUMBULL NAILS & SPA",
-            "UNIVERSITY OF WISCONSI",
             "VERIZON WRLS D2587-01",
-            "VILLAGE-INN-REST #923",
-
-        ]
-        // C1R-10-01-2017 - 09-01-2018.csv
-        let C1R10012017 = [
-            "BURGER KING 4NJ44",
-            "HARVERST MARKET WOLF",
-            "MR. GAS PLUS",
-            "WOLFEBORO GARAGE IRVIN",
         ]
 
     }//end func
@@ -107,31 +139,43 @@ class Credit_Cards_UnitTests: XCTestCase {
         //var desc = ""
         //C1V-09-02-2018 - 08-10-2019.csv
         let C1V = [
-            "7-ELEVEN 32509":           "7 ELEVEN",
+            "7-ELEVEN 32509":            "7 ELEVEN",
             "AMTRAK AGENC1450927069712": "AMTRAK",
-            "BP#9463555STRATFORD BP":   "BP",
-            "BP#9155029GENE'S AUTO":    "BP",
-            "CARALUZZI'S GEORGET":      "CARALUZZIS GEORGET",
-            "CONSUMERREPORTS.ORG":      "CONSUMERREPORTS.ORG",
+            "BP#9463555STRATFORD BP":    "BP",
+            "BP#9155029GENE'S AUTO":     "BP",
+            "BP#9493677CIRCLE K QPS":    "BP",
+            "CARALUZZI'S GEORGET":       "CARALUZZIS GEORGET",
+            "CONSUMERREPORTS.ORG":       "CONSUMERREPORTS.ORG",
             "CRACKER BARREL #194 N MYR": "CRACKER BARREL",
-            "CVS/PHARMACY #02572":      "CVS PHARMACY",
-            "HNDISCOVER ST1955":        "HNDISCOVER",
-            "LOWES #02651*":            "LOWES",
-            "MTA*MNR STATION TIX":      "MNR STATION TIX",
-            "NINO`S PIZZA":             "NINOS PIZZA",
-            "NJT NWK-INT AIR   0356":   "NJT NWK INT AIR",
-            "OSTERIA ROMANA MAIN":      "OSTERIA ROMANA MAIN",
-            "PILOT_00337":              "PILOT",
-            "PSV* Momentum Alert":      "MOMENTUM ALERT",
-            "SPRINT *WIRELESS":         "SPRINT",
-            "SPRINT RETAIL #030712":    "SPRINT RETAIL",
-            "UBER   TRIP":              "UBER TRIP",
-            "VERIZON WRLS P2027-01":    "VERIZON WRLS",
-            "VIOC AE0034":              "VIOC",
-            "VZWRLSS*APOCC VISN":       "VZWRLSS",
-            "VZWRLSS*IVR VN":           "VZWRLSS",
-            "WAL-MART #0942":           "WAL MART",
-            "WAWA 860      00008607":   "WAWA",
+            "CVS/PHARMACY #02572":       "CVS PHARMACY",
+            "SQU*SQ *GOLD STAR COAC":    "GOLD STAR COAC",
+            "HARVERST MARKET WOLF":      "HARVERST MARKET WOLF",
+            "HNDISCOVER ST1955":         "HNDISCOVER",
+            "LAKE & MAIN SERV CENTE":    "LAKE&MAIN SERV CENTE",
+            "LOWES #02651*":             "LOWES",
+            "MR. GAS PLUS":              "MR. GAS PLUS",
+            "MTA*MNR STATION TIX":       "MNR STATION TIX",
+            "NINO`S PIZZA":              "NINOS PIZZA",
+            "NJT NWK-INT AIR   0356":    "NJT NWK INT AIR",
+            "OSTERIA ROMANA MAIN":       "OSTERIA ROMANA MAIN",
+            "PILOT_00337":               "PILOT",
+            "PSV* Momentum Alert":       "MOMENTUM ALERT",
+            "SPRINT *WIRELESS":          "SPRINT",
+            "SPRINT RETAIL #030712":     "SPRINT RETAIL",
+            "UBER   TRIP":               "UBER TRIP",
+            "VERIZON WRLS P2027-01":     "VERIZON WRLS",
+            "VILLAGE-INN-REST #923":     "VILLAGE INN REST",
+            "VIOC AE0034":               "VIOC",
+            "VZWRLSS*APOCC VISN":        "VZWRLSS",
+            "VZWRLSS*IVR VN":            "VZWRLSS",
+            "WAL-MART #0942":            "WAL MART",
+            "WAWA 860      00008607":    "WAWA",
+
+            "APPLEBEES NEIxxxx6818   BOYNTON BEACHFL":  "APPLEBEES",
+            "BB&T PUCKETT SCHEETZ AND xxx-xxx8122  SC": "BB&T PUCKETT SCHEETZ",
+            "IHOP #xx-092             GAINESVILLE  FL": "IHOP",
+            "LONGHORN STEAKxxxx3264   WINTER GARDENFL": "LONGHORN",
+            "MCDONALD'S  Fx3620       NORTH MYRTLE SC": "MCDONALDS"
         ]
         /* BAD RESULTS
          "EBC SECURITY, LLC":        "EBC SECURITY LLC",
@@ -142,17 +186,11 @@ class Credit_Cards_UnitTests: XCTestCase {
          "ABES OF MAINE           xxx-xxx-1777 NJ"
          "ALLSTATE    *PAYMENT     xxx-xxx-7828 IL"
          "BED BATH&BEYOND #xxx   xxx-xxx-4333 NJ"
-         "LONGHORN STEAKxxxx3264   WINTER GARDENFL"
 
-         "MCDONALD'S  Fx3620       NORTH MYRTLE SC"
-         
          problems
          "ALG*AIR     7BN2JZ       xxx-xxx-8888 NV" => "AIR     7BN2JZ       xxx-xxx-8888 NV"
 
-         "BB&T PUCKETT SCHEETZ AND xxx-xxx8122  SC" => "BB&T PUCKETT SCHEETZ&xxx-xxx8122  SC"
-         "APPLEBEES NEIxxxx6818   BOYNTON BEACHFL"
          "BP#xxx5702CIRCLE K ST 27 NORTH MYRTLE SC"
-         "IHOP #xx-092             GAINESVILLE  FL"
          "JETBLUE     2xxxxxxxx0098SALT LAKE CTYUT"
          "MARATHON PETROxx0003"
          "MICROSOFT   *OFFICE xxx  xxx-xxx-7676 WA"
@@ -172,9 +210,8 @@ class Credit_Cards_UnitTests: XCTestCase {
          */
 
         //C1V-10-01-2017 - 09-01-2018.csv
-        let xxxx = [
+        _ = [
             "ABC FINE WINE/SPIRITS 156",
-            "APPLEBEE'S NEI98696818",
             "DROPBOX*7YNSFZ4JM6FQ",
             "E & J PACKAGE STORE",
             "EBC SECURITY, LLC",

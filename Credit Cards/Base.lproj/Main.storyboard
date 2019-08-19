@@ -717,12 +717,12 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="749" translatesAutoresizingMaskIntoConstraints="NO" id="ud1-Xt-qfO">
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="749" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ud1-Xt-qfO">
                                 <rect key="frame" x="8" y="391" width="784" height="160"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="160" id="TTx-cp-D3g"/>
                                 </constraints>
-                                <textFieldCell key="cell" lineBreakMode="clipping" borderStyle="border" alignment="center" id="mVW-Ja-dVe">
+                                <textFieldCell key="cell" lineBreakMode="clipping" selectable="YES" borderStyle="border" alignment="center" id="mVW-Ja-dVe">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
