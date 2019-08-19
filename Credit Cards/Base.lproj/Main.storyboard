@@ -722,8 +722,8 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="160" id="TTx-cp-D3g"/>
                                 </constraints>
-                                <textFieldCell key="cell" lineBreakMode="clipping" selectable="YES" borderStyle="border" alignment="center" id="mVW-Ja-dVe">
-                                    <font key="font" metaFont="system"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" selectable="YES" borderStyle="border" alignment="center" title="-" id="mVW-Ja-dVe">
+                                    <font key="font" size="13" name="Courier"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>

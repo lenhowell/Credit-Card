@@ -246,9 +246,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
         statString += "\n \(lineItemArray.count) CREDIT CARD Transactions PROCESSED."
         statString += "\n Of These:"
-        statString += "\n(a) \(Stats.successfulLookupCount) were found in Category File."
-        statString += "\n      (b) \(Stats.addedCatCount) were inserted into Category File."
-        statString += "\n     (c) \(Stats.descWithNoCat) still have no Category assigned."
+        statString += "\n(a)\(String(Stats.successfulLookupCount).rightJust(5)) were found in Category File.      ←"
+        statString += "\n(b)\(String(Stats.addedCatCount).rightJust(5)) were inserted into Category File. ←"
+        statString += "\n(c)\(String(Stats.descWithNoCat).rightJust(5)) still with no Category assigned.  ←"
         lblResults.stringValue = statString
         
         let endTime   = CFAbsoluteTimeGetCurrent()
