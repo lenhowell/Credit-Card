@@ -235,10 +235,10 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         if filesToProcessURLs.count == 1 {
             let shortTransFilePath = removeUserFromPath(filesToProcessURLs[0].path)
-            statString += "\(Stats.transFileCount) File named \"\(shortTransFilePath)\" Processed."
+            statString += "\(Stats.transFileCount) File named \"\(shortTransFilePath)/\" Processed."
         } else {
             let shortTransFilePath = removeUserFromPath(transactionDirURL.path)
-            statString += "\(Stats.transFileCount) Files from \"\(shortTransFilePath)\" Processed."
+            statString += "\(Stats.transFileCount) Files from \"\(shortTransFilePath)/\" Processed."
         }
 
         if Stats.junkFileCount > 0 {
