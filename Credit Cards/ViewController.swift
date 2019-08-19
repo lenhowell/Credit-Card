@@ -79,7 +79,11 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
         dictCategory = loadCategories(categoryFileURL: categoryFileURL) // Build Categories Dictionary
         Stats.origCatCount = dictCategory.count
+
         // Show on Screen
+        let shortCatFilePath = removeUserFromPath(categoryFileURL.path)
+        lblResults.stringValue = "Category File \"\(shortCatFilePath)\" loaded with \(Stats.origCatCount) items.\n"
+
         txtOutputFolder.stringValue     = pathOutputDir
         txtCategoryFolder.stringValue   = pathCategoryDir
         txtTransationFolder.stringValue = pathTransactionDir
@@ -174,17 +178,17 @@ class ViewController: NSViewController, NSWindowDelegate {
             handleError(codeFile: "ViewController", codeLineNum: #line, type: .codeError, action: .alertAndDisplay,  fileName: transactionDirURL.path, dataLineNum: 0, lineText: "", errorMsg: "Directory does not exist")
         }
 
-        let fileURLs: [URL]
+        let filesToProcessURLs: [URL]
         let shown = cboFiles.stringValue.trim
         if shown == "-all-" {
-            fileURLs = transFileURLs
+            filesToProcessURLs = transFileURLs
         } else {
             let nameWithExt = shown + ".csv"
             let fileURL = transactionDirURL.appendingPathComponent(nameWithExt)
-            fileURLs = [fileURL]
+            filesToProcessURLs = [fileURL]
         }
 
-        for fileURL in fileURLs {
+        for fileURL in filesToProcessURLs {
             let fileName = fileURL.lastPathComponent
             let nameComps = fileName.components(separatedBy: "-")
             let cardType = nameComps[0].uppercased()
@@ -223,9 +227,20 @@ class ViewController: NSViewController, NSWindowDelegate {
         if Stats.addedCatCount > 0 {
             writeCategoriesToFile(categoryFileURL: categoryFileURL, dictCat: dictCategory)
         }
+
         var statString = ""
-        statString += "Category File started with \(Stats.origCatCount) items.\n"
-        statString += "\(Stats.transFileCount) Files Processed."
+
+        let shortCatFilePath = removeUserFromPath(categoryFileURL.path)
+        statString += "Category File \"\(shortCatFilePath)\" loaded with \(Stats.origCatCount) items.\n"
+
+        if filesToProcessURLs.count == 1 {
+            let shortTransFilePath = removeUserFromPath(filesToProcessURLs[0].path)
+            statString += "\(Stats.transFileCount) File named \"\(shortTransFilePath)\" Processed."
+        } else {
+            let shortTransFilePath = removeUserFromPath(transactionDirURL.path)
+            statString += "\(Stats.transFileCount) Files from \"\(shortTransFilePath)\" Processed."
+        }
+
         if Stats.junkFileCount > 0 {
             statString += "\n\(Stats.junkFileCount) NOT Recognized as a Credit Card Transaction"
         }

@@ -39,14 +39,29 @@ func getContentsOf(dirURL: URL) -> [URL] {
     }
 }//end func
 
+public func removeUserFromPath(_ fullPath: String) -> String {
+    var path = fullPath
+    if path.contains("/Users/") {
+        let comps = path.components(separatedBy: "/Users/")
+        if comps.count > 1 {
+            path = comps[1]
+            let idxSlash = path.firstIntIndexOf("/")
+            if idxSlash >= 0 && idxSlash < path.count-1 {
+                path = String(path.dropFirst(idxSlash+1))
+            }
+        }
+    }
+    return path
+}
+
 //????? incorporate both getFileInfo() funcs into struct as inits
 public struct FileAttributes: Equatable {
-    let url:            URL?
-    var name        = "????"
+    let url:              URL?
+    var name                    = "????"
     var creationDate:     Date?
     var modificationDate: Date?
-    var size        = 0
-    var isDir       = false
+    var size                    = 0
+    var isDir                   = false
 
     //------ getFileInfo - returns attributes of fileName (file or folder) as a FileAttributes struct
     ///Get file info for a file path
