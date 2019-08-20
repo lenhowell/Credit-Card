@@ -8,8 +8,8 @@
 
 import Foundation
 
-//MARK:- handleCards - 13-111 = 98-lines
-// uses Global Vars: dictCategory(I/O), Stats(I/O)
+//MARK:---- handleCards - 13-77 = 64-lines
+
 func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [LineItem] {
     let cardArrayCount = cardArray.count
     var lineItemArray = [LineItem]()                // Create Array variable(lineItemArray) Type lineItem.
@@ -66,39 +66,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
         lineNum += 1
         if tran.trim.isEmpty { continue }
 
-        var lineItem = LineItem(fromTransFileLine: tran, dictColNums: dictColNums, fileName: fileName, lineNum: lineNum)
-
-        lineItem.cardType = cardType
-
-        let descKey = makeDescKey(from: lineItem.desc, fileName: fileName)
-
-        if !descKey.isEmpty {
-            if let catItem = dictCategory[descKey] {
-                lineItem.genCat = catItem.category      // Here if Lookup of KEY was successful
-                lineItem.catSource = catItem.source
-                Stats.successfulLookupCount += 1
-                uniqueCategoryCounts[descKey, default: 0] += 1
-            } else {
-                let source = cardType                   // Here if NOT in Category Dictionary
-                //print("          Did Not Find ",key)
-
-                if hasCatHeader {
-                    let catItem = CategoryItem(category: lineItem.rawCat, source: source)
-                    let rawCat = catItem.category
-
-                    if rawCat.count >= 3 {
-                        dictCategory[descKey] = catItem //Do Actual Insert
-                        Stats.addedCatCount += 1
-                        // print("Category that was inserted = Key==> \(key) Value ==> \(self.rawCat) Source ==> \(source)")
-                    } else {
-                        Stats.descWithNoCat += 1
-                        handleError(codeFile: "LineItems", codeLineNum: #line, type: .dataWarning, action: .printOnly, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: "Raw Category too short to be legit: \"\(rawCat)\"")
-                    }
-                } else {
-                    Stats.descWithNoCat += 1
-                }
-            }
-        }//endif descKey not empty
+        let lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, cardType: cardType, hasCatHeader: hasCatHeader, fileName: fileName, lineNum: lineNum)
 
         if !lineItem.desc.isEmpty || !lineItem.postDate.isEmpty || lineItem.debit != 0  || lineItem.credit != 0 {
             lineItemArray.append(lineItem)          // Add new output Record to be output
@@ -108,3 +76,43 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
     return lineItemArray
 }//end func handleCards
 
+
+//MARK:---- makeLineItem - 80-116 = 36-lines
+// uses Global Vars: dictCategory(I/O), Stats(I/O)
+internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int], cardType: String, hasCatHeader: Bool, fileName: String, lineNum: Int) -> LineItem {
+
+    var lineItem = LineItem(fromTransFileLine: fromTransFileLine, dictColNums: dictColNums, fileName: fileName, lineNum: lineNum)
+    lineItem.cardType = cardType
+
+    let descKey = makeDescKey(from: lineItem.desc, fileName: fileName)
+
+    if !descKey.isEmpty {
+        if let catItem = dictCategory[descKey] {
+            lineItem.genCat = catItem.category      // Here if Lookup of KEY was successful
+            lineItem.catSource = catItem.source
+            Stats.successfulLookupCount += 1
+            uniqueCategoryCounts[descKey, default: 0] += 1
+        } else {
+            let source = cardType                   // Here if NOT in Category Dictionary
+            //print("          Did Not Find ",key)
+
+            if hasCatHeader {
+                let catItem = CategoryItem(category: lineItem.rawCat, source: source)
+                let rawCat = catItem.category
+
+                if rawCat.count >= 3 {
+                    dictCategory[descKey] = catItem //Do Actual Insert
+                    Stats.addedCatCount += 1
+                    // print("Category that was inserted = Key==> \(key) Value ==> \(self.rawCat) Source ==> \(source)")
+                } else {
+                    Stats.descWithNoCat += 1
+                    handleError(codeFile: "LineItems", codeLineNum: #line, type: .dataWarning, action: .printOnly, fileName: fileName, dataLineNum: lineNum, lineText: fromTransFileLine, errorMsg: "Raw Category too short to be legit: \"\(rawCat)\"")
+                }
+            } else {
+                Stats.descWithNoCat += 1
+            }
+        }
+    }//endif descKey not empty
+
+    return lineItem
+}//end func makeLineItem

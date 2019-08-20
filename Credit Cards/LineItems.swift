@@ -15,7 +15,7 @@ public struct LineItem {
     var desc     = ""
     var debit    = 0.0
     var credit   = 0.0
-    var genCat   = ""
+    var genCat   = ""       // Generated Category
     var rawCat   = ""
     var catSource = ""
 
