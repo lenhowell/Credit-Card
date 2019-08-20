@@ -8,7 +8,7 @@
 
 import Foundation
 
-//MARK:---- handleCards - 13-77 = 64-lines
+//MARK:---- handleCards - 13-63 = 50-lines
 
 func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [LineItem] {
     let cardArrayCount = cardArray.count
@@ -34,21 +34,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
         return lineItemArray
     }
 
-    var dictColNums = [String: Int]()
-    for colNum in 0..<headers.count {
-        let rawKey = headers[colNum].uppercased().trim.replacingOccurrences(of: "\"", with: "")
-        let key: String
-        if rawKey == "DATE" {
-            key = "TRAN"
-        } else if rawKey.hasPrefix("ORIG") && rawKey.hasSuffix("DESCRIPTION") { //
-            key = "DESC"
-        } else if rawKey.hasPrefix("MERCH") && rawKey.hasSuffix("CATEGORY") {   // Handle "Merchant Category"
-            key = "CATE"
-        } else {
-            key = String(rawKey.replacingOccurrences(of: "\"", with: "").prefix(4))
-        }
-        dictColNums[key] = colNum
-    }//next colNum
+    let dictColNums = makeDictColNums(headers: headers)
 
     let hasCatHeader: Bool
     if dictColNums["CATE"] == nil {
@@ -77,7 +63,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
 }//end func handleCards
 
 
-//MARK:---- makeLineItem - 80-116 = 36-lines
+//MARK:---- makeLineItem - 68-104 = 36-lines
 // uses Global Vars: dictCategory(I/O), Stats(I/O)
 internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int], cardType: String, hasCatHeader: Bool, fileName: String, lineNum: Int) -> LineItem {
 
@@ -116,3 +102,25 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
 
     return lineItem
 }//end func makeLineItem
+
+//MARK:---- makeDictColNums - 108-126 = 18-lines
+
+func makeDictColNums(headers: [String]) -> [String: Int] {
+    var dictColNums = [String: Int]()
+    for colNum in 0..<headers.count {
+        let rawKey = headers[colNum].uppercased().trim.replacingOccurrences(of: "\"", with: "")
+        let key: String
+        if rawKey == "DATE" {
+            key = "TRAN"
+        } else if rawKey.hasPrefix("ORIG") && rawKey.hasSuffix("DESCRIPTION") { //
+            key = "DESC"
+        } else if rawKey.hasPrefix("MERCH") && rawKey.hasSuffix("CATEGORY") {   // Handle "Merchant Category"
+            key = "CATE"
+        } else {
+            key = String(rawKey.replacingOccurrences(of: "\"", with: "").prefix(4))
+        }
+        dictColNums[key] = colNum
+    }//next colNum
+
+    return dictColNums
+}

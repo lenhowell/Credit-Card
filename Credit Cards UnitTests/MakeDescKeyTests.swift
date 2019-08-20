@@ -19,11 +19,6 @@ class MakeDescKeyTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-
     func testMakeDescKey() {
         var result = ""
         var desc = ""
@@ -68,10 +63,6 @@ class MakeDescKeyTests: XCTestCase {
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "FORMULYST.COM")
 
-        desc = "HARRYS 888-212-6855 8882126855 NY"
-        result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "HARRYS")
-
         desc = "KFC J235016"
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "KFC")
@@ -80,17 +71,9 @@ class MakeDescKeyTests: XCTestCase {
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "MCDONALDS")
 
-        desc = "MCDONALD`S F3625"
-        result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "MCDONALDS")
-
         desc = "MCDONALD'S  Fx3620       NORTH MYRTLE SC"
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "MCDONALDS")
-
-        desc = "NEOGENISHUMAN855636404 855-6364040 TX"
-        result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "NEOGENISHUMAN")
 
         desc = "STOP & SHOP 0620"
         result = makeDescKey(from: desc)
@@ -135,6 +118,7 @@ class MakeDescKeyTests: XCTestCase {
         //C1V-09-02-2018 - 08-10-2019.csv
         let C1V = [
             "7-ELEVEN 32509":            "7 ELEVEN",
+            "ABC FINE WINE/SPIRITS 156": "ABC FINE WINE SPIRITS",
             "AMTRAK AGENC1450927069712": "AMTRAK",
             "BP#9463555STRATFORD BP":    "BP",
             "BP#9155029GENE'S AUTO":     "BP",
@@ -150,6 +134,7 @@ class MakeDescKeyTests: XCTestCase {
             "LOWES #02651*":             "LOWES",
             "MR. GAS PLUS":              "MR. GAS PLUS",
             "MTA*MNR STATION TIX":       "MNR STATION TIX",
+            "NH LIQUOR STORE #66":       "NH LIQUOR STORE",
             "NINO`S PIZZA":              "NINOS PIZZA",
             "NJT NWK-INT AIR   0356":    "NJT NWK INT AIR",
             "OSTERIA ROMANA MAIN":       "OSTERIA ROMANA MAIN",
@@ -168,10 +153,15 @@ class MakeDescKeyTests: XCTestCase {
 
             "APPLEBEES NEIxxxx6818   BOYNTON BEACHFL":  "APPLEBEES",
             "BB&T PUCKETT SCHEETZ AND xxx-xxx8122  SC": "BB&T PUCKETT SCHEETZ",
+            "HARRYS 888-212-6855 8882126855 NY":        "HARRYS",
             "IHOP #xx-092             GAINESVILLE  FL": "IHOP",
             "LONGHORN STEAKxxxx3264   WINTER GARDENFL": "LONGHORN",
-            "MCDONALD'S  Fx3620       NORTH MYRTLE SC": "MCDONALDS"
-        ]
+            "MCDONALD'S  Fx3620       NORTH MYRTLE SC": "MCDONALDS",
+            "NEOGENISHUMAN855636404 855-6364040 TX":    "NEOGENISHUMAN",
+            "RACETRAC465   xxxx4655   CLERMONT     FL": "RACETRAC",
+
+            ]
+
         /* BAD RESULTS
          "EBC SECURITY, LLC":        "EBC SECURITY LLC",
          "ROUTE 40 DINER":           "ROUTE 40 DINER",
@@ -192,12 +182,10 @@ class MakeDescKeyTests: XCTestCase {
          "PAYPAL *FANKEKE          xxx-xxx-7733 CA"
          "PAYPAL *LAKEAMPHIBI      xxx-xxx-7733 CA"
          "PP*WHIRLWIND SUN N FUN   CLEARWATER   FL"
-         "RACETRAC465   xxxx4655   CLERMONT     FL"
          "SUNPASS*ACCxx7622        xxx-xxx-5352 FL"
 
          "SWA*EARLYBRDxxxxxxxxxxxxxxxx-xxx-9792 TX"
 
-         "UBER TECHNOLOGIES INC    xxx-xxx-1039 CA"
          "VERIZON WRLS Pxxx7-01    WINTER GARDENFL"   -> [VERIZON WRLS P]
          "WAWA xxxx     xxxx2241   SARASOTA     FL"
          "WHATCHA MCCOLLUM CAR RENTxxx-xxx5816  SC"
@@ -206,7 +194,6 @@ class MakeDescKeyTests: XCTestCase {
 
         //C1V-10-01-2017 - 09-01-2018.csv
         _ = [
-            "ABC FINE WINE/SPIRITS 156",
             "DROPBOX*7YNSFZ4JM6FQ",
             "E & J PACKAGE STORE",
             "EBC SECURITY, LLC",
@@ -216,14 +203,12 @@ class MakeDescKeyTests: XCTestCase {
             "KFC J235017",
             "MARATHON PETRO149260",
             "MOTEL 6 YOUNGSTOWN #4553",
-            "NH LIQUOR STORE #66",
             "NINETY 9 BOTTLES TRUMBULL",
             "OPC TAX*SERVICE FEE 024",
             "PALM BEACH TAN CNT003",
             "PARKER STEAKS & SCOTCH",
             "STARLANDER BECK, INC",
             "SUPER 8",
-            "TINAS NAIL AND SKIN",
             "TRUMBULL NAILS & SPA",
             "TACO BELL# 29310",
             "UBER   US OCT30 JAHQC",
@@ -231,7 +216,6 @@ class MakeDescKeyTests: XCTestCase {
             "YULEE 10",
             "ZIPS #9",
         ]
-
 
         for (key, value) in C1V {
             result = makeDescKey(from: key)

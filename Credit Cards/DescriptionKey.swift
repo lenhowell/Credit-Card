@@ -94,10 +94,6 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
     //        let x = 1
     //    }
 
-    if desc.contains("MOTEL") {
-        print("FreeFuncs \(#line) \(desc)") // Debug Trap
-    }
-
     // Remove spaces around " & "
     key2 = descKeyLong.replacingOccurrences(of: " ?& ?", with: "&", options: .regularExpression, range: nil)
     descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Fix \"&\" spaces")
