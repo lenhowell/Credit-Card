@@ -17,6 +17,7 @@ import Cocoa
 // Global Variables
 var dictCategory            = [String: CategoryItem]()  // Hash For Category Lookup
 var uniqueCategoryCounts    = [String: Int]()           // Hash For Unique Category Counts
+var isUnitTesting = false
 
 //MARK:- ViewController
 class ViewController: NSViewController, NSWindowDelegate {
