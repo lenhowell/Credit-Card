@@ -45,40 +45,58 @@ public struct LineItem {
         transaction = transaction.replacingOccurrences(of: "\"", with: "")
         transaction = transaction.replacingOccurrences(of: "\r", with: "")
         let columns = transaction.components(separatedBy: ",")  // Isolate columns within this transaction
-        if columns.count != expectedColumnCount {
-            let msg = "\(columns.count) in transaction; should be \(expectedColumnCount)"
+        let columnCount = columns.count
+        if columnCount != expectedColumnCount {
+            let msg = "\(columnCount) in transaction; should be \(expectedColumnCount)"
             handleError(codeFile: "LineItems", codeLineNum: #line, type: .dataError, action: .display,  fileName: fileName, dataLineNum: lineNum, lineText: fromTransFileLine, errorMsg: msg)
         }
         // Building the lineitem record
         self.tranDate = columns[dictColNums["TRAN"]!]
+
         if let colNum = dictColNums["POST"] {
-            self.postDate = columns[colNum]
+            if colNum < columnCount {
+                self.postDate = columns[colNum]
+            }
         }
         if let colNum = dictColNums["DESC"] {
-            self.desc = columns[colNum].replacingOccurrences(of: "\"", with: "")
-            if self.desc.trim.isEmpty {
-                print("LineItems #\(#line) - Empty Description\n\(transaction)")
+            if colNum < columnCount {
+                self.desc = columns[colNum].replacingOccurrences(of: "\"", with: "")
+                if self.desc.trim.isEmpty {
+                    print("LineItems #\(#line) - Empty Description\n\(transaction)")
+                }
             }
         }
         if let colNum = dictColNums["CARD"] {
-            self.cardNum = columns[colNum]
+            if colNum < columnCount {
+                self.cardNum = columns[colNum]
+            }
         }
         if let colNum = dictColNums["CATE"] {
-            self.rawCat = columns[colNum]
+            if colNum < columnCount {
+                self.rawCat = columns[colNum]
+            }
         }
         if let colNum = dictColNums["AMOU"] {
-            let amount = Double(columns[colNum].trim) ?? 0
-            if amount < 0 {
-                self.credit = -amount
-            } else {
-                self.debit = amount
+            if colNum < columnCount {
+                let amount = Double(columns[colNum].trim) ?? 0
+                if amount < 0 {
+                    self.credit = -amount
+                } else {
+                    self.debit = amount
+                }
             }
         }
         if let colNum = dictColNums["CRED"] {
-            self.credit = Double(columns[colNum].trim) ?? 0
+            if colNum < columnCount {
+                self.credit = Double(columns[colNum].trim) ?? 0
+            }
+            
         }
         if let colNum = dictColNums["DEBI"] {
-            self.debit = Double(columns[colNum].trim) ?? 0
+            if colNum < columnCount {
+                self.debit = Double(columns[colNum].trim) ?? 0
+            }
+            
         }
     }//end init
 
