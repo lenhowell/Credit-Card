@@ -27,10 +27,10 @@ public func getStringFromClipBoard() -> String {
 //MARK:- Date Extensions
 extension Date {
 
-    //---- Date.ToString
+    //---- Date.toString
     ///Convert to String using formats like "MM/dd/yyyy hh:mm:ss"
     /// - parameter format: String like "MM/dd/yyyy hh:mm:ss"
-    func ToString(_ format: String) -> String {
+    func toString(_ format: String) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format
         let out = dateFormatter.string(from: self)

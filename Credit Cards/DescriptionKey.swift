@@ -172,7 +172,7 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
             key2 = String(descKeyLong.prefix(posHash))
             descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove \"#...\"")
         } else {
-            //let x=1 // Debug Trap
+            // let x=1 // Debug Trap Never hit
         }
     }
 
@@ -185,7 +185,7 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
             key2 = String(descKeyLong.prefix(posStar))
             descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove \"*...\"")
         } else {
-            //let x=1 // Debug Trap
+            //let x=1 // Debug Trap - "PP*WHIRLWIND SUN N FUN..."
         }
     }
 
@@ -195,10 +195,12 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
 
     if descKeyLong.isEmpty { return "" }
 
-    if descKeyLong[descKeyLong.count-1].isNumber {
+    // Check last char in descKeyLong
+    if descKeyLong.lastChar().isNumber {
         descKeyLong = stripTrailingNumber(descKeyLong, fileName: fileName)
     }
-    if descKeyLong[descKeyLong.count-1].isNumber {
+    // Check last char in descKeyLong - again
+    if descKeyLong.lastChar().isNumber {
         descKeyLong = stripTrailingNumber(descKeyLong, fileName: fileName)
     }
 
@@ -216,6 +218,16 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
 
     return descKey
 }//end func makeDescKey
+
+
+extension StringProtocol {
+    func lastChar() -> Character {
+        if self.isEmpty {
+            return Character("\u{0}")
+        }
+        return self[self.index(self.endIndex, offsetBy: -1)]
+    }
+}//end extension StringProtocol 
 
 /*
  🔹 C1V-09-02-2018 - 08-10-2019.csv STOP & SHOP
@@ -338,7 +350,6 @@ func checkDif(newStr: String, oldStr: String, doPrint: Bool, comment: String) ->
     if oldStr != newStr {
         if doPrint {
             print("🍎 [\(oldStr)] -> [\(newStr)]  \(comment)")
-            return newStr
         }
         return newStr
     }

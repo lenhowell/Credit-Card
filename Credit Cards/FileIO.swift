@@ -139,7 +139,7 @@ func writeCategoriesToFile(categoryFileURL: URL, dictCat: [String: CategoryItem]
     let fileAttributes = FileAttributes.getFileInfo(url: categoryFileURL)
     let modDate = fileAttributes.modificationDate
     let oldNameWithExt = categoryFileURL.lastPathComponent
-    let adder = modDate?.ToString("yyyy-MM-dd hhmm") ?? "BU"
+    let adder = modDate?.toString("yyyy-MM-dd hhmm") ?? "BU"
     let nameComps = oldNameWithExt.components(separatedBy: ".")
     let oldName = nameComps[0]
     let ext = "." + nameComps[1]
