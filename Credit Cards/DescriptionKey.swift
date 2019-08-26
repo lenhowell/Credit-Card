@@ -22,7 +22,7 @@ let descKeyLength          = 18   //         16->195 14->191 12->187 11->180 10-
  "BOSTON MARKET 01"     "BOSTON MARKET 09"   ok to 14
  "GOLDEN CORRAL 08"     "GOLDEN CORRAL 26"   ok to 14
  "PROMO PRICING CR"     "PROMO PRICING DE"   ok to 14
- "INTEREST CHARGE"     "INTEREST CHARGED"    ok to 15
+ "INTEREST CHARGE"      "INTEREST CHARGED"   ok to 15
 
  "VERIZON WRL MY A"     "VERIZON WRLS P"
  "COUNTRY CORNER C"     "COUNTRY HOUSE RE"   needs 9 or 10
@@ -102,7 +102,7 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
     key2 = descKeyLong.replacingOccurrences(of: " +AND +", with: "&", options: .regularExpression, range: nil)
     descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Fix \" AND \"")
 
-    // Remove "SQU*", "SQ *", "APL*" ,from beginning of line.
+    // Remove "SQU*", "SQ *", "APL*", etc. from beginning of line.
     key2 = descKeyLong.replacingOccurrences(of: #"^...\*"#, with: "", options: .regularExpression, range: nil)
     descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove \"SQU*\" etc.")
 
@@ -196,12 +196,16 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
     if descKeyLong.isEmpty { return "" }
 
     // Check last char in descKeyLong
-    if descKeyLong.lastChar().isNumber {
-        descKeyLong = stripTrailingNumber(descKeyLong, fileName: fileName)
+    if let chr = descKeyLong.last {
+        if chr.isWholeNumber {
+            descKeyLong = stripTrailingNumber(descKeyLong, fileName: fileName)
+        }
     }
     // Check last char in descKeyLong - again
-    if descKeyLong.lastChar().isNumber {
-        descKeyLong = stripTrailingNumber(descKeyLong, fileName: fileName)
+    if let chr = descKeyLong.last {
+        if chr.isWholeNumber {
+            descKeyLong = stripTrailingNumber(descKeyLong, fileName: fileName)
+        }
     }
 
     descKeyLong = descKeyLong.trim
@@ -212,22 +216,15 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
 
     // Truncate & uppercase
     var descKey = String(descKeyLong.prefix(descKeyLength)).trim.uppercased()
-    if descKey[descKey.count-1].isNumber {
-        descKey = stripTrailingNumber(descKey, fileName: fileName)
+    if let chr = descKey.last {
+        if chr.isWholeNumber {
+            descKey = stripTrailingNumber(descKey, fileName: fileName)
+        }
     }
 
     return descKey
 }//end func makeDescKey
 
-
-extension StringProtocol {
-    func lastChar() -> Character {
-        if self.isEmpty {
-            return Character("\u{0}")
-        }
-        return self[self.index(self.endIndex, offsetBy: -1)]
-    }
-}//end extension StringProtocol 
 
 /*
  🔹 C1V-09-02-2018 - 08-10-2019.csv STOP & SHOP
@@ -325,22 +322,14 @@ internal func stripTrailingNumber(_ keyIn: String, fileName: String = "") -> Str
     }
 
     if key.contains(" ") {      // has a space
-        for index in (1..<key.count).reversed() {
-            if key[index] == " " {
-                key2 = String(key.prefix(index))
-                break
-            }
-        }
-        print("🔹 2 ",fileName, key, "=>" , key2)
+        let indexSp = key.lastIndex(of: " ") ?? key.startIndex
+        key2 = String(key[..<indexSp])  // String(key.prefix(upTo: indexSp))
+        print("🔹 2 ",fileName, "\(key)  =>  \"\(key2)\"")
         key = key2          // MCDONALDS F13620 => MCDONALDS  VIOC AE0034 => VIOC    (# starts with letters)
     } else {                // no space
-        for index in stride(from: key.count-1, through: 1, by: -1) {
-            if !key[index].isNumber {
-                key2 = String(key.prefix(index+1))
-                break
-            }
-        }
-        print("🔹 3 ",fileName, key, "=>" , key2)
+        let indexLet = key.lastIndex(where: {!$0.isNumber}) ?? key.index(before: key.endIndex) // optional
+        key2 = String(key[...indexLet])                                 // "AE1B"
+        print("🔹 3 ",fileName, "\(key)  =>  \"\(key2)\"")
         key = key2                  // STP&SHPFUEL0663 => STP&SHPFUEL (no space between name & #)
     }
     return key.trim

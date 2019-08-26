@@ -105,16 +105,16 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
 
 //MARK:---- makeDictColNums - 108-126 = 18-lines
 
-func makeDictColNums(headers: [String]) -> [String: Int] {
+internal func makeDictColNums(headers: [String]) -> [String: Int] {
     var dictColNums = [String: Int]()
     for colNum in 0..<headers.count {
         let rawKey = headers[colNum].uppercased().trim.replacingOccurrences(of: "\"", with: "")
         let key: String
-        if rawKey == "DATE" {
+        if rawKey == "DATE" {                                                   // "Date"
             key = "TRAN"
-        } else if rawKey.hasPrefix("ORIG") && rawKey.hasSuffix("DESCRIPTION") { //
+        } else if rawKey.hasPrefix("ORIG") && rawKey.hasSuffix("DESCRIPTION") { // "Original Description"
             key = "DESC"
-        } else if rawKey.hasPrefix("MERCH") && rawKey.hasSuffix("CATEGORY") {   // Handle "Merchant Category"
+        } else if rawKey.hasPrefix("MERCH") && rawKey.hasSuffix("CATEGORY") {   // "Merchant Category"
             key = "CATE"
         } else {
             key = String(rawKey.replacingOccurrences(of: "\"", with: "").prefix(4))
@@ -123,4 +123,4 @@ func makeDictColNums(headers: [String]) -> [String: Int] {
     }//next colNum
 
     return dictColNums
-}
+}//end func

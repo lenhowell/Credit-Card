@@ -19,18 +19,6 @@ class MakeDescKeyTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testLastChar() {
-        var result: Character
-
-        var str = "1234"
-        result = str.lastChar()
-        XCTAssertEqual(result, Character("4"))
-
-        str = ""
-        result = str.lastChar()
-        XCTAssertEqual(result, Character("\u{0}"))
-    }
-
     func testMakeDescKey() {
         var result = ""
         var desc = ""
