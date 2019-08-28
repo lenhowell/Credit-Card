@@ -7,7 +7,6 @@
 //
 
 // TODO: Append Error message to Error File
-// TODO: Show Alert if  ErrAction == .alert or .alertAndDisplay
 // TODO: Terminate app if ErrType == .codeFatal or .dataFatal
 
 import Foundation

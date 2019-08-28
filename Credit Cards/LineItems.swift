@@ -51,8 +51,11 @@ public struct LineItem {
             handleError(codeFile: "LineItems", codeLineNum: #line, type: .dataError, action: .display,  fileName: fileName, dataLineNum: lineNum, lineText: fromTransFileLine, errorMsg: msg)
         }
         // Building the lineitem record
-        self.tranDate = columns[dictColNums["TRAN"]!]
-
+        if let colNum = dictColNums["TRAN"] {
+            if colNum < columnCount {
+                self.tranDate = columns[colNum]
+            }
+        }
         if let colNum = dictColNums["POST"] {
             if colNum < columnCount {
                 self.postDate = columns[colNum]

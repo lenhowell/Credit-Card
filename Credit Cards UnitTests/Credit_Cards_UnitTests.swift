@@ -39,8 +39,8 @@ class Credit_Cards_UnitTests: XCTestCase {
         XCTAssertEqual(dc.year, 4000)
         XCTAssertEqual(dc.month, 12)
         XCTAssertEqual(dc.day, 31)
-        let str = date.toString("yyyy-MM-dd hh-mm-ss")
-        XCTAssertEqual(str, "4000-12-31 07-00-00")
+        let str = date.toString("yyyy-MM-dd HH-mm-ss")
+        XCTAssertEqual(str, "4000-12-31 19-00-00")
     }
 
     func testMakeLineItemAndDictColNums() {

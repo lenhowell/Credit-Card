@@ -135,11 +135,11 @@ func loadCategories(categoryFileURL: URL) -> [String: CategoryItem]  {
 //---- writeCategoriesToFile - uses workingFolderUrl(I), handleError(F)
 func writeCategoriesToFile(categoryFileURL: URL, dictCat: [String: CategoryItem]) {
 
-    // Rename the existing file to "CategoryLookup yyyy-MM-dd hhmm.txt"
+    // Rename the existing file to "CategoryLookup yyyy-MM-dd HHmm.txt"
     let fileAttributes = FileAttributes.getFileInfo(url: categoryFileURL)
     let modDate = fileAttributes.modificationDate
     let oldNameWithExt = categoryFileURL.lastPathComponent
-    let adder = modDate?.toString("yyyy-MM-dd hhmm") ?? "BU"
+    let adder = modDate?.toString("yyyy-MM-dd HHmm") ?? "BU"
     let nameComps = oldNameWithExt.components(separatedBy: ".")
     let oldName = nameComps[0]
     let ext = "." + nameComps[1]
@@ -153,6 +153,8 @@ func writeCategoriesToFile(categoryFileURL: URL, dictCat: [String: CategoryItem]
 
     var text = "// Category keys are up to \(descKeyLength) chars long.\n"
     text += "// Apostrophies are removed, and other extraneous punctuation changed to spaces.\n"
+    text += "// Prefix of \"SQ *\" or any other \"???*\" is removed if result > 9 chars.\n"
+    text += "// When a double-space is found, the rest is truncated.\n"
     text += "// When a phone number or \"xxx...\" or other multi-digit number is reached the rest is truncated.\n"
     text += "\n// Description Key        Category              Source\n"
     var prevCat = ""

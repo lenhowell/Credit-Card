@@ -82,17 +82,25 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
     //let descKeySeparator       = " "  // 30->479 16->437 14->406 12->377         10->353 9->
     // 30->397 20->381 18->375
     //                 18->361
-    var descKeyLong = ""
+    var descKeyLong = desc
     var key2 = ""
+    var ccPrefix = ""
+
+    // Truncate at Double Space
+    let posDblSpc = descKeyLong.firstIntIndexOf("  ")
+    if posDblSpc >= 0 {
+        //print("✅ Got double-space at pos \(posDblSpc) in \(descKeyLong)")
+        if posDblSpc >= 2 {
+            key2 = String(descKeyLong.prefix(posDblSpc))
+            descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove \"xxx...\"")
+        } else {
+            //let xx=1 // Debug Trap: Never hit
+        }
+    }
 
     // Eliminate apostrophies Allen's => Allens
-    key2 = desc.replacingOccurrences(of: "['`]", with: "", options: .regularExpression, range: nil)
+    key2 = descKeyLong.replacingOccurrences(of: "['`]", with: "", options: .regularExpression, range: nil)
     descKeyLong = checkDif(newStr: key2, oldStr: desc, doPrint: false, comment: "Remove apostrophy")
-
-    //    if desc.contains("PARKER") {
-    //        print(desc)
-    //        let x = 1
-    //    }
 
     // Remove spaces around " & "
     key2 = descKeyLong.replacingOccurrences(of: " ?& ?", with: "&", options: .regularExpression, range: nil)
@@ -102,13 +110,16 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
     key2 = descKeyLong.replacingOccurrences(of: " +AND +", with: "&", options: .regularExpression, range: nil)
     descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Fix \" AND \"")
 
-    // Remove "SQU*", "SQ *", "APL*", etc. from beginning of line.
+    // Remove "SQU*", "SQ *", etc. from beginning of line.
     key2 = descKeyLong.replacingOccurrences(of: #"^...\*"#, with: "", options: .regularExpression, range: nil)
+    if key2 != descKeyLong {
+        ccPrefix = String(descKeyLong.prefix(3))
+    }
     descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove \"SQU*\" etc.")
 
-    // Remove 2nd "SQU*", "SQ *", "APL*" ,from beginning of line.
-    key2 = descKeyLong.replacingOccurrences(of: #"^\w\w.\*"#, with: "", options: .regularExpression, range: nil)
-    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove repeat \"SQU*\" etc.")
+    // Remove 2nd "SQU*", "SQ *", etc. from beginning of line.
+    key2 = descKeyLong.replacingOccurrences(of: #"^...\*"#, with: "", options: .regularExpression, range: nil)
+    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: true, comment: "Remove repeat \"SQU*\" etc.")
 
     // Truncate Line upon th following matches
 
@@ -156,12 +167,12 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
             key2 = String(descKeyLong.prefix(posX))
             descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove \"xxx...\"")
         } else {
-            //let x=1 // Debug Trap
+            //let xx=1 // Debug Trap: Never hit
         }
     }
 
 
-
+    //TODO: Eliminate use of firstIntIndexOf()
 
     // APPLE STORE  #R102  (# at 13)
     // Truncate at "#..."
@@ -172,7 +183,7 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
             key2 = String(descKeyLong.prefix(posHash))
             descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove \"#...\"")
         } else {
-            // let x=1 // Debug Trap Never hit
+            //let xx=1 // Debug Trap: Never hit
         }
     }
 
@@ -185,7 +196,7 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
             key2 = String(descKeyLong.prefix(posStar))
             descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove \"*...\"")
         } else {
-            //let x=1 // Debug Trap - "PP*WHIRLWIND SUN N FUN..."
+            //let xx=1 // Debug Trap - "PP*WHIRLWIND SUN N FUN..."
         }
     }
 
@@ -198,13 +209,13 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
     // Check last char in descKeyLong
     if let chr = descKeyLong.last {
         if chr.isWholeNumber {
-            descKeyLong = stripTrailingNumber(descKeyLong, fileName: fileName)
-        }
-    }
-    // Check last char in descKeyLong - again
-    if let chr = descKeyLong.last {
-        if chr.isWholeNumber {
-            descKeyLong = stripTrailingNumber(descKeyLong, fileName: fileName)
+            let comps = descKeyLong.components(separatedBy: " ")
+            let lastWord = comps.last ?? descKeyLong
+            if lastWord.count > 2 {
+                descKeyLong = stripTrailingNumber(descKeyLong, fileName: fileName)
+            } else {
+                //let xx=1
+            }
         }
     }
 
@@ -214,13 +225,15 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
     key2 = descKeyLong.replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression, range: nil)
     descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Squish double spaces")
 
-    // Truncate & uppercase
-    var descKey = String(descKeyLong.prefix(descKeyLength)).trim.uppercased()
-    if let chr = descKey.last {
-        if chr.isWholeNumber {
-            descKey = stripTrailingNumber(descKey, fileName: fileName)
-        }
+    if !ccPrefix.isEmpty && descKeyLong.count < 9 {
+        print("⚠️ \(ccPrefix) + \"\(descKeyLong)\"   \(descKeyLong.count)")
+        descKeyLong = ccPrefix + " " + descKeyLong
+        print(descKeyLong)
+        //let xx=1
     }
+
+    // Truncate & uppercase
+    let descKey = String(descKeyLong.prefix(descKeyLength)).trim.uppercased()
 
     return descKey
 }//end func makeDescKey
@@ -314,9 +327,9 @@ internal func stripTrailingNumber(_ keyIn: String, fileName: String = "") -> Str
     var key = keyIn
     var key2 = key
 
-    // Replace (spc) (1 or more digits) (word boundry) with spc
-    key2 = key.replacingOccurrences(of:  #" \d+\b"#, with: " ", options: .regularExpression, range: nil).trim
-    if key2 != key {
+    // Replace (spc) (2 or more digits) (word boundry) with spc
+    key2 = key.replacingOccurrences(of:  #" \d\d+\b"#, with: " ", options: .regularExpression, range: nil).trim
+    if key2 != key {    // "PILOT 00337", "SUPER 8", "STAR SHOWER 2", "DTGC 1", "JETBLUE     2"
         print("🔹 1 ",fileName, key, "=>" , key2)   // CIRCLE B 10 => CIRCLE B (# was too short)
         return key2.trim
     }

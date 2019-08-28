@@ -19,6 +19,17 @@ class MakeDescKeyTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
+    func testEdge() {
+        //   "SUPER 8",
+        var result = ""
+        var desc = ""
+
+        desc = "SUPER 8"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "SUPER 8")
+
+    }
+
     func testMakeDescKey() {
         var result = ""
         var desc = ""
@@ -96,10 +107,40 @@ class MakeDescKeyTests: XCTestCase {
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "GOOGLE")
 
+        desc = "UBER   TRIP"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "UBER")
+
+        desc = "MTA*MNR STATION TIX"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "MNR STATION TIX")
+
+        desc = "PSV* Momentum Alert"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "MOMENTUM ALERT")
+
+        desc = "SWA*EARLYBRDxxxxxxxxxxxxxxxx-xxx-9792 TX"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "SWA EARLYBRD")
+
+        desc = "ALG*AIR     7BN2JZ       xxx-xxx-8888 NV"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "ALG AIR")
+
+        desc = "HUM*HUMANN8556364040 855-6364040 TX"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "HUM HUMANN")
+
+        desc = "SQ *RETHREADS"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "RETHREADS")
+
 
         //CIT-07-2-2017 - 08-11-2019.csv
         desc = "SECURITY CREDIT-LPI*LITTLE PASSPORTS"
         desc = "LPI*LITTLE PASSPORTS CONTACTLP.COM CA"
+
+
 
         //C1R-09-02-2018 - 08-10-2019.csv
         _ = [
@@ -133,16 +174,13 @@ class MakeDescKeyTests: XCTestCase {
             "LAKE & MAIN SERV CENTE":    "LAKE&MAIN SERV CENTE",
             "LOWES #02651*":             "LOWES",
             "MR. GAS PLUS":              "MR. GAS PLUS",
-            "MTA*MNR STATION TIX":       "MNR STATION TIX",
             "NH LIQUOR STORE #66":       "NH LIQUOR STORE",
             "NINO`S PIZZA":              "NINOS PIZZA",
             "NJT NWK-INT AIR   0356":    "NJT NWK INT AIR",
             "OSTERIA ROMANA MAIN":       "OSTERIA ROMANA MAIN",
             "PILOT_00337":               "PILOT",
-            "PSV* Momentum Alert":       "MOMENTUM ALERT",
             "SPRINT *WIRELESS":          "SPRINT",
             "SPRINT RETAIL #030712":     "SPRINT RETAIL",
-            "UBER   TRIP":               "UBER TRIP",
             "VERIZON WRLS P2027-01":     "VERIZON WRLS",
             "VILLAGE-INN-REST #923":     "VILLAGE INN REST",
             "VIOC AE0034":               "VIOC",
@@ -208,7 +246,6 @@ class MakeDescKeyTests: XCTestCase {
             "PALM BEACH TAN CNT003",
             "PARKER STEAKS & SCOTCH",
             "STARLANDER BECK, INC",
-            "SUPER 8",
             "TRUMBULL NAILS & SPA",
             "TACO BELL# 29310",
             "UBER   US OCT30 JAHQC",
