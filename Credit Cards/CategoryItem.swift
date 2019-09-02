@@ -7,7 +7,3 @@
 //
 
 import Foundation
-public struct CategoryItem{
-    var category    = ""
-    var source      = "UG"
-}

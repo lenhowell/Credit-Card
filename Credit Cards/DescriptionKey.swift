@@ -11,6 +11,7 @@ import Foundation
 //MARK:- Globals
 let descKeysuppressionList = " \";_@/,#*-"
 let descKeyLength          = 18   //         16->195 14->191 12->187 11->180 10->179 9->
+var dictDescKeyAlgorithm = [String: Int]()
 
 /*
  "RACETRAC465"          "RACETRAC599"        ok to 8
@@ -92,7 +93,7 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
         //print("✅ Got double-space at pos \(posDblSpc) in \(descKeyLong)")
         if posDblSpc >= 2 {
             key2 = String(descKeyLong.prefix(posDblSpc))
-            descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove \"xxx...\"")
+            descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "01.Truncate @ Dbl-Space")
         } else {
             //let xx=1 // Debug Trap: Never hit
         }
@@ -100,26 +101,45 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
 
     // Eliminate apostrophies Allen's => Allens
     key2 = descKeyLong.replacingOccurrences(of: "['`]", with: "", options: .regularExpression, range: nil)
-    descKeyLong = checkDif(newStr: key2, oldStr: desc, doPrint: false, comment: "Remove apostrophy")
+    descKeyLong = checkDif(newStr: key2, oldStr: desc, doPrint: false, comment: "02.Remove apostrophy")
+
+    // Find KeyWords in Description
+    let descKeyUpper = descKeyLong.uppercased()
+    for (keyWord, descKeyWord) in dictDescKeyWords {
+        if descKeyWord.isPrefix {
+            if descKeyUpper.hasPrefix(keyWord) {
+                return descKeyWord.descKey
+            }
+        } else {
+            if descKeyUpper.contains(keyWord) {
+                return descKeyWord.descKey
+            }
+        }
+    }//next
+
 
     // Remove spaces around " & "
     key2 = descKeyLong.replacingOccurrences(of: " ?& ?", with: "&", options: .regularExpression, range: nil)
-    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Fix \"&\" spaces")
+    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "03.Fix \"&\" spaces")
 
     //  Change " AND " to "&"
     key2 = descKeyLong.replacingOccurrences(of: " +AND +", with: "&", options: .regularExpression, range: nil)
-    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Fix \" AND \"")
+    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "04.Fix \" AND \"")
 
     // Remove "SQU*", "SQ *", etc. from beginning of line.
     key2 = descKeyLong.replacingOccurrences(of: #"^...\*"#, with: "", options: .regularExpression, range: nil)
     if key2 != descKeyLong {
         ccPrefix = String(descKeyLong.prefix(3))
     }
-    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove \"SQU*\" etc.")
+    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "05.Remove \"SQU*\" etc.")
 
     // Remove 2nd "SQU*", "SQ *", etc. from beginning of line.
     key2 = descKeyLong.replacingOccurrences(of: #"^...\*"#, with: "", options: .regularExpression, range: nil)
-    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: true, comment: "Remove repeat \"SQU*\" etc.")
+    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "06.Remove 2nd \"SQU*\" etc.")
+
+//    if descKeyLong.contains("SWEET TOMATOES 72 Q14") {
+//        let xx=1  // debug trap
+//    }
 
     // Truncate Line upon th following matches
 
@@ -127,16 +147,26 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
     var regexp = #"\d+-\d+-\d+.*"#
     if let range = descKeyLong.range(of:regexp, options: .regularExpression) {
         key2 = descKeyLong.replacingCharacters(in: range, with: "").trim
-        descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove phone number")
+        descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "07.Remove phone number")
     }
 
-    // Truncate at bare Number(>=2 digits) [ #12...], [ 12...]
-    regexp = #" #?\d\d.*"#
+    // Truncate at bare Number(>=3 digits) [ #12...], [ 12...]
+    regexp = #" #?\d\d\d.*"#
     if let range = descKeyLong.range(of:regexp, options: .regularExpression) {
         key2 = descKeyLong.replacingCharacters(in: range, with: "").trim
         //let result = descKeyLong[range]
         //print("[\(key2)] = [\(descKeyLong)] - [\(result)]")
-        descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove bare number")
+        descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "08.Truncate @ bare number >=3")
+    }
+
+    // Truncate at Spc, 0orMore Letters, 2orMore digits at end
+    // "STEAK-N-SHAKE#0382< Q99>"
+    regexp = #" #?\w?\d\d+$"#
+    if let range = descKeyLong.range(of:regexp, options: .regularExpression) {
+        key2 = descKeyLong.replacingCharacters(in: range, with: "").trim
+        //let result = descKeyLong[range]
+        //print("[\(key2)] = [\(descKeyLong)] - [\(result)]")
+        descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "09.Truncate @ trailing number >1 dig")
     }
 
     // Truncate at  embedded Number(>=3 digits) [#123...] (must be done before removing "#")
@@ -145,16 +175,16 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
         key2 = descKeyLong.replacingCharacters(in: range, with: "").trim
         //let result = descKeyLong[range]
         //print("[\(key2)] = [\(descKeyLong)] - [\(result)]")
-        descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove embedded number")
+        descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "10.Truncate @ embedded # + 3dig")
     }
 
     // Truncate at [ Fx123...] Spc 0orMore Caps 0orMore x's
-    regexp = #" [A-Z]*x*\d\d+.*"#
+    regexp = #" [A-Z]*x*\d\d\d+.*"#
     if let range = descKeyLong.range(of:regexp, options: .regularExpression) {
         key2 = descKeyLong.replacingCharacters(in: range, with: "").trim
         //let result = descKeyLong[range]
         //print("[\(key2)] = [\(descKeyLong)] - [\(result)]")
-        descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove [ Fx123]")
+        descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "11.Truncate @ [ Fx123]")
     }
 
 
@@ -165,7 +195,7 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
         //print("✅ Got (xx) at pos \(posX) in \(descKeyLong)")
         if posX >= 2 {
             key2 = String(descKeyLong.prefix(posX))
-            descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove \"xxx...\"")
+            descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "12.Truncate @ \"xxx...\"")
         } else {
             //let xx=1 // Debug Trap: Never hit
         }
@@ -181,7 +211,7 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
         //print("✅ Got (#) at pos \(posHash) in \(descKeyLong)")
         if posHash >= 2 {
             key2 = String(descKeyLong.prefix(posHash))
-            descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove \"#...\"")
+            descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "13.Truncate @ \"#\"")
         } else {
             //let xx=1 // Debug Trap: Never hit
         }
@@ -194,7 +224,7 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
         //print("✅ Got (*) at pos \(posStar) in \(descKeyLong)")
         if posStar >= 6 {
             key2 = String(descKeyLong.prefix(posStar))
-            descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Remove \"*...\"")
+            descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "14.Truncate @ \"*\" if pos>5")
         } else {
             //let xx=1 // Debug Trap - "PP*WHIRLWIND SUN N FUN..."
         }
@@ -202,7 +232,8 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
 
 
     // Replace chars in suppression list with spaces
-    descKeyLong = descKeyLong.replacingOccurrences(of: "["+descKeysuppressionList+"]", with: " ", options: .regularExpression, range: nil)
+    key2 = descKeyLong.replacingOccurrences(of: "["+descKeysuppressionList+"]", with: " ", options: .regularExpression, range: nil)
+    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "15.Char Suppression List.")
 
     if descKeyLong.isEmpty { return "" }
 
@@ -211,10 +242,11 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
         if chr.isWholeNumber {
             let comps = descKeyLong.components(separatedBy: " ")
             let lastWord = comps.last ?? descKeyLong
-            if lastWord.count > 2 {
-                descKeyLong = stripTrailingNumber(descKeyLong, fileName: fileName)
+            if lastWord.count > 1 {
+                key2 = stripTrailingNumber(descKeyLong, fileName: fileName)
+                descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "16.Strip trailing digits off last word.")
             } else {
-                //let xx=1
+                // "SUPER 8", "DTGC 1", "DTGC_1", "STAR SHOWER 2"
             }
         }
     }
@@ -223,13 +255,13 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
 
     // Remove Double Spaces
     key2 = descKeyLong.replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression, range: nil)
-    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "Squish double spaces")
+    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "17.Squish double spaces")
 
     if !ccPrefix.isEmpty && descKeyLong.count < 9 {
         print("⚠️ \(ccPrefix) + \"\(descKeyLong)\"   \(descKeyLong.count)")
         descKeyLong = ccPrefix + " " + descKeyLong
         print(descKeyLong)
-        //let xx=1
+        //"SWA EARLYBRD", "ALG AIR", "HUM HUMANN"
     }
 
     // Truncate & uppercase
@@ -352,7 +384,9 @@ func checkDif(newStr: String, oldStr: String, doPrint: Bool, comment: String) ->
     if oldStr != newStr {
         if doPrint {
             print("🍎 [\(oldStr)] -> [\(newStr)]  \(comment)")
+            let xx=1
         }
+        dictDescKeyAlgorithm[comment, default: 0] += 1
         return newStr
     }
     return oldStr

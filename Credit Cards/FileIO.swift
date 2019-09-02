@@ -8,6 +8,17 @@
 
 import Foundation
 
+public struct CategoryItem {
+    var category    = ""
+    var source      = "UG"
+}
+
+public struct DescKeyWord {
+    //var keyWord = ""
+    var descKey = ""
+    var isPrefix = false
+}
+
 //MARK:- General Purpose
 
 // Creates FileURL or returns an error message
@@ -95,6 +106,40 @@ public struct FileAttributes: Equatable {
         }
     }
 }// end struct FileAttributes
+
+//MARK:- Description KeyWords
+
+func loadDescKeyWords(descKeyWordFileURL: URL) -> [String: DescKeyWord]  {
+    var dictKeyWords = [String: DescKeyWord]()
+    let contentof = (try? String(contentsOf: descKeyWordFileURL)) ?? ""
+    let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
+    var lineNum = 0
+    for line in lines {
+        lineNum += 1
+        if line.trim.isEmpty || line.hasPrefix("//") {
+            continue
+        }
+        //let line = line.replacingOccurrences(of: "\"", with: "")
+
+        // Create an Array of line components the seperator being a ","
+        let keyWordArray = line.components(separatedBy: ",")
+        if keyWordArray.count < 2 {
+            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: descKeyWordFileURL.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "expected a comma")
+            continue
+        }
+        var keyWord = keyWordArray[0].trim
+        var isPrefix = false
+        if keyWord.hasPrefix("^") {
+            isPrefix = true
+            keyWord = String(keyWord.dropFirst().removeEnclosingQuotes())
+        } else {
+            keyWord = keyWord.removeEnclosingQuotes()
+        }
+        let descKey = keyWordArray[1].trim.removeEnclosingQuotes()
+        dictKeyWords[keyWord] = DescKeyWord(descKey: descKey, isPrefix: isPrefix)
+    }
+    return dictKeyWords
+}//end func loadDescKeyWords
 
 //MARK:- Categories
 

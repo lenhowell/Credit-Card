@@ -15,8 +15,10 @@ import Cocoa
 // Global Constants
 
 // Global Variables
-var dictCategory            = [String: CategoryItem]()  // Hash For Category Lookup
-var uniqueCategoryCounts    = [String: Int]()           // Hash For Unique Category Counts
+var dictCategory            = [String: CategoryItem]()  // Hash for Category Lookup
+var dictDescKeyWords        = [String: DescKeyWord]()   // Hash for Description KeyWord Lookup
+var dictMyCatNames          = [String: String]()        // Hash of Category Synonyms
+var uniqueCategoryCounts    = [String: Int]()           // Hash for Unique Category Counts
 var isUnitTesting = false
 
 //MARK:- ViewController
@@ -27,16 +29,20 @@ class ViewController: NSViewController, NSWindowDelegate {
     // Constants
     let myFileNameOut       = "Combined-Creditcard-Master.csv" // Only used in outputTranactions
     let categoryFilename    = "CategoryLookup.txt"
+    let descKeyWordFilename = "DescriptionKeyWords.txt"
+    let dictMyCatNames      = "MyCategories.txt"
 
     // Variables
     var containsDictionary  = [String: String]()        // String: is the Key - Generated Category
     var transFileURLs       = [URL]()
     var pathTransactionDir  = "Downloads/Credit Card Trans"
-    var pathCategoryDir     = "Desktop/Credit Card Files"
+    var pathSupportDir      = "Desktop/Credit Card Files"
     var pathOutputDir       = "Desktop/Credit Card Files"
 
     var transactionDirURL   = FileManager.default.homeDirectoryForCurrentUser
     var categoryFileURL     = FileManager.default.homeDirectoryForCurrentUser
+    var descKeyWordFileURL  = FileManager.default.homeDirectoryForCurrentUser
+    var myCatsFileURL       = FileManager.default.homeDirectoryForCurrentUser
     var outputFileURL       = FileManager.default.homeDirectoryForCurrentUser
 
     //MARK:- Overrides & Lifecycle
@@ -52,8 +58,8 @@ class ViewController: NSViewController, NSWindowDelegate {
                                                 object:   nil
         )
 
-        if let dir = UserDefaults.standard.string(forKey: UDKey.categoryFolder) {
-            if !dir.isEmpty { pathCategoryDir = dir }
+        if let dir = UserDefaults.standard.string(forKey: UDKey.supportFolder) {
+            if !dir.isEmpty { pathSupportDir = dir }
         }
         pathOutputDir       = UserDefaults.standard.string(forKey: UDKey.outputFolder) ?? pathOutputDir
         pathTransactionDir  = UserDefaults.standard.string(forKey: UDKey.transactionFolder) ?? pathTransactionDir
@@ -74,19 +80,14 @@ class ViewController: NSViewController, NSWindowDelegate {
             lblErrMsg.stringValue = "Transaction" + errTxt
         }
 
-        (categoryFileURL, errTxt)  = makeFileURL(pathFileDir: pathCategoryDir, fileName: categoryFilename)
-        if !errTxt.isEmpty {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "Category" + errTxt)
-        }
-        dictCategory = loadCategories(categoryFileURL: categoryFileURL) // Build Categories Dictionary
-        Stats.origCatCount = dictCategory.count
+        readSupportFiles()
 
         // Show on Screen
         let shortCatFilePath = removeUserFromPath(categoryFileURL.path)
         lblResults.stringValue = "Category File \"\(shortCatFilePath)\" loaded with \(Stats.origCatCount) items.\n"
 
         txtOutputFolder.stringValue     = pathOutputDir
-        txtCategoryFolder.stringValue   = pathCategoryDir
+        txtCategoryFolder.stringValue   = pathSupportDir
         txtTransationFolder.stringValue = pathTransactionDir
 
         txtTransationFolder.delegate = self         // Allow ViewController to see when txtTransationFolder changes.
@@ -150,21 +151,19 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
 
         pathOutputDir = txtOutputFolder.stringValue
+
         (outputFileURL, errTxt)  = makeFileURL(pathFileDir: pathOutputDir, fileName: myFileNameOut)
         if !errTxt.isEmpty {
             handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Output" + errTxt)
             return
         }
-        pathCategoryDir = txtCategoryFolder.stringValue
-        (categoryFileURL, errTxt)  = makeFileURL(pathFileDir: pathCategoryDir, fileName: categoryFilename)
-        if !errTxt.isEmpty {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Category" + errTxt)
-            return
-        }
+        pathSupportDir = txtCategoryFolder.stringValue
+
+        readSupportFiles()
 
         // Save UserDefaults
         UserDefaults.standard.set(pathTransactionDir, forKey: UDKey.transactionFolder)
-        UserDefaults.standard.set(pathCategoryDir, forKey: UDKey.categoryFolder)
+        UserDefaults.standard.set(pathSupportDir, forKey: UDKey.supportFolder)
         UserDefaults.standard.set(pathOutputDir, forKey: UDKey.outputFolder)
 
         Stats.clearAll()
@@ -220,6 +219,12 @@ class ViewController: NSViewController, NSWindowDelegate {
         }//next fileURL
 
         outputTranactions(outputFileURL: outputFileURL, lineItemArray: lineItemArray)
+
+        print("\n--- Description-Key algorithms ---")
+        for (key, val) in dictDescKeyAlgorithm.sorted(by: <) {
+            print("\(key.PadRight(40))\(val)")
+        }
+
         let uniqueCategoryCountsSorted = uniqueCategoryCounts.sorted(by: <)
         print("\n\(uniqueCategoryCounts.count) uniqueCategoryCountsSorted by description (vendor)")
         print (uniqueCategoryCountsSorted)
@@ -270,6 +275,24 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         print("🤣cboFiles has \(cboFiles.numberOfItems) items.")
     }//end func loadComboBoxFiles
+
+    func readSupportFiles() {
+        var errTxt = ""
+        (categoryFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: categoryFilename)
+        if !errTxt.isEmpty {
+            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "Category" + errTxt)
+        }
+        dictCategory = loadCategories(categoryFileURL: categoryFileURL) // Build Categories Dictionary
+        Stats.origCatCount = dictCategory.count
+
+        (descKeyWordFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: descKeyWordFilename)
+        if !errTxt.isEmpty {
+            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "Category" + errTxt)
+        }
+        dictDescKeyWords = loadDescKeyWords(descKeyWordFileURL: descKeyWordFileURL) // Build Desc-KeyWord Dictionary
+        Stats.origCatCount = dictCategory.count
+
+    }
 
 }//end class ViewController
 

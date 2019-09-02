@@ -19,14 +19,57 @@ class MakeDescKeyTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testEdge() {
-        //   "SUPER 8",
+    func testNumberEdgeCases() {
         var result = ""
         var desc = ""
+
+        desc = "STEAK-N-SHAKE#0382 Q99"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "STEAK N SHAKE")
+
+        desc = "SWEET TOMATOES 72 Q14    ORLANDO      FL"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "SWEET TOMATOES")
+
+        desc = "ROUTE 40 DINER"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "ROUTE 40 DINER")
+
+        desc = "FISH AT 30 LAKE"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "FISH AT 30 LAKE")
 
         desc = "SUPER 8"
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "SUPER 8")
+
+        desc = "CIRCLE B 10"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "CIRCLE B")
+}
+
+    func testProblems() {
+        var result = ""
+        var desc = ""
+        desc = "STP&SHPFUEL0639 STRATFORD CT03061R"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "STP&SHPFUEL")
+
+        desc = "BIG Y 84 STRATFORD"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "BIG Y 84 STRATFORD")
+
+        desc = "VZWRLSS*APOCC VISN"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "VERIZON")
+
+        desc = "VZWRLSS*IVR VN"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "VERIZON")
+
+        desc = "The Adventure Park at Dis,Entertainment"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "ADVENTURE PARK")
 
     }
 
@@ -49,10 +92,6 @@ class MakeDescKeyTests: XCTestCase {
         desc = "AUTOPAY 221152216034323RAUTOPAY AUTO-PMT"
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "AUTOPAY")
-
-        desc =  "BIG Y 84 STRATFORD"
-        result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "BIG Y")
 
         desc = "SP * BLACKBOXDEALZ 5033957597 WA"
         result = makeDescKey(from: desc)
@@ -94,6 +133,10 @@ class MakeDescKeyTests: XCTestCase {
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "STP&SHPFUEL")
 
+        desc = "PP*WHIRLWIND SUN N FUN   CLEARWATER   FL"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "PP WHIRLWIND SUN N")
+
         // ************** PROBLEMS!! ****************
         desc = "HEALTHY*BACK INSTITUTE 800-216-4908 TX"
         result = makeDescKey(from: desc)
@@ -101,7 +144,7 @@ class MakeDescKeyTests: XCTestCase {
 
         desc = "OFFER 04 PROMOTIONAL APR ENDED 07/01/19"
         result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "OFFER")
+        XCTAssertEqual(result, "OFFER PROMOTIONAL")
 
         desc = "GOOGLE*DIGIBITES G.CO HELPPAY# CA"
         result = makeDescKey(from: desc)
@@ -181,12 +224,10 @@ class MakeDescKeyTests: XCTestCase {
             "PILOT_00337":               "PILOT",
             "SPRINT *WIRELESS":          "SPRINT",
             "SPRINT RETAIL #030712":     "SPRINT RETAIL",
-            "VERIZON WRLS P2027-01":     "VERIZON WRLS",
+            "VERIZON WRLS P2027-01":     "VERIZON",
             "VILLAGE-INN-REST #923":     "VILLAGE INN REST",
             "VIOC AE0034":               "VIOC",
-            "VZWRLSS*APOCC VISN":        "VZWRLSS",
-            "VZWRLSS*IVR VN":            "VZWRLSS",
-            "WAL-MART #0942":            "WAL MART",
+            "WAL-MART #0942":            "WALMART",
             "WAWA 860      00008607":    "WAWA",
 
             "APPLEBEES NEIxxxx6818   BOYNTON BEACHFL":  "APPLEBEES",
@@ -266,6 +307,7 @@ class MakeDescKeyTests: XCTestCase {
 
     // DIS-05/16/2018 - 05-16-2019.csv
     let DIS1819 = [
+        //23456789012345678
         "BEST BUY MH00006882295 PALM BEACH GAFL",
         "BONEFISH 7027 BOYNTON BEACHFL00422R",
         "HARVEST MARKET WOLFBORO WOLFBORO FALLNH",
@@ -275,7 +317,6 @@ class MakeDescKeyTests: XCTestCase {
         "MORRISSEYS FRONT PORCH WOLFEBORO NH",
         "OLD TOWNE RESTAURANT TRUMBULL CT",
         "STOP & SHOP 0620 TRUMBULL CT01775R",
-        "STP&SHPFUEL0639 STRATFORD CT03061R",
         "TRADER JOE'S #524 QPS ORANGE CT",
         "VAZZYS OSTERIA MONROE CT",
     ]

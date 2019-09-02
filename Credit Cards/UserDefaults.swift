@@ -10,7 +10,7 @@ import Foundation
 
 public enum UDKey {
     static let transactionFolder = "CCTransactionFolder"
-    static let categoryFolder    = "CCCategoryFolder"
+    static let supportFolder     = "CCCategoryFolder"
     static let outputFolder      = "CCOoutputFolder"
 }
 
