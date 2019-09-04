@@ -14,6 +14,7 @@ struct Stats {
     static var origCatCount          = 0    // Count when CategoryLookup.txt was read in.
     static var successfulLookupCount = 0    // Transactions where Cat found in CatFile.
     static var addedCatCount         = 0    // Catagories added by program from a Transaction.
+    static var changedCatCount       = 0    // Catagories overridden by program
     static var descWithNoCat         = 0    // Descs not in Catagory File & not added by Transaction
 
     static func clearAll() {
@@ -22,6 +23,7 @@ struct Stats {
         origCatCount            = 0
         successfulLookupCount   = 0
         addedCatCount           = 0
+        changedCatCount         = 0
         descWithNoCat           = 0
     }
 }

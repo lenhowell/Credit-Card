@@ -7,28 +7,31 @@
 //
 
 import Foundation
-public struct LineItem {
-    var cardType = ""
-    var tranDate = ""
-    var postDate = ""
-    var cardNum  = ""
-    var desc     = ""
-    var debit    = 0.0
-    var credit   = 0.0
+public struct LineItem: Equatable, Hashable {
+    var cardType = ""       // Identifies the Credit-Card account
+    var tranDate = ""       // Transaction-Date String
+    var postDate = ""       // Post-Date String
+    var cardNum  = ""       // Card Number (last 4)
+    var descKey  = ""       // Generated Key for this desc. (vendor)
+    var desc     = ""       // Description (Vendor)
+    var debit    = 0.0      // Debit (payments to vendors, etc.)
+    var credit   = 0.0      // Credit (Credit-Card payments, refunds, etc.)
+    var rawCat   = ""       // Category from Tansaction
     var genCat   = ""       // Generated Category
-    var rawCat   = ""
-    var catSource = ""
+    var catSource = ""      // Source of Generated Category (including "$" for "LOCKED")
 
     init() {
     }
 
-    //MARK:- init - 28-83 = 55-lines
-    //  fileName: String, lineNum: Int only needed for err handling
+    //MARK:- init - 29-105 = 76-lines
+    //  fileName & lineNum only needed for err handling
     //TODO: Allow LineItem.init to throw errors
+    // Create a LineItem from a Transaction-File line
     init(fromTransFileLine: String, dictColNums: [String: Int], fileName: String, lineNum: Int) {
         let expectedColumnCount = dictColNums.count
 
         var transaction = fromTransFileLine
+
         // Parse transaction, replacing all "," within quotes with a ";"
         var inQuote = false
         var tranArray = Array(fromTransFileLine)     // Create an Array of Individual characters in current transaction.
@@ -42,6 +45,7 @@ public struct LineItem {
             }
         }
         transaction = String(tranArray) //.uppercased()    // Covert the Parsed "Array" Item Back to a string
+
         transaction = transaction.replacingOccurrences(of: "\"", with: "")
         transaction = transaction.replacingOccurrences(of: "\r", with: "")
         let columns = transaction.components(separatedBy: ",")  // Isolate columns within this transaction
@@ -51,17 +55,17 @@ public struct LineItem {
             handleError(codeFile: "LineItems", codeLineNum: #line, type: .dataError, action: .display,  fileName: fileName, dataLineNum: lineNum, lineText: fromTransFileLine, errorMsg: msg)
         }
         // Building the lineitem record
-        if let colNum = dictColNums["TRAN"] {
+        if let colNum = dictColNums["TRAN"] {   // TRANACTION DATE
             if colNum < columnCount {
                 self.tranDate = columns[colNum]
             }
         }
-        if let colNum = dictColNums["POST"] {
+        if let colNum = dictColNums["POST"] {   // POST DATE
             if colNum < columnCount {
                 self.postDate = columns[colNum]
             }
         }
-        if let colNum = dictColNums["DESC"] {
+        if let colNum = dictColNums["DESC"] {   // DESCRIPTION
             if colNum < columnCount {
                 self.desc = columns[colNum].replacingOccurrences(of: "\"", with: "")
                 if self.desc.trim.isEmpty {
@@ -69,17 +73,19 @@ public struct LineItem {
                 }
             }
         }
-        if let colNum = dictColNums["CARD"] {
+        if let colNum = dictColNums["CARD"] {   // CARD NUMBER
             if colNum < columnCount {
                 self.cardNum = columns[colNum]
             }
         }
-        if let colNum = dictColNums["CATE"] {
+        if let colNum = dictColNums["CATE"] {   // CATEGORY
             if colNum < columnCount {
-                self.rawCat = columns[colNum]
+                let assignedCat =  columns[colNum]
+                let myCat = dictMyCatAliases[assignedCat] ?? assignedCat
+                self.rawCat = myCat
             }
         }
-        if let colNum = dictColNums["AMOU"] {
+        if let colNum = dictColNums["AMOU"] {   // AMOUNT
             if colNum < columnCount {
                 let amount = Double(columns[colNum].trim) ?? 0
                 if amount < 0 {
@@ -89,18 +95,37 @@ public struct LineItem {
                 }
             }
         }
-        if let colNum = dictColNums["CRED"] {
+        if let colNum = dictColNums["CRED"] {   // CREDIT
             if colNum < columnCount {
                 self.credit = Double(columns[colNum].trim) ?? 0
             }
-            
         }
-        if let colNum = dictColNums["DEBI"] {
+        if let colNum = dictColNums["DEBI"] {   // DEBIT
             if colNum < columnCount {
                 self.debit = Double(columns[colNum].trim) ?? 0
             }
-            
         }
     }//end init
 
-}//end class LineItem
+
+    // Equatable - Ignore Category-info & truncate desc
+    static public func == (lhs: LineItem, rhs: LineItem) -> Bool {
+        return lhs.cardType == rhs.cardType &&
+            lhs.tranDate    == rhs.tranDate &&
+            lhs.cardNum     == rhs.cardNum &&
+            lhs.desc.prefix(8) == rhs.desc.prefix(8)  &&
+            lhs.debit       == rhs.debit &&
+            lhs.credit      == rhs.credit
+    }
+
+    // Hashable - Ignore Category-info & truncate desc
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(cardType)
+        hasher.combine(tranDate)
+        hasher.combine(cardNum)
+        hasher.combine(desc.prefix(8))
+        hasher.combine(debit)
+        hasher.combine(credit)
+    }
+
+}//end struct LineItem

@@ -63,47 +63,69 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
 }//end func handleCards
 
 
-//MARK:---- makeLineItem - 68-104 = 36-lines
-// uses Global Vars: dictCategory(I/O), Stats(I/O)
+//MARK:---- makeLineItem - 68-108 = 40-lines
+// uses Global Vars: dictCatLookupByVendor(I/O), Stats(I/O)
 internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int], cardType: String, hasCatHeader: Bool, fileName: String, lineNum: Int) -> LineItem {
 
     var lineItem = LineItem(fromTransFileLine: fromTransFileLine, dictColNums: dictColNums, fileName: fileName, lineNum: lineNum)
     lineItem.cardType = cardType
 
     let descKey = makeDescKey(from: lineItem.desc, fileName: fileName)
+    lineItem.descKey = descKey
 
     if !descKey.isEmpty {
-        if let catItem = dictCategory[descKey] {
-            lineItem.genCat = catItem.category      // Here if Lookup of KEY was successful
-            lineItem.catSource = catItem.source
+        if let vendorCatItem = dictCatLookupByVendor[descKey] {
+            lineItem.genCat = vendorCatItem.category            // Here if Lookup of KEY was successful
+            lineItem.catSource = vendorCatItem.source
+
+            let catFromLineItem = dictMyCatAliases[lineItem.rawCat] ?? "?" + lineItem.rawCat
+            let catItemFromTran = CategoryItem(category: catFromLineItem, source: cardType)
+            //TODO: Implement Learning mode
+            //TODO: Recognize "LOCKED" Vendors
+            if vendorCatItem.category != catFromLineItem {
+                let chosenCat = pickTheBestCat(catItem1: vendorCatItem, catItem2: catItemFromTran)
+                lineItem.genCat = chosenCat.category
+                lineItem.catSource = chosenCat.source
+                print("\(#line) Cat for \(descKey) = \(vendorCatItem.category);  TransCat = \(catFromLineItem)  Chose: \(chosenCat.category)")
+                if learnMode && chosenCat != vendorCatItem {
+                    dictCatLookupByVendor[descKey] = chosenCat //Do Actual Insert
+                    Stats.changedCatCount += 1
+                }
+                //
+            }
             Stats.successfulLookupCount += 1
             uniqueCategoryCounts[descKey, default: 0] += 1
-        } else {
-            let source = cardType                   // Here if NOT in Category Dictionary
-            //print("          Did Not Find ",key)
+
+        } else {                   // Here if NOT found in Category-Lookup-by-Vendor Dictionary
+            let source = cardType
+            // If Transaction-Line has a Category, put it in the Vendor file.
 
             if hasCatHeader {
-                let catItem = CategoryItem(category: lineItem.rawCat, source: source)
-                let rawCat = catItem.category
+                if lineItem.rawCat.count >= 3 {
+                    let myCatFromTran  = dictMyCatAliases[lineItem.rawCat] ?? "?" + lineItem.rawCat
 
-                if rawCat.count >= 3 {
-                    dictCategory[descKey] = catItem //Do Actual Insert
+                    if dictMyCatAliases[myCatFromTran] == nil {
+                        print("HandleCards#\(#line): Unknown Category: \"\(myCatFromTran)\" from \(descKey)")
+                        //
+                    }
+
+                    dictCatLookupByVendor[descKey] = CategoryItem(category: myCatFromTran, source: source) //Do Actual Insert
                     Stats.addedCatCount += 1
                     // print("Category that was inserted = Key==> \(key) Value ==> \(self.rawCat) Source ==> \(source)")
                 } else {
                     Stats.descWithNoCat += 1
-                    handleError(codeFile: "LineItems", codeLineNum: #line, type: .dataWarning, action: .printOnly, fileName: fileName, dataLineNum: lineNum, lineText: fromTransFileLine, errorMsg: "Raw Category too short to be legit: \"\(rawCat)\"")
+                    handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .printOnly, fileName: fileName, dataLineNum: lineNum, lineText: fromTransFileLine, errorMsg: "Raw Category too short to be legit: \"\(lineItem.rawCat)\"")
                 }
             } else {
                 Stats.descWithNoCat += 1
-            }
+            }// hasCatHeader or not
         }
     }//endif descKey not empty
 
     return lineItem
 }//end func makeLineItem
 
-//MARK:---- makeDictColNums - 108-126 = 18-lines
+//MARK:---- makeDictColNums - 112-130 = 18-lines
 
 internal func makeDictColNums(headers: [String]) -> [String: Int] {
     var dictColNums = [String: Int]()
@@ -124,3 +146,20 @@ internal func makeDictColNums(headers: [String]) -> [String: Int] {
 
     return dictColNums
 }//end func
+
+//TODO: Prioritize prefered cards
+//---- pickTheBestCat - All else being equal, catItem1 is returned
+internal func pickTheBestCat(catItem1: CategoryItem, catItem2: CategoryItem) -> CategoryItem {
+    let cat1 = catItem1.category
+    let cat2 = catItem2.category
+    if cat1 == cat2                                 { return catItem1 } // Both the same.
+    if cat1.isEmpty || cat1 == "?"                  { return catItem2 } // cat1 missing
+    if cat2.isEmpty || cat2 == "?"                  { return catItem1 } // cat2 missing
+    if cat1.hasPrefix("?") && !cat2.hasPrefix("?")  { return catItem2 } // use the cat with no "?"
+    if cat2.hasPrefix("?") && !cat1.hasPrefix("?")  { return catItem1 } //      "
+    if cat2.contains("Unkno")                       { return catItem1 } // "Unknown"
+    if cat1.contains("Unkno")                       { return catItem2 } //      "
+    if cat2.contains("Merch")                       { return catItem1 } // "Merchandise" is weak
+    if cat1.contains("Merch")                       { return catItem2 } //      "
+    return catItem1
+}

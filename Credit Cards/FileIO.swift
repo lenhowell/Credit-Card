@@ -8,18 +8,32 @@
 
 import Foundation
 
-public struct CategoryItem {
+public struct CategoryItem: Equatable {
     var category    = ""
-    var source      = "UG"
+    var source      = ""  // Source of Category (including "$" for "LOCKED")
 }
 
-public struct DescKeyWord {
+public struct DescKeyWord: Equatable {
     //var keyWord = ""
     var descKey = ""
     var isPrefix = false
 }
 
 //MARK:- General Purpose
+
+func folderExists(atPath: String, isPartialPath: Bool = false) -> Bool {
+    let fileManager = FileManager.default
+    var isDirectory: ObjCBool = false
+
+    if isPartialPath {
+        let homeURL = fileManager.homeDirectoryForCurrentUser
+        let dirURL = homeURL.appendingPathComponent(atPath)
+        return fileManager.fileExists(atPath: dirURL.path, isDirectory: &isDirectory) && isDirectory.boolValue
+    } else {
+        return fileManager.fileExists(atPath: atPath, isDirectory: &isDirectory) && isDirectory.boolValue
+    }
+    
+}//end func
 
 // Creates FileURL or returns an error message
 func makeFileURL(pathFileDir: String, fileName: String) -> (URL, String) {
@@ -28,8 +42,8 @@ func makeFileURL(pathFileDir: String, fileName: String) -> (URL, String) {
     let dirURL = homeURL.appendingPathComponent(pathFileDir)
 
     var isDirectory: ObjCBool = false
-    if fileManager.fileExists(atPath: dirURL.path, isDirectory: &isDirectory) {
-        //print("😀 \(#line) \(dirURL.path) exists")
+    if fileManager.fileExists(atPath: dirURL.path, isDirectory: &isDirectory) && isDirectory.boolValue {
+        print("😀 \(#line) \"\(dirURL.path)\" exists")
         let fileURL = dirURL.appendingPathComponent(fileName)
         return (fileURL, "")
     }
@@ -107,6 +121,30 @@ public struct FileAttributes: Equatable {
     }
 }// end struct FileAttributes
 
+//MARK:- My Cataagory List
+
+func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
+    var dictMyCats = [String: String]()
+    let contentof = (try? String(contentsOf: myCatsFileURL)) ?? ""
+    let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
+    var lineNum = 0
+    for line in lines {
+        lineNum += 1
+        if line.trim.isEmpty || line.hasPrefix("//") {
+            continue
+        }
+
+        // Create an Array of line components the seperator being a ","
+        let myCatsArray = line.components(separatedBy: ",")
+        let myCat = myCatsArray[0].trim
+        dictMyCatNames[myCat] = 0
+        for myCatAlias in myCatsArray {
+            dictMyCats[myCatAlias.trim] = myCat
+        }
+    }//next line
+    return dictMyCats
+}//end func loadMyCats
+
 //MARK:- Description KeyWords
 
 func loadDescKeyWords(descKeyWordFileURL: URL) -> [String: DescKeyWord]  {
@@ -143,12 +181,12 @@ func loadDescKeyWords(descKeyWordFileURL: URL) -> [String: DescKeyWord]  {
 
 //MARK:- Categories
 
-func loadCategories(categoryFileURL: URL) -> [String: CategoryItem]  {
+func loadCategories(catLookupFileURL: URL) -> [String: CategoryItem]  {
     var dictCat   = [String: CategoryItem]()
 
     // Get data in "CategoryLookup" if there is any. If NIL set to Empty.
     //let contentof = (try? String(contentsOfFile: filePathCategories)) ?? ""
-    let contentof = (try? String(contentsOf: categoryFileURL)) ?? ""
+    let contentof = (try? String(contentsOf: catLookupFileURL)) ?? ""
     let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
     
     // For each line in "CategoryLookup"
@@ -161,7 +199,7 @@ func loadCategories(categoryFileURL: URL) -> [String: CategoryItem]  {
         // Create an Array of line components the seperator being a ","
         let categoryArray = line.components(separatedBy: ",")
         if categoryArray.count != 3 {
-            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .display, fileName: categoryFileURL.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "Expected 2 commas per line")
+            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .display, fileName: catLookupFileURL.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "Expected 2 commas per line")
             continue
         }
         let descKey  = categoryArray[0].trimmingCharacters(in: .whitespaces)  // make-DescKey(from: categoryArray[0])
@@ -171,7 +209,7 @@ func loadCategories(categoryFileURL: URL) -> [String: CategoryItem]  {
         dictCat[descKey] = categoryItem
         
     }
-    print("\(dictCat.count) Items Read into Category dictionary from: \(categoryFileURL.path)")
+    print("\(dictCat.count) Items Read into Category dictionary from: \(catLookupFileURL.path)")
     
     return dictCat
 }//end func loadCategories
@@ -203,12 +241,12 @@ func writeCategoriesToFile(categoryFileURL: URL, dictCat: [String: CategoryItem]
     text += "// When a phone number or \"xxx...\" or other multi-digit number is reached the rest is truncated.\n"
     text += "\n// Description Key        Category              Source\n"
     var prevCat = ""
-    print("\n Different Descs that have the same 8-chars")
+    print("\n Different Descs that have the same 10-chars")
     for catItem in dictCat.sorted(by: {$0.key < $1.key}) {
         text += "\(catItem.key.PadRight(descKeyLength)), \(catItem.value.category.PadRight(26)),  \(catItem.value.source)\n"
 
-        let first8 = String(catItem.key.prefix(8))
-        if first8 == prevCat.prefix(8) {
+        let first10 = String(catItem.key.prefix(10))
+        if first10 == prevCat.prefix(10) {
             print("😡 \"\(prevCat)\"     \"\(catItem.key)\"")
         }
         prevCat = catItem.key

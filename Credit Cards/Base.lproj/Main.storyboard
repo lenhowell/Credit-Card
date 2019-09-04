@@ -778,7 +778,7 @@ DQ
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eKB-zm-Y8F">
                                 <rect key="frame" x="6" y="305" width="152" height="17"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Category Folder" id="rZI-I3-JQW">
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Support Folder" id="rZI-I3-JQW">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -871,8 +871,8 @@ DQ
                         <outlet property="lblResults" destination="ud1-Xt-qfO" id="w7R-1s-rYd"/>
                         <outlet property="lblRunTime" destination="d8k-DQ-haq" id="X8d-tc-6v4"/>
                         <outlet property="lblTranFileCount" destination="ZKE-KE-nfA" id="SDp-c9-hE7"/>
-                        <outlet property="txtCategoryFolder" destination="v27-pq-HHL" id="W73-Zr-6Qo"/>
                         <outlet property="txtOutputFolder" destination="J1U-oB-kQd" id="9tC-BW-XFl"/>
+                        <outlet property="txtSupportFolder" destination="v27-pq-HHL" id="W73-Zr-6Qo"/>
                         <outlet property="txtTransationFolder" destination="MPH-cH-q8h" id="8F2-kM-GWD"/>
                     </connections>
                 </viewController>
