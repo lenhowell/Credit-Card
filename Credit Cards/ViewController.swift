@@ -15,13 +15,16 @@ import Cocoa
 // Global Constants
 
 // Global Variables
+var gTransFilename          = ""
 var dictCatLookupByVendor   = [String: CategoryItem]()  // Hash for Category Lookup
 var dictDescKeyWords        = [String: DescKeyWord]()   // Hash for Description KeyWord Lookup
 var dictMyCatAliases        = [String: String]()        // Hash of Category Synonyms
 var dictMyCatNames          = [String: Int]()           // Hash of Category Name Counts
 var uniqueCategoryCounts    = [String: Int]()           // Hash for Unique Category Counts
-var isUnitTesting   = false
-var learnMode       = true
+var dictTransactions        = [LineItem: String]()
+var isUnitTesting       = false
+var learnMode           = true
+var userIntervention    = true
 
 //MARK:- ViewController
 class ViewController: NSViewController, NSWindowDelegate {
@@ -35,7 +38,6 @@ class ViewController: NSViewController, NSWindowDelegate {
     let myCatsFilename      = "MyCategories.txt"
 
     // Variables
-    var containsDictionary  = [String: String]()        // String: is the Key - Generated Category
     var transFileURLs       = [URL]()
     var pathTransactionDir  = "Downloads/Credit Card Trans"
     var pathSupportDir      = "Desktop/Credit Card Files"
@@ -95,6 +97,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         let shortCatFilePath = removeUserFromPath(catLookupFileURL.path)
         lblResults.stringValue = "Category Lookup File \"\(shortCatFilePath)\" loaded with \(Stats.origCatCount) items.\n"
 
+        chkLearningMode.state = learnMode ? .on : .off
+        chkUserInput.state = userIntervention ? .on : .off
+
         // Set txtTransationFolder.delegate
         txtTransationFolder.delegate = self         // Allow ViewController to see when txtTransationFolder changes.
     }
@@ -140,6 +145,17 @@ class ViewController: NSViewController, NSWindowDelegate {
     @IBOutlet var txtOutputFolder:     NSTextField!
     @IBOutlet weak var btnStart: NSButton!
     @IBOutlet var cboFiles: NSComboBox!
+    @IBOutlet var chkLearningMode: NSButton!
+    @IBOutlet var chkUserInput: NSButton!
+
+    @IBAction func chkLearningModeClick(_ sender: Any) {
+        learnMode = chkLearningMode.state == .on
+        print("learnMode = \(learnMode)")
+    }
+    @IBAction func chkUserInputClick(_ sender: Any) {
+        userIntervention = chkUserInput.state == .on
+        print("userIntervention = \(userIntervention)")
+    }
     
     //MARK:- Main Program
     
@@ -185,6 +201,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         var fileContents    = ""                        // Where All Transactions in a File go
         var lineItemArray   = [LineItem]()
+        dictTransactions = [:]
         lblErrMsg.stringValue = ""
         
         if !FileManager.default.fileExists(atPath: transactionDirURL.path) {
@@ -202,9 +219,10 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
 
         for fileURL in filesToProcessURLs {
-            let fileName = fileURL.lastPathComponent
-            let nameComps = fileName.components(separatedBy: "-")
-            let cardType = nameComps[0].uppercased()
+            let fileName    = fileURL.lastPathComponent
+            gTransFilename  = fileURL.lastPathComponent
+            let nameComps   = fileName.components(separatedBy: "-")
+            let cardType    = nameComps[0].uppercased()
             let fileAttributes = FileAttributes.getFileInfo(url: fileURL)
             if fileAttributes.isDir { continue }
 
@@ -225,6 +243,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             switch cardType {
             case "C1V", "C1R", "DIS", "CIT", "BACT", "BAPR", "ML":
                 lineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray)
+                chkUserInput.state = userIntervention ? .on : .off
                 Stats.transFileCount += 1
             default:
                 Stats.junkFileCount += 1

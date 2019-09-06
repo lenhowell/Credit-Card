@@ -35,7 +35,7 @@ func folderExists(atPath: String, isPartialPath: Bool = false) -> Bool {
     
 }//end func
 
-// Creates FileURL or returns an error message
+// Creates FileURL from FolderPath & FilePath or returns an error message
 func makeFileURL(pathFileDir: String, fileName: String) -> (URL, String) {
     let fileManager = FileManager.default
     let homeURL = fileManager.homeDirectoryForCurrentUser
@@ -43,7 +43,7 @@ func makeFileURL(pathFileDir: String, fileName: String) -> (URL, String) {
 
     var isDirectory: ObjCBool = false
     if fileManager.fileExists(atPath: dirURL.path, isDirectory: &isDirectory) && isDirectory.boolValue {
-        print("😀 \(#line) \"\(dirURL.path)\" exists")
+        //print("😀 \(#line) \"\(dirURL.path)\" exists")
         let fileURL = dirURL.appendingPathComponent(fileName)
         return (fileURL, "")
     }
@@ -267,9 +267,9 @@ func writeCategoriesToFile(categoryFileURL: URL, dictCat: [String: CategoryItem]
 //---- outputTranactions - uses: handleError(F), workingFolderUrl(I)
 func outputTranactions(outputFileURL: URL, lineItemArray: [LineItem]) {
     
-    var outPutStr = "Card Type\tTranDate\tDesc\tDebit\tCredit\tCategory\tRaw Category\tCategory Source\n"
+    var outPutStr = "Card Type\tTranDate\tDescKey\tDesc\tDebit\tCredit\tCategory\tRaw Category\tCategory Source\n"
     for xX in lineItemArray {
-        let text = "\(xX.cardType)\t\(xX.tranDate)\t\(xX.desc)\t\(xX.debit)\t\(xX.credit)\t\(xX.genCat)\t\(xX.rawCat)\t\(xX.catSource)\n"
+        let text = "\(xX.cardType)\t\(xX.tranDate)\t\(xX.descKey)\t\(xX.desc)\t\(xX.debit)\t\(xX.credit)\t\(xX.genCat)\t\(xX.rawCat)\t\(xX.catSource)\n"
         outPutStr += text
     }
     

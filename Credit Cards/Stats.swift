@@ -16,6 +16,7 @@ struct Stats {
     static var addedCatCount         = 0    // Catagories added by program from a Transaction.
     static var changedCatCount       = 0    // Catagories overridden by program
     static var descWithNoCat         = 0    // Descs not in Catagory File & not added by Transaction
+    static var processedCount        = 0    // Transactions processed
 
     static func clearAll() {
         transFileCount          = 0
@@ -25,5 +26,6 @@ struct Stats {
         addedCatCount           = 0
         changedCatCount         = 0
         descWithNoCat           = 0
+        processedCount          = 0
     }
 }

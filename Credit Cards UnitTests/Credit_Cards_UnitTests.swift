@@ -68,11 +68,11 @@ class Credit_Cards_UnitTests: XCTestCase {
         XCTAssertEqual(lineItem.rawCat, "Exterm")
         //XCTAssertEqual(lineItem.genCat, "Entertainment")
 
-        tran = "2018-08-25,2018-08-27,8772,LX FITNESS,Cat inserted for LX FITNESS,,31.85"
+        tran = "2018-08-25,2018-08-27,8772,LX FITNESS,Bad Category,,31.85"
         lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666)
         XCTAssertEqual(lineItem.cardType, "TEst")
         XCTAssertEqual(lineItem.credit, 31.85)
-        XCTAssertEqual(lineItem.rawCat, "Cat inserted for LX FITNESS")
+        XCTAssertEqual(lineItem.rawCat, "Bad Category")
         XCTAssertEqual(lineItem.genCat, "")
 
         // Bad Line - Run AFTER creating "Cat inserted for LX FITNESS" above
@@ -82,7 +82,7 @@ class Credit_Cards_UnitTests: XCTestCase {
         XCTAssertEqual(lineItem.credit, 0)
         XCTAssertEqual(lineItem.debit, 31.85)
         XCTAssertEqual(lineItem.rawCat, "This is a TEST")
-        XCTAssertEqual(lineItem.genCat, "Cat inserted for LX FITNESS")
+        XCTAssertEqual(lineItem.genCat, "?Bad Category")
 
     }
 
@@ -126,12 +126,12 @@ class Credit_Cards_UnitTests: XCTestCase {
         //XCTAssertEqual(lineItemArray[0].desc, "BONEFISH 7027 BOYNTON BEACHFL00422R")
         XCTAssertEqual(lineItemArray[0].debit, 32.56)
         XCTAssertEqual(lineItemArray[0].credit, 0.00)
-        XCTAssertEqual(lineItemArray[0].rawCat, "Restaurants")
+        XCTAssertEqual(lineItemArray[0].rawCat, "Dining")  //Depends on MyCategories.txt
 
         //XCTAssertEqual(lineItemArray[1].desc, "BONEFISH 7027 BOYNTON BEACHFL00422R")
         XCTAssertEqual(lineItemArray[1].debit, 0.00)
         XCTAssertEqual(lineItemArray[1].credit, 32.56)
-        XCTAssertEqual(lineItemArray[1].rawCat, "Payments and Credits")
+        XCTAssertEqual(lineItemArray[1].rawCat, "Payment")  //Depends on MyCategories.txt
 
 
         //TODO: The following Unit-Tests need assertions
