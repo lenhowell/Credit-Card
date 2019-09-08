@@ -16,10 +16,10 @@ import Cocoa
 
 // Global Variables
 var gTransFilename          = ""
+var gMyCatNames             = [String]()           // Array of Category Names
+var dictMyCatAliases        = [String: String]()        // Hash of Category Synonyms
 var dictCatLookupByVendor   = [String: CategoryItem]()  // Hash for Category Lookup
 var dictDescKeyWords        = [String: DescKeyWord]()   // Hash for Description KeyWord Lookup
-var dictMyCatAliases        = [String: String]()        // Hash of Category Synonyms
-var dictMyCatNames          = [String: Int]()           // Hash of Category Name Counts
 var uniqueCategoryCounts    = [String: Int]()           // Hash for Unique Category Counts
 var dictTransactions        = [LineItem: String]()
 var isUnitTesting       = false
@@ -306,7 +306,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         cboFiles.addItem(withObjectValue: "-all-")
         cboFiles.addItems(withObjectValues: fileNames)
 
-        print("🤣cboFiles has \(cboFiles.numberOfItems) items.")
+        print("ViewController#\(#line): 🤣cboFiles has \(cboFiles.numberOfItems) items.")
     }//end func loadComboBoxFiles
 
 
@@ -345,8 +345,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories" + errTxt)
         }
         dictMyCatAliases = loadMyCats(myCatsFileURL: myCatsFileURL)
-
-    }
+    }//end func
 
 }//end class ViewController
 
@@ -360,7 +359,7 @@ extension ViewController: NSTextFieldDelegate {
         }
         var errText = ""
         pathTransactionDir = txtTransationFolder.stringValue
-        (transactionDirURL, errText)  = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
+        (transactionDirURL, errText) = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
         if errText.isEmpty {
             btnStart.isEnabled = true
             transFileURLs = getTransFileList(transDirURL: transactionDirURL)
@@ -368,6 +367,7 @@ extension ViewController: NSTextFieldDelegate {
             cboFiles.isHidden = false
             lblTranFileCount.stringValue = "\(transFileURLs.count) Transaction \("file".pluralize(transFileURLs.count))"
             lblErrMsg.stringValue = ""
+            print("Trans Folder changed to: \"\(textView.stringValue)\"")
 
         } else {
             btnStart.isEnabled = false
@@ -375,9 +375,8 @@ extension ViewController: NSTextFieldDelegate {
             loadComboBoxFiles(fileURLs: transFileURLs)
             cboFiles.isHidden = true
             lblTranFileCount.stringValue = "----"
-            lblErrMsg.stringValue = txtTransationFolder.stringValue + " does not exist!"
+            lblErrMsg.stringValue = errText
         }
-        print("Trans Folder changed to: \"\(textView.stringValue)\"")
     }
 
 }//end extension ViewController: NSTextFieldDelegate

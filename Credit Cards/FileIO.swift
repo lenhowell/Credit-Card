@@ -124,6 +124,7 @@ public struct FileAttributes: Equatable {
 //MARK:- My Cataagory List
 
 func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
+    gMyCatNames = []
     var dictMyCats = [String: String]()
     let contentof = (try? String(contentsOf: myCatsFileURL)) ?? ""
     let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
@@ -137,11 +138,14 @@ func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
         // Create an Array of line components the seperator being a ","
         let myCatsArray = line.components(separatedBy: ",")
         let myCat = myCatsArray[0].trim
-        dictMyCatNames[myCat] = 0
+        //if !myCat.hasPrefix("?") { gMyCatNames.append(myCat) }
+         gMyCatNames.append(myCat)
+        //dictMyCatNames[myCat] = 0
         for myCatAlias in myCatsArray {
             dictMyCats[myCatAlias.trim] = myCat
         }
     }//next line
+    gMyCatNames.sort()
     return dictMyCats
 }//end func loadMyCats
 

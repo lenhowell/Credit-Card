@@ -57,20 +57,26 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
     key2 = descKeyLong.replacingOccurrences(of: " +AND +", with: "&", options: .regularExpression, range: nil)
     descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "04.Change \" AND \" to \"&\"")
 
+
+
     //-- Remove "SQU*", "SQ *", etc. from beginning of line. -- [TLF*CITY LINE FLORIST] -> [CITY LINE FLORIST]
-    key2 = descKeyLong.replacingOccurrences(of: #"^...\*"#, with: "", options: .regularExpression, range: nil)
-    if key2 != descKeyLong {
-        ccPrefix = String(descKeyLong.prefix(3))
+    if descKeyLong.prefix(9).contains("*") {
+        key2 = descKeyLong.replacingOccurrences(of: #"^PAYPAL ?\*"#, with: "", options: .regularExpression, range: nil)
+        if key2 != descKeyLong {
+            print(descKeyLong, " => ", key2)
+            ccPrefix = "PAYPAL"
+        }
+        key2 = descKeyLong.replacingOccurrences(of: #"^...\*"#, with: "", options: .regularExpression, range: nil)
+        if key2 != descKeyLong {
+            ccPrefix = String(descKeyLong.prefix(3))
+        }
+        descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "05.Remove \"SQU*\" etc.")
+
+        //-- Remove 2nd "SQU*", "SQ *", etc. from beginning of line. [SQ *SQ *FOREFLIGHT] -> [FOREFLIGHT]
+        key2 = descKeyLong.replacingOccurrences(of: #"^...\*"#, with: "", options: .regularExpression, range: nil)
+        descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "06.Remove 2nd \"SQU*\" etc.")
+
     }
-    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "05.Remove \"SQU*\" etc.")
-
-    //-- Remove 2nd "SQU*", "SQ *", etc. from beginning of line. [SQ *SQ *FOREFLIGHT] -> [FOREFLIGHT]
-    key2 = descKeyLong.replacingOccurrences(of: #"^...\*"#, with: "", options: .regularExpression, range: nil)
-    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "06.Remove 2nd \"SQU*\" etc.")
-
-//    if descKeyLong.contains("SWEET TOMATOES 72 Q14") {
-//        // debug trap
-//    }
 
     // Truncate Line upon th following matches
 

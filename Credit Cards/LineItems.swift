@@ -7,6 +7,8 @@
 //
 
 import Foundation
+
+//FIXIT: tranDate should be of type Date, for comparing
 public struct LineItem: Equatable, Hashable {
     var cardType = ""       // Identifies the Credit-Card account
     var tranDate = ""       // Transaction-Date String
@@ -85,9 +87,11 @@ public struct LineItem: Equatable, Hashable {
                 self.rawCat = myCat
             }
         }
+        //TODO: Detect & report corrupt $values rather than crashing
         if let colNum = dictColNums["AMOU"] {   // AMOUNT
             if colNum < columnCount {
-                let amount = Double(columns[colNum].trim) ?? 0
+                let amt = columns[colNum].replacingOccurrences(of: ";", with: "").trim + "0" //"0" is for empty fields
+                let amount = Double(amt)! // ?? 0)
                 if amount < 0 {
                     self.credit = -amount
                 } else {
@@ -97,12 +101,14 @@ public struct LineItem: Equatable, Hashable {
         }
         if let colNum = dictColNums["CRED"] {   // CREDIT
             if colNum < columnCount {
-                self.credit = Double(columns[colNum].trim) ?? 0
+                let amt = columns[colNum].replacingOccurrences(of: ";", with: "").trim + "0"
+                self.credit = abs(Double(amt)!) // ?? 0)
             }
         }
         if let colNum = dictColNums["DEBI"] {   // DEBIT
             if colNum < columnCount {
-                self.debit = Double(columns[colNum].trim) ?? 0
+                let amt = columns[colNum].replacingOccurrences(of: ";", with: "").trim + "0"
+                self.debit = abs(Double(amt)!) // ?? 0)
             }
         }
     }//end init

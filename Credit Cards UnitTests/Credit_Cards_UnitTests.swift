@@ -14,6 +14,8 @@ class Credit_Cards_UnitTests: XCTestCase {
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
         isUnitTesting = true
+        userIntervention = false
+        learnMode = false
         allowAlerts = false
     }
 
@@ -82,7 +84,7 @@ class Credit_Cards_UnitTests: XCTestCase {
         XCTAssertEqual(lineItem.credit, 0)
         XCTAssertEqual(lineItem.debit, 31.85)
         XCTAssertEqual(lineItem.rawCat, "This is a TEST")
-        XCTAssertEqual(lineItem.genCat, "?Bad Category")
+        XCTAssertEqual(lineItem.genCat, "?This is a TEST")
 
     }
 

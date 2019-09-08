@@ -12,20 +12,30 @@ class UserInputVC: NSViewController, NSWindowDelegate {
 //    weak var delegate: UserInputVcDelegate?          //delegate <— (2)
     var t        = LineItem()
     var catItemFromVendor = CategoryItem()
-    var catItemFromTran = CategoryItem()
-    var catItemPrefered = CategoryItem()
-    var textPassed      = ""
+    var catItemFromTran   = CategoryItem()
+    var catItemPrefered   = CategoryItem()
+    var catItemCurrent    = CategoryItem()
+    var textPassed     = ""
+    var unlockedSource = ""
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
+        lblFile.stringValue = gTransFilename
         t = usrLineItem
-        lblLineItem.stringValue     = "\(t.cardType) \(t.tranDate)  \(t.descKey)   \(t.desc)   \(t.debit)"
+        let amt = t.debit - t.credit
+        let strDebit = String(format:"%.2f", amt)
+        let desc = t.desc.PadRight(40, truncate: true, useEllipsis: true, fillChr: " ")
+        lblLineItem.stringValue     = "\(t.tranDate)  \"\(t.descKey)\"  \(desc) $\(strDebit)"
 
         lblcatFromTran.stringValue   = usrCatItemFromTran.category
         lblcatFromVendor.stringValue = usrCatItemFromVendor.category
         lblcatPrefered.stringValue   = usrCatItemPrefered.category
         lblProcessed.stringValue     = String(Stats.processedCount)
+
+        loadComboBoxCats()
+        catItemCurrent = usrCatItemPrefered
+        updateAfterCatChange(newCatItem: catItemCurrent)
     }
 
     override func viewDidAppear() {
@@ -33,25 +43,84 @@ class UserInputVC: NSViewController, NSWindowDelegate {
         view.window!.delegate = self
     }
 
-    @IBOutlet var chkContinueUserInput: NSButton!
+    @IBOutlet var lblFile:          NSTextField!
     @IBOutlet var lblLineItem:      NSTextField!
     @IBOutlet var lblcatFromTran:   NSTextField!
     @IBOutlet var lblcatPrefered:   NSTextField!
     @IBOutlet var lblcatFromVendor: NSTextField!
     @IBOutlet var lblProcessed:     NSTextField!
-
+    @IBOutlet var cboCats: NSComboBox!
+    @IBOutlet var chkContinueUserInput: NSButton!
+    @IBOutlet var radioCatFromTran:     NSButton!
+    @IBOutlet var radioCatFromVendor:   NSButton!
+    @IBOutlet var radioCatPrefered:     NSButton!
+    @IBOutlet var chkQuestionMark:      NSButton!
+    @IBOutlet var chkLockIn: NSButton!
+    @IBOutlet var radioFileTransac:     NSButton!
+    @IBOutlet var radioFileVendor:      NSButton!
+    
 
     @IBAction func radioCatChange(_ sender: Any) {
+        if radioCatPrefered.state == .on {
+            catItemCurrent = usrCatItemPrefered
+
+        } else if radioCatFromVendor.state == .on {
+            catItemCurrent = usrCatItemFromVendor
+
+        } else if radioCatFromTran.state == .on {
+            catItemCurrent = usrCatItemFromTran
+        }
+        updateAfterCatChange(newCatItem: catItemCurrent)
+    }
+
+    @IBAction func cboCatsChange(_ sender: Any) {
+        print("cboCatsChange \(cboCats.stringValue)")
+        catItemCurrent.category = cboCats.stringValue
+        catItemCurrent.source = "GWB"
+        updateAfterCatChange(newCatItem: catItemCurrent)
+    }
+
+    @IBAction func chkLockInClick(_ sender: Any) {
 
     }
 
+    @IBAction func chkQuestionMarkClick(_ sender: Any) {
+        let myCat = catItemCurrent.category
+        if chkQuestionMark.state == .on {
+            if !myCat.hasPrefix("?") {
+                catItemCurrent.category = "?" + myCat
+            }
+        } else {
+            if myCat.hasPrefix("?") {
+                catItemCurrent.category = String(myCat.dropFirst())
+            }
+        }
+        updateAfterCatChange(newCatItem: catItemCurrent)
+    }
+
+    @IBAction func radioFileChange(_ sender: Any) {
+
+    }
+
+
     @IBAction func btnOK(_ sender: Any) {
+        usrFixVendor = (radioFileVendor.state == .on)
+        usrCatItemReturned = catItemCurrent
+        if chkLockIn.state == .on {
+            usrCatItemReturned.source = "$GWB"
+        }
+        print("return \(usrCatItemReturned.category) \(usrCatItemReturned.source)")
         NSApplication.shared.stopModal(withCode: .OK)
     }
 
     @IBAction func btnCancel(_ sender: Any) {
         NSApplication.shared.stopModal(withCode: .cancel)
     }
+
+    @IBAction func btnAbortClick(_ sender: Any) {
+        NSApplication.shared.stopModal(withCode: .abort)
+    }
+
     @IBAction func chkContinueUserInputClick(_ sender: Any) {
         userIntervention = chkContinueUserInput.state == .on
         print("userIntervention = \(userIntervention)")
@@ -81,5 +150,18 @@ class UserInputVC: NSViewController, NSWindowDelegate {
         return true
     }
 
+    func updateAfterCatChange(newCatItem: CategoryItem) {
+        let newCat = newCatItem.category
+        cboCats.stringValue = newCat
+        chkQuestionMark.state = (newCat.hasPrefix("?")) ? .on : .off
+    }//end func
 
-}
+    //------ loadComboBoxCats - load ComboBoxCatss with myCategories
+    private func loadComboBoxCats() {
+        cboCats.removeAllItems()
+        cboCats.addItems(withObjectValues: gMyCatNames)
+        //print("🤣cboCats has \(cboCats.numberOfItems) items.")
+    }//end func loadComboBoxFiles
+
+
+}//end class

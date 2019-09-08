@@ -689,6 +689,7 @@
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="455" y="216" width="800" height="600"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+                        <value key="minSize" type="size" width="800" height="600"/>
                         <connections>
                             <outlet property="delegate" destination="B8D-0N-5wS" id="98r-iN-zZc"/>
                         </connections>
@@ -934,16 +935,16 @@ DQ
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xZz-c5-B01">
-                                <rect key="frame" x="12" y="248" width="584" height="17"/>
+                                <rect key="frame" x="12" y="237" width="584" height="17"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="This is the window for user intervention." id="w0V-O5-Gbk">
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Transaction goes here." id="w0V-O5-Gbk">
                                     <font key="font" usesAppearanceFont="YES"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1MA-Un-RjF">
-                                <rect key="frame" x="18" y="18" width="192" height="18"/>
+                                <rect key="frame" x="18" y="15" width="192" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Continue User Interventions" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="4mS-SC-EbE">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -954,7 +955,7 @@ DQ
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0XC-Xw-a7H">
-                                <rect key="frame" x="218" y="200" width="154" height="17"/>
+                                <rect key="frame" x="218" y="189" width="154" height="17"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="tKU-JJ-mSu">
                                     <font key="font" metaFont="system"/>
@@ -963,7 +964,7 @@ DQ
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CZc-Jh-KgQ">
-                                <rect key="frame" x="218" y="224" width="154" height="17"/>
+                                <rect key="frame" x="218" y="213" width="154" height="17"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="gqi-Xj-zd5">
                                     <font key="font" metaFont="system"/>
@@ -972,7 +973,7 @@ DQ
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WWf-lg-goH">
-                                <rect key="frame" x="40" y="223" width="170" height="18"/>
+                                <rect key="frame" x="40" y="212" width="170" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="radio" title="from above transaction  " bezelStyle="regularSquare" imagePosition="right" alignment="right" inset="2" id="eEq-Q6-k66">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -983,7 +984,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UJ5-vO-God">
-                                <rect key="frame" x="33" y="199" width="177" height="18"/>
+                                <rect key="frame" x="33" y="188" width="177" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="radio" title="Vendor CategoryLookup  " bezelStyle="regularSquare" imagePosition="right" alignment="right" inset="2" id="2sY-dR-gu4">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -994,7 +995,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YQA-VK-klD">
-                                <rect key="frame" x="74" y="177" width="136" height="18"/>
+                                <rect key="frame" x="74" y="166" width="136" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="radio" title="Best Guess    ." bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="x65-Ge-7mX">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1005,7 +1006,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ssp-Z2-Jvb">
-                                <rect key="frame" x="220" y="6" width="82" height="32"/>
+                                <rect key="frame" x="450" y="6" width="82" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="LrU-0z-4MH">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1019,7 +1020,7 @@ Gw
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HAC-7v-dHZ">
-                                <rect key="frame" x="218" y="178" width="154" height="17"/>
+                                <rect key="frame" x="218" y="167" width="154" height="17"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="rtW-9n-gP3">
                                     <font key="font" metaFont="system"/>
@@ -1042,23 +1043,110 @@ Gw
                                 <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="GGP-z2-uf1">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <string key="keyEquivalent" base64-UTF8="YES">
-DQ
-</string>
                                 </buttonCell>
                                 <connections>
                                     <action selector="btnOK:" target="5se-PX-5kl" id="3JI-0U-Jhh"/>
                                 </connections>
                             </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kyJ-32-oZs">
+                                <rect key="frame" x="14" y="262" width="582" height="17"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Filename" id="C4L-ZI-biR">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <comboBox verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DP0-U9-YMZ">
+                                <rect key="frame" x="462" y="202" width="135" height="26"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" completes="NO" numberOfVisibleItems="5" id="kSl-5o-irM">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <objectValues>
+                                        <string>Item 1</string>
+                                        <string>Item 2</string>
+                                        <string>Item 3</string>
+                                    </objectValues>
+                                </comboBoxCell>
+                                <connections>
+                                    <action selector="cboCatsChange:" target="5se-PX-5kl" id="imZ-gO-cFD"/>
+                                </connections>
+                            </comboBox>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s1s-Ny-IUT">
+                                <rect key="frame" x="226" y="6" width="75" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="Abort" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="P54-mJ-H0N">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="btnAbortClick:" target="5se-PX-5kl" id="BAz-Ms-L32"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="y9r-ja-tGY">
+                                <rect key="frame" x="388" y="53" width="208" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="radio" title="Change CategoryLookup entry" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="dBg-ER-9JG">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="radioFileChange:" target="5se-PX-5kl" id="Ihe-sz-QMC"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ckv-3B-Q0W">
+                                <rect key="frame" x="400" y="75" width="196" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="radio" title="Change this transaction only" bezelStyle="regularSquare" imagePosition="right" alignment="right" inset="2" id="Qqc-a3-b9j">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="radioFileChange:" target="5se-PX-5kl" id="QSY-BO-zNG"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WBO-u6-2d6">
+                                <rect key="frame" x="436" y="110" width="160" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Add Question Mark &quot;?&quot;" bezelStyle="regularSquare" imagePosition="right" inset="2" id="IFr-Xg-VG6">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="chkQuestionMarkClick:" target="5se-PX-5kl" id="xmS-yX-sb7"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5vi-kI-JnO">
+                                <rect key="frame" x="478" y="134" width="118" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Lock in  wth &quot;$&quot;" bezelStyle="regularSquare" imagePosition="right" alignment="right" inset="2" id="pXa-e4-GnB">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="chkLockInClick:" target="5se-PX-5kl" id="hs1-2A-sVj"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="cboCats" destination="DP0-U9-YMZ" id="K2Q-hQ-nIp"/>
                         <outlet property="chkContinueUserInput" destination="1MA-Un-RjF" id="emM-Sz-nro"/>
+                        <outlet property="chkLockIn" destination="5vi-kI-JnO" id="J4p-U9-zef"/>
+                        <outlet property="chkQuestionMark" destination="WBO-u6-2d6" id="jEK-jU-wk4"/>
+                        <outlet property="lblFile" destination="kyJ-32-oZs" id="xFG-T3-6QQ"/>
                         <outlet property="lblLineItem" destination="xZz-c5-B01" id="duQ-aV-8h8"/>
                         <outlet property="lblProcessed" destination="V1e-nv-MRP" id="iUW-RR-MTg"/>
                         <outlet property="lblcatFromTran" destination="CZc-Jh-KgQ" id="cYF-fF-lLL"/>
                         <outlet property="lblcatFromVendor" destination="0XC-Xw-a7H" id="Afd-ow-BZ0"/>
                         <outlet property="lblcatPrefered" destination="HAC-7v-dHZ" id="Ubk-4h-JFb"/>
+                        <outlet property="radioCatFromTran" destination="WWf-lg-goH" id="Z8O-2O-QYl"/>
+                        <outlet property="radioCatFromVendor" destination="UJ5-vO-God" id="bpF-Ce-QSE"/>
+                        <outlet property="radioCatPrefered" destination="YQA-VK-klD" id="v8Y-oN-ter"/>
+                        <outlet property="radioFileTransac" destination="ckv-3B-Q0W" id="Tmg-Ju-OwD"/>
+                        <outlet property="radioFileVendor" destination="y9r-ja-tGY" id="m2J-iI-f84"/>
                     </connections>
                 </viewController>
                 <customObject id="Px0-g5-byd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

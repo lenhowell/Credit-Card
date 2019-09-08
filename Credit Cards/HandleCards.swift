@@ -9,13 +9,13 @@
 import Cocoa    // needed to access NSStoryboard & NSWindowController for segue
 
 //MARK:- Globals
-var usrCatItemreturned  = CategoryItem()
-var usrPressed          = ""
 var usrLineItem         = LineItem()
 var usrCatItemFromVendor = CategoryItem()
 var usrCatItemFromTran  = CategoryItem()
 var usrCatItemPrefered  = CategoryItem()
 
+var usrCatItemReturned  = CategoryItem()
+var usrFixVendor        = true
 
 //MARK:---- handleCards - 13-63 = 50-lines
 
@@ -68,8 +68,10 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
                 dictTransactions[lineItem] = fileName
                 lineItemArray.append(lineItem)          // Add new output Record to be output
             } else {
-                handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .printOnly, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: "Duplicate transaction")
+                handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .alertAndDisplay, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: "Duplicate transaction")
             }
+        } else {
+            // debug trap - empty line
         }
     }//end line-by-line loop
 
@@ -100,7 +102,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
             //TODO: Implement Learning mode
             //TODO: Recognize "LOCKED" Vendors
             //if catItemFromVendor.category != catFromLineItem {
-                (catItemPrefered, catItemPrefered) = pickTheBestCat(catItemVendor: catItemFromVendor, catItemTransa: catItemFromTran)
+                (catItemPrefered, isClearWinner) = pickTheBestCat(catItemVendor: catItemFromVendor, catItemTransa: catItemFromTran)
                 lineItem.genCat = catItemPrefered.category
                 lineItem.catSource = catItemPrefered.source
                 //print("\(#line) Cat for \(descKey) = \(catItemFromVendor.category);  TransCat = \(catFromLineItem)  Chose: \(catItemPrefered.category)")
@@ -136,8 +138,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
 
     if userIntervention && !isClearWinner {
         showUserInputForm(lineItem: lineItem, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemPrefered)
-    }
-    if learnMode && catItemPrefered != catItemFromVendor {
+    } else if learnMode && catItemPrefered != catItemFromVendor {
         dictCatLookupByVendor[descKey] = catItemPrefered //Do Actual Insert
         Stats.changedCatCount += 1
     }
@@ -157,8 +158,20 @@ func showUserInputForm(lineItem: LineItem, catItemFromVendor: CategoryItem, catI
         //let userVC = storyBoard.instantiateController(withIdentifier: "UserInput") as! UserInputVC
 
         let application = NSApplication.shared
-        application.runModal(for: userInputWindow)
+        let returnVal = application.runModal(for: userInputWindow)
         userInputWindow.close()
+        if returnVal == .abort { exit(101) }
+        if returnVal == .OK {
+            if usrFixVendor {
+                if lineItem.descKey.trim.isEmpty {
+                    // debug trap
+                }
+                dictCatLookupByVendor[lineItem.descKey] = usrCatItemReturned
+                Stats.changedCatCount += 1
+            } else {
+                // Fix Transaction here
+            }
+        }
     } else {
         handleError(codeFile: "HandleCards", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: "Could not open User-Input window.")
     }//end if let
@@ -192,7 +205,7 @@ internal func makeDictColNums(headers: [String]) -> [String: Int] {
 internal func pickTheBestCat(catItemVendor: CategoryItem, catItemTransa: CategoryItem) -> (CategoryItem, Bool) {
     let catVendor = catItemVendor.category
     let catTransa = catItemTransa.category
-    if catVendor.hasPrefix("$")                     { return (catItemVendor, true) } // User modified
+    if catItemVendor.source.hasPrefix("$")                  { return (catItemVendor, true) } // User modified
     let catVendStrong = !catVendor.isEmpty && !catVendor.hasPrefix("?") && !catVendor.contains("Unkno") && !catVendor.contains("Merch")
     let catTranStrong = !catTransa.isEmpty && !catTransa.hasPrefix("?") && !catTransa.contains("Unkno") && !catTransa.contains("Merch")
 
