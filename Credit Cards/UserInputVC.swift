@@ -17,6 +17,8 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     var catItemCurrent    = CategoryItem()
     var textPassed     = ""
     var unlockedSource = ""
+    //TODO: Blank out "$" & "?" checkboxes if user is not changing CategoryLookup
+    //TODO: Add "Ignore this vendor for now"
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -76,7 +78,7 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     @IBAction func cboCatsChange(_ sender: Any) {
         print("cboCatsChange \(cboCats.stringValue)")
         catItemCurrent.category = cboCats.stringValue
-        catItemCurrent.source = "GWB"
+        catItemCurrent.source = gUserInitials
         updateAfterCatChange(newCatItem: catItemCurrent)
     }
 
@@ -107,7 +109,7 @@ class UserInputVC: NSViewController, NSWindowDelegate {
         usrFixVendor = (radioFileVendor.state == .on)
         usrCatItemReturned = catItemCurrent
         if chkLockIn.state == .on {
-            usrCatItemReturned.source = "$GWB"
+            usrCatItemReturned.source = "$" + gUserInitials
         }
         print("return \(usrCatItemReturned.category) \(usrCatItemReturned.source)")
         NSApplication.shared.stopModal(withCode: .OK)
@@ -122,8 +124,8 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func chkContinueUserInputClick(_ sender: Any) {
-        userIntervention = chkContinueUserInput.state == .on
-        print("userIntervention = \(userIntervention)")
+        gUserInputMode = chkContinueUserInput.state == .on
+        print("userIntervention = \(gUserInputMode)")
     }
 
     //---- viewWillDisappear - Set gCityNum to positive value. Send changed-flags back to delegate in main ViewController

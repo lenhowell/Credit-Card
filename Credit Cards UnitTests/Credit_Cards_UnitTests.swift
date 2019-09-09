@@ -13,15 +13,15 @@ class Credit_Cards_UnitTests: XCTestCase {
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
-        isUnitTesting = true
-        userIntervention = false
-        learnMode = false
+        gIsUnitTesting = true
+        gUserInputMode = false
+        gLearnMode = false
         allowAlerts = false
     }
 
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
-        isUnitTesting = false
+        gIsUnitTesting = false
         allowAlerts = true
     }
 

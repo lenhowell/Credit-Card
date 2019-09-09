@@ -12,6 +12,9 @@ public enum UDKey {
     static let transactionFolder = "CCTransactionFolder"
     static let supportFolder     = "CCCategoryFolder"
     static let outputFolder      = "CCOoutputFolder"
+    static let userInitials      = "CCUserInitials"
+    static let userInputMode     = "CCUserInput"
+    static let learningMode      = "CCLearningMode"
 }
 
 //func saveUserDefaults() {

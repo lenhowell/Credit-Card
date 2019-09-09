@@ -8,14 +8,15 @@
 
 import Cocoa    // needed to access NSStoryboard & NSWindowController for segue
 
-//MARK:- Globals
-var usrLineItem         = LineItem()
+//MARK:- Globals for UserInputs
+// Parameters for UserInputs
+var usrLineItem          = LineItem()
 var usrCatItemFromVendor = CategoryItem()
-var usrCatItemFromTran  = CategoryItem()
-var usrCatItemPrefered  = CategoryItem()
-
-var usrCatItemReturned  = CategoryItem()
-var usrFixVendor        = true
+var usrCatItemFromTran   = CategoryItem()
+var usrCatItemPrefered   = CategoryItem()
+// Returns from UserInputs
+var usrCatItemReturned   = CategoryItem()
+var usrFixVendor         = true
 
 //MARK:---- handleCards - 13-63 = 50-lines
 
@@ -64,11 +65,13 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
         let lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, cardType: cardType, hasCatHeader: hasCatHeader, fileName: fileName, lineNum: lineNum)
 
         if !lineItem.desc.isEmpty || !lineItem.postDate.isEmpty || lineItem.debit != 0  || lineItem.credit != 0 {
+            // Check for duplicate from another file
             if dictTransactions[lineItem] == nil || dictTransactions[lineItem] == fileName {
-                dictTransactions[lineItem] = fileName
-                lineItemArray.append(lineItem)          // Add new output Record to be output
+                dictTransactions[lineItem] = fileName   // mark for dupes check
+                lineItemArray.append(lineItem)          // Add new output Record
             } else {
-                handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .alertAndDisplay, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: "Duplicate transaction")
+                let msg = "Duplicate transaction"
+                handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .alertAndDisplay, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: msg)
             }
         } else {
             // debug trap - empty line
@@ -85,7 +88,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
     var lineItem = LineItem(fromTransFileLine: fromTransFileLine, dictColNums: dictColNums, fileName: fileName, lineNum: lineNum)
     lineItem.cardType = cardType
 
-    let descKey = makeDescKey(from: lineItem.desc, fileName: fileName)
+    var descKey = makeDescKey(from: lineItem.desc, fileName: fileName)
     lineItem.descKey = descKey
     var catItemFromVendor   = CategoryItem()
     var catItemPrefered     = CategoryItem()
@@ -93,10 +96,18 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
     let catFromLineItem = dictMyCatAliases[lineItem.rawCat] ?? "?" + lineItem.rawCat
     let catItemFromTran = CategoryItem(category: catFromLineItem, source: cardType)
 
+    // Check for Modified Transaction
+    let modTranKey = fromTransFileLine.trim
+    if let modTrans = dictModifiedTrans[modTranKey] {
+        lineItem.genCat = modTrans.category
+        lineItem.catSource = modTrans.source
+        descKey = ""                            //Prevent further processing
+    }
+
     if !descKey.isEmpty {
         if let cV = dictCatLookupByVendor[descKey] {
-            catItemFromVendor = cV
-            lineItem.genCat = catItemFromVendor.category            // Here if Lookup of KEY was successful
+            catItemFromVendor = cV                  // Here if Lookup of KEY was successful
+            lineItem.genCat = catItemFromVendor.category
             lineItem.catSource = catItemFromVendor.source
 
             //TODO: Implement Learning mode
@@ -118,9 +129,12 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
                 if lineItem.rawCat.count >= 3 {
                     let myCatFromTran  = dictMyCatAliases[lineItem.rawCat] ?? "?" + lineItem.rawCat
 
-                    if dictMyCatAliases[myCatFromTran] == nil {
+                    if let catTran = dictMyCatAliases[myCatFromTran] {
+                        usrCatItemFromTran = CategoryItem(category: catTran, source: cardType)
+                        isClearWinner = true
+                    } else {
                         print("HandleCards#\(#line): Unknown Category: \"\(myCatFromTran)\" from \(descKey)")
-                        //
+                        isClearWinner = false
                     }
 
                     dictCatLookupByVendor[descKey] = CategoryItem(category: myCatFromTran, source: source) //Do Actual Insert
@@ -134,14 +148,15 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
                 Stats.descWithNoCat += 1
             }// hasCatHeader or not
         }
-    }//endif descKey empty
 
-    if userIntervention && !isClearWinner {
-        showUserInputForm(lineItem: lineItem, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemPrefered)
-    } else if learnMode && catItemPrefered != catItemFromVendor {
-        dictCatLookupByVendor[descKey] = catItemPrefered //Do Actual Insert
-        Stats.changedCatCount += 1
-    }
+        if gUserInputMode && !isClearWinner {
+            showUserInputForm(lineItem: lineItem, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemPrefered)
+        } else if gLearnMode && catItemPrefered != catItemFromVendor {
+            dictCatLookupByVendor[descKey] = catItemPrefered //Do Actual Insert
+            Stats.changedCatCount += 1
+        }
+
+    }//endif descKey empty
 
     Stats.processedCount += 1
     return lineItem
@@ -158,7 +173,7 @@ func showUserInputForm(lineItem: LineItem, catItemFromVendor: CategoryItem, catI
         //let userVC = storyBoard.instantiateController(withIdentifier: "UserInput") as! UserInputVC
 
         let application = NSApplication.shared
-        let returnVal = application.runModal(for: userInputWindow)
+        let returnVal = application.runModal(for: userInputWindow) // <==
         userInputWindow.close()
         if returnVal == .abort { exit(101) }
         if returnVal == .OK {
@@ -169,7 +184,8 @@ func showUserInputForm(lineItem: LineItem, catItemFromVendor: CategoryItem, catI
                 dictCatLookupByVendor[lineItem.descKey] = usrCatItemReturned
                 Stats.changedCatCount += 1
             } else {
-                // Fix Transaction here
+                let transKey = lineItem.transText
+                dictModifiedTrans[transKey] = usrCatItemReturned
             }
         }
     } else {

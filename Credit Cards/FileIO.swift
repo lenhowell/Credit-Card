@@ -79,6 +79,29 @@ public func removeUserFromPath(_ fullPath: String) -> String {
     return path
 }
 
+public func saveBackupFile(url: URL) {
+    // Rename the existing file to "CategoryLookup yyyy-MM-dd HHmm.txt"
+    let fileAttributes = FileAttributes.getFileInfo(url: url)
+    let modDate = fileAttributes.modificationDate
+    let oldNameWithExt = url.lastPathComponent
+    let adder = modDate?.toString("yyyy-MM-dd HHmm") ?? "BU"
+    let nameComps = oldNameWithExt.components(separatedBy: ".")
+    let oldName = nameComps[0]
+    let ext: String
+    if nameComps.count >= 2 {
+        ext = "." + nameComps[1]
+    } else {
+        ext = ""
+    }
+    let newName = oldName + " " + adder + ext
+    let newPath = url.deletingLastPathComponent().path + "/" + newName
+    do {
+        try FileManager.default.moveItem(atPath: url.path, toPath: newPath)
+    } catch {
+        // print("Error: \(error.localizedDescription)")
+    }
+}
+
 //????? incorporate both getFileInfo() funcs into struct as inits
 public struct FileAttributes: Equatable {
     let url:              URL?
@@ -121,7 +144,7 @@ public struct FileAttributes: Equatable {
     }
 }// end struct FileAttributes
 
-//MARK:- My Cataagory List
+//MARK:- My Catagory List
 
 func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
     gMyCatNames = []
@@ -149,11 +172,71 @@ func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
     return dictMyCats
 }//end func loadMyCats
 
+//MARK:- My Modified Transactions
+
+func loadMyModifiedTrans(myModifiedTranURL: URL) -> [String: CategoryItem]  {
+    //let dictColNums = ["TRAN":0, "DESC":1, "DEBI":2, "CRED":3, "CATE":4]
+    let fileName = myModifiedTranURL.lastPathComponent
+    var dictTrans = [String: CategoryItem]()
+    let contentof = (try? String(contentsOf: myModifiedTranURL)) ?? ""
+    let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
+    var lineNum = 0
+    for line in lines {
+        lineNum += 1
+        if line.trim.isEmpty || line.hasPrefix("//") {
+            continue
+        }
+        //TODO: Check for out-of-bounds
+        let comps = line.components(separatedBy: "\t").map{$0.trim}
+        let genCat = comps[0]
+        let catSource = comps[1]
+        let key = comps[2]
+        let catItem = CategoryItem(category: genCat, source: catSource)
+        dictTrans[key] = catItem
+    }//next line
+    /*
+     tranDate, desc, Debit, Credit, rawCat
+     var cardType = ""       //     Identifies the Credit-Card account
+     var tranDate = ""       // 0! Transaction-Date String
+     var postDate = ""       //     Post-Date String
+     var cardNum  = ""       //     Card Number (last 4)
+     var descKey  = ""       //     Generated Key for this desc. (vendor)
+     var desc     = ""       // 1! Description (Vendor)
+     var debit    = 0.0      // 2! Debit (payments to vendors, etc.)
+     var credit   = 0.0      // 3! Credit (Credit-Card payments, refunds, etc.)
+     var rawCat   = ""       // 4! Category from Transaction
+     var genCat   = ""       //     Generated Category
+     var catSource = ""      //     Source of Generated Category (including "$" for "LOCKED")
+     */
+    return dictTrans
+}//end func loadMyModifiedTrans
+
+func writeModTransTofile(url: URL, dictModTrans: [String: CategoryItem]) {
+    saveBackupFile(url: url)
+    var text = "// Machine-generated file\n"
+    text += "//TranDate,        Desc,         Debit, Credit, Category, NewCat, Source\n"
+    for (key, catItem) in dictModTrans {
+//        text += lineItem.tranDate + ", " + lineItem.desc + ", "
+//        text += String(lineItem.debit) + ", " + String(lineItem.credit) + ", "
+//        text += lineItem.rawCat + ", "
+        text += catItem.category + "\t" + catItem.source + "\t" + key + "\n"
+    }
+    //— writing —
+    do {
+        try text.write(to: url, atomically: false, encoding: .utf8)
+        print("\n😀 Successfully wrote \(dictModTrans.count) transactions to: \(url.path)")
+    } catch {
+        let msg = "Could not write new MyModifiesTransactions file."
+        handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: url.lastPathComponent, errorMsg: msg)
+    }
+
+}
+
 //MARK:- Description KeyWords
 
-func loadDescKeyWords(descKeyWordFileURL: URL) -> [String: DescKeyWord]  {
+func loadDescKeyWords(url: URL) -> [String: DescKeyWord]  {
     var dictKeyWords = [String: DescKeyWord]()
-    let contentof = (try? String(contentsOf: descKeyWordFileURL)) ?? ""
+    let contentof = (try? String(contentsOf: url)) ?? ""
     let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
     var lineNum = 0
     for line in lines {
@@ -166,7 +249,7 @@ func loadDescKeyWords(descKeyWordFileURL: URL) -> [String: DescKeyWord]  {
         // Create an Array of line components the seperator being a ","
         let keyWordArray = line.components(separatedBy: ",")
         if keyWordArray.count < 2 {
-            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: descKeyWordFileURL.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "expected a comma")
+            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: url.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "expected a comma")
             continue
         }
         var keyWord = keyWordArray[0].trim
@@ -185,12 +268,12 @@ func loadDescKeyWords(descKeyWordFileURL: URL) -> [String: DescKeyWord]  {
 
 //MARK:- Categories
 
-func loadCategories(catLookupFileURL: URL) -> [String: CategoryItem]  {
+func loadCategories(url: URL) -> [String: CategoryItem]  {
     var dictCat   = [String: CategoryItem]()
 
     // Get data in "CategoryLookup" if there is any. If NIL set to Empty.
     //let contentof = (try? String(contentsOfFile: filePathCategories)) ?? ""
-    let contentof = (try? String(contentsOf: catLookupFileURL)) ?? ""
+    let contentof = (try? String(contentsOf: url)) ?? ""
     let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
     
     // For each line in "CategoryLookup"
@@ -203,7 +286,7 @@ func loadCategories(catLookupFileURL: URL) -> [String: CategoryItem]  {
         // Create an Array of line components the seperator being a ","
         let categoryArray = line.components(separatedBy: ",")
         if categoryArray.count != 3 {
-            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .display, fileName: catLookupFileURL.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "Expected 2 commas per line")
+            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .display, fileName: url.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "Expected 2 commas per line")
             continue
         }
         let descKey  = categoryArray[0].trimmingCharacters(in: .whitespaces)  // make-DescKey(from: categoryArray[0])
@@ -213,30 +296,16 @@ func loadCategories(catLookupFileURL: URL) -> [String: CategoryItem]  {
         dictCat[descKey] = categoryItem
         
     }
-    print("\(dictCat.count) Items Read into Category dictionary from: \(catLookupFileURL.path)")
+    print("\(dictCat.count) Items Read into Category dictionary from: \(url.path)")
     
     return dictCat
 }//end func loadCategories
 
 
 //---- writeCategoriesToFile - uses workingFolderUrl(I), handleError(F)
-func writeCategoriesToFile(categoryFileURL: URL, dictCat: [String: CategoryItem]) {
+func writeCategoriesToFile(url: URL, dictCat: [String: CategoryItem]) {
 
-    // Rename the existing file to "CategoryLookup yyyy-MM-dd HHmm.txt"
-    let fileAttributes = FileAttributes.getFileInfo(url: categoryFileURL)
-    let modDate = fileAttributes.modificationDate
-    let oldNameWithExt = categoryFileURL.lastPathComponent
-    let adder = modDate?.toString("yyyy-MM-dd HHmm") ?? "BU"
-    let nameComps = oldNameWithExt.components(separatedBy: ".")
-    let oldName = nameComps[0]
-    let ext = "." + nameComps[1]
-    let newName = oldName + " " + adder + ext
-    let newPath = categoryFileURL.deletingLastPathComponent().path + "/" + newName
-    do {
-        try FileManager.default.moveItem(atPath: categoryFileURL.path, toPath: newPath)
-    } catch {
-        // print("Error: \(error.localizedDescription)")
-    }
+    saveBackupFile(url: url)
 
     var text = "// Category keys are up to \(descKeyLength) chars long.\n"
     text += "// Apostrophies are removed, and other extraneous punctuation changed to spaces.\n"
@@ -258,11 +327,11 @@ func writeCategoriesToFile(categoryFileURL: URL, dictCat: [String: CategoryItem]
     
     //— writing —
     do {
-        try text.write(to: categoryFileURL, atomically: false, encoding: .utf8)
-        print("\n😀 Successfully wrote \(dictCat.count) items, using \(descKeyLength) keys, to: \(categoryFileURL.path)")
+        try text.write(to: url, atomically: false, encoding: .utf8)
+        print("\n😀 Successfully wrote \(dictCat.count) items, using \(descKeyLength) keys, to: \(url.path)")
     } catch {
         let msg = "Could not write new CategoryLookup file."
-        handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: categoryFileURL.lastPathComponent, errorMsg: msg)
+        handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: url.lastPathComponent, errorMsg: msg)
     }
 }//end func writeCategoriesToFile
 

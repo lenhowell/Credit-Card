@@ -15,16 +15,18 @@ import Cocoa
 // Global Constants
 
 // Global Variables
+var gUserInitials           = "GWB"
 var gTransFilename          = ""
 var gMyCatNames             = [String]()           // Array of Category Names
-var dictMyCatAliases        = [String: String]()        // Hash of Category Synonyms
+var dictMyCatAliases        = [String: String]()            // Hash of Category Synonyms
 var dictCatLookupByVendor   = [String: CategoryItem]()  // Hash for Category Lookup
 var dictDescKeyWords        = [String: DescKeyWord]()   // Hash for Description KeyWord Lookup
+var dictTransactions        = [LineItem: String]()      // Hash for finding duplicate transactions
+var dictModifiedTrans       = [String: CategoryItem]()  // Hash for user-modified transactions
 var uniqueCategoryCounts    = [String: Int]()           // Hash for Unique Category Counts
-var dictTransactions        = [LineItem: String]()
-var isUnitTesting       = false
-var learnMode           = true
-var userIntervention    = true
+var gIsUnitTesting   = false
+var gLearnMode       = true
+var gUserInputMode   = true
 
 //MARK:- ViewController
 class ViewController: NSViewController, NSWindowDelegate {
@@ -36,6 +38,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     let catLookupFilename   = "CategoryLookup.txt"
     let descKeyWordFilename = "DescriptionKeyWords.txt"
     let myCatsFilename      = "MyCategories.txt"
+    let myModifiedTranFilename = "MyModifiedTransactions.txt"
 
     // Variables
     var transFileURLs       = [URL]()
@@ -47,6 +50,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     var catLookupFileURL    = FileManager.default.homeDirectoryForCurrentUser
     var descKeyWordFileURL  = FileManager.default.homeDirectoryForCurrentUser
     var myCatsFileURL       = FileManager.default.homeDirectoryForCurrentUser
+    var myModifiedTransURL  = FileManager.default.homeDirectoryForCurrentUser
     var outputFileURL       = FileManager.default.homeDirectoryForCurrentUser
 
     //MARK:- Overrides & Lifecycle
@@ -68,6 +72,18 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
         pathOutputDir       = UserDefaults.standard.string(forKey: UDKey.outputFolder) ?? pathOutputDir
         pathTransactionDir  = UserDefaults.standard.string(forKey: UDKey.transactionFolder) ?? pathTransactionDir
+
+        //TODO: Allow User to chang his initials.
+        gUserInitials = UserDefaults.standard.string(forKey: UDKey.userInitials) ?? ""
+        if gUserInitials.isEmpty {
+            let homeURL = FileManager.default.homeDirectoryForCurrentUser
+            gUserInitials = homeURL.lastPathComponent.prefix(3).uppercased()
+        }
+
+        if !gIsUnitTesting {
+            gLearnMode = UserDefaults.standard.bool(forKey: UDKey.learningMode)
+            gUserInputMode = UserDefaults.standard.bool(forKey: UDKey.userInputMode)
+        }
 
         // Get List of Transaction Files
         var errTxt = ""
@@ -97,8 +113,8 @@ class ViewController: NSViewController, NSWindowDelegate {
         let shortCatFilePath = removeUserFromPath(catLookupFileURL.path)
         lblResults.stringValue = "Category Lookup File \"\(shortCatFilePath)\" loaded with \(Stats.origCatCount) items.\n"
 
-        chkLearningMode.state = learnMode ? .on : .off
-        chkUserInput.state = userIntervention ? .on : .off
+        chkLearningMode.state = gLearnMode     ? .on : .off
+        chkUserInput.state    = gUserInputMode ? .on : .off
 
         // Set txtTransationFolder.delegate
         txtTransationFolder.delegate = self         // Allow ViewController to see when txtTransationFolder changes.
@@ -149,12 +165,12 @@ class ViewController: NSViewController, NSWindowDelegate {
     @IBOutlet var chkUserInput: NSButton!
 
     @IBAction func chkLearningModeClick(_ sender: Any) {
-        learnMode = chkLearningMode.state == .on
-        print("learnMode = \(learnMode)")
+        gLearnMode = chkLearningMode.state == .on
+        print("learnMode = \(gLearnMode)")
     }
     @IBAction func chkUserInputClick(_ sender: Any) {
-        userIntervention = chkUserInput.state == .on
-        print("userIntervention = \(userIntervention)")
+        gUserInputMode = chkUserInput.state == .on
+        print("UserInputMode = \(gUserInputMode)")
     }
     
     //MARK:- Main Program
@@ -194,9 +210,12 @@ class ViewController: NSViewController, NSWindowDelegate {
         UserDefaults.standard.set(pathTransactionDir, forKey: UDKey.transactionFolder)
         UserDefaults.standard.set(pathSupportDir,     forKey: UDKey.supportFolder)
         UserDefaults.standard.set(pathOutputDir,      forKey: UDKey.outputFolder)
+        UserDefaults.standard.set(gUserInitials,      forKey: UDKey.userInitials)
+        UserDefaults.standard.set(gUserInputMode,     forKey: UDKey.userInputMode)
+        UserDefaults.standard.set(gLearnMode,         forKey: UDKey.learningMode)
 
         Stats.clearAll()
-        dictCatLookupByVendor = loadCategories(catLookupFileURL: catLookupFileURL) // Re-read Categories Dictionary
+        dictCatLookupByVendor = loadCategories(url: catLookupFileURL) // Re-read Categories Dictionary
         Stats.origCatCount = dictCatLookupByVendor.count
 
         var fileContents    = ""                        // Where All Transactions in a File go
@@ -243,7 +262,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             switch cardType {
             case "C1V", "C1R", "DIS", "CIT", "BACT", "BAPR", "ML":
                 lineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray)
-                chkUserInput.state = userIntervention ? .on : .off
+                chkUserInput.state = gUserInputMode ? .on : .off
                 Stats.transFileCount += 1
             default:
                 Stats.junkFileCount += 1
@@ -263,8 +282,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         print("\n\(uniqueCategoryCounts.count) uniqueCategoryCounts.sorted by count")
         print (uniqueCategoryCounts.sorted {$0.value > $1.value})
         if Stats.addedCatCount > 0 || Stats.changedCatCount > 0 {
-            writeCategoriesToFile(categoryFileURL: catLookupFileURL, dictCat: dictCatLookupByVendor)
+            writeCategoriesToFile(url: catLookupFileURL, dictCat: dictCatLookupByVendor)
         }
+        writeModTransTofile(url: myModifiedTransURL, dictModTrans: dictModifiedTrans)
 
         var statString = ""
 
@@ -327,24 +347,36 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     func readSupportFiles() {
         var errTxt = ""
+
+        // "CategoryLookup.txt"
         (catLookupFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: catLookupFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "Category" + errTxt)
         }
-        dictCatLookupByVendor = loadCategories(catLookupFileURL: catLookupFileURL) // Build Categories Dictionary
+        dictCatLookupByVendor = loadCategories(url: catLookupFileURL)       // Build Categories Dictionary
         Stats.origCatCount = dictCatLookupByVendor.count
 
+        // "DescriptionKeyWords.txt"
         (descKeyWordFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: descKeyWordFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "descKeyWord" + errTxt)
         }
-        dictDescKeyWords = loadDescKeyWords(descKeyWordFileURL: descKeyWordFileURL) // Build Desc-KeyWord Dictionary
+        dictDescKeyWords = loadDescKeyWords(url: descKeyWordFileURL)        // Build Desc-KeyWord Dictionary
 
+        // "MyCategories.txt"
         (myCatsFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myCatsFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories" + errTxt)
         }
         dictMyCatAliases = loadMyCats(myCatsFileURL: myCatsFileURL)
+
+        // "MyModifiedTransactions"
+        (myModifiedTransURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myModifiedTranFilename)
+        if !errTxt.isEmpty {
+            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyModifiedTransactions" + errTxt)
+        }
+        dictModifiedTrans = loadMyModifiedTrans(myModifiedTranURL: myModifiedTransURL)
+
     }//end func
 
 }//end class ViewController

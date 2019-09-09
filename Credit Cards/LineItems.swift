@@ -21,6 +21,7 @@ public struct LineItem: Equatable, Hashable {
     var rawCat   = ""       // Category from Tansaction
     var genCat   = ""       // Generated Category
     var catSource = ""      // Source of Generated Category (including "$" for "LOCKED")
+    var transText = ""      // Original Transaction Line from file
 
     init() {
     }
@@ -32,7 +33,8 @@ public struct LineItem: Equatable, Hashable {
     init(fromTransFileLine: String, dictColNums: [String: Int], fileName: String, lineNum: Int) {
         let expectedColumnCount = dictColNums.count
 
-        var transaction = fromTransFileLine
+        var transaction = fromTransFileLine.trim
+        self.transText = transaction
 
         // Parse transaction, replacing all "," within quotes with a ";"
         var inQuote = false
@@ -50,7 +52,7 @@ public struct LineItem: Equatable, Hashable {
 
         transaction = transaction.replacingOccurrences(of: "\"", with: "")
         transaction = transaction.replacingOccurrences(of: "\r", with: "")
-        let columns = transaction.components(separatedBy: ",")  // Isolate columns within this transaction
+        let columns = transaction.components(separatedBy: ",").map{$0.trim}  // Isolate columns within this transaction
         let columnCount = columns.count
         if columnCount != expectedColumnCount {
             let msg = "\(columnCount) in transaction; should be \(expectedColumnCount)"
@@ -70,7 +72,7 @@ public struct LineItem: Equatable, Hashable {
         if let colNum = dictColNums["DESC"] {   // DESCRIPTION
             if colNum < columnCount {
                 self.desc = columns[colNum].replacingOccurrences(of: "\"", with: "")
-                if self.desc.trim.isEmpty {
+                if self.desc.isEmpty {
                     print("LineItems #\(#line) - Empty Description\n\(transaction)")
                 }
             }
@@ -90,7 +92,7 @@ public struct LineItem: Equatable, Hashable {
         //TODO: Detect & report corrupt $values rather than crashing
         if let colNum = dictColNums["AMOU"] {   // AMOUNT
             if colNum < columnCount {
-                let amt = columns[colNum].replacingOccurrences(of: ";", with: "").trim + "0" //"0" is for empty fields
+                let amt = columns[colNum].replacingOccurrences(of: ";", with: "") + "0" //"0" is for empty fields
                 let amount = Double(amt)! // ?? 0)
                 if amount < 0 {
                     self.credit = -amount
@@ -101,7 +103,7 @@ public struct LineItem: Equatable, Hashable {
         }
         if let colNum = dictColNums["CRED"] {   // CREDIT
             if colNum < columnCount {
-                let amt = columns[colNum].replacingOccurrences(of: ";", with: "").trim + "0"
+                let amt = columns[colNum].replacingOccurrences(of: ";", with: "") + "0"
                 self.credit = abs(Double(amt)!) // ?? 0)
             }
         }
