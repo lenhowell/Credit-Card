@@ -2,8 +2,8 @@
 //  FreeFuncs.swift
 //  Credit Cards
 //
-//  Created by Lenard Howell on 8/9/19.
-//  Copyright © 2019 Lenard Howell. All rights reserved.
+//  Created by George Bauer on 8/9/19.
+//  Copyright © 2019 George Bauer. All rights reserved.
 //
 
 import Cocoa    // Cocoa is needed to recognize NSPasteboard

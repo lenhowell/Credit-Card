@@ -3,7 +3,7 @@
 //  Credit Cards
 //
 //  Created by George Bauer on 8/8/19.
-//  Copyright © 2019 Lenard Howell. All rights reserved.
+//  Copyright © 2019 George Bauer. All rights reserved.
 //
 
 // TODO: Append Error message to Error File
