@@ -3,7 +3,7 @@
 //  Credit Cards UnitTests
 //
 //  Created by George Bauer on 8/19/19.
-//  Copyright © 2019 Lenard Howell. All rights reserved.
+//  Copyright © 2019 George Bauer. All rights reserved.
 //
 
 import XCTest
@@ -51,6 +51,7 @@ class MakeDescKeyTests: XCTestCase {
     func testProblems() {
         var result = ""
         var desc = ""
+
         desc = "STP&SHPFUEL0639 STRATFORD CT03061R"
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "STP&SHPFUEL")
@@ -58,6 +59,16 @@ class MakeDescKeyTests: XCTestCase {
         desc = "BIG Y 84 STRATFORD"
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "BIG Y 84 STRATFORD")
+
+        desc = "The Adventure Park at Dis,Entertainment"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "ADVENTURE PARK")
+
+    }
+
+    func testPrefix()  {
+        var result = ""
+        var desc = ""
 
         desc = "VZWRLSS*APOCC VISN"
         result = makeDescKey(from: desc)
@@ -67,39 +78,13 @@ class MakeDescKeyTests: XCTestCase {
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "VERIZON")
 
-        desc = "The Adventure Park at Dis,Entertainment"
-        result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "ADVENTURE PARK")
-
-    }
-
-    func testMakeDescKey() {
-        var result = ""
-        var desc = ""
-
         desc = "APL*ITUNES.COM/BILL 866-712-7753 CA"
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "ITUNES.COM BILL")
 
-        desc = "APPLEBEE'S NEI98696818"
-        result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "APPLEBEES")
-
-        desc = "ATK GOLF @ TASHUA KNOL"
-        result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "ATK GOLF TASHUA KN")
-
-        desc = "AUTOPAY 221152216034323RAUTOPAY AUTO-PMT"
-        result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "AUTOPAY")
-
         desc = "SP * BLACKBOXDEALZ 5033957597 WA"
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "BLACKBOXDEALZ")
-
-        desc = "BURGER KING 4NJ44"
-        result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "BURGER KING")
 
         desc = "CLKBANK*COM_5GFZUFBM 800-390-6035 ID"
         result = makeDescKey(from: desc)
@@ -113,46 +98,13 @@ class MakeDescKeyTests: XCTestCase {
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "FORMULYST.COM")
 
-        desc = "KFC J235016"
-        result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "KFC")
-
-        desc = "MCDONALD'S F3625"
-        result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "MCDONALDS")
-
-        desc = "MCDONALD'S  Fx3620       NORTH MYRTLE SC"
-        result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "MCDONALDS")
-
-        desc = "STOP & SHOP 0620"
-        result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "STOP&SHOP")
-
-        desc = "STP&SHPFUEL0663"
-        result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "STP&SHPFUEL")
-
         desc = "PP*WHIRLWIND SUN N FUN   CLEARWATER   FL"
         result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "PP WHIRLWIND SUN N")
-
-        // ************** PROBLEMS!! ****************
-        desc = "HEALTHY*BACK INSTITUTE 800-216-4908 TX"
-        result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "HEALTHY")
-
-        desc = "OFFER 04 PROMOTIONAL APR ENDED 07/01/19"
-        result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "OFFER PROMOTIONAL")
+        XCTAssertEqual(result, "PP WHIRLWIND SUN N FUN")
 
         desc = "GOOGLE*DIGIBITES G.CO HELPPAY# CA"
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "GOOGLE")
-
-        desc = "UBER   TRIP"
-        result = makeDescKey(from: desc)
-        XCTAssertEqual(result, "UBER")
 
         desc = "MTA*MNR STATION TIX"
         result = makeDescKey(from: desc)
@@ -177,6 +129,77 @@ class MakeDescKeyTests: XCTestCase {
         desc = "SQ *RETHREADS"
         result = makeDescKey(from: desc)
         XCTAssertEqual(result, "RETHREADS")
+
+        desc = "PAYPAL *TYOMA            xxx-xxx-7733 CA"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "PAYPAL TYOMA")
+
+        desc = "PAYPAL *FANKEKE          xxx-xxx-7733 CA"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "PAYPAL FANKEKE")
+
+        desc = "PAYPAL *MACNANBIO      xxx-xxx-7733 CA"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "MACNANBIO PAYPAL")
+
+        desc = "PAYPAL *LAKEAMPHIBI      xxx-xxx-7733 CA"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "LAKEAMPHIBI PAYPAL")
+
+ }
+
+    func testMakeDescKey() {
+        var result = ""
+        var desc = ""
+
+        desc = "APPLEBEE'S NEI98696818"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "APPLEBEES")
+
+        desc = "ATK GOLF @ TASHUA KNOL"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "ATK GOLF TASHUA KNOL")
+
+        desc = "AUTOPAY 221152216034323RAUTOPAY AUTO-PMT"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "AUTOPAY")
+
+        desc = "BURGER KING 4NJ44"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "BURGER KING")
+
+        desc = "KFC J235016"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "KFC")
+
+        desc = "MCDONALD'S F3625"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "MCDONALDS")
+
+        desc = "MCDONALD'S  Fx3620       NORTH MYRTLE SC"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "MCDONALDS")
+
+        desc = "STOP & SHOP 0620"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "STOP&SHOP")
+
+        desc = "STP&SHPFUEL0663"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "STP&SHPFUEL")
+
+        // ************** PROBLEMS!! ****************
+        desc = "HEALTHY*BACK INSTITUTE 800-216-4908 TX"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "HEALTHY")
+
+        desc = "OFFER 04 PROMOTIONAL APR ENDED 07/01/19"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "OFFER PROMOTIONAL APR EN")
+
+        desc = "UBER   TRIP"
+        result = makeDescKey(from: desc)
+        XCTAssertEqual(result, "UBER")
 
 
         //CIT-07-2-2017 - 08-11-2019.csv
@@ -231,7 +254,7 @@ class MakeDescKeyTests: XCTestCase {
             "WAWA 860      00008607":    "WAWA",
 
             "APPLEBEES NEIxxxx6818   BOYNTON BEACHFL":  "APPLEBEES",
-            "BB&T PUCKETT SCHEETZ AND xxx-xxx8122  SC": "BB&T PUCKETT SCHEETZ",
+            "BB&T PUCKETT SCHEETZ AND xxx-xxx8122  SC": "BB&T PUCKETT SCHEETZ&",
             "HARRYS 888-212-6855 8882126855 NY":        "HARRYS",
             "IHOP #xx-092             GAINESVILLE  FL": "IHOP",
             "LONGHORN STEAKxxxx3264   WINTER GARDENFL": "LONGHORN",

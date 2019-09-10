@@ -15,8 +15,10 @@ var usrCatItemFromVendor = CategoryItem()
 var usrCatItemFromTran   = CategoryItem()
 var usrCatItemPrefered   = CategoryItem()
 // Returns from UserInputs
-var usrCatItemReturned   = CategoryItem()
-var usrFixVendor         = true
+var usrCatItemReturned  = CategoryItem()
+var usrFixVendor        = true
+var usrIgnoreVendors    = [String: Int]()
+
 
 //MARK:---- handleCards - 13-63 = 50-lines
 
@@ -149,7 +151,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
             }// hasCatHeader or not
         }
 
-        if gUserInputMode && !isClearWinner {
+        if gUserInputMode && !isClearWinner && usrIgnoreVendors[lineItem.descKey] == nil {
             showUserInputForm(lineItem: lineItem, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemPrefered)
         } else if gLearnMode && catItemPrefered != catItemFromVendor {
             dictCatLookupByVendor[descKey] = catItemPrefered //Do Actual Insert

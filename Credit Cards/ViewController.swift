@@ -15,10 +15,10 @@ import Cocoa
 // Global Constants
 
 // Global Variables
-var gUserInitials           = "GWB"
-var gTransFilename          = ""
-var gMyCatNames             = [String]()           // Array of Category Names
-var dictMyCatAliases        = [String: String]()            // Hash of Category Synonyms
+var gUserInitials           = "GWB"                 // Initials used for "Category Source" when Cat is changes by user.
+var gTransFilename          = ""                    // Current Transaction Filename
+var gMyCatNames             = [String]()            // Array of Category Names
+var dictMyCatAliases        = [String: String]()        // Hash of Category Synonyms
 var dictCatLookupByVendor   = [String: CategoryItem]()  // Hash for Category Lookup
 var dictDescKeyWords        = [String: DescKeyWord]()   // Hash for Description KeyWord Lookup
 var dictTransactions        = [LineItem: String]()      // Hash for finding duplicate transactions
@@ -34,11 +34,11 @@ class ViewController: NSViewController, NSWindowDelegate {
     //MARK:- Instance Variables
     
     // Constants
-    let myFileNameOut       = "Combined-Creditcard-Master.txt" // Only used in outputTranactions
-    let catLookupFilename   = "CategoryLookup.txt"
-    let descKeyWordFilename = "DescriptionKeyWords.txt"
-    let myCatsFilename      = "MyCategories.txt"
-    let myModifiedTranFilename = "MyModifiedTransactions.txt"
+    let myFileNameOut           = "Combined-Creditcard-Master.txt" // Only used in outputTranactions
+    let catLookupFilename       = "CategoryLookup.txt"
+    let descKeyWordFilename     = "DescriptionKeyWords.txt"
+    let myCatsFilename          = "MyCategories.txt"
+    let myModifiedTranFilename  = "MyModifiedTransactions.txt"
 
     // Variables
     var transFileURLs       = [URL]()
@@ -144,12 +144,6 @@ class ViewController: NSViewController, NSWindowDelegate {
         //print ("ErrMsg: \"\(msg)\" received from ErrorHandler via NotificationCenter")
     }
 
-    //MARK:- @IBActions
-    
-    @IBAction func btnStartClick(_ sender: Any) {
-        main()
-    }
-    
     //MARK:- @IBOutlets
     
     @IBOutlet weak var lblErrMsg:   NSTextField!
@@ -163,6 +157,12 @@ class ViewController: NSViewController, NSWindowDelegate {
     @IBOutlet var cboFiles: NSComboBox!
     @IBOutlet var chkLearningMode: NSButton!
     @IBOutlet var chkUserInput: NSButton!
+
+    //MARK:- @IBActions
+
+    @IBAction func btnStartClick(_ sender: Any) {
+        main()
+    }
 
     @IBAction func chkLearningModeClick(_ sender: Any) {
         gLearnMode = chkLearningMode.state == .on
@@ -317,6 +317,8 @@ class ViewController: NSViewController, NSWindowDelegate {
         print()
 
     }// End of func main
+
+    //MARK: Support funcs
 
     //------ loadComboBoxFiles - Read Trk filenames and load ComboBoxFiles with Recent, Not-done, & Outdated files
     private func loadComboBoxFiles(fileURLs: [URL]) {          // 555-637 = 82 lines

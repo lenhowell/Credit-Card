@@ -92,8 +92,8 @@ public struct LineItem: Equatable, Hashable {
         //TODO: Detect & report corrupt $values rather than crashing
         if let colNum = dictColNums["AMOU"] {   // AMOUNT
             if colNum < columnCount {
-                let amt = columns[colNum].replacingOccurrences(of: ";", with: "") + "0" //"0" is for empty fields
-                let amount = Double(amt)! // ?? 0)
+                let amt = columns[colNum].replacingOccurrences(of: ";", with: "") //"0" is for empty fields
+                let amount = Double(amt) ?? 0
                 if amount < 0 {
                     self.credit = -amount
                 } else {
@@ -103,14 +103,14 @@ public struct LineItem: Equatable, Hashable {
         }
         if let colNum = dictColNums["CRED"] {   // CREDIT
             if colNum < columnCount {
-                let amt = columns[colNum].replacingOccurrences(of: ";", with: "") + "0"
-                self.credit = abs(Double(amt)!) // ?? 0)
+                let amt = columns[colNum].replacingOccurrences(of: ";", with: "")
+                self.credit = abs(Double(amt) ?? 0)
             }
         }
         if let colNum = dictColNums["DEBI"] {   // DEBIT
             if colNum < columnCount {
-                let amt = columns[colNum].replacingOccurrences(of: ";", with: "").trim + "0"
-                self.debit = abs(Double(amt)!) // ?? 0)
+                let amt = columns[colNum].replacingOccurrences(of: ";", with: "").trim
+                self.debit = abs(Double(amt) ?? 0)
             }
         }
     }//end init

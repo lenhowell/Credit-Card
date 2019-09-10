@@ -23,13 +23,18 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
+        chkIgnoreVendor.state = .off
+        chkLockIn.state       = .off
+        chkQuestionMark.state = .off
+        chkContinueUserInput.state = .on
+        
         lblFile.stringValue = gTransFilename
         t = usrLineItem
         let amt = t.debit - t.credit
         let strDebit = String(format:"%.2f", amt)
         let desc = t.desc.PadRight(40, truncate: true, useEllipsis: true, fillChr: " ")
-        lblLineItem.stringValue     = "\(t.tranDate)  \"\(t.descKey)\"  \(desc) $\(strDebit)"
-
+        lblLineItem.stringValue      = "\(t.tranDate)  \"\(t.descKey)\"   $\(strDebit)"
+        lblDesc.stringValue          = "              \(desc)"
         lblcatFromTran.stringValue   = usrCatItemFromTran.category
         lblcatFromVendor.stringValue = usrCatItemFromVendor.category
         lblcatPrefered.stringValue   = usrCatItemPrefered.category
@@ -47,6 +52,7 @@ class UserInputVC: NSViewController, NSWindowDelegate {
 
     @IBOutlet var lblFile:          NSTextField!
     @IBOutlet var lblLineItem:      NSTextField!
+    @IBOutlet var lblDesc:          NSTextField!
     @IBOutlet var lblcatFromTran:   NSTextField!
     @IBOutlet var lblcatPrefered:   NSTextField!
     @IBOutlet var lblcatFromVendor: NSTextField!
@@ -57,7 +63,8 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     @IBOutlet var radioCatFromVendor:   NSButton!
     @IBOutlet var radioCatPrefered:     NSButton!
     @IBOutlet var chkQuestionMark:      NSButton!
-    @IBOutlet var chkLockIn: NSButton!
+    @IBOutlet var chkLockIn:            NSButton!
+    @IBOutlet var chkIgnoreVendor:      NSButton!
     @IBOutlet var radioFileTransac:     NSButton!
     @IBOutlet var radioFileVendor:      NSButton!
     
@@ -104,8 +111,8 @@ class UserInputVC: NSViewController, NSWindowDelegate {
 
     }
 
-
     @IBAction func btnOK(_ sender: Any) {
+        if chkIgnoreVendor.state == .on { usrIgnoreVendors[usrLineItem.descKey] = 101 }
         usrFixVendor = (radioFileVendor.state == .on)
         usrCatItemReturned = catItemCurrent
         if chkLockIn.state == .on {
@@ -116,6 +123,7 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func btnCancel(_ sender: Any) {
+        if chkIgnoreVendor.state == .on { usrIgnoreVendors[usrLineItem.descKey] = 101 }
         NSApplication.shared.stopModal(withCode: .cancel)
     }
 

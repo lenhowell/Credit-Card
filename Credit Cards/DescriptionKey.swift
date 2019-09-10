@@ -10,7 +10,7 @@ import Foundation
 
 //MARK:- Globals
 let descKeysuppressionList = " \";_@/,#*-"
-let descKeyLength          = 18
+let descKeyLength          = 24
 var dictDescKeyAlgorithm = [String: Int]()
 
 //MARK:- makeDescKey 17-216 = 199-lines
@@ -64,6 +64,7 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
         key2 = descKeyLong.replacingOccurrences(of: #"^PAYPAL ?\*"#, with: "", options: .regularExpression, range: nil)
         if key2 != descKeyLong {
             print(descKeyLong, " => ", key2)
+            descKeyLong = key2
             ccPrefix = "PAYPAL"
         }
         key2 = descKeyLong.replacingOccurrences(of: #"^...\*"#, with: "", options: .regularExpression, range: nil)
@@ -208,11 +209,19 @@ public func makeDescKey(from desc: String, fileName: String = "") -> String {
     key2 = descKeyLong.replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression, range: nil)
     descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "19.Squish double spaces")
 
-    if !ccPrefix.isEmpty && descKeyLong.count < 9 {
-        print("⚠️ \(ccPrefix) + \"\(descKeyLong)\"   \(descKeyLong.count)")
-        descKeyLong = ccPrefix + " " + descKeyLong
-        print(descKeyLong)
-        //"SWA EARLYBRD", "ALG AIR", "HUM HUMANN"
+    if !ccPrefix.isEmpty {
+        key2 = descKeyLong
+        if descKeyLong.count < 9 {
+            print("⚠️ \(ccPrefix) + \"\(descKeyLong)\"   \(descKeyLong.count)")
+            key2 = ccPrefix + " " + descKeyLong
+            //"SWA EARLYBRD", "ALG AIR", "HUM HUMANN"
+        } else if ccPrefix == "PAYPAL" {
+            key2 += " " + ccPrefix
+        }
+        if key2 != descKeyLong {
+            print("DescriptionKey#\(#line): \(descKeyLong) => \(key2)")
+            descKeyLong = key2
+        }
     }
 
     // Truncate
