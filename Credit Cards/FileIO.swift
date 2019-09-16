@@ -13,12 +13,6 @@ public struct CategoryItem: Equatable {
     var source      = ""  // Source of Category (including "$" for "LOCKED")
 }
 
-public struct DescKeyWord: Equatable {
-    //var keyWord = ""
-    var descKey = ""
-    var isPrefix = false
-}
-
 //MARK:- General Purpose
 
 func folderExists(atPath: String, isPartialPath: Bool = false) -> Bool {
@@ -79,6 +73,7 @@ public func removeUserFromPath(_ fullPath: String) -> String {
     return path
 }
 
+//TODO: Change saveBackupFile to limit # of Backups
 public func saveBackupFile(url: URL) {
     // Rename the existing file to "CategoryLookup yyyy-MM-dd HHmm.txt"
     let fileAttributes = FileAttributes.getFileInfo(url: url)
@@ -176,7 +171,7 @@ func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
 
 func loadMyModifiedTrans(myModifiedTranURL: URL) -> [String: CategoryItem]  {
     //let dictColNums = ["TRAN":0, "DESC":1, "DEBI":2, "CRED":3, "CATE":4]
-    let fileName = myModifiedTranURL.lastPathComponent
+    //let fileName = myModifiedTranURL.lastPathComponent
     var dictTrans = [String: CategoryItem]()
     let contentof = (try? String(contentsOf: myModifiedTranURL)) ?? ""
     let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
@@ -211,6 +206,7 @@ func loadMyModifiedTrans(myModifiedTranURL: URL) -> [String: CategoryItem]  {
     return dictTrans
 }//end func loadMyModifiedTrans
 
+//TODO: writeModTransTofile - only write if cnanged
 func writeModTransTofile(url: URL, dictModTrans: [String: CategoryItem]) {
     saveBackupFile(url: url)
     var text = "// Machine-generated file\n"
@@ -234,8 +230,8 @@ func writeModTransTofile(url: URL, dictModTrans: [String: CategoryItem]) {
 
 //MARK:- Description KeyWords
 
-func loadDescKeyWords(url: URL) -> [String: DescKeyWord]  {
-    var dictKeyWords = [String: DescKeyWord]()
+func loadDescKeyWords(url: URL) -> [String: String]  {
+    var dictKeyWords = [String: String]()
     let contentof = (try? String(contentsOf: url)) ?? ""
     let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
     var lineNum = 0
@@ -252,16 +248,9 @@ func loadDescKeyWords(url: URL) -> [String: DescKeyWord]  {
             handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: url.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "expected a comma")
             continue
         }
-        var keyWord = keyWordArray[0].trim
-        var isPrefix = false
-        if keyWord.hasPrefix("^") {
-            isPrefix = true
-            keyWord = String(keyWord.dropFirst().removeEnclosingQuotes())
-        } else {
-            keyWord = keyWord.removeEnclosingQuotes()
-        }
+        let keyWord = keyWordArray[0].trim
         let descKey = keyWordArray[1].trim.removeEnclosingQuotes()
-        dictKeyWords[keyWord] = DescKeyWord(descKey: descKey, isPrefix: isPrefix)
+        dictKeyWords[keyWord] = descKey
     }
     return dictKeyWords
 }//end func loadDescKeyWords
@@ -314,13 +303,13 @@ func writeCategoriesToFile(url: URL, dictCat: [String: CategoryItem]) {
     text += "// When a phone number or \"xxx...\" or other multi-digit number is reached the rest is truncated.\n"
     text += "\n// Description Key        Category              Source\n"
     var prevCat = ""
-    print("\n Different Descs that have the same 10-chars")
+    print("\n Different Descs that have the same 15-chars")
     for catItem in dictCat.sorted(by: {$0.key < $1.key}) {
         text += "\(catItem.key.PadRight(descKeyLength)), \(catItem.value.category.PadRight(26)),  \(catItem.value.source)\n"
 
-        let first10 = String(catItem.key.prefix(10))
-        if first10 == prevCat.prefix(10) {
-            print("😡 \"\(prevCat)\"     \"\(catItem.key)\"")
+        let first10 = String(catItem.key.prefix(15))
+        if first10 == prevCat.prefix(15) {
+            print("😡 \"\(prevCat)\" (\(prevCat.count))     \"\(catItem.key)\" (\(catItem.key.count))")
         }
         prevCat = catItem.key
     }

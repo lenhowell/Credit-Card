@@ -20,9 +20,9 @@ var usrFixVendor        = true
 var usrIgnoreVendors    = [String: Int]()
 
 
-//MARK:---- handleCards - 13-63 = 50-lines
+//MARK:---- handleCards - 25-85 = 60-lines
 
-func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [LineItem] {
+func handleCards(fileName: String, cardType: String, cardArray: [String], dictDescripKeyWords: [String: String]) -> [LineItem] {
     let cardArrayCount = cardArray.count
     var lineItemArray = [LineItem]()                // Create Array variable(lineItemArray) Type lineItem.
     var lineNum = 0
@@ -62,14 +62,15 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
     while lineNum < cardArrayCount {
         let tran = cardArray[lineNum]
         lineNum += 1
-        if tran.trim.isEmpty { continue }
+        if tran.trim.count < 16 { continue }    // Blank line or ",,,,,,,,,,,"
 
-        let lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, cardType: cardType, hasCatHeader: hasCatHeader, fileName: fileName, lineNum: lineNum)
+        Stats.processedCount += 1
+        let lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictDescripKeyWords: dictDescripKeyWords, cardType: cardType, hasCatHeader: hasCatHeader, fileName: fileName, lineNum: lineNum)
 
         if !lineItem.desc.isEmpty || !lineItem.postDate.isEmpty || lineItem.debit != 0  || lineItem.credit != 0 {
             // Check for duplicate from another file
-            if dictTransactions[lineItem] == nil || dictTransactions[lineItem] == fileName {
-                dictTransactions[lineItem] = fileName   // mark for dupes check
+            if dictTranDupes[lineItem] == nil || dictTranDupes[lineItem] == fileName {
+                dictTranDupes[lineItem] = fileName      // mark for dupes check
                 lineItemArray.append(lineItem)          // Add new output Record
             } else {
                 let msg = "Duplicate transaction"
@@ -83,84 +84,80 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
     return lineItemArray
 }//end func handleCards
 
-//MARK:---- makeLineItem - 68-108 = 40-lines
+//MARK:---- makeLineItem - 89-163 = 74-lines
 // uses Global Vars: dictCatLookupByVendor(I/O), Stats(I/O)
-internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int], cardType: String, hasCatHeader: Bool, fileName: String, lineNum: Int) -> LineItem {
+internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int], dictDescripKeyWords: [String: String], cardType: String, hasCatHeader: Bool, fileName: String, lineNum: Int) -> LineItem {
 
     var lineItem = LineItem(fromTransFileLine: fromTransFileLine, dictColNums: dictColNums, fileName: fileName, lineNum: lineNum)
     lineItem.cardType = cardType
 
-    var descKey = makeDescKey(from: lineItem.desc, fileName: fileName)
-    lineItem.descKey = descKey
-    var catItemFromVendor   = CategoryItem()
-    var catItemPrefered     = CategoryItem()
-    var isClearWinner       = false
-    let catFromLineItem = dictMyCatAliases[lineItem.rawCat] ?? "?" + lineItem.rawCat
-    let catItemFromTran = CategoryItem(category: catFromLineItem, source: cardType)
-
     // Check for Modified Transaction
     let modTranKey = fromTransFileLine.trim
     if let modTrans = dictModifiedTrans[modTranKey] {
-        lineItem.genCat = modTrans.category
+        lineItem.genCat = modTrans.category             // Here if found this transaction in MyModifiedTransactions.txt
         lineItem.catSource = modTrans.source
-        descKey = ""                            //Prevent further processing
+        Stats.userModTransUsed += 1
+        return lineItem                                 // Use the User-Modified genCat & catSource without looking further
     }
 
+    var catItemFromVendor   = CategoryItem()
+    var catItemPrefered     = CategoryItem()
+    var isClearWinner       = false
+    var catFromTran     = dictMyCatAliases[lineItem.rawCat] ?? "?" + lineItem.rawCat
+    var catItemFromTran = CategoryItem(category: catFromTran, source: cardType)
+
+    let descKey = makeDescKey(from: lineItem.desc, dictDescripKeyWords: dictDescripKeyWords, fileName: fileName)
+    lineItem.descKey = descKey
     if !descKey.isEmpty {
         if let cV = dictCatLookupByVendor[descKey] {
-            catItemFromVendor = cV                  // Here if Lookup of KEY was successful
-            lineItem.genCat = catItemFromVendor.category
-            lineItem.catSource = catItemFromVendor.source
-
-            //TODO: Implement Learning mode
-            //TODO: Recognize "LOCKED" Vendors
-            //if catItemFromVendor.category != catFromLineItem {
-                (catItemPrefered, isClearWinner) = pickTheBestCat(catItemVendor: catItemFromVendor, catItemTransa: catItemFromTran)
-                lineItem.genCat = catItemPrefered.category
-                lineItem.catSource = catItemPrefered.source
-                //print("\(#line) Cat for \(descKey) = \(catItemFromVendor.category);  TransCat = \(catFromLineItem)  Chose: \(catItemPrefered.category)")
-            //}
+            catItemFromVendor = cV                  // ------ Here if Lookup by Vendor was successful
+            (catItemPrefered, isClearWinner) = pickTheBestCat(catItemVendor: catItemFromVendor, catItemTransa: catItemFromTran)
+            lineItem.genCat = catItemPrefered.category    // Generated Cat is the prefered one
+            lineItem.catSource = catItemPrefered.source
+            //print("\(#line) Cat for \(descKey) = \(catItemFromVendor.category);  TransCat = \(catFromLineItem)  Chose: \(catItemPrefered.category)")
             Stats.successfulLookupCount += 1
             uniqueCategoryCounts[descKey, default: 0] += 1
 
-        } else {                   // Here if NOT found in Category-Lookup-by-Vendor Dictionary
+        } else {                   // ------ Here if NOT found in Category-Lookup-by-Vendor Dictionary
+            findShorterDescKey(descKey) // Have we already found a truncated (shorter) version of descKey?
             let source = cardType
             // If Transaction-Line has a Category, put it in the Vendor file.
 
-            if hasCatHeader {
-                if lineItem.rawCat.count >= 3 {
-                    let myCatFromTran  = dictMyCatAliases[lineItem.rawCat] ?? "?" + lineItem.rawCat
+            if catFromTran.count < 3 { catFromTran = "" }
 
-                    if let catTran = dictMyCatAliases[myCatFromTran] {
-                        usrCatItemFromTran = CategoryItem(category: catTran, source: cardType)
-                        isClearWinner = true
-                    } else {
-                        print("HandleCards#\(#line): Unknown Category: \"\(myCatFromTran)\" from \(descKey)")
-                        isClearWinner = false
-                    }
+            if let catTran = dictMyCatAliases[catFromTran] {
+                catFromTran = catTran
+                isClearWinner = !catFromTran.hasPrefix("?") // if no "?", we have a winner
+            } else {
+                print("HandleCards#\(#line): Unknown Category: \"\(lineItem.rawCat)\" from \(descKey)")
+                isClearWinner = false
+            }
+            catItemFromTran = CategoryItem(category: catFromTran, source: source)
+            catItemPrefered = usrCatItemFromTran
+            lineItem.genCat = catFromTran
+            if gLearnMode {
+                dictCatLookupByVendor[descKey] = CategoryItem(category: catFromTran, source: source) //Do Actual Insert
 
-                    dictCatLookupByVendor[descKey] = CategoryItem(category: myCatFromTran, source: source) //Do Actual Insert
-                    Stats.addedCatCount += 1
-                    // print("Category that was inserted = Key==> \(key) Value ==> \(self.rawCat) Source ==> \(source)")
-                } else {
-                    Stats.descWithNoCat += 1
-                    handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .printOnly, fileName: fileName, dataLineNum: lineNum, lineText: fromTransFileLine, errorMsg: "Raw Category too short to be legit: \"\(lineItem.rawCat)\"")
-                }
+                Stats.addedCatCount += 1
             } else {
                 Stats.descWithNoCat += 1
-            }// hasCatHeader or not
-        }
+            }
+            // print("Category that was inserted = Key==> \(key) Value ==> \(self.rawCat) Source ==> \(source)")
+        }//end if NOT found in Category-Lookup-by-Vendor Dictionary
+
 
         if gUserInputMode && !isClearWinner && usrIgnoreVendors[lineItem.descKey] == nil {
             showUserInputForm(lineItem: lineItem, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemPrefered)
-        } else if gLearnMode && catItemPrefered != catItemFromVendor {
+            catItemPrefered = usrCatItemReturned
+        }
+        if gLearnMode && catItemPrefered != catItemFromVendor {
             dictCatLookupByVendor[descKey] = catItemPrefered //Do Actual Insert
             Stats.changedCatCount += 1
         }
+    } else {
+        // debug trap
+    }//endif descKey empty or not
 
-    }//endif descKey empty
-
-    Stats.processedCount += 1
     return lineItem
 }//end func makeLineItem
 
@@ -176,10 +173,11 @@ func showUserInputForm(lineItem: LineItem, catItemFromVendor: CategoryItem, catI
 
         let application = NSApplication.shared
         let returnVal = application.runModal(for: userInputWindow) // <==
-        userInputWindow.close()
+
+        userInputWindow.close()                     // Return here from userInputWindow
         if returnVal == .abort { exit(101) }
         if returnVal == .OK {
-            if usrFixVendor {
+            if usrFixVendor && gLearnMode {
                 if lineItem.descKey.trim.isEmpty {
                     // debug trap
                 }
@@ -196,8 +194,9 @@ func showUserInputForm(lineItem: LineItem, catItemFromVendor: CategoryItem, catI
     return catItemPrefered
 }//end func
 
-//MARK:---- makeDictColNums - 112-130 = 18-lines
+//MARK:---- makeDictColNums - 200-218 = 18-lines
 
+//---- makeDictColNums - Infer which columns have the relevant data based in the Header row. Returns dictColNums
 internal func makeDictColNums(headers: [String]) -> [String: Int] {
     var dictColNums = [String: Int]()
     for colNum in 0..<headers.count {
@@ -218,28 +217,49 @@ internal func makeDictColNums(headers: [String]) -> [String: Int] {
     return dictColNums
 }//end func
 
+internal func findShorterDescKey(_ descKey: String) {
+    let descKeyCount = descKey.count
+    for (key, value) in dictCatLookupByVendor {
+        let keyCount = key.count
+        if descKeyCount < keyCount && descKeyCount > 3 {
+            if key.prefix(descKeyCount) == descKey {
+                print("Found \(descKey) (\(descKey.count)) as subset of \(key) (\(keyCount)) : \(value)")
+                //
+            }
+        } else if descKeyCount > keyCount && keyCount > 3 {
+            if descKey.prefix(keyCount) == key {
+                print("Found \(descKey) (\(descKey.count)) as superset of \(key) (\(keyCount)) : \(value)")
+                //
+            }
+        }
+    }//next key,value
+}//end func
+
 //TODO: Prioritize prefered cards
-//---- pickTheBestCat - Returns
+//TODO: Add Unit Test
+//---- pickTheBestCat - Returns (catItemPrefered, isClearWinner) tuple.
 internal func pickTheBestCat(catItemVendor: CategoryItem, catItemTransa: CategoryItem) -> (CategoryItem, Bool) {
+    let weak    = false
+    let strong  = true
     let catVendor = catItemVendor.category
     let catTransa = catItemTransa.category
-    if catItemVendor.source.hasPrefix("$")                  { return (catItemVendor, true) } // User modified
+    if catItemVendor.source.hasPrefix("$")                  { return (catItemVendor, strong) }  // User modified
     let catVendStrong = !catVendor.isEmpty && !catVendor.hasPrefix("?") && !catVendor.contains("Unkno") && !catVendor.contains("Merch")
     let catTranStrong = !catTransa.isEmpty && !catTransa.hasPrefix("?") && !catTransa.contains("Unkno") && !catTransa.contains("Merch")
 
     if (catVendor == catTransa)                             { return (catItemTransa, catTranStrong) } // Both the same.
 
-    if catVendStrong && catTranStrong                       { return (catItemVendor, false) }
-    if !catVendStrong && catTranStrong                      { return (catItemTransa, true) }
-    if catVendStrong && !catTranStrong                      { return (catItemVendor, true) }
+    if catVendStrong && catTranStrong                       { return (catItemTransa, weak) }    // tie: both strong
+    if !catVendStrong && catTranStrong                      { return (catItemTransa, strong) }  // Transaction strong
+    if catVendStrong && !catTranStrong                      { return (catItemVendor, strong) }  // Vendor strong
 
-    if catVendor.isEmpty || catVendor == "?"                { return (catItemTransa, false) } // catVendor missing
-    if catTransa.isEmpty || catTransa == "?"                { return (catItemVendor, false) } // catTransa missing
-    if catVendor.hasPrefix("?") && !catTransa.hasPrefix("?") { return (catItemTransa, false) } // use the cat with no "?"
-    if catTransa.hasPrefix("?") && !catVendor.hasPrefix("?") { return (catItemVendor, false) } //      "
-    if catTransa.contains("Unkno")                          { return (catItemVendor, false) } // "Unknown"
-    if catVendor.contains("Unkno")                          { return (catItemTransa, false) } //      "
-    if catTransa.contains("Merch")                          { return (catItemVendor, false) } // "Merchandise" is weak
-    if catVendor.contains("Merch")                          { return (catItemTransa, false) } //      "
-    return (catItemTransa,false)
+    if catVendor.isEmpty || catVendor == "?"                { return (catItemTransa, weak) }    // catVendor missing
+    if catTransa.isEmpty || catTransa == "?"                { return (catItemVendor, weak) }    // catTransa missing
+    if catVendor.hasPrefix("?") && !catTransa.hasPrefix("?") { return (catItemTransa, weak) }   // use the cat with no "?"
+    if catTransa.hasPrefix("?") && !catVendor.hasPrefix("?") { return (catItemVendor, weak) }   //      "
+    if catTransa.contains("Unkno")                          { return (catItemVendor, weak) }    // "Unknown"
+    if catVendor.contains("Unkno")                          { return (catItemTransa, weak) }    //      "
+    if catTransa.contains("Merch")                          { return (catItemVendor, weak) }    // "Merchandise" is weak
+    if catVendor.contains("Merch")                          { return (catItemTransa, weak) }    //      "
+    return (catItemTransa, weak)
 }

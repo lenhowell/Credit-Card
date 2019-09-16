@@ -10,6 +10,7 @@ import XCTest
 @testable import Credit_Cards
 
 class Credit_Cards_UnitTests: XCTestCase {
+    let dictDescripKeyWords = [String: String]()
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -64,22 +65,22 @@ class Credit_Cards_UnitTests: XCTestCase {
         var lineItem = LineItem()
 
         tran = "2018-08-25,2018-08-27,8772,LA FITNESS,Exterm,31.85,"
-        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666)
+        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictDescripKeyWords: dictDescripKeyWords, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666)
         XCTAssertEqual(lineItem.cardType, "TEst")
         XCTAssertEqual(lineItem.debit, 31.85)
         XCTAssertEqual(lineItem.rawCat, "Exterm")
         //XCTAssertEqual(lineItem.genCat, "Entertainment")
 
         tran = "2018-08-25,2018-08-27,8772,LX FITNESS,Bad Category,,31.85"
-        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666)
+        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictDescripKeyWords: dictDescripKeyWords, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666)
         XCTAssertEqual(lineItem.cardType, "TEst")
         XCTAssertEqual(lineItem.credit, 31.85)
         XCTAssertEqual(lineItem.rawCat, "Bad Category")
-        XCTAssertEqual(lineItem.genCat, "")
+        XCTAssertEqual(lineItem.genCat, "?Bad Category")
 
         // Bad Line - Run AFTER creating "Cat inserted for LX FITNESS" above
         tran = "2018-08-25,2018-08-27,8772,LX FITNESS,This is a TEST,31.85"
-        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666)
+        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictDescripKeyWords: dictDescripKeyWords, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666)
         XCTAssertEqual(lineItem.cardType, "TEst")
         XCTAssertEqual(lineItem.credit, 0)
         XCTAssertEqual(lineItem.debit, 31.85)
@@ -91,18 +92,18 @@ class Credit_Cards_UnitTests: XCTestCase {
 
     func testHandleCards() {
         var lineItemArray = [LineItem]()
-        
+
         // Generates Alert - Move to UITests
         let contentGarbage = "\nGarbage\nGarbage\nGarbage\n"
         let cardArrayGarbage = contentGarbage.components(separatedBy: "\n")
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGarbage)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGarbage, dictDescripKeyWords: dictDescripKeyWords)
         XCTAssertEqual(lineItemArray.isEmpty, true)
 
         let cardArrayC1R = [
             "Transaction Date,Posted Date,Card No.,Description,Category,Debit,Credit",
             "2018-08-11,2018-08-18,8772,MORRISSEYS FRONT PORCH,Dining,12.14,",
         ]
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayC1R)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayC1R, dictDescripKeyWords: dictDescripKeyWords)
         XCTAssertEqual(lineItemArray.count, 1)
         XCTAssertEqual(lineItemArray[0].tranDate, "2018-08-11")
         XCTAssertEqual(lineItemArray[0].postDate, "2018-08-18")
@@ -120,7 +121,7 @@ class Credit_Cards_UnitTests: XCTestCase {
     04/30/2018,04/30/2018,"PHONE PAYMENT - THANK YOU",-32.56,"Payments and Credits"
     """
         let cardArrayLHDC = contentLHDC.components(separatedBy: "\n")
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHDC)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHDC, dictDescripKeyWords: dictDescripKeyWords)
         XCTAssertEqual(lineItemArray.count, 2)
         XCTAssertEqual(lineItemArray[0].tranDate, "04/04/2018")
         XCTAssertEqual(lineItemArray[0].postDate, "04/04/2018")
@@ -129,11 +130,6 @@ class Credit_Cards_UnitTests: XCTestCase {
         XCTAssertEqual(lineItemArray[0].debit, 32.56)
         XCTAssertEqual(lineItemArray[0].credit, 0.00)
         XCTAssertEqual(lineItemArray[0].rawCat, "Dining")  //Depends on MyCategories.txt
-
-        //XCTAssertEqual(lineItemArray[1].desc, "BONEFISH 7027 BOYNTON BEACHFL00422R")
-        XCTAssertEqual(lineItemArray[1].debit, 0.00)
-        XCTAssertEqual(lineItemArray[1].credit, 32.56)
-        XCTAssertEqual(lineItemArray[1].rawCat, "Payment")  //Depends on MyCategories.txt
 
 
         //TODO: The following Unit-Tests need assertions
@@ -147,7 +143,7 @@ class Credit_Cards_UnitTests: XCTestCase {
     Cleared,08/07/2019,"BEACH COVE RESORT F&B N MYRTLE BCH SC",27.59,
     """
         let cardArrayLHCT = contentLHCT.components(separatedBy: "\n")
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHCT)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHCT, dictDescripKeyWords: dictDescripKeyWords)
         XCTAssertEqual(lineItemArray.count, 2)
 
 
@@ -161,7 +157,7 @@ class Credit_Cards_UnitTests: XCTestCase {
     9/2/19,9/3/19,8772,,Dining,9.02,
     """
         let cardArrayLHC1V = contentLHC1V.components(separatedBy: "\n")
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHC1V)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHC1V, dictDescripKeyWords: dictDescripKeyWords)
         XCTAssertEqual(lineItemArray.count, 4)
 
 
@@ -173,7 +169,7 @@ class Credit_Cards_UnitTests: XCTestCase {
     posted,9/14/18,A&M PIZZA                LEBANON      PA,,Restaurants/Dining,USD,-22.00, , ,Personal,Bank of America - Credit Card - Bank of America Premium Rewards Visa Sig,A&M PIZZA                LEBANON      PA
     """
         let cardArrayGBBA = contentGBBA.components(separatedBy: "\n")
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGBBA)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGBBA, dictDescripKeyWords: dictDescripKeyWords)
         XCTAssertEqual(lineItemArray.count, 2)
 
 
@@ -187,7 +183,7 @@ class Credit_Cards_UnitTests: XCTestCase {
     "01/15/2018","VZWRLSS*APOCC VISE","800-922-0204  FL","147.32","Other/Unclassified"
     """
         let cardArrayGBML = contentGBML.components(separatedBy: "\n")
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGBML)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGBML, dictDescripKeyWords: dictDescripKeyWords)
         XCTAssertEqual(lineItemArray.count, 3)
 
     }//end func testHandleCards

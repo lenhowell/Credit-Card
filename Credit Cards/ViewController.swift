@@ -15,14 +15,13 @@ import Cocoa
 // Global Constants
 
 // Global Variables
-var gUserInitials           = "GWB"                 // Initials used for "Category Source" when Cat is changes by user.
-var gTransFilename          = ""                    // Current Transaction Filename
-var gMyCatNames             = [String]()            // Array of Category Names
-var dictMyCatAliases        = [String: String]()        // Hash of Category Synonyms
-var dictCatLookupByVendor   = [String: CategoryItem]()  // Hash for Category Lookup
-var dictDescKeyWords        = [String: DescKeyWord]()   // Hash for Description KeyWord Lookup
-var dictTransactions        = [LineItem: String]()      // Hash for finding duplicate transactions
-var dictModifiedTrans       = [String: CategoryItem]()  // Hash for user-modified transactions
+var gUserInitials           = "GWB"     // (UserInputVC.swift-2) Initials used for "Category Source" when Cat is changes by user.
+var gTransFilename          = ""                // (UserInputVC.swift-viewDidLoad) Current Transaction Filename
+var gMyCatNames             = [String]()            // (loadMyCats, UserInputVC.swift-viewDidLoad) Array of Category Names (MyCategories.txt)
+var dictMyCatAliases        = [String: String]()        // (LineItems.init, etc) Hash of Category Synonyms
+var dictCatLookupByVendor   = [String: CategoryItem]()  // (HandleCards.swift-3) Hash for Category Lookup (CategoryLookup.txt)
+var dictTranDupes           = [LineItem: String]()      // (handleCards) Hash for finding duplicate transactions
+var dictModifiedTrans       = [String: CategoryItem]()  // (MyModifiedTransactions.txt) Hash for user-modified transactions
 var uniqueCategoryCounts    = [String: Int]()           // Hash for Unique Category Counts
 var gIsUnitTesting   = false
 var gLearnMode       = true
@@ -36,11 +35,12 @@ class ViewController: NSViewController, NSWindowDelegate {
     // Constants
     let myFileNameOut           = "Combined-Creditcard-Master.txt" // Only used in outputTranactions
     let catLookupFilename       = "CategoryLookup.txt"
-    let descKeyWordFilename     = "DescriptionKeyWords.txt"
+    let descripKeyWordFilename  = "DescriptionKeyWords.txt"
     let myCatsFilename          = "MyCategories.txt"
     let myModifiedTranFilename  = "MyModifiedTransactions.txt"
 
     // Variables
+    var dictDescripKeyWords     = [String: String]()        // Hash for Description KeyWord Lookup (DescriptionKeyWords.txt)
     var transFileURLs       = [URL]()
     var pathTransactionDir  = "Downloads/Credit Card Trans"
     var pathSupportDir      = "Desktop/Credit Card Files"
@@ -73,17 +73,15 @@ class ViewController: NSViewController, NSWindowDelegate {
         pathOutputDir       = UserDefaults.standard.string(forKey: UDKey.outputFolder) ?? pathOutputDir
         pathTransactionDir  = UserDefaults.standard.string(forKey: UDKey.transactionFolder) ?? pathTransactionDir
 
-        //TODO: Allow User to chang his initials.
+        //TODO: Allow User to change his initials.
         gUserInitials = UserDefaults.standard.string(forKey: UDKey.userInitials) ?? ""
         if gUserInitials.isEmpty {
             let homeURL = FileManager.default.homeDirectoryForCurrentUser
             gUserInitials = homeURL.lastPathComponent.prefix(3).uppercased()
         }
 
-        if !gIsUnitTesting {
-            gLearnMode = UserDefaults.standard.bool(forKey: UDKey.learningMode)
-            gUserInputMode = UserDefaults.standard.bool(forKey: UDKey.userInputMode)
-        }
+        gLearnMode = UserDefaults.standard.bool(forKey: UDKey.learningMode)
+        gUserInputMode = UserDefaults.standard.bool(forKey: UDKey.userInputMode)
 
         // Get List of Transaction Files
         var errTxt = ""
@@ -164,6 +162,10 @@ class ViewController: NSViewController, NSWindowDelegate {
         main()
     }
 
+    @IBAction func btnFindTruncatedDescs(_ sender: Any) {
+        findTruncatedDescs()
+    }
+
     @IBAction func chkLearningModeClick(_ sender: Any) {
         gLearnMode = chkLearningMode.state == .on
         print("learnMode = \(gLearnMode)")
@@ -220,7 +222,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         var fileContents    = ""                        // Where All Transactions in a File go
         var lineItemArray   = [LineItem]()
-        dictTransactions = [:]
+        dictTranDupes = [:]
         lblErrMsg.stringValue = ""
         
         if !FileManager.default.fileExists(atPath: transactionDirURL.path) {
@@ -261,7 +263,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             // Check which Credit Card Transactions we are currently processing
             switch cardType {
             case "C1V", "C1R", "DIS", "CIT", "BACT", "BAPR", "ML":
-                lineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray)
+                lineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray, dictDescripKeyWords: dictDescripKeyWords)
                 chkUserInput.state = gUserInputMode ? .on : .off
                 Stats.transFileCount += 1
             default:
@@ -282,7 +284,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         print("\n\(uniqueCategoryCounts.count) uniqueCategoryCounts.sorted by count")
         print (uniqueCategoryCounts.sorted {$0.value > $1.value})
         if Stats.addedCatCount > 0 || Stats.changedCatCount > 0 {
-            writeCategoriesToFile(url: catLookupFileURL, dictCat: dictCatLookupByVendor)
+            if gLearnMode {
+                writeCategoriesToFile(url: catLookupFileURL, dictCat: dictCatLookupByVendor)
+            }
         }
         writeModTransTofile(url: myModifiedTransURL, dictModTrans: dictModifiedTrans)
 
@@ -359,11 +363,11 @@ class ViewController: NSViewController, NSWindowDelegate {
         Stats.origCatCount = dictCatLookupByVendor.count
 
         // "DescriptionKeyWords.txt"
-        (descKeyWordFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: descKeyWordFilename)
+        (descKeyWordFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: descripKeyWordFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "descKeyWord" + errTxt)
         }
-        dictDescKeyWords = loadDescKeyWords(url: descKeyWordFileURL)        // Build Desc-KeyWord Dictionary
+        dictDescripKeyWords = loadDescKeyWords(url: descKeyWordFileURL)        // Build Desc-KeyWord Dictionary
 
         // "MyCategories.txt"
         (myCatsFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myCatsFilename)
@@ -380,6 +384,39 @@ class ViewController: NSViewController, NSWindowDelegate {
         dictModifiedTrans = loadMyModifiedTrans(myModifiedTranURL: myModifiedTransURL)
 
     }//end func
+
+    func findTruncatedDescs() {
+        let catLookupSortedByLength = Array(dictCatLookupByVendor.keys).sorted(by: {$0.count > $1.count})
+        guard let maxLen = catLookupSortedByLength.first?.count else {
+            return
+        }
+        for (idx, desc) in catLookupSortedByLength.enumerated() {
+            let currentLen = desc.count
+            if desc.uppercased().hasPrefix("SPRINT") {
+                //
+            }
+            if currentLen < maxLen {
+                for i in 0..<idx-1 {
+                    let descLong = catLookupSortedByLength[i]
+
+                    if descLong.prefix(currentLen) == desc {
+                        let truncLong = descLong.dropFirst(currentLen)
+                        if currentLen > 9 || truncLong.hasPrefix(" ") {
+                            print("Possible dupe \(desc) (\(currentLen)) is part of \(descLong) (\(descLong.count))")
+                            //
+                        } else {
+                            print("Too short for a dupe \(desc) (\(currentLen)) is part of \(descLong) (\(descLong.count))")
+                        }
+                    } else  if desc.prefix(6) == descLong.prefix(6) {
+                        print("Not a dupe, but same at 9 \(desc) (\(currentLen)) is part of \(descLong) (\(descLong.count))")
+                        //
+                    }
+                }//next i
+            }//endif
+        }//next desc
+
+
+    }
 
 }//end class ViewController
 
