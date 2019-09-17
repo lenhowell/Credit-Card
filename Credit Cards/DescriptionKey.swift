@@ -15,7 +15,7 @@ var dictDescKeyAlgorithm = [String: Int]()
 
 //MARK:- makeDescKey 18-225 = 207-lines
 //---- makeDescKey - Make a CategoryLookup key from the transaction "Description"
-public func makeDescKey(from desc: String, dictDescripKeyWords: [String: String], fileName: String = "") -> String {
+public func makeDescKey(from desc: String, dictVendorShortNames: [String: String], fileName: String = "") -> String {
     var descKeyLong = desc.trim
     var key2 = ""
 
@@ -30,11 +30,11 @@ public func makeDescKey(from desc: String, dictDescripKeyWords: [String: String]
     key2 = descKeyLong.replacingOccurrences(of: "['`]", with: "", options: .regularExpression, range: nil)
     descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "02.Remove apostrophy")
 
-    //-- Find KeyWords in Description
+    //-- Find Short Names in Description
     let descKeyUpper = descKeyLong.uppercased()
-    for (key, descKey) in dictDescripKeyWords {
-        let keyWord = key.removeEnclosingQuotes()
-        if descKeyUpper.hasPrefix(keyWord) {
+    for (key, descKey) in dictVendorShortNames {
+        let shortName = key.removeEnclosingQuotes()
+        if descKeyUpper.hasPrefix(shortName) {
             return descKey
         }
     }//next
@@ -66,10 +66,7 @@ public func makeDescKey(from desc: String, dictDescripKeyWords: [String: String]
         descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "06.Remove 2nd \"SQU*\" etc.")
     }
 
-
-
-
-    //-- VZWRLSS*APOCC VISN     (7)
+    //-- [DROPBOX*6J696N7MMMSW] -> [DROPBOX]
     // Truncate at "*..." if it is chr #7 or greater followed by digit -- [SPRINT *WIRELESS] -> [SPRINT ]
     let posStar = descKeyLong.firstIntIndexOf("*")
     if posStar >= 0 {
@@ -84,6 +81,7 @@ public func makeDescKey(from desc: String, dictDescripKeyWords: [String: String]
         } else {
             // Debug Trap - "PP*WHIRLWIND SUN N FUN..."
         }
+        //--  [VZWRLSS*APOCC VISN] -> [VZWRLSS APOCC VISN];   [LOWES #02651*] -> [LOWES #02651 ]; [SUNPASS*ACC997622] -> [SUNPASS ACC997622]
         key2 = descKeyLong.replacingOccurrences(of: "*", with: " ")
         descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "08.Remove \"*\"")
     }
@@ -206,20 +204,22 @@ public func makeDescKey(from desc: String, dictDescripKeyWords: [String: String]
     }
 
 
-    descKeyLong = descKeyLong.uppercased()
+    key2 = descKeyLong.uppercased()
+    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "20.Force Uppercase")
 
     //-- Remove "THE" "INC", "LLC" -- [TREELANDS INC] -> [TREELANDS ];  [GUNDRY MD  LLC] -> [GUNDRY MD  ]
     key2 = descKeyLong.replacingOccurrences(of: #"^THE\b|\bINC\b|\bLLC\b|\bIN$|\bI$"#, with: "", options: .regularExpression, range: nil).trim
-    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "20.Remove \"INC\" & \"LLC\" ")
+    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "21.Remove \"INC\" & \"LLC\" ")
 
     descKeyLong = descKeyLong.trim
 
     //-- Remove Double Spaces -- [DMV   BRIDGEPORT BRANC] -> [DMV BRIDGEPORT BRANC]
     key2 = descKeyLong.replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression, range: nil)
-    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "21.Squish double spaces")
+    descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "22.Squish double spaces")
 
     // Truncate
-    let descKey = String(descKeyLong.prefix(descKeyLength)).trim
+    key2 = String(descKeyLong.prefix(descKeyLength)).trim
+    let descKey = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "23.Truncate to \(descKeyLength) chars")
 
     return descKey
 }//end func makeDescKey

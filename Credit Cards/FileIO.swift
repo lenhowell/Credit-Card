@@ -228,10 +228,10 @@ func writeModTransTofile(url: URL, dictModTrans: [String: CategoryItem]) {
 
 }
 
-//MARK:- Description KeyWords
+//MARK:- Vendor Short Names
 
-func loadDescKeyWords(url: URL) -> [String: String]  {
-    var dictKeyWords = [String: String]()
+func vendorShortNames(url: URL) -> [String: String]  {
+    var dictVendorShortNames = [String: String]()
     let contentof = (try? String(contentsOf: url)) ?? ""
     let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
     var lineNum = 0
@@ -243,21 +243,21 @@ func loadDescKeyWords(url: URL) -> [String: String]  {
         //let line = line.replacingOccurrences(of: "\"", with: "")
 
         // Create an Array of line components the seperator being a ","
-        let keyWordArray = line.components(separatedBy: ",")
-        if keyWordArray.count < 2 {
+        let vendorShortNameArray = line.components(separatedBy: ",")
+        if vendorShortNameArray.count < 2 {
             handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: url.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "expected a comma")
             continue
         }
-        let keyWord = keyWordArray[0].trim
-        let descKey = keyWordArray[1].trim.removeEnclosingQuotes()
-        dictKeyWords[keyWord] = descKey
+        let shortName = vendorShortNameArray[0].trim
+        let descKey = vendorShortNameArray[1].trim.removeEnclosingQuotes()
+        dictVendorShortNames[shortName] = descKey
     }
-    return dictKeyWords
-}//end func loadDescKeyWords
+    return dictVendorShortNames
+}//end func vendorShortNames
 
 //MARK:- Categories
 
-func loadCategories(url: URL) -> [String: CategoryItem]  {
+func loadVendorCategories(url: URL) -> [String: CategoryItem]  {
     var dictCat   = [String: CategoryItem]()
 
     // Get data in "CategoryLookup" if there is any. If NIL set to Empty.
@@ -288,7 +288,7 @@ func loadCategories(url: URL) -> [String: CategoryItem]  {
     print("\(dictCat.count) Items Read into Category dictionary from: \(url.path)")
     
     return dictCat
-}//end func loadCategories
+}//end func loadVendorCategories
 
 
 //---- writeCategoriesToFile - uses workingFolderUrl(I), handleError(F)

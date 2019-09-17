@@ -10,7 +10,7 @@ import XCTest
 @testable import Credit_Cards
 
 class MakeDescKeyTests: XCTestCase {
-    var dictDescripKeyWords = [String: String]()
+    var dictVendorShortNames = [String: String]()
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -31,27 +31,27 @@ class MakeDescKeyTests: XCTestCase {
         var desc = ""
 
         desc = "STEAK-N-SHAKE#0382 Q99"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "STEAK N SHAKE")
 
         desc = "SWEET TOMATOES 72 Q14    ORLANDO      FL"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "SWEET TOMATOES")
 
         desc = "ROUTE 40 DINER"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "ROUTE 40 DINER")
 
         desc = "FISH AT 30 LAKE"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "FISH AT 30 LAKE")
 
         desc = "SUPER 8"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "SUPER 8")
 
         desc = "CIRCLE B 10"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "CIRCLE B")
 }
 
@@ -61,24 +61,24 @@ class MakeDescKeyTests: XCTestCase {
 
 
 
-        dictDescripKeyWords = [ "STP&SHPFUEL": "STP&SHPFUEL" ]
+        dictVendorShortNames = [ "STP&SHPFUEL": "STP&SHPFUEL" ]
 
         desc = "STP&SHPFUEL0639 STRATFORD CT03061R"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "STP&SHPFUEL")
 
-        dictDescripKeyWords = [String: String]()
+        dictVendorShortNames = [String: String]()
 
 
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "STP&SHPFUEL0639 STRATFOR")
 
         desc = "BIG Y 84 STRATFORD"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "BIG Y 84 STRATFORD")
 
         desc = "The Adventure Park at Dis"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "ADVENTURE PARK AT DIS")
 
     }
@@ -89,103 +89,103 @@ class MakeDescKeyTests: XCTestCase {
         var desc = ""
 
         desc = "HUM*HUMANN8556364040 855-6364040 TX"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "HUM HUMANN")
 
-        // Without dictDescripKeyWords
+        // Without dictVendorShortNames
         desc = "VZWRLSS*APOCC VISN"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "VZWRLSS APOCC VISN")
 
         desc = "VZWRLSS*IVR VN"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "VZWRLSS IVR VN")
 
         desc = "VERIZON WRLS P2027-01"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "VERIZON WRLS")
 
 
-        dictDescripKeyWords = [ "VERIZON W": "VERIZON WIRELESS", "VZWRLSS": "VERIZON WIRELESS" ]
+        dictVendorShortNames = [ "VERIZON W": "VERIZON WIRELESS", "VZWRLSS": "VERIZON WIRELESS" ]
 
-        // With dictDescripKeyWords
+        // With dictVendorShortNames
         desc = "VZWRLSS*APOCC VISN"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "VERIZON WIRELESS")
 
         desc = "VZWRLSS*IVR VN"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "VERIZON WIRELESS")
 
         desc = "VERIZON WRLS P2027-01"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "VERIZON WIRELESS")
 
-        dictDescripKeyWords = [String: String]()
+        dictVendorShortNames = [String: String]()
 
 
         desc = "APL*ITUNES.COM/BILL 866-712-7753 CA"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "ITUNES.COM BILL")
 
         desc = "SP * BLACKBOXDEALZ 5033957597 WA"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "BLACKBOXDEALZ")
 
         desc = "CLKBANK*COM_5GFZUFBM 800-390-6035 ID"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "CLKBANK COM 5GFZUFBM")
 
         desc = "SQ *SQ *FOREFLIGHT"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "FOREFLIGHT")
 
         desc = "Ref*Formulyst.com 18889218458 GBR"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "FORMULYST.COM")
 
         desc = "PP*WHIRLWIND SUN N FUN   CLEARWATER   FL"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "PP WHIRLWIND SUN N FUN")
 
         desc = "GOOGLE*DIGIBITES G.CO HELPPAY# CA"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "GOOGLE DIGIBITES G.CO HE")
 
         desc = "MTA*MNR STATION TIX"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "MNR STATION TIX")
 
         desc = "PSV* Momentum Alert"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "MOMENTUM ALERT")
 
         desc = "SWA*EARLYBRDxxxxxxxxxxxxxxxx-xxx-9792 TX"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "SWA EARLYBRD")
 
         desc = "ALG*AIR     7BN2JZ       xxx-xxx-8888 NV"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "ALG AIR")
 
         desc = "SQ *RETHREADS"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "RETHREADS")
 
         desc = "PAYPAL *TYOMA            xxx-xxx-7733 CA"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "PAYPAL TYOMA")
 
         desc = "PAYPAL *FANKEKE          xxx-xxx-7733 CA"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "PAYPAL FANKEKE")
 
         desc = "PAYPAL *MACNANBIO      xxx-xxx-7733 CA"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "MACNANBIO PAYPAL")
 
         desc = "PAYPAL *LAKEAMPHIBI      xxx-xxx-7733 CA"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "LAKEAMPHIBI PAYPAL")
 
  }
@@ -195,55 +195,53 @@ class MakeDescKeyTests: XCTestCase {
         var desc = ""
 
         desc = "APPLEBEE'S NEI98696818"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "APPLEBEES")
 
         desc = "ATK GOLF @ TASHUA KNOL"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "ATK GOLF TASHUA KNOL")
 
         desc = "AUTOPAY 221152216034323RAUTOPAY AUTO-PMT"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "AUTOPAY")
 
         desc = "BURGER KING 4NJ44"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "BURGER KING")
 
         desc = "KFC J235016"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "KFC")
 
         desc = "MCDONALD'S F3625"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "MCDONALDS")
 
         desc = "MCDONALD'S  Fx3620       NORTH MYRTLE SC"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "MCDONALDS")
 
         desc = "STOP & SHOP 0620"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "STOP&SHOP")
 
         desc = "STP&SHPFUEL0663"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "STP&SHPFUEL")
-
-        //            "WAL-MART #0942":            "WALMART",   // Keyword
 
 
         // ************** PROBLEMS!! ****************
         desc = "HEALTHY*BACK INSTITUTE 800-216-4908 TX"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "HEALTHY BACK INSTITUTE")
 
         desc = "OFFER 04 PROMOTIONAL APR ENDED 07/01/19"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "OFFER PROMOTIONAL APR EN")
 
         desc = "UBER   TRIP"
-        result = makeDescKey(from: desc, dictDescripKeyWords: dictDescripKeyWords)
+        result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "UBER")
 
 
@@ -362,7 +360,7 @@ class MakeDescKeyTests: XCTestCase {
         ]
 
         for (key, value) in C1V {
-            result = makeDescKey(from: key, dictDescripKeyWords: dictDescripKeyWords)
+            result = makeDescKey(from: key, dictVendorShortNames: dictVendorShortNames)
             XCTAssertEqual(result, String(value.prefix(descKeyLength)))
         }
 

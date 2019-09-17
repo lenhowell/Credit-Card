@@ -19,7 +19,7 @@ var gUserInitials           = "GWB"     // (UserInputVC.swift-2) Initials used f
 var gTransFilename          = ""                // (UserInputVC.swift-viewDidLoad) Current Transaction Filename
 var gMyCatNames             = [String]()            // (loadMyCats, UserInputVC.swift-viewDidLoad) Array of Category Names (MyCategories.txt)
 var dictMyCatAliases        = [String: String]()        // (LineItems.init, etc) Hash of Category Synonyms
-var dictCatLookupByVendor   = [String: CategoryItem]()  // (HandleCards.swift-3) Hash for Category Lookup (CategoryLookup.txt)
+var dictVendorCatLookup     = [String: CategoryItem]()  // (HandleCards.swift-3) Hash for Category Lookup (CategoryLookup.txt)
 var dictTranDupes           = [LineItem: String]()      // (handleCards) Hash for finding duplicate transactions
 var dictModifiedTrans       = [String: CategoryItem]()  // (MyModifiedTransactions.txt) Hash for user-modified transactions
 var uniqueCategoryCounts    = [String: Int]()           // Hash for Unique Category Counts
@@ -34,24 +34,24 @@ class ViewController: NSViewController, NSWindowDelegate {
     
     // Constants
     let myFileNameOut           = "Combined-Creditcard-Master.txt" // Only used in outputTranactions
-    let catLookupFilename       = "CategoryLookup.txt"
-    let descripKeyWordFilename  = "DescriptionKeyWords.txt"
+    let VendorCatLookupFilename = "VendorCategoryLookup.txt"
+    let vendorShortNameFilename = "VendorShortNames.txt"
     let myCatsFilename          = "MyCategories.txt"
     let myModifiedTranFilename  = "MyModifiedTransactions.txt"
 
     // Variables
-    var dictDescripKeyWords     = [String: String]()        // Hash for Description KeyWord Lookup (DescriptionKeyWords.txt)
-    var transFileURLs       = [URL]()
-    var pathTransactionDir  = "Downloads/Credit Card Trans"
-    var pathSupportDir      = "Desktop/Credit Card Files"
-    var pathOutputDir       = "Desktop/Credit Card Files"
+    var dictVendorShortNames    = [String: String]()        // Hash for VendorShortNames Lookup (VendorShortNames.txt)
+    var transFileURLs           = [URL]()
+    var pathTransactionDir      = "Downloads/Credit Card Trans"
+    var pathSupportDir          = "Desktop/Credit Card Files"
+    var pathOutputDir           = "Desktop/Credit Card Files"
 
-    var transactionDirURL   = FileManager.default.homeDirectoryForCurrentUser
-    var catLookupFileURL    = FileManager.default.homeDirectoryForCurrentUser
-    var descKeyWordFileURL  = FileManager.default.homeDirectoryForCurrentUser
-    var myCatsFileURL       = FileManager.default.homeDirectoryForCurrentUser
-    var myModifiedTransURL  = FileManager.default.homeDirectoryForCurrentUser
-    var outputFileURL       = FileManager.default.homeDirectoryForCurrentUser
+    var transactionDirURL       = FileManager.default.homeDirectoryForCurrentUser
+    var VendorCatLookupFileURL  = FileManager.default.homeDirectoryForCurrentUser
+    var vendorShortNamesFileURL = FileManager.default.homeDirectoryForCurrentUser
+    var myCatsFileURL           = FileManager.default.homeDirectoryForCurrentUser
+    var myModifiedTransURL      = FileManager.default.homeDirectoryForCurrentUser
+    var outputFileURL           = FileManager.default.homeDirectoryForCurrentUser
 
     //MARK:- Overrides & Lifecycle
     
@@ -100,7 +100,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             lblErrMsg.stringValue = "Transaction" + errTxt
         }
 
-        // Read Support files ("CategoryLookup.txt", "DescriptionKeyWords.txt", "MyCategories.txt")
+        // Read Support files ("CategoryLookup.txt", "VendorShortNames.txt", "MyCategories.txt")
         txtOutputFolder.stringValue     = pathOutputDir
         txtSupportFolder.stringValue    = pathSupportDir
         txtTransationFolder.stringValue = pathTransactionDir
@@ -108,7 +108,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         if !errMsg.isEmpty { handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataWarning, action: .display, fileName: "", dataLineNum: 0, lineText: "", errorMsg: errMsg) }
         readSupportFiles()
 
-        let shortCatFilePath = removeUserFromPath(catLookupFileURL.path)
+        let shortCatFilePath = removeUserFromPath(VendorCatLookupFileURL.path)
         lblResults.stringValue = "Category Lookup File \"\(shortCatFilePath)\" loaded with \(Stats.origCatCount) items.\n"
 
         chkLearningMode.state = gLearnMode     ? .on : .off
@@ -217,8 +217,8 @@ class ViewController: NSViewController, NSWindowDelegate {
         UserDefaults.standard.set(gLearnMode,         forKey: UDKey.learningMode)
 
         Stats.clearAll()
-        dictCatLookupByVendor = loadCategories(url: catLookupFileURL) // Re-read Categories Dictionary
-        Stats.origCatCount = dictCatLookupByVendor.count
+        dictVendorCatLookup = loadVendorCategories(url: VendorCatLookupFileURL) // Re-read Categories Dictionary
+        Stats.origCatCount = dictVendorCatLookup.count
 
         var fileContents    = ""                        // Where All Transactions in a File go
         var lineItemArray   = [LineItem]()
@@ -263,7 +263,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             // Check which Credit Card Transactions we are currently processing
             switch cardType {
             case "C1V", "C1R", "DIS", "CIT", "BACT", "BAPR", "ML":
-                lineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray, dictDescripKeyWords: dictDescripKeyWords)
+                lineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray, dictVendorShortNames: dictVendorShortNames)
                 chkUserInput.state = gUserInputMode ? .on : .off
                 Stats.transFileCount += 1
             default:
@@ -285,14 +285,14 @@ class ViewController: NSViewController, NSWindowDelegate {
         print (uniqueCategoryCounts.sorted {$0.value > $1.value})
         if Stats.addedCatCount > 0 || Stats.changedCatCount > 0 {
             if gLearnMode {
-                writeCategoriesToFile(url: catLookupFileURL, dictCat: dictCatLookupByVendor)
+                writeCategoriesToFile(url: VendorCatLookupFileURL, dictCat: dictVendorCatLookup)
             }
         }
         writeModTransTofile(url: myModifiedTransURL, dictModTrans: dictModifiedTrans)
 
         var statString = ""
 
-        let shortCatFilePath = removeUserFromPath(catLookupFileURL.path)
+        let shortCatFilePath = removeUserFromPath(VendorCatLookupFileURL.path)
         statString += "Category File \"\(shortCatFilePath)\" loaded with \(Stats.origCatCount) items.\n"
 
         if filesToProcessURLs.count == 1 {
@@ -355,49 +355,49 @@ class ViewController: NSViewController, NSWindowDelegate {
         var errTxt = ""
 
         // "CategoryLookup.txt"
-        (catLookupFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: catLookupFilename)
+        (VendorCatLookupFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: VendorCatLookupFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "Category" + errTxt)
         }
-        dictCatLookupByVendor = loadCategories(url: catLookupFileURL)       // Build Categories Dictionary
-        Stats.origCatCount = dictCatLookupByVendor.count
+        dictVendorCatLookup = loadVendorCategories(url: VendorCatLookupFileURL)       // Build Categories Dictionary
+        Stats.origCatCount = dictVendorCatLookup.count
 
-        // "DescriptionKeyWords.txt"
-        (descKeyWordFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: descripKeyWordFilename)
+        // "VendorShortNames.txt"
+        (vendorShortNamesFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: vendorShortNameFilename)
         if !errTxt.isEmpty {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "descKeyWord" + errTxt)
+            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "VendorShortNames " + errTxt)
         }
-        dictDescripKeyWords = loadDescKeyWords(url: descKeyWordFileURL)        // Build Desc-KeyWord Dictionary
+        dictVendorShortNames = vendorShortNames(url: vendorShortNamesFileURL)        // Build VendorShortNames Dictionary
 
         // "MyCategories.txt"
         (myCatsFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myCatsFilename)
         if !errTxt.isEmpty {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories" + errTxt)
+            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories " + errTxt)
         }
         dictMyCatAliases = loadMyCats(myCatsFileURL: myCatsFileURL)
 
         // "MyModifiedTransactions"
         (myModifiedTransURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myModifiedTranFilename)
         if !errTxt.isEmpty {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyModifiedTransactions" + errTxt)
+            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyModifiedTransactions " + errTxt)
         }
         dictModifiedTrans = loadMyModifiedTrans(myModifiedTranURL: myModifiedTransURL)
 
     }//end func
 
     func findTruncatedDescs() {
-        let catLookupSortedByLength = Array(dictCatLookupByVendor.keys).sorted(by: {$0.count > $1.count})
-        guard let maxLen = catLookupSortedByLength.first?.count else {
+        let VendorCatLookupSortedByLength = Array(dictVendorCatLookup.keys).sorted(by: {$0.count > $1.count})
+        guard let maxLen = VendorCatLookupSortedByLength.first?.count else {
             return
         }
-        for (idx, desc) in catLookupSortedByLength.enumerated() {
+        for (idx, desc) in VendorCatLookupSortedByLength.enumerated() {
             let currentLen = desc.count
             if desc.uppercased().hasPrefix("SPRINT") {
                 //
             }
             if currentLen < maxLen {
                 for i in 0..<idx-1 {
-                    let descLong = catLookupSortedByLength[i]
+                    let descLong = VendorCatLookupSortedByLength[i]
 
                     if descLong.prefix(currentLen) == desc {
                         let truncLong = descLong.dropFirst(currentLen)

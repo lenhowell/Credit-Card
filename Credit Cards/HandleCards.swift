@@ -22,7 +22,7 @@ var usrIgnoreVendors    = [String: Int]()
 
 //MARK:---- handleCards - 25-85 = 60-lines
 
-func handleCards(fileName: String, cardType: String, cardArray: [String], dictDescripKeyWords: [String: String]) -> [LineItem] {
+func handleCards(fileName: String, cardType: String, cardArray: [String], dictVendorShortNames: [String: String]) -> [LineItem] {
     let cardArrayCount = cardArray.count
     var lineItemArray = [LineItem]()                // Create Array variable(lineItemArray) Type lineItem.
     var lineNum = 0
@@ -65,7 +65,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], dictDe
         if tran.trim.count < 16 { continue }    // Blank line or ",,,,,,,,,,,"
 
         Stats.processedCount += 1
-        let lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictDescripKeyWords: dictDescripKeyWords, cardType: cardType, hasCatHeader: hasCatHeader, fileName: fileName, lineNum: lineNum)
+        let lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: dictVendorShortNames, cardType: cardType, hasCatHeader: hasCatHeader, fileName: fileName, lineNum: lineNum)
 
         if !lineItem.desc.isEmpty || !lineItem.postDate.isEmpty || lineItem.debit != 0  || lineItem.credit != 0 {
             // Check for duplicate from another file
@@ -85,8 +85,8 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], dictDe
 }//end func handleCards
 
 //MARK:---- makeLineItem - 89-163 = 74-lines
-// uses Global Vars: dictCatLookupByVendor(I/O), Stats(I/O)
-internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int], dictDescripKeyWords: [String: String], cardType: String, hasCatHeader: Bool, fileName: String, lineNum: Int) -> LineItem {
+// uses Global Vars: dictVendorCatLookup(I/O), Stats(I/O)
+internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int], dictVendorShortNames: [String: String], cardType: String, hasCatHeader: Bool, fileName: String, lineNum: Int) -> LineItem {
 
     var lineItem = LineItem(fromTransFileLine: fromTransFileLine, dictColNums: dictColNums, fileName: fileName, lineNum: lineNum)
     lineItem.cardType = cardType
@@ -106,10 +106,10 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
     var catFromTran     = dictMyCatAliases[lineItem.rawCat] ?? "?" + lineItem.rawCat
     var catItemFromTran = CategoryItem(category: catFromTran, source: cardType)
 
-    let descKey = makeDescKey(from: lineItem.desc, dictDescripKeyWords: dictDescripKeyWords, fileName: fileName)
+    let descKey = makeDescKey(from: lineItem.desc, dictVendorShortNames: dictVendorShortNames, fileName: fileName)
     lineItem.descKey = descKey
     if !descKey.isEmpty {
-        if let cV = dictCatLookupByVendor[descKey] {
+        if let cV = dictVendorCatLookup[descKey] {
             catItemFromVendor = cV                  // ------ Here if Lookup by Vendor was successful
             (catItemPrefered, isClearWinner) = pickTheBestCat(catItemVendor: catItemFromVendor, catItemTransa: catItemFromTran)
             lineItem.genCat = catItemPrefered.category    // Generated Cat is the prefered one
@@ -129,14 +129,14 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
                 catFromTran = catTran
                 isClearWinner = !catFromTran.hasPrefix("?") // if no "?", we have a winner
             } else {
-                print("HandleCards#\(#line): Unknown Category: \"\(lineItem.rawCat)\" from \(descKey)")
+                print("HandleCards#\(#line): Unknown Category: \"\(lineItem.rawCat)\" from \(descKey) (line#\(lineNum) in \(fileName))")
                 isClearWinner = false
             }
             catItemFromTran = CategoryItem(category: catFromTran, source: source)
             catItemPrefered = usrCatItemFromTran
             lineItem.genCat = catFromTran
             if gLearnMode {
-                dictCatLookupByVendor[descKey] = CategoryItem(category: catFromTran, source: source) //Do Actual Insert
+                dictVendorCatLookup[descKey] = CategoryItem(category: catFromTran, source: source) //Do Actual Insert
 
                 Stats.addedCatCount += 1
             } else {
@@ -151,7 +151,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
             catItemPrefered = usrCatItemReturned
         }
         if gLearnMode && catItemPrefered != catItemFromVendor {
-            dictCatLookupByVendor[descKey] = catItemPrefered //Do Actual Insert
+            dictVendorCatLookup[descKey] = catItemPrefered //Do Actual Insert
             Stats.changedCatCount += 1
         }
     } else {
@@ -181,7 +181,7 @@ func showUserInputForm(lineItem: LineItem, catItemFromVendor: CategoryItem, catI
                 if lineItem.descKey.trim.isEmpty {
                     // debug trap
                 }
-                dictCatLookupByVendor[lineItem.descKey] = usrCatItemReturned
+                dictVendorCatLookup[lineItem.descKey] = usrCatItemReturned
                 Stats.changedCatCount += 1
             } else {
                 let transKey = lineItem.transText
@@ -219,7 +219,7 @@ internal func makeDictColNums(headers: [String]) -> [String: Int] {
 
 internal func findShorterDescKey(_ descKey: String) {
     let descKeyCount = descKey.count
-    for (key, value) in dictCatLookupByVendor {
+    for (key, value) in dictVendorCatLookup {
         let keyCount = key.count
         if descKeyCount < keyCount && descKeyCount > 3 {
             if key.prefix(descKeyCount) == descKey {
