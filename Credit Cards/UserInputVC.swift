@@ -108,8 +108,14 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func radioFileChange(_ sender: Any) {
-
-    }
+        if radioFileTransac.state == .on {
+            chkLockIn.isHidden = true
+            chkQuestionMark.isHidden = true
+        } else {
+            chkLockIn.isHidden = false
+            chkQuestionMark.isHidden = false
+        }
+    }//end func
 
     @IBAction func btnOK(_ sender: Any) {
         if chkIgnoreVendor.state == .on { usrIgnoreVendors[usrLineItem.descKey] = 101 }
@@ -120,7 +126,7 @@ class UserInputVC: NSViewController, NSWindowDelegate {
         }
         print("return \(usrCatItemReturned.category) \(usrCatItemReturned.source)")
         NSApplication.shared.stopModal(withCode: .OK)
-    }
+    }//end func
 
     @IBAction func btnCancel(_ sender: Any) {
         if chkIgnoreVendor.state == .on { usrIgnoreVendors[usrLineItem.descKey] = 101 }

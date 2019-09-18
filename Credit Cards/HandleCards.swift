@@ -121,6 +121,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
         } else {                   // ------ Here if NOT found in Category-Lookup-by-Vendor Dictionary
             findShorterDescKey(descKey) // Have we already found a truncated (shorter) version of descKey?
             let source = cardType
+            catItemFromVendor = CategoryItem(category: "?", source: "")
             // If Transaction-Line has a Category, put it in the Vendor file.
 
             if catFromTran.count < 3 { catFromTran = "" }
@@ -133,7 +134,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
                 isClearWinner = false
             }
             catItemFromTran = CategoryItem(category: catFromTran, source: source)
-            catItemPrefered = usrCatItemFromTran
+            catItemPrefered = catItemFromTran
             lineItem.genCat = catFromTran
             if gLearnMode {
                 dictVendorCatLookup[descKey] = CategoryItem(category: catFromTran, source: source) //Do Actual Insert
@@ -172,7 +173,7 @@ func showUserInputForm(lineItem: LineItem, catItemFromVendor: CategoryItem, catI
         //let userVC = storyBoard.instantiateController(withIdentifier: "UserInput") as! UserInputVC
 
         let application = NSApplication.shared
-        let returnVal = application.runModal(for: userInputWindow) // <==
+        let returnVal = application.runModal(for: userInputWindow) // <==  UserInputVC
 
         userInputWindow.close()                     // Return here from userInputWindow
         if returnVal == .abort { exit(101) }

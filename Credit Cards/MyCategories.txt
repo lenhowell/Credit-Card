@@ -1,0 +1,88 @@
+Art-Equipment
+Art-Supplies
+Art-Misc
+
+?Automobile,           Gas/Automotive, Automotive Expenses,  Automotive
+Auto-Gas,              Gasoline,       Gasoline/Fuel
+Auto-Maintenance
+Auto-Purchase
+Auto-Tolls/Parking
+
+Aviation-Club
+Aviation-Fuel/Tiedown, Aircraft fuel & Tiedown
+Aviation-Purchase
+Aviation-Maintenance
+Aviation-Misc
+Aviation-Training
+
+Boat-Maintenance
+Boat-Misc
+Boat-Purchase
+
+Charity,               Charitable Giving
+Clothing,              Clothing/Shoes
+Cable/Internet,        Cable/Satellite Services
+Computer,              Computer
+Education
+?Electronics,          Electronics
+Entertainment,         Entertainment/Recreation
+
+Food-Alchohol
+Food-Groceries,        Supermarkets
+Food-Restaurant,       Dining, Restaurants/Dining, Restaurants
+Food-Suppliments
+Food-Other
+
+Gift-Family
+Gift-Other
+Gift-Spouse
+
+Hobby-Equipment
+Hobby-Supplies
+Hobby-Misc
+
+Home Maintenance,      Home Improvement
+
+?Insurance,            Insurance
+Insurance-Auto
+Insurance-Aircraft
+Insurance-Business,    Beach Cove Insurance
+Insurance-Home,        Insurance - 1450
+
+Investments
+
+Laundry/DryClean,
+Lawyer
+Magazine
+?Merchandise,          Merchandise,    General Merchandise
+
+Personal-Dental 
+Personal-Healthcare,   Health Care,    Healthcare/Medical
+Personal-Services
+
+Pet-Purchase
+Pet-Healthcare
+Pet-Misc
+
+Phone-CellService,     Telephone Services
+Phone-Equipment
+
+Photo-Equipment
+Photo-Misc
+Photo-Processing
+Photo-Misc
+
+Postage/Shipping,      Postage and Shipping
+
+?Travel,               Travel,         Other Travel
+Travel-Airline,        Airfare
+Travel-Lodging
+Travel-CarRental,      Rent
+Travel-Train
+Travel-Other
+
+?Unknown,              Other Services, Other/Unclassified, Other, Professional Services, Other Expenses, Online Services
+
+?Credit,               Other Income, Payment/Credit, Payments and Credits
+CC-Fees,               Service Charges/Fees, Fee/Interest Charge
+CC-Payment,            Credit Card Payments

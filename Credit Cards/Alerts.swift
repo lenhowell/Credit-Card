@@ -98,25 +98,28 @@ public class GBox {
     //}
 
 
+    //TODO: InputBox options: DefaultText="", maxChars=24
     //---- InputBox - returns text
-    static func inputBox(_ msg: String) -> String {
+    static func inputBox(prompt: String, defaultText: String = "", maxChars: Int = 24) -> String {
         let alert = NSAlert()
-        alert.messageText = msg
+        alert.messageText = prompt
         alert.addButton(withTitle: "Ok")
         alert.addButton(withTitle: "Cancel")
-        let input = NSTextField(frame: NSMakeRect(0, 0, 60, 30))
-        input.stringValue = ""
-        input.font = NSFont.systemFont(ofSize: 16)
-        alert.accessoryView = input
+        let frameWidth = CGFloat(14 * maxChars)
+        let txtInput = NSTextField(frame: NSMakeRect(0, 0, frameWidth, 30))
+        txtInput.stringValue = ""
+        txtInput.font = NSFont.systemFont(ofSize: 16)
+        txtInput.stringValue = defaultText
+        alert.accessoryView = txtInput
         //alert.accessoryView?.window!.makeFirstResponder(input)
-        //self.view.window!.makeFirstResponder(input)               //????? How do I make "input" the FirstResponder
+        //self.view.window!.makeFirstResponder(input)               //????? How do I make "txtInput" the FirstResponder
         //input.becomeFirstResponder()
         let button: NSApplication.ModalResponse = alert.runModal()
         alert.buttons[0].setAccessibilityLabel("InputBox OK")
 
         //input.becomeFirstResponder()
         if button == .alertFirstButtonReturn {
-            let str = input.stringValue
+            let str = txtInput.stringValue
             return str
         }
         return ""                               // anything else

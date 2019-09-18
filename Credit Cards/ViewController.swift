@@ -15,7 +15,7 @@ import Cocoa
 // Global Constants
 
 // Global Variables
-var gUserInitials           = "GWB"     // (UserInputVC.swift-2) Initials used for "Category Source" when Cat is changes by user.
+var gUserInitials           = "User"    // (UserInputVC.swift-2) Initials used for "Category Source" when Cat is changes by user.
 var gTransFilename          = ""                // (UserInputVC.swift-viewDidLoad) Current Transaction Filename
 var gMyCatNames             = [String]()            // (loadMyCats, UserInputVC.swift-viewDidLoad) Array of Category Names (MyCategories.txt)
 var dictMyCatAliases        = [String: String]()        // (LineItems.init, etc) Hash of Category Synonyms
@@ -38,13 +38,14 @@ class ViewController: NSViewController, NSWindowDelegate {
     let vendorShortNameFilename = "VendorShortNames.txt"
     let myCatsFilename          = "MyCategories.txt"
     let myModifiedTranFilename  = "MyModifiedTransactions.txt"
+    let codeFile    = "ViewController"
 
     // Variables
     var dictVendorShortNames    = [String: String]()        // Hash for VendorShortNames Lookup (VendorShortNames.txt)
     var transFileURLs           = [URL]()
     var pathTransactionDir      = "Downloads/Credit Card Trans"
-    var pathSupportDir          = "Desktop/Credit Card Files"
-    var pathOutputDir           = "Desktop/Credit Card Files"
+    var pathSupportDir          = "Desktop/CreditCard"
+    var pathOutputDir           = "Desktop/CreditCard"
 
     var transactionDirURL       = FileManager.default.homeDirectoryForCurrentUser
     var VendorCatLookupFileURL  = FileManager.default.homeDirectoryForCurrentUser
@@ -66,56 +67,51 @@ class ViewController: NSViewController, NSWindowDelegate {
                                                 object:   nil
         )
 
+        // Set txtTransationFolder.delegate
+        txtTransationFolder.delegate = self         // Allow ViewController to see when txtTransationFolder changes.
+
+
         // Get folder UserDefaults
         if let dir = UserDefaults.standard.string(forKey: UDKey.supportFolder) {
-            if !dir.isEmpty { pathSupportDir = dir }
+            if dir.isEmpty {
+                handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, errorMsg: "Support Folder is empty")
+            } else {
+                pathSupportDir = dir
+            }
         }
         pathOutputDir       = UserDefaults.standard.string(forKey: UDKey.outputFolder) ?? pathOutputDir
         pathTransactionDir  = UserDefaults.standard.string(forKey: UDKey.transactionFolder) ?? pathTransactionDir
 
+        gLearnMode          = UserDefaults.standard.bool(forKey: UDKey.learningMode)
+        gUserInputMode      = UserDefaults.standard.bool(forKey: UDKey.userInputMode)
+
         //TODO: Allow User to change his initials.
-        gUserInitials = UserDefaults.standard.string(forKey: UDKey.userInitials) ?? ""
+        gUserInitials       = UserDefaults.standard.string(forKey: UDKey.userInitials) ?? ""
         if gUserInitials.isEmpty {
             let homeURL = FileManager.default.homeDirectoryForCurrentUser
             gUserInitials = homeURL.lastPathComponent.prefix(3).uppercased()
         }
 
-        gLearnMode = UserDefaults.standard.bool(forKey: UDKey.learningMode)
-        gUserInputMode = UserDefaults.standard.bool(forKey: UDKey.userInputMode)
-
         // Get List of Transaction Files
-        var errTxt = ""
-        (transactionDirURL, errTxt)  = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
-        if errTxt.isEmpty {
-            transFileURLs = getTransFileList(transDirURL: transactionDirURL)
-            cboFiles.isHidden = false
-            loadComboBoxFiles(fileURLs: transFileURLs)
-            lblTranFileCount.stringValue = "\(transFileURLs.count) Transaction \("file".pluralize(transFileURLs.count))"
-            lblErrMsg.stringValue = ""
-        } else {
-            transFileURLs = []
-            cboFiles.isHidden = true
-            loadComboBoxFiles(fileURLs: transFileURLs)
-            lblTranFileCount.stringValue = "---"
-            lblErrMsg.stringValue = "Transaction" + errTxt
-        }
+        gotNewTranactionFolder()
 
         // Read Support files ("CategoryLookup.txt", "VendorShortNames.txt", "MyCategories.txt")
         txtOutputFolder.stringValue     = pathOutputDir
         txtSupportFolder.stringValue    = pathSupportDir
         txtTransationFolder.stringValue = pathTransactionDir
         let errMsg = verifyFolders()
-        if !errMsg.isEmpty { handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataWarning, action: .display, fileName: "", dataLineNum: 0, lineText: "", errorMsg: errMsg) }
-        readSupportFiles()
-
-        let shortCatFilePath = removeUserFromPath(VendorCatLookupFileURL.path)
-        lblResults.stringValue = "Category Lookup File \"\(shortCatFilePath)\" loaded with \(Stats.origCatCount) items.\n"
+        if !errMsg.isEmpty { handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, fileName: "", dataLineNum: 0, lineText: "", errorMsg: errMsg) }
+        if pathSupportDir.isEmpty || errMsg.contains("upport"){
+            lblResults.stringValue = "You will need to create a folder to hold support files before you can proceed."
+        } else {
+            readSupportFiles()
+            let shortCatFilePath = removeUserFromPath(VendorCatLookupFileURL.path)
+            lblResults.stringValue = "Category Lookup File \"\(shortCatFilePath)\" loaded with \(Stats.origCatCount) items.\n"
+        }
 
         chkLearningMode.state = gLearnMode     ? .on : .off
         chkUserInput.state    = gUserInputMode ? .on : .off
 
-        // Set txtTransationFolder.delegate
-        txtTransationFolder.delegate = self         // Allow ViewController to see when txtTransationFolder changes.
     }
     
     override func viewDidAppear() {
@@ -163,7 +159,8 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func btnFindTruncatedDescs(_ sender: Any) {
-        findTruncatedDescs()
+        let vendorNameDescs = Array(dictVendorCatLookup.keys)
+        findTruncatedDescs(vendorNameDescs)
     }
 
     @IBAction func chkLearningModeClick(_ sender: Any) {
@@ -174,13 +171,51 @@ class ViewController: NSViewController, NSWindowDelegate {
         gUserInputMode = chkUserInput.state == .on
         print("UserInputMode = \(gUserInputMode)")
     }
-    
+
+    // MARK: - IBActions - menus
+
+    @IBAction func mnuResetUserDefaults(_ sender: Any) {
+        let response = GBox.alert("Are you sure you want to reset all User Defaults?", style: .yesNo)
+        if response == .yes {
+            resetUserDefaults()
+        }
+    }
+
+    @IBAction func mnuChangeUserInitials(_ sender: Any) {
+        var prompt = "Enter your initials (2-6 letters)"
+        var isValid = false
+        let minChars = 2
+        let maxChars = 6
+        repeat {
+            let response = GBox.inputBox(prompt: prompt, defaultText: gUserInitials, maxChars: maxChars)
+            let name = response.trim
+            let len = name.count
+            if name.isEmpty {
+                let msg = "Your initials were not changed from \(gUserInitials)."
+                handleError(codeFile: "", codeLineNum: #line, type: .note, action: .alertAndDisplay, errorMsg: msg)
+                isValid = true
+            }
+            if len >= minChars && len <= maxChars && !name.contains(" ") {
+                gUserInitials = name
+                UserDefaults.standard.set(gUserInitials,      forKey: UDKey.userInitials)
+                let msg = "Your initials have been changed to \(gUserInitials)."
+                handleError(codeFile: "", codeLineNum: #line, type: .note, action: .alertAndDisplay, errorMsg: msg)
+                isValid = true
+            }
+            prompt = "Only letters and digits allowed"
+            if len < minChars { prompt = "Initials must have at least \(minChars) letters"  }
+            if len > maxChars { prompt = "Initials must have no more than  \(maxChars) letters"  }
+            prompt += ". Try again."
+        } while !isValid
+    }
+
+
     //MARK:- Main Program
     
     func main() {
         let errMsg = verifyFolders()
         if !errMsg.isEmpty {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataWarning, action: .alertAndDisplay, fileName: "", dataLineNum: 0, lineText: "", errorMsg: errMsg)
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .alertAndDisplay, fileName: "", dataLineNum: 0, lineText: "", errorMsg: errMsg)
             return
         }
 
@@ -192,14 +227,13 @@ class ViewController: NSViewController, NSWindowDelegate {
         pathTransactionDir = txtTransationFolder.stringValue
         (transactionDirURL, errTxt)  = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
         if !errTxt.isEmpty {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Transaction" + errTxt)
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Transaction" + errTxt)
             return
         }
 
-
         (outputFileURL, errTxt)  = makeFileURL(pathFileDir: pathOutputDir, fileName: myFileNameOut)
         if !errTxt.isEmpty {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Output" + errTxt)
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Output" + errTxt)
             return
         }
 
@@ -226,7 +260,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         lblErrMsg.stringValue = ""
         
         if !FileManager.default.fileExists(atPath: transactionDirURL.path) {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .codeError, action: .alertAndDisplay,  fileName: transactionDirURL.path, dataLineNum: 0, lineText: "", errorMsg: "Directory does not exist")
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay,  fileName: transactionDirURL.path, dataLineNum: 0, lineText: "", errorMsg: "Directory does not exist")
         }
 
         let filesToProcessURLs: [URL]
@@ -338,16 +372,18 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     // Reads Support & Output folder names from textViews, & verifies they exist
     func verifyFolders() -> String {
-        if !folderExists(atPath: txtSupportFolder.stringValue, isPartialPath: true) {
+        let supportPath = txtSupportFolder.stringValue.trim
+        if supportPath.isEmpty || !folderExists(atPath: supportPath, isPartialPath: true) {
             return "Support folder: \"\(txtSupportFolder.stringValue)\" doesn't exist."
         }
-        pathSupportDir = txtSupportFolder.stringValue
+        pathSupportDir = supportPath
 
-        if !folderExists(atPath: txtOutputFolder.stringValue, isPartialPath: true) {
+        let outputPath = txtOutputFolder.stringValue.trim
+        if outputPath.isEmpty || !folderExists(atPath: outputPath, isPartialPath: true) {
             return "Output folder: \"\(txtOutputFolder.stringValue)\" doesn't exist."
         }
-        pathOutputDir  = txtOutputFolder.stringValue
 
+        pathOutputDir  = outputPath
         return ""
     }
 
@@ -357,7 +393,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         // "CategoryLookup.txt"
         (VendorCatLookupFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: VendorCatLookupFilename)
         if !errTxt.isEmpty {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "Category" + errTxt)
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "Category" + errTxt)
         }
         dictVendorCatLookup = loadVendorCategories(url: VendorCatLookupFileURL)       // Build Categories Dictionary
         Stats.origCatCount = dictVendorCatLookup.count
@@ -365,58 +401,82 @@ class ViewController: NSViewController, NSWindowDelegate {
         // "VendorShortNames.txt"
         (vendorShortNamesFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: vendorShortNameFilename)
         if !errTxt.isEmpty {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "VendorShortNames " + errTxt)
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "VendorShortNames " + errTxt)
         }
         dictVendorShortNames = vendorShortNames(url: vendorShortNamesFileURL)        // Build VendorShortNames Dictionary
 
         // "MyCategories.txt"
         (myCatsFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myCatsFilename)
         if !errTxt.isEmpty {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories " + errTxt)
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories " + errTxt)
         }
         dictMyCatAliases = loadMyCats(myCatsFileURL: myCatsFileURL)
 
         // "MyModifiedTransactions"
         (myModifiedTransURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myModifiedTranFilename)
         if !errTxt.isEmpty {
-            handleError(codeFile: "ViewController", codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyModifiedTransactions " + errTxt)
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyModifiedTransactions " + errTxt)
         }
         dictModifiedTrans = loadMyModifiedTrans(myModifiedTranURL: myModifiedTransURL)
 
     }//end func
 
-    func findTruncatedDescs() {
-        let VendorCatLookupSortedByLength = Array(dictVendorCatLookup.keys).sorted(by: {$0.count > $1.count})
-        guard let maxLen = VendorCatLookupSortedByLength.first?.count else {
-            return
+    func findTruncatedDescs(_ vendorNameDescs: [String]) {
+        // Sort by length - longest to shortest
+        let VendorCatLookupSortedByLength = vendorNameDescs.sorted(by: {$0.count > $1.count})
+        guard let minLen = VendorCatLookupSortedByLength.last?.count else {
+            return      // empty
         }
-        for (idx, desc) in VendorCatLookupSortedByLength.enumerated() {
-            let currentLen = desc.count
-            if desc.uppercased().hasPrefix("SPRINT") {
-                //
-            }
-            if currentLen < maxLen {
-                for i in 0..<idx-1 {
-                    let descLong = VendorCatLookupSortedByLength[i]
-
-                    if descLong.prefix(currentLen) == desc {
-                        let truncLong = descLong.dropFirst(currentLen)
-                        if currentLen > 9 || truncLong.hasPrefix(" ") {
-                            print("Possible dupe \(desc) (\(currentLen)) is part of \(descLong) (\(descLong.count))")
-                            //
-                        } else {
-                            print("Too short for a dupe \(desc) (\(currentLen)) is part of \(descLong) (\(descLong.count))")
-                        }
-                    } else  if desc.prefix(6) == descLong.prefix(6) {
-                        print("Not a dupe, but same at 9 \(desc) (\(currentLen)) is part of \(descLong) (\(descLong.count))")
+        for (idx, descLong) in VendorCatLookupSortedByLength.enumerated() {
+            let longLen = descLong.count
+            if longLen <= minLen { break }
+            for i in idx+1..<VendorCatLookupSortedByLength.count {
+                let descShort = VendorCatLookupSortedByLength[i]
+                let shortLen  = descShort.count
+                if descLong.prefix(shortLen) == descShort {
+                    let truncLong = descLong.dropFirst(shortLen)
+                    if longLen > 9 || truncLong.hasPrefix(" ") {
+                        print("Possible dupe \"\(descShort)\"(\(shortLen)) is part of \"\(descLong)\"(\(longLen))")
                         //
+                    } else {
+                        print("Too short for a dupe \(descShort) (\(shortLen)) is part of \(descLong) (\(longLen))")
                     }
-                }//next i
-            }//endif
+                } else  if descLong.prefix(9) == descShort.prefix(9) {
+                    //print("Not a dupe, but same at 9 \"\(descShort)\"(\(shortLen)) is part of \"\(descLong)\"(\(longLen))")
+                }
+            }//next i
         }//next desc
 
 
     }
+
+    func resetUserDefaults() {
+        if let appDomain = Bundle.main.bundleIdentifier {
+            UserDefaults.standard.removePersistentDomain(forName: appDomain)
+        }
+    }
+
+    func gotNewTranactionFolder() {
+        var errText = ""
+        (transactionDirURL, errText)  = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
+        if errText.isEmpty {             // Transaction Folder Exists
+            btnStart.isEnabled = true
+            transFileURLs = getTransFileList(transDirURL: transactionDirURL)
+            loadComboBoxFiles(fileURLs: transFileURLs)
+            cboFiles.isHidden = false
+            lblTranFileCount.stringValue = "\(transFileURLs.count) Transaction \("file".pluralize(transFileURLs.count))"
+            lblErrMsg.stringValue = ""
+            print("Trans Folder set to: \"\(pathTransactionDir)\"")
+
+        } else {                        // Error getting Transaction Folder
+            btnStart.isEnabled = false
+            transFileURLs = []
+            loadComboBoxFiles(fileURLs: transFileURLs)
+            cboFiles.isHidden = true
+            lblTranFileCount.stringValue = "----"
+            lblErrMsg.stringValue = errText
+        }
+    }//end func
 
 }//end class ViewController
 
@@ -428,25 +488,9 @@ extension ViewController: NSTextFieldDelegate {
         guard let textView = obj.object as? NSTextField else {
             return
         }
-        var errText = ""
-        pathTransactionDir = txtTransationFolder.stringValue
-        (transactionDirURL, errText) = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
-        if errText.isEmpty {
-            btnStart.isEnabled = true
-            transFileURLs = getTransFileList(transDirURL: transactionDirURL)
-            loadComboBoxFiles(fileURLs: transFileURLs)
-            cboFiles.isHidden = false
-            lblTranFileCount.stringValue = "\(transFileURLs.count) Transaction \("file".pluralize(transFileURLs.count))"
-            lblErrMsg.stringValue = ""
-            print("Trans Folder changed to: \"\(textView.stringValue)\"")
-
-        } else {
-            btnStart.isEnabled = false
-            transFileURLs = []
-            loadComboBoxFiles(fileURLs: transFileURLs)
-            cboFiles.isHidden = true
-            lblTranFileCount.stringValue = "----"
-            lblErrMsg.stringValue = errText
+        if pathTransactionDir != txtTransationFolder.stringValue {
+            pathTransactionDir = txtTransationFolder.stringValue
+            gotNewTranactionFolder()
         }
     }
 

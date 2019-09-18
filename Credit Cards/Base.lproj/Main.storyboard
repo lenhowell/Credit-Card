@@ -24,6 +24,19 @@
                                         <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
                                         <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW"/>
                                         <menuItem isSeparatorItem="YES" id="wFC-TO-SCJ"/>
+                                        <menuItem title="Reset all User Defaults" id="8vk-Av-YP7">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="mnuResetUserDefaults:" target="Ady-hI-5gd" id="Gfs-sc-Jc1"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Change your Intitials" id="mlQ-Rk-rl4">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="mnuChangeUserInitials:" target="Ady-hI-5gd" id="Gf8-ZF-Phm"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="hah-Th-vAp"/>
                                         <menuItem title="Quit Credit Cards" keyEquivalent="q" id="4sb-4s-VLi">
                                             <connections>
                                                 <action selector="terminate:" target="Ady-hI-5gd" id="Te7-pn-YzF"/>
@@ -611,7 +624,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <comboBox verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DP0-U9-YMZ">
-                                <rect key="frame" x="462" y="198" width="135" height="26"/>
+                                <rect key="frame" x="451" y="198" width="146" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" completes="NO" numberOfVisibleItems="5" id="kSl-5o-irM">
                                     <font key="font" metaFont="system"/>
@@ -661,25 +674,14 @@ Gw
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WBO-u6-2d6">
-                                <rect key="frame" x="436" y="106" width="160" height="18"/>
+                                <rect key="frame" x="449" y="170" width="132" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Add Question Mark &quot;?&quot;" bezelStyle="regularSquare" imagePosition="right" inset="2" id="IFr-Xg-VG6">
+                                <buttonCell key="cell" type="check" title="&quot;?&quot; Question Mark" bezelStyle="regularSquare" imagePosition="left" inset="2" id="IFr-Xg-VG6">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="chkQuestionMarkClick:" target="5se-PX-5kl" id="xmS-yX-sb7"/>
-                                </connections>
-                            </button>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5vi-kI-JnO">
-                                <rect key="frame" x="478" y="130" width="118" height="18"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Lock in  wth &quot;$&quot;" bezelStyle="regularSquare" imagePosition="right" alignment="right" inset="2" id="pXa-e4-GnB">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="chkLockInClick:" target="5se-PX-5kl" id="hs1-2A-sVj"/>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7sx-dx-cB8">
@@ -699,6 +701,17 @@ Gw
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5vi-kI-JnO">
+                                <rect key="frame" x="449" y="141" width="132" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="&quot;$&quot; to Lock in " bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="pXa-e4-GnB">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="chkLockInClick:" target="5se-PX-5kl" id="hs1-2A-sVj"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
