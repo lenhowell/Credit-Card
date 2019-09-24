@@ -73,13 +73,11 @@ public func removeUserFromPath(_ fullPath: String) -> String {
     return path
 }
 
-//TODO: Change saveBackupFile to limit # of Backups
-public func saveBackupFile(url: URL) {
+public func saveBackupFile(url: URL, multiple: Bool = false) {
+    // Create a FileManager instance
+    let fileManager = FileManager.default
     // Rename the existing file to "CategoryLookup yyyy-MM-dd HHmm.txt"
-    let fileAttributes = FileAttributes.getFileInfo(url: url)
-    let modDate = fileAttributes.modificationDate
     let oldNameWithExt = url.lastPathComponent
-    let adder = modDate?.toString("yyyy-MM-dd HHmm") ?? "BU"
     let nameComps = oldNameWithExt.components(separatedBy: ".")
     let oldName = nameComps[0]
     let ext: String
@@ -88,15 +86,37 @@ public func saveBackupFile(url: URL) {
     } else {
         ext = ""
     }
+    var adder = "BU"
+    if multiple {
+        //for multiple backups, use the creation dates instead of "BU" in the names
+        let fileAttributes = FileAttributes.getFileInfo(url: url)
+        let modDate = fileAttributes.modificationDate
+        adder = modDate?.toString("yyyy-MM-dd HHmm") ?? "BU"
+    }
+
     let newName = oldName + " " + adder + ext
     let newPath = url.deletingLastPathComponent().path + "/" + newName
+
+    if fileManager.fileExists(atPath: newPath) {
+        // Delete newFile if it already exists
+        do {
+            try fileManager.removeItem(atPath: newPath)
+        }
+        catch let error as NSError {
+            print("Ooops! Something went wrong: \(error)")
+        }
+    }//end if new file already exists
+
     do {
-        try FileManager.default.moveItem(atPath: url.path, toPath: newPath)
+        // Rename oldFile to newFile
+        try fileManager.moveItem(atPath: url.path, toPath: newPath)
     } catch {
         // print("Error: \(error.localizedDescription)")
     }
-}
 
+}//end func saveBackupFile
+
+//MARK: FileAttributes struct
 //????? incorporate both getFileInfo() funcs into struct as inits
 public struct FileAttributes: Equatable {
     let url:              URL?
@@ -136,7 +156,8 @@ public struct FileAttributes: Equatable {
         } else {   // url = nil
             return FileAttributes(url: nil, name: "???", creationDate: nil, modificationDate: nil, size: 0, isDir: false)
         }
-    }
+    }//end func getFileInfo
+
 }// end struct FileAttributes
 
 //MARK:- My Catagory List
@@ -225,12 +246,11 @@ func writeModTransTofile(url: URL, dictModTrans: [String: CategoryItem]) {
         let msg = "Could not write new MyModifiesTransactions file."
         handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: url.lastPathComponent, errorMsg: msg)
     }
-
-}
+}//end func
 
 //MARK:- Vendor Short Names
 
-func vendorShortNames(url: URL) -> [String: String]  {
+func loadVendorShortNames(url: URL) -> [String: String]  {
     var dictVendorShortNames = [String: String]()
     let contentof = (try? String(contentsOf: url)) ?? ""
     let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
@@ -253,7 +273,25 @@ func vendorShortNames(url: URL) -> [String: String]  {
         dictVendorShortNames[shortName] = descKey
     }
     return dictVendorShortNames
-}//end func vendorShortNames
+}//end func loadVendorShortNames
+
+func writeVendorShortNames(url: URL, dictVendorShortNames: [String: String]) {
+    saveBackupFile(url: url)
+    var text = "// Machine-generated file\n"
+    text += "// ShortName (prefix),   Full Description Key\n"
+    for (shortName, fullDescKey) in dictVendorShortNames {
+        text += "\(shortName.PadRight(24, truncate: false)), \(fullDescKey)\n"
+    }
+    //— writing —
+    do {
+        try text.write(to: url, atomically: false, encoding: .utf8)
+        print("\n😀 Successfully wrote \(dictVendorShortNames.count) transactions to: \(url.path)")
+    } catch {
+        let msg = "Could not write new MyModifiesTransactions file."
+        handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: url.lastPathComponent, errorMsg: msg)
+    }
+}//end func
+
 
 //MARK:- Categories
 
@@ -283,16 +321,14 @@ func loadVendorCategories(url: URL) -> [String: CategoryItem]  {
         let source   = categoryArray[2].trim.replacingOccurrences(of: "\"", with: "")
         let categoryItem = CategoryItem(category: category, source: source)
         dictCat[descKey] = categoryItem
-        
     }
     print("\(dictCat.count) Items Read into Category dictionary from: \(url.path)")
-    
     return dictCat
 }//end func loadVendorCategories
 
 
-//---- writeCategoriesToFile - uses workingFolderUrl(I), handleError(F)
-func writeCategoriesToFile(url: URL, dictCat: [String: CategoryItem]) {
+//---- writeVendorCategoriesToFile - uses workingFolderUrl(I), handleError(F)
+func writeVendorCategoriesToFile(url: URL, dictCat: [String: CategoryItem]) {
 
     saveBackupFile(url: url)
 
@@ -303,7 +339,7 @@ func writeCategoriesToFile(url: URL, dictCat: [String: CategoryItem]) {
     text += "// When a phone number or \"xxx...\" or other multi-digit number is reached the rest is truncated.\n"
     text += "\n// Description Key        Category              Source\n"
     var prevCat = ""
-    print("\n Different Descs that have the same 15-chars")
+    print("\n Different Descs that start with the same 15-chars")
     for catItem in dictCat.sorted(by: {$0.key < $1.key}) {
         text += "\(catItem.key.PadRight(descKeyLength)), \(catItem.value.category.PadRight(26)),  \(catItem.value.source)\n"
 
@@ -322,7 +358,7 @@ func writeCategoriesToFile(url: URL, dictCat: [String: CategoryItem]) {
         let msg = "Could not write new CategoryLookup file."
         handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: url.lastPathComponent, errorMsg: msg)
     }
-}//end func writeCategoriesToFile
+}//end func writeVendorCategoriesToFile
 
 //MARK:- Transactions
 
@@ -348,13 +384,15 @@ func outputTranactions(outputFileURL: URL, lineItemArray: [LineItem]) {
 }//end func outputTranactions
 
 public func getTransFileList(transDirURL: URL) -> [URL] {
-    print("\nFreeFuncs.getTransFileList \(#line)")
+    print("\nFileIO.getTransFileList#\(#line)")
     do {
         let fileURLs = try FileManager.default.contentsOfDirectory(at: transDirURL, includingPropertiesForKeys: [], options:  [.skipsHiddenFiles, .skipsSubdirectoryDescendants])
         let csvURLs = fileURLs.filter{ $0.pathExtension.lowercased() == "csv" }
         let transURLs = csvURLs.filter{ $0.lastPathComponent.components(separatedBy: "-")[0].count <= 6 }
         print("\(transURLs.count) Transaction Files found.")
-        print(transURLs)
+        for url in transURLs {
+            print(url.path)
+        }
         print()
         return transURLs
     } catch {

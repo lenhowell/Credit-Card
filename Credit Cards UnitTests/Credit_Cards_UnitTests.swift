@@ -10,7 +10,6 @@ import XCTest
 @testable import Credit_Cards
 
 class Credit_Cards_UnitTests: XCTestCase {
-    let dictVendorShortNames = [String: String]()
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -47,7 +46,7 @@ class Credit_Cards_UnitTests: XCTestCase {
     }
 
     func testMakeLineItemAndDictColNums() {
-
+        var dictVendorShortNames = [String: String]()
         var headerLine = ""
         var headers: [String]
         var dictColNums = [String: Int]()
@@ -91,19 +90,22 @@ class Credit_Cards_UnitTests: XCTestCase {
 
 
     func testHandleCards() {
+        var dictVendorShortNames = [String: String]()
         var lineItemArray = [LineItem]()
 
         // Generates Alert - Move to UITests
         let contentGarbage = "\nGarbage\nGarbage\nGarbage\n"
         let cardArrayGarbage = contentGarbage.components(separatedBy: "\n")
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGarbage, dictVendorShortNames: dictVendorShortNames)
+        dictVendorShortNames = [String: String]()
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGarbage, dictVendorShortNames: &dictVendorShortNames)
         XCTAssertEqual(lineItemArray.isEmpty, true)
 
         let cardArrayC1R = [
             "Transaction Date,Posted Date,Card No.,Description,Category,Debit,Credit",
             "2018-08-11,2018-08-18,8772,MORRISSEYS FRONT PORCH,Dining,12.14,",
         ]
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayC1R, dictVendorShortNames: dictVendorShortNames)
+        dictVendorShortNames = [String: String]()
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayC1R, dictVendorShortNames: &dictVendorShortNames)
         XCTAssertEqual(lineItemArray.count, 1)
         XCTAssertEqual(lineItemArray[0].tranDate, "2018-08-11")
         XCTAssertEqual(lineItemArray[0].postDate, "2018-08-18")
@@ -111,7 +113,7 @@ class Credit_Cards_UnitTests: XCTestCase {
         XCTAssertEqual(lineItemArray[0].desc, "MORRISSEYS FRONT PORCH")
         XCTAssertEqual(lineItemArray[0].debit, 12.14)
         XCTAssertEqual(lineItemArray[0].credit, 0.00)
-        XCTAssertEqual(lineItemArray[0].rawCat, "Dining")
+        //XCTAssertEqual(lineItemArray[0].rawCat, "Food-Restaurant") //Note: Depends on MyCategories.txt
 
 
         let contentLHDC =
@@ -121,7 +123,8 @@ class Credit_Cards_UnitTests: XCTestCase {
     04/30/2018,04/30/2018,"PHONE PAYMENT - THANK YOU",-32.56,"Payments and Credits"
     """
         let cardArrayLHDC = contentLHDC.components(separatedBy: "\n")
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHDC, dictVendorShortNames: dictVendorShortNames)
+        dictVendorShortNames = [String: String]()
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHDC, dictVendorShortNames: &dictVendorShortNames)
         XCTAssertEqual(lineItemArray.count, 2)
         XCTAssertEqual(lineItemArray[0].tranDate, "04/04/2018")
         XCTAssertEqual(lineItemArray[0].postDate, "04/04/2018")
@@ -129,7 +132,7 @@ class Credit_Cards_UnitTests: XCTestCase {
         //XCTAssertEqual(lineItemArray[0].desc, "BONEFISH 7027 BOYNTON BEACHFL00422R")
         XCTAssertEqual(lineItemArray[0].debit, 32.56)
         XCTAssertEqual(lineItemArray[0].credit, 0.00)
-        XCTAssertEqual(lineItemArray[0].rawCat, "Dining")  //Depends on MyCategories.txt
+        //XCTAssertEqual(lineItemArray[0].rawCat, "Food-Restaurant") //Note: Depends on MyCategories.txt
 
 
         //TODO: The following Unit-Tests need assertions
@@ -143,7 +146,8 @@ class Credit_Cards_UnitTests: XCTestCase {
     Cleared,08/07/2019,"BEACH COVE RESORT F&B N MYRTLE BCH SC",27.59,
     """
         let cardArrayLHCT = contentLHCT.components(separatedBy: "\n")
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHCT, dictVendorShortNames: dictVendorShortNames)
+        dictVendorShortNames = [String: String]()
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHCT, dictVendorShortNames: &dictVendorShortNames)
         XCTAssertEqual(lineItemArray.count, 2)
 
 
@@ -157,7 +161,8 @@ class Credit_Cards_UnitTests: XCTestCase {
     9/2/19,9/3/19,8772,,Dining,9.02,
     """
         let cardArrayLHC1V = contentLHC1V.components(separatedBy: "\n")
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHC1V, dictVendorShortNames: dictVendorShortNames)
+        dictVendorShortNames = [String: String]()
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHC1V, dictVendorShortNames: &dictVendorShortNames)
         XCTAssertEqual(lineItemArray.count, 4)
 
 
@@ -169,7 +174,8 @@ class Credit_Cards_UnitTests: XCTestCase {
     posted,9/14/18,A&M PIZZA                LEBANON      PA,,Restaurants/Dining,USD,-22.00, , ,Personal,Bank of America - Credit Card - Bank of America Premium Rewards Visa Sig,A&M PIZZA                LEBANON      PA
     """
         let cardArrayGBBA = contentGBBA.components(separatedBy: "\n")
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGBBA, dictVendorShortNames: dictVendorShortNames)
+        dictVendorShortNames = [String: String]()
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGBBA, dictVendorShortNames: &dictVendorShortNames)
         XCTAssertEqual(lineItemArray.count, 2)
 
 
@@ -183,11 +189,85 @@ class Credit_Cards_UnitTests: XCTestCase {
     "01/15/2018","VZWRLSS*APOCC VISE","800-922-0204  FL","147.32","Other/Unclassified"
     """
         let cardArrayGBML = contentGBML.components(separatedBy: "\n")
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGBML, dictVendorShortNames: dictVendorShortNames)
+        dictVendorShortNames = [String: String]()
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGBML, dictVendorShortNames: &dictVendorShortNames)
         XCTAssertEqual(lineItemArray.count, 3)
 
     }//end func testHandleCards
 
+    func testFindTruncatedDescs() {
+        var dictShortNames = [String: String]()
+        let vendorNameDescs = [
+            "BEACH COVE RESORT F&B", "BEACH COVE RESORT F&B N",
+            "CARALUZZIS GEORGET", "CARALUZZIS GEORGETO",
+            "CITGO", "CITGO CORNER STORE",
+            "CITGO", "CITGO MARKET PLACE",
+            "CITGO", "CITGO 14 KIMBERLY AVD",
+            "CITGO", "CITGO AIRPORT COUNTRY CO",
+            "CITGO GM SERVICE STATI", "CITGO GM SERVICE STATION",
+            "CITGO", "CITGO GM SERVICE STATION",
+            "CITGO", "CITGO EASTON VILLAGE S",
+            "CITGO", "CITGO GM SERVICE STATI",
+            "VAZZYS OSTERIA", "VAZZYS OSTERIA MONROE CT",
+                               "HEALTHYHOLIC FITNESS C", "HEALTHYHOLIC FITNESS CAF",
+                               "HEALTHYHOLIC FITNESS", "HEALTHYHOLIC FITNESS CAF",
+                               "TASHUA KNOLLS REST", "TASHUA KNOLLS REST TRUMB",
+                               "OLD TOWNE RESTAURANT", "OLD TOWNE RESTAURANT TRU",
+                               "ELECTRONIC PAYMENT", "ELECTRONIC PAYMENT THANK",
+                               "SOUTH OF THE BORDER TA", "SOUTH OF THE BORDER TANN",
+                               "MORRISSEYS FRONT PORCH", "MORRISSEYS FRONT PORCH W",
+                               "SOUTH BEACH TANNING CO", "SOUTH BEACH TANNING COMP",
+                               "NEW COUNTRY LEXUS WEST", "NEW COUNTRY LEXUS WESTPO",
+                               "HUNTERS SHOP N SAV", "HUNTERS SHOP N SAVE WOLF",
+                               "PALM BEACH TAN", "PALM BEACH TAN RECURRING",
+                               "STP&SHPFUEL", "STP&SHPFUEL0639 STRATFOR",
+                               "CHANGE POINT LAUNDRY P", "CHANGE POINT LAUNDRY PYM",
+                               "MEX ON MAIN", "MEX ON MAIN TRUMBULL CT",
+                               "ATK GOLF TASHUA KNOL", "ATK GOLF TASHUA KNOLLS",
+                               "HEALTHYHOLIC FITNESS", "HEALTHYHOLIC FITNESS C",
+                               "ADVENTURE P", "ADVENTURE PARK AT DIS",
+                               "SOLAIRE NUTRACE", "SOLAIRE NUTRACEUTICAL",
+                               "CONNECTICUTORTHOP", "CONNECTICUTORTHOPAEDI",
+                               "HARVERST MARKET WOL", "HARVERST MARKET WOLF",
+                               "KIEZELPAY", "KIEZELPAY PAYPAL",
+                               "PAST DUE FEE", "PAST DUE FEE ADJ",
+                               "JETBLUE", "JETBLUE INFLIGHT",
+                               "PILOT", "PILOTWORKSHOPS",
+                               "PUBLIX", "PUBLIX SUPERMARKETS",
+                               "TW", "TWO GEORGES",
+                               "UBER", "UBERTIS FISH MARKET",
+                                ]
+        dictShortNames = [String: String]()
+//        let doWrite = findTruncatedDescs(vendorNameDescs: vendorNameDescs, dictShortNames: &dictShortNames)
+//        print("\ndictShortNames.count = \(dictShortNames.count)")
+//        XCTAssertEqual(dictShortNames.count, 34)
+//        XCTAssertEqual(dictShortNames["JETBLUE INFLIGHT"], "JETBLUE")
+//        XCTAssertEqual(dictShortNames["PALM BEACH TAN RECURRING"], "PALM BEACH TAN")
+//        XCTAssertEqual(dictShortNames["CITGO GM SERVICE STATI"], "CITGO")
+//        XCTAssertEqual(dictShortNames["CITGO GM SERVICE STATION"], "CITGO")
+//        XCTAssertEqual(dictShortNames["CITGO AIRPORT COUNTRY CO"], "CITGO")
+
+//        print("\ntestFindTruncatedDescs#\(#line) dictAlias1: dictAlias1.count = \(dictAlias1.count) ")
+//        for (key, val) in dictAlias1.sorted(by: <) {
+//            print("\(val) <==  \(key)")
+//        }
+
+        let v2 = [
+                "JETBLUE", "JETBLUE INFLIGHT",
+                "PILOT", "PILOTWORKSHOPS",
+                "TW", "TWO GEORGES",
+                "UBER", "UBERTIS FISH MARKET",
+                ]
+        dictShortNames = [String: String]()
+//        let doWrite2 = findTruncatedDescs(vendorNameDescs: vendorNameDescs, dictShortNames: &dictShortNames)
+//        XCTAssertEqual(dictShortNames.count, 1)
+//        XCTAssertEqual(dictShortNames["JETBLUE INFLIGHT"], "JETBLUE")
+//        XCTAssertEqual(dictShortNames["TWO GEORGES"],  nil)
+//        XCTAssertEqual(dictShortNames["PILOTWORKSHOPS"],  nil)
+//        XCTAssertEqual(dictShortNames["UBERTIS FISH MARKET"],  nil)
+
+
+    }
 
     
 //    func testPerformanceExample() {

@@ -22,7 +22,7 @@ var usrIgnoreVendors    = [String: Int]()
 
 //MARK:---- handleCards - 25-85 = 60-lines
 
-func handleCards(fileName: String, cardType: String, cardArray: [String], dictVendorShortNames: [String: String]) -> [LineItem] {
+func handleCards(fileName: String, cardType: String, cardArray: [String], dictVendorShortNames: inout [String: String]) -> [LineItem] {
     let cardArrayCount = cardArray.count
     var lineItemArray = [LineItem]()                // Create Array variable(lineItemArray) Type lineItem.
     var lineNum = 0

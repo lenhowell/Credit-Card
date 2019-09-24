@@ -25,6 +25,8 @@
 		CE4A27FD2301BEC500CA5A38 /* Stats.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4A27FC2301BEC500CA5A38 /* Stats.swift */; };
 		CE5B1E022304E03C00337C2F /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5B1E012304E03C00337C2F /* UserDefaults.swift */; };
 		CE7548132309DC0600FEDAFB /* DescriptionKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7548122309DC0600FEDAFB /* DescriptionKey.swift */; };
+		CE95CC9B23367191008363B7 /* UserInputShortNameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE95CC9A23367191008363B7 /* UserInputShortNameVC.swift */; };
+		CE95CC9D2336D722008363B7 /* VendorShortNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE95CC9C2336D722008363B7 /* VendorShortNames.swift */; };
 		CE9FFEBB2302F3DF00261390 /* Thoughts.rtf in Resources */ = {isa = PBXBuildFile; fileRef = CE9FFEBA2302F3DF00261390 /* Thoughts.rtf */; };
 		CEA62D302306232C00160DEB /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA62D2F2306232C00160DEB /* Alerts.swift */; };
 		CEB315962321607E00D88759 /* UserInputVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB315942321607E00D88759 /* UserInputVC.swift */; };
@@ -82,6 +84,8 @@
 		CE4A27FC2301BEC500CA5A38 /* Stats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stats.swift; sourceTree = "<group>"; };
 		CE5B1E012304E03C00337C2F /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		CE7548122309DC0600FEDAFB /* DescriptionKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionKey.swift; sourceTree = "<group>"; };
+		CE95CC9A23367191008363B7 /* UserInputShortNameVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInputShortNameVC.swift; sourceTree = "<group>"; };
+		CE95CC9C2336D722008363B7 /* VendorShortNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorShortNames.swift; sourceTree = "<group>"; };
 		CE9FFEBA2302F3DF00261390 /* Thoughts.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Thoughts.rtf; sourceTree = "<group>"; };
 		CEA62D2F2306232C00160DEB /* Alerts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alerts.swift; sourceTree = "<group>"; };
 		CEB315942321607E00D88759 /* UserInputVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInputVC.swift; sourceTree = "<group>"; };
@@ -151,6 +155,7 @@
 				BF992C4722EE56410089DAB8 /* AppDelegate.swift */,
 				BF992C4922EE56410089DAB8 /* ViewController.swift */,
 				CEB315942321607E00D88759 /* UserInputVC.swift */,
+				CE95CC9A23367191008363B7 /* UserInputShortNameVC.swift */,
 				CEA62D2F2306232C00160DEB /* Alerts.swift */,
 				BF9DD30B22F793EA00C22E41 /* CategoryItem.swift */,
 				BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */,
@@ -159,11 +164,12 @@
 				CE7548122309DC0600FEDAFB /* DescriptionKey.swift */,
 				BFECDEE222FDCBCD00F1BF5E /* HandleCards.swift */,
 				BF5D549B22EF458500111875 /* LineItems.swift */,
+				CE95CC9C2336D722008363B7 /* VendorShortNames.swift */,
 				CE4A27FC2301BEC500CA5A38 /* Stats.swift */,
 				CE5B1E012304E03C00337C2F /* UserDefaults.swift */,
-				BF9DD30922F1370200C22E41 /* StringExtension.swift */,
 				CE1F7EC723317453004765E7 /* MyCategories.txt */,
 				CE9FFEBA2302F3DF00261390 /* Thoughts.rtf */,
+				BF9DD30922F1370200C22E41 /* StringExtension.swift */,
 				BF992C4B22EE56420089DAB8 /* Assets.xcassets */,
 				BF992C4D22EE56420089DAB8 /* Main.storyboard */,
 				BF992C5022EE56420089DAB8 /* Info.plist */,
@@ -370,7 +376,9 @@
 				BF9DD30A22F1370200C22E41 /* StringExtension.swift in Sources */,
 				CE4A27FD2301BEC500CA5A38 /* Stats.swift in Sources */,
 				BFECDEE322FDCBCD00F1BF5E /* HandleCards.swift in Sources */,
+				CE95CC9D2336D722008363B7 /* VendorShortNames.swift in Sources */,
 				CE5B1E022304E03C00337C2F /* UserDefaults.swift in Sources */,
+				CE95CC9B23367191008363B7 /* UserInputShortNameVC.swift in Sources */,
 				BF992C4A22EE56410089DAB8 /* ViewController.swift in Sources */,
 				BF992C4822EE56410089DAB8 /* AppDelegate.swift in Sources */,
 				BFA770DF22FD10BE00BA15B6 /* ErrorHandler.swift in Sources */,
@@ -562,12 +570,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 422;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MARKETING_VERSION = 1.4.6;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -580,12 +590,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 422;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MARKETING_VERSION = 1.4.6;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

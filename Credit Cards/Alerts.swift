@@ -98,7 +98,6 @@ public class GBox {
     //}
 
 
-    //TODO: InputBox options: DefaultText="", maxChars=24
     //---- InputBox - returns text
     static func inputBox(prompt: String, defaultText: String = "", maxChars: Int = 24) -> String {
         let alert = NSAlert()

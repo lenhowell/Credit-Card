@@ -41,10 +41,10 @@ class ViewController: NSViewController, NSWindowDelegate {
     let codeFile    = "ViewController"
 
     // Variables
-    var dictVendorShortNames    = [String: String]()        // Hash for VendorShortNames Lookup (VendorShortNames.txt)
+    var dictVendorShortNames    = [String: String]()        // (VendorShortNames.txt) Hash for VendorShortNames Lookup
     var transFileURLs           = [URL]()
     var pathTransactionDir      = "Downloads/Credit Card Trans"
-    var pathSupportDir          = "Desktop/CreditCard"
+    var pathSupportDir          = "Desktop/CreditCard/xxx"
     var pathOutputDir           = "Desktop/CreditCard"
 
     var transactionDirURL       = FileManager.default.homeDirectoryForCurrentUser
@@ -53,7 +53,26 @@ class ViewController: NSViewController, NSWindowDelegate {
     var myCatsFileURL           = FileManager.default.homeDirectoryForCurrentUser
     var myModifiedTransURL      = FileManager.default.homeDirectoryForCurrentUser
     var outputFileURL           = FileManager.default.homeDirectoryForCurrentUser
+    var gotItem: GotItem        = .empty
 
+    struct GotItem: OptionSet {
+        let rawValue: Int
+        static let empty        = GotItem(rawValue: 0)
+        static let dirSupport   = GotItem(rawValue: 1 << 0)
+        static let dirOutput    = GotItem(rawValue: 1 << 1)
+        static let dirTrans     = GotItem(rawValue: 1 << 2)
+
+        static let fileTransactions     = GotItem(rawValue: 1 << 3)
+        static let fileVendorShortNames = GotItem(rawValue: 1 << 4)
+        static let fileMyCategories     = GotItem(rawValue: 1 << 5)
+        static let fileMyModifiedTrans  = GotItem(rawValue: 1 << 6)
+        // "VendorShortNames.txt" "MyCategories.txt" "MyModifiedTransactions"
+
+
+        static let userInitials = GotItem(rawValue: 1 << 9)
+
+        static let allDirs: GotItem = [.dirSupport, .dirOutput, .dirTrans]
+    }
     //MARK:- Overrides & Lifecycle
     
     override func viewDidLoad() {
@@ -71,16 +90,25 @@ class ViewController: NSViewController, NSWindowDelegate {
         txtTransationFolder.delegate = self         // Allow ViewController to see when txtTransationFolder changes.
 
 
-        // Get folder UserDefaults
+        // Get UserDefaults
         if let dir = UserDefaults.standard.string(forKey: UDKey.supportFolder) {
-            if dir.isEmpty {
-                handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, errorMsg: "Support Folder is empty")
-            } else {
-                pathSupportDir = dir
+            pathSupportDir = dir
+            if !dir.isEmpty && folderExists(atPath: dir, isPartialPath: true) {
+                gotItem = [gotItem, .dirSupport]
             }
         }
-        pathOutputDir       = UserDefaults.standard.string(forKey: UDKey.outputFolder) ?? pathOutputDir
-        pathTransactionDir  = UserDefaults.standard.string(forKey: UDKey.transactionFolder) ?? pathTransactionDir
+        if let dir = UserDefaults.standard.string(forKey: UDKey.outputFolder) {
+            pathOutputDir = dir
+            if !dir.isEmpty && folderExists(atPath: dir, isPartialPath: true) {
+                gotItem = [gotItem, .dirOutput]
+            }
+        }
+        if let dir = UserDefaults.standard.string(forKey: UDKey.transactionFolder) {
+            pathTransactionDir = dir
+            if !dir.isEmpty && folderExists(atPath: dir, isPartialPath: true) {
+                gotItem = [gotItem, .dirTrans]
+            }
+        }
 
         gLearnMode          = UserDefaults.standard.bool(forKey: UDKey.learningMode)
         gUserInputMode      = UserDefaults.standard.bool(forKey: UDKey.userInputMode)
@@ -89,7 +117,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         gUserInitials       = UserDefaults.standard.string(forKey: UDKey.userInitials) ?? ""
         if gUserInitials.isEmpty {
             let homeURL = FileManager.default.homeDirectoryForCurrentUser
-            gUserInitials = homeURL.lastPathComponent.prefix(3).uppercased()
+            gUserInitials = String(homeURL.lastPathComponent.prefix(6))
+        } else {
+            gotItem = [gotItem, .userInitials]
         }
 
         // Get List of Transaction Files
@@ -112,7 +142,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         chkLearningMode.state = gLearnMode     ? .on : .off
         chkUserInput.state    = gUserInputMode ? .on : .off
 
-    }
+    }//end func viewDidLoad
     
     override func viewDidAppear() {
         self.view.window?.delegate = self
@@ -160,7 +190,8 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     @IBAction func btnFindTruncatedDescs(_ sender: Any) {
         let vendorNameDescs = Array(dictVendorCatLookup.keys)
-        findTruncatedDescs(vendorNameDescs)
+        findTruncatedDescs(vendorNameDescs: vendorNameDescs, dictShortNames: &dictVendorShortNames)
+        writeVendorShortNames(url: vendorShortNamesFileURL, dictVendorShortNames: dictVendorShortNames)
     }
 
     @IBAction func chkLearningModeClick(_ sender: Any) {
@@ -182,10 +213,10 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func mnuChangeUserInitials(_ sender: Any) {
-        var prompt = "Enter your initials (2-6 letters)"
         var isValid = false
         let minChars = 2
-        let maxChars = 6
+        let maxChars = 8
+        var prompt = "Enter your initials (\(minChars)-\(maxChars) letters)"
         repeat {
             let response = GBox.inputBox(prompt: prompt, defaultText: gUserInitials, maxChars: maxChars)
             let name = response.trim
@@ -297,7 +328,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             // Check which Credit Card Transactions we are currently processing
             switch cardType {
             case "C1V", "C1R", "DIS", "CIT", "BACT", "BAPR", "ML":
-                lineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray, dictVendorShortNames: dictVendorShortNames)
+                lineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray, dictVendorShortNames: &dictVendorShortNames)
                 chkUserInput.state = gUserInputMode ? .on : .off
                 Stats.transFileCount += 1
             default:
@@ -319,7 +350,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         print (uniqueCategoryCounts.sorted {$0.value > $1.value})
         if Stats.addedCatCount > 0 || Stats.changedCatCount > 0 {
             if gLearnMode {
-                writeCategoriesToFile(url: VendorCatLookupFileURL, dictCat: dictVendorCatLookup)
+                writeVendorCategoriesToFile(url: VendorCatLookupFileURL, dictCat: dictVendorCatLookup)
             }
         }
         writeModTransTofile(url: myModifiedTransURL, dictModTrans: dictModifiedTrans)
@@ -403,7 +434,8 @@ class ViewController: NSViewController, NSWindowDelegate {
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "VendorShortNames " + errTxt)
         }
-        dictVendorShortNames = vendorShortNames(url: vendorShortNamesFileURL)        // Build VendorShortNames Dictionary
+        dictVendorShortNames = loadVendorShortNames(url: vendorShortNamesFileURL)        // Build VendorShortNames Dictionary
+        if dictVendorShortNames.count > 0 {gotItem = [gotItem, .fileVendorShortNames]}
 
         // "MyCategories.txt"
         (myCatsFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myCatsFilename)
@@ -411,6 +443,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories " + errTxt)
         }
         dictMyCatAliases = loadMyCats(myCatsFileURL: myCatsFileURL)
+        if dictMyCatAliases.count > 0 {gotItem = [gotItem, .fileMyCategories]}
 
         // "MyModifiedTransactions"
         (myModifiedTransURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myModifiedTranFilename)
@@ -418,41 +451,18 @@ class ViewController: NSViewController, NSWindowDelegate {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyModifiedTransactions " + errTxt)
         }
         dictModifiedTrans = loadMyModifiedTrans(myModifiedTranURL: myModifiedTransURL)
-
+        if dictModifiedTrans.count > 0 {gotItem = [gotItem, .fileMyModifiedTrans]}
     }//end func
-
-    func findTruncatedDescs(_ vendorNameDescs: [String]) {
-        // Sort by length - longest to shortest
-        let VendorCatLookupSortedByLength = vendorNameDescs.sorted(by: {$0.count > $1.count})
-        guard let minLen = VendorCatLookupSortedByLength.last?.count else {
-            return      // empty
-        }
-        for (idx, descLong) in VendorCatLookupSortedByLength.enumerated() {
-            let longLen = descLong.count
-            if longLen <= minLen { break }
-            for i in idx+1..<VendorCatLookupSortedByLength.count {
-                let descShort = VendorCatLookupSortedByLength[i]
-                let shortLen  = descShort.count
-                if descLong.prefix(shortLen) == descShort {
-                    let truncLong = descLong.dropFirst(shortLen)
-                    if longLen > 9 || truncLong.hasPrefix(" ") {
-                        print("Possible dupe \"\(descShort)\"(\(shortLen)) is part of \"\(descLong)\"(\(longLen))")
-                        //
-                    } else {
-                        print("Too short for a dupe \(descShort) (\(shortLen)) is part of \(descLong) (\(longLen))")
-                    }
-                } else  if descLong.prefix(9) == descShort.prefix(9) {
-                    //print("Not a dupe, but same at 9 \"\(descShort)\"(\(shortLen)) is part of \"\(descLong)\"(\(longLen))")
-                }
-            }//next i
-        }//next desc
-
-
-    }
 
     func resetUserDefaults() {
         if let appDomain = Bundle.main.bundleIdentifier {
             UserDefaults.standard.removePersistentDomain(forName: appDomain)
+            let msg = "User Defaults reset. Restart program to enter setup mode."
+            _ = GBox.inputBox(prompt: msg, defaultText: "", maxChars: 0)
+            NSApplication.shared.terminate(self)
+        } else {
+            let msg = "Could not reset User Defaults!"
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
         }
     }
 
