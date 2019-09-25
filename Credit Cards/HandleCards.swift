@@ -69,12 +69,14 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], dictVe
 
         if !lineItem.desc.isEmpty || !lineItem.postDate.isEmpty || lineItem.debit != 0  || lineItem.credit != 0 {
             // Check for duplicate from another file
-            if dictTranDupes[lineItem] == nil || dictTranDupes[lineItem] == fileName {
-                dictTranDupes[lineItem] = fileName      // mark for dupes check
+            //FIXME: Not all dupes are picked up
+            if dictTranDupes[tran] == nil || dictTranDupes[tran] == fileName {
+                dictTranDupes[tran] = fileName      // mark for dupes check
                 lineItemArray.append(lineItem)          // Add new output Record
             } else {
-                let msg = "Duplicate transaction"
-                handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .alertAndDisplay, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: msg)
+                let msg = "Duplicate transaction of one from \(dictTranDupes[tran]!)"
+                handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .display, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: msg)
+                //
             }
         } else {
             // debug trap - empty line

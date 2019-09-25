@@ -160,33 +160,62 @@ public struct FileAttributes: Equatable {
 
 }// end struct FileAttributes
 
-//MARK:- My Catagory List
+//MARK:- My Catagories
 
 func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
     gMyCatNames = []
     var dictMyCats = [String: String]()
-    let contentof = (try? String(contentsOf: myCatsFileURL)) ?? ""
+    var contentof = ""
+    do {
+        contentof = (try String(contentsOf: myCatsFileURL))
+    } catch {
+        print(myCatsFileURL.path)
+        print(error.localizedDescription)
+        //
+    }
+    gMyCategoryContent = contentof
     let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
     var lineNum = 0
     for line in lines {
         lineNum += 1
-        if line.trim.isEmpty || line.hasPrefix("//") {
+        if line.trim.isEmpty || line.trim.hasPrefix("//") {
             continue
         }
 
         // Create an Array of line components the seperator being a ","
         let myCatsArray = line.components(separatedBy: ",")
-        let myCat = myCatsArray[0].trim
+        let myCat = myCatsArray[0].trim.removeEnclosingQuotes()
         //if !myCat.hasPrefix("?") { gMyCatNames.append(myCat) }
          gMyCatNames.append(myCat)
         //dictMyCatNames[myCat] = 0
         for myCatAlias in myCatsArray {
-            dictMyCats[myCatAlias.trim] = myCat
+            dictMyCats[myCatAlias.trim.removeEnclosingQuotes()] = myCat
         }
     }//next line
     gMyCatNames.sort()
     return dictMyCats
 }//end func loadMyCats
+
+func writeMyCats(url: URL) {
+    saveBackupFile(url: url)
+    var text = "// Machine-generated file\n"
+    text += "//Category,      alias,      alias,    ...\n"
+
+//    var catAliases = [String: String]()
+//    for catName in gMyCatNames {
+//        catAliases[catName] = ""
+//    }
+
+    //— writing —
+    do {
+        try gMyCategoryContent.write(to: url, atomically: false, encoding: .utf8)
+        print("\n😀 Successfully wrote MyCategories to: \(url.path)")
+    } catch {
+        let msg = "Could not write new MyCategories file."
+        handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: url.lastPathComponent, errorMsg: msg)
+    }
+}//end func
+
 
 //MARK:- My Modified Transactions
 
@@ -227,7 +256,7 @@ func loadMyModifiedTrans(myModifiedTranURL: URL) -> [String: CategoryItem]  {
     return dictTrans
 }//end func loadMyModifiedTrans
 
-//TODO: writeModTransTofile - only write if cnanged
+//TODO: writeModTransTofile - only write if changed
 func writeModTransTofile(url: URL, dictModTrans: [String: CategoryItem]) {
     saveBackupFile(url: url)
     var text = "// Machine-generated file\n"
@@ -268,9 +297,9 @@ func loadVendorShortNames(url: URL) -> [String: String]  {
             handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: url.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "expected a comma")
             continue
         }
-        let shortName = vendorShortNameArray[0].trim
-        let descKey = vendorShortNameArray[1].trim.removeEnclosingQuotes()
-        dictVendorShortNames[shortName] = descKey
+        let shortName = vendorShortNameArray[0].trim.removeEnclosingQuotes()
+        let fullDescKey = vendorShortNameArray[1].trim.removeEnclosingQuotes()
+        dictVendorShortNames[shortName] = fullDescKey
     }
     return dictVendorShortNames
 }//end func loadVendorShortNames
@@ -280,7 +309,8 @@ func writeVendorShortNames(url: URL, dictVendorShortNames: [String: String]) {
     var text = "// Machine-generated file\n"
     text += "// ShortName (prefix),   Full Description Key\n"
     for (shortName, fullDescKey) in dictVendorShortNames {
-        text += "\(shortName.PadRight(24, truncate: false)), \(fullDescKey)\n"
+        let shortNameInQuotes = "\"\(shortName)\""
+        text += "\(shortNameInQuotes.PadRight(descKeyLength, truncate: false)), \(fullDescKey)\n"
     }
     //— writing —
     do {
@@ -293,7 +323,7 @@ func writeVendorShortNames(url: URL, dictVendorShortNames: [String: String]) {
 }//end func
 
 
-//MARK:- Categories
+//MARK:- Vendor Category Lookup
 
 func loadVendorCategories(url: URL) -> [String: CategoryItem]  {
     var dictCat   = [String: CategoryItem]()
@@ -360,7 +390,7 @@ func writeVendorCategoriesToFile(url: URL, dictCat: [String: CategoryItem]) {
     }
 }//end func writeVendorCategoriesToFile
 
-//MARK:- Transactions
+//MARK:- Transaction Files
 
 //---- outputTranactions - uses: handleError(F), workingFolderUrl(I)
 func outputTranactions(outputFileURL: URL, lineItemArray: [LineItem]) {

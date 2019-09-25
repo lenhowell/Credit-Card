@@ -1,53 +1,67 @@
+// This is a "Starter" file.
+// You can replace it or edit it, as needed
+// Each comma-delimited line starts with your category name,
+// follow by a list of caegory names used by the card providers.
+// My Name,          alias1,        alias2,    ...
 Art-Equipment
 Art-Supplies
-Art-Misc
+Art-Other
 
 ?Automobile,           Gas/Automotive, Automotive Expenses,  Automotive
 Auto-Gas,              Gasoline,       Gasoline/Fuel
 Auto-Maintenance
-Auto-Purchase
 Auto-Tolls/Parking
+Auto-Purchase
+Auto-Other
 
 Aviation-Club
 Aviation-Fuel/Tiedown, Aircraft fuel & Tiedown
-Aviation-Purchase
 Aviation-Maintenance
-Aviation-Misc
 Aviation-Training
+Aviation-Purchase
+Aviation-Other
 
 Boat-Maintenance
-Boat-Misc
 Boat-Purchase
+Boat-Other
+
+?Computer,             Computer
+Computer-Repair
+Computer-Puchase
+Computer-Other
 
 Charity,               Charitable Giving
 Clothing,              Clothing/Shoes
 Cable/Internet,        Cable/Satellite Services
-Computer,              Computer
 Education
 ?Electronics,          Electronics
 Entertainment,         Entertainment/Recreation
 
-Food-Alchohol
+Food-Alcohol
 Food-Groceries,        Supermarkets
 Food-Restaurant,       Dining, Restaurants/Dining, Restaurants
 Food-Suppliments
 Food-Other
 
 Gift-Family
-Gift-Other
 Gift-Spouse
+Gift-Other
 
 Hobby-Equipment
 Hobby-Supplies
-Hobby-Misc
+Hobby-Other
 
-Home Maintenance,      Home Improvement
+Home-Improvement
+Home-Maintenance,      Home Improvement
+Home-Purchase
+Home-Other
 
 ?Insurance,            Insurance
 Insurance-Auto
 Insurance-Aircraft
 Insurance-Business,    Beach Cove Insurance
 Insurance-Home,        Insurance - 1450
+Insurance-Other
 
 Investments
 
@@ -59,18 +73,19 @@ Magazine
 Personal-Dental 
 Personal-Healthcare,   Health Care,    Healthcare/Medical
 Personal-Services
+Personal-Other
 
 Pet-Purchase
 Pet-Healthcare
-Pet-Misc
+Pet-Other
 
 Phone-CellService,     Telephone Services
 Phone-Equipment
+Phone-Other
 
 Photo-Equipment
-Photo-Misc
 Photo-Processing
-Photo-Misc
+Photo-Other
 
 Postage/Shipping,      Postage and Shipping
 

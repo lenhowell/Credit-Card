@@ -32,12 +32,16 @@ public func makeDescKey(from desc: String, dictVendorShortNames: [String: String
 
     //-- Find Short Names in Description
     let descKeyUpper = descKeyLong.uppercased()
-    for (key, descKey) in dictVendorShortNames {
-        let shortName = key.removeEnclosingQuotes()
-        if descKeyUpper.hasPrefix(shortName) {
-            return descKey
-        }
-    }//next
+    let match = findPrefixMatch(name: descKeyUpper, dictShortNames: dictVendorShortNames)
+    if !match.fullDescKey.isEmpty {
+        return match.fullDescKey
+    }
+//    for (key, descKey) in dictVendorShortNames {
+//        let shortName = key.removeEnclosingQuotes()
+//        if descKeyUpper.hasPrefix(shortName) {
+//            return descKey
+//        }
+//    }//next
 
     //-- Remove spaces around " & " -- [STOP & SHOP 0620] -> [STOP&SHOP 0620]
     key2 = descKeyLong.replacingOccurrences(of: " ?& ?", with: "&", options: .regularExpression, range: nil)

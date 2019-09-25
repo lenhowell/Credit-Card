@@ -20,9 +20,10 @@ var gTransFilename          = ""                // (UserInputVC.swift-viewDidLoa
 var gMyCatNames             = [String]()            // (loadMyCats, UserInputVC.swift-viewDidLoad) Array of Category Names (MyCategories.txt)
 var dictMyCatAliases        = [String: String]()        // (LineItems.init, etc) Hash of Category Synonyms
 var dictVendorCatLookup     = [String: CategoryItem]()  // (HandleCards.swift-3) Hash for Category Lookup (CategoryLookup.txt)
-var dictTranDupes           = [LineItem: String]()      // (handleCards) Hash for finding duplicate transactions
+var dictTranDupes           = [String: String]()        // (handleCards) Hash for finding duplicate transactions
 var dictModifiedTrans       = [String: CategoryItem]()  // (MyModifiedTransactions.txt) Hash for user-modified transactions
 var uniqueCategoryCounts    = [String: Int]()           // Hash for Unique Category Counts
+var gMyCategoryContent      = ""
 var gIsUnitTesting   = false
 var gLearnMode       = true
 var gUserInputMode   = true
@@ -48,7 +49,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     var pathOutputDir           = "Desktop/CreditCard"
 
     var transactionDirURL       = FileManager.default.homeDirectoryForCurrentUser
-    var VendorCatLookupFileURL  = FileManager.default.homeDirectoryForCurrentUser
+    var vendorCatLookupFileURL  = FileManager.default.homeDirectoryForCurrentUser
     var vendorShortNamesFileURL = FileManager.default.homeDirectoryForCurrentUser
     var myCatsFileURL           = FileManager.default.homeDirectoryForCurrentUser
     var myModifiedTransURL      = FileManager.default.homeDirectoryForCurrentUser
@@ -135,7 +136,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             lblResults.stringValue = "You will need to create a folder to hold support files before you can proceed."
         } else {
             readSupportFiles()
-            let shortCatFilePath = removeUserFromPath(VendorCatLookupFileURL.path)
+            let shortCatFilePath = removeUserFromPath(vendorCatLookupFileURL.path)
             lblResults.stringValue = "Category Lookup File \"\(shortCatFilePath)\" loaded with \(Stats.origCatCount) items.\n"
         }
 
@@ -177,10 +178,10 @@ class ViewController: NSViewController, NSWindowDelegate {
     @IBOutlet var txtTransationFolder: NSTextField!
     @IBOutlet var txtSupportFolder:    NSTextField!
     @IBOutlet var txtOutputFolder:     NSTextField!
-    @IBOutlet weak var btnStart: NSButton!
+    @IBOutlet weak var btnStart:    NSButton!
+    @IBOutlet var chkLearningMode:  NSButton!
+    @IBOutlet var chkUserInput:     NSButton!
     @IBOutlet var cboFiles: NSComboBox!
-    @IBOutlet var chkLearningMode: NSButton!
-    @IBOutlet var chkUserInput: NSButton!
 
     //MARK:- @IBActions
 
@@ -190,8 +191,10 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     @IBAction func btnFindTruncatedDescs(_ sender: Any) {
         let vendorNameDescs = Array(dictVendorCatLookup.keys)
-        findTruncatedDescs(vendorNameDescs: vendorNameDescs, dictShortNames: &dictVendorShortNames)
-        writeVendorShortNames(url: vendorShortNamesFileURL, dictVendorShortNames: dictVendorShortNames)
+        let doWrite = findTruncatedDescs(vendorNameDescs: vendorNameDescs, dictShortNames: &dictVendorShortNames)
+        if doWrite {
+            writeVendorShortNames(url: vendorShortNamesFileURL, dictVendorShortNames: dictVendorShortNames)
+        }
     }
 
     @IBAction func chkLearningModeClick(_ sender: Any) {
@@ -282,7 +285,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         UserDefaults.standard.set(gLearnMode,         forKey: UDKey.learningMode)
 
         Stats.clearAll()
-        dictVendorCatLookup = loadVendorCategories(url: VendorCatLookupFileURL) // Re-read Categories Dictionary
+        dictVendorCatLookup = loadVendorCategories(url: vendorCatLookupFileURL) // Re-read Categories Dictionary
         Stats.origCatCount = dictVendorCatLookup.count
 
         var fileContents    = ""                        // Where All Transactions in a File go
@@ -350,14 +353,14 @@ class ViewController: NSViewController, NSWindowDelegate {
         print (uniqueCategoryCounts.sorted {$0.value > $1.value})
         if Stats.addedCatCount > 0 || Stats.changedCatCount > 0 {
             if gLearnMode {
-                writeVendorCategoriesToFile(url: VendorCatLookupFileURL, dictCat: dictVendorCatLookup)
+                writeVendorCategoriesToFile(url: vendorCatLookupFileURL, dictCat: dictVendorCatLookup)
             }
         }
         writeModTransTofile(url: myModifiedTransURL, dictModTrans: dictModifiedTrans)
 
         var statString = ""
 
-        let shortCatFilePath = removeUserFromPath(VendorCatLookupFileURL.path)
+        let shortCatFilePath = removeUserFromPath(vendorCatLookupFileURL.path)
         statString += "Category File \"\(shortCatFilePath)\" loaded with \(Stats.origCatCount) items.\n"
 
         if filesToProcessURLs.count == 1 {
@@ -422,11 +425,11 @@ class ViewController: NSViewController, NSWindowDelegate {
         var errTxt = ""
 
         // "CategoryLookup.txt"
-        (VendorCatLookupFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: VendorCatLookupFilename)
+        (vendorCatLookupFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: VendorCatLookupFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "Category" + errTxt)
         }
-        dictVendorCatLookup = loadVendorCategories(url: VendorCatLookupFileURL)       // Build Categories Dictionary
+        dictVendorCatLookup = loadVendorCategories(url: vendorCatLookupFileURL)       // Build Categories Dictionary
         Stats.origCatCount = dictVendorCatLookup.count
 
         // "VendorShortNames.txt"
@@ -435,15 +438,26 @@ class ViewController: NSViewController, NSWindowDelegate {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "VendorShortNames " + errTxt)
         }
         dictVendorShortNames = loadVendorShortNames(url: vendorShortNamesFileURL)        // Build VendorShortNames Dictionary
-        if dictVendorShortNames.count > 0 {gotItem = [gotItem, .fileVendorShortNames]}
-
+        if dictVendorShortNames.count > 0 {
+            gotItem = [gotItem, .fileVendorShortNames]
+        }
         // "MyCategories.txt"
         (myCatsFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myCatsFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories " + errTxt)
         }
         dictMyCatAliases = loadMyCats(myCatsFileURL: myCatsFileURL)
-        if dictMyCatAliases.count > 0 {gotItem = [gotItem, .fileMyCategories]}
+        if dictMyCatAliases.count > 0 {
+            gotItem = [gotItem, .fileMyCategories]
+        } else {
+            let path = Bundle.main.path(forResource: "MyCategories", ofType: "txt")!
+            let bundleCatsFileURL = URL(fileURLWithPath: path)
+            dictMyCatAliases = loadMyCats(myCatsFileURL: bundleCatsFileURL)
+            writeMyCats(url: myCatsFileURL)
+            let msg = "A starter \"MyCategories.txt\" was placed in your support-files folder"
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, errorMsg: msg)
+        }
+
 
         // "MyModifiedTransactions"
         (myModifiedTransURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myModifiedTranFilename)

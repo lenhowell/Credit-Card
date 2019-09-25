@@ -9,7 +9,7 @@
 import Cocoa
 
 class UserInputShortNameVC: NSViewController, NSWindowDelegate {
-
+    //TODO: CLEAN UP UI
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
@@ -63,14 +63,6 @@ class UserInputShortNameVC: NSViewController, NSWindowDelegate {
         NSApplication.shared.stopModal(withCode: .OK)
     }
     
-    func changeVis(hide: Bool) {
-        lblPrefix.isHidden = hide
-        txtPrefix.isHidden = hide
-        lblFullDescKey.isHidden = hide
-        txtFullDescKey.isHidden = hide
-        lblPrefixChars.isHidden = hide
-        lblFullDescKeyChars.isHidden = hide
-    }
 }//end class
 
 // Allow ViewController to see when a TextField changes.
@@ -81,8 +73,14 @@ extension UserInputShortNameVC: NSTextFieldDelegate {
         guard let textView = obj.object as? NSTextField else {
             return      // Not a TextField
         }
-        if txtPrefix.stringValue.count > descKeyLength {
-            txtPrefix.stringValue = String(txtPrefix.stringValue.prefix(descKeyLength))
+        if txtPrefix.stringValue.count > usrVendrShortName.count {
+            txtPrefix.stringValue = usrVendrShortName
+        }
+        if txtPrefix.stringValue.count < 4 {
+            txtPrefix.stringValue = String(usrVendrShortName.prefix(4))
+        }
+        if txtPrefix.stringValue != usrVendrShortName.prefix(txtPrefix.stringValue.count) {
+            txtPrefix.stringValue = String(usrVendrShortName.prefix(txtPrefix.stringValue.count))
         }
         if txtFullDescKey.stringValue.count > descKeyLength {
             txtFullDescKey.stringValue = String(txtFullDescKey.stringValue.prefix(descKeyLength))

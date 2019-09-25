@@ -17,6 +17,7 @@ var usrVendrPrefix = ""
 var usrVendrFullDescKey = ""
 
 //MARK:- Vendor Description funcs
+//----findTruncatedDescs - In "VendorCategoryLookup.txt" find multiple names that are similar
 func findTruncatedDescs(vendorNameDescs: [String], dictShortNames: inout [String: String]) -> Bool {
     // Sort by length - longest to shortest
     let VendorCatLookupSortedByLength = vendorNameDescs.sorted(by: {$0.count > $1.count})
@@ -82,7 +83,7 @@ func showUserInputShortNameForm(shortName: String, longName: String) -> NSApplic
 
 func findPrefixMatch(name: String, dictShortNames: [String: String]) -> (prefix: String, fullDescKey: String) {
     for (prefix, fullDescKey) in dictShortNames {
-        if name.hasPrefix(prefix) {
+        if name.hasPrefix(prefix) || name == prefix.trim {
             return (prefix, fullDescKey)
         }
     }
