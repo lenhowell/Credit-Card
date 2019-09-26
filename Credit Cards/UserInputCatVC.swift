@@ -15,19 +15,17 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     var catItemFromTran   = CategoryItem()
     var catItemPrefered   = CategoryItem()
     var catItemCurrent    = CategoryItem()
-    var textPassed     = ""
-    var unlockedSource = ""
+    var textPassed        = ""
+    var unlockedSource    = ""
     //TODO: Blank out "$" & "?" checkboxes if user is not changing CategoryLookup
     //TODO: Add "Ignore this vendor for now"
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
-        chkIgnoreVendor.state = .off
         chkLockIn.state       = .off
         chkQuestionMark.state = .off
-        chkContinueUserInput.state = .on
-        
+
         lblFile.stringValue = gTransFilename
         t = usrLineItem
         let amt = t.debit - t.credit
@@ -58,13 +56,11 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     @IBOutlet var lblcatFromVendor: NSTextField!
     @IBOutlet var lblProcessed:     NSTextField!
     @IBOutlet var cboCats: NSComboBox!
-    @IBOutlet var chkContinueUserInput: NSButton!
     @IBOutlet var radioCatFromTran:     NSButton!
     @IBOutlet var radioCatFromVendor:   NSButton!
     @IBOutlet var radioCatPrefered:     NSButton!
     @IBOutlet var chkQuestionMark:      NSButton!
     @IBOutlet var chkLockIn:            NSButton!
-    @IBOutlet var chkIgnoreVendor:      NSButton!
     @IBOutlet var radioFileTransac:     NSButton!
     @IBOutlet var radioFileVendor:      NSButton!
     
@@ -118,29 +114,33 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     }//end func
 
     @IBAction func btnOK(_ sender: Any) {
-        if chkIgnoreVendor.state == .on { usrIgnoreVendors[usrLineItem.descKey] = 101 }
         usrFixVendor = (radioFileVendor.state == .on)
         usrCatItemReturned = catItemCurrent
         if chkLockIn.state == .on {
             usrCatItemReturned.source = "$" + gUserInitials
         }
-        print("return \(usrCatItemReturned.category) \(usrCatItemReturned.source)")
+        print("UserInputCatVC#\(#line) return \(usrCatItemReturned.category) \(usrCatItemReturned.source)")
         NSApplication.shared.stopModal(withCode: .OK)
     }//end func
 
+    @IBAction func btnIgnoreVendorClick(_ sender: Any) {
+        usrIgnoreVendors[usrLineItem.descKey] = 101
+        NSApplication.shared.stopModal(withCode: .cancel)
+    }
+
     @IBAction func btnCancel(_ sender: Any) {
-        if chkIgnoreVendor.state == .on { usrIgnoreVendors[usrLineItem.descKey] = 101 }
         NSApplication.shared.stopModal(withCode: .cancel)
     }
 
     @IBAction func btnAbortClick(_ sender: Any) {
-        NSApplication.shared.stopModal(withCode: .abort)
+        let answer = GBox.alert("Do you want to save the results so far", style: .yesNo)
+        if answer == .yes {
+            NSApplication.shared.stopModal(withCode: .continue)
+        } else {
+            NSApplication.shared.stopModal(withCode: .abort)
+        }
     }
 
-    @IBAction func chkContinueUserInputClick(_ sender: Any) {
-        gUserInputMode = chkContinueUserInput.state == .on
-        print("userIntervention = \(gUserInputMode)")
-    }
 
     //---- viewWillDisappear - Set gCityNum to positive value. Send changed-flags back to delegate in main ViewController
     override func viewWillDisappear() {
@@ -162,7 +162,6 @@ class UserInputVC: NSViewController, NSWindowDelegate {
         print("✅ windowShouldClose")
         let application = NSApplication.shared
         application.stopModal()
-        //dismiss(self) //does not work
         return true
     }
 

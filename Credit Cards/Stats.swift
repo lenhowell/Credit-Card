@@ -9,10 +9,10 @@
 import Foundation
 // struct for handling counts
 struct Stats {
-    static var transFileCount        = 0    // Transaction files read
-    static var junkFileCount         = 0    // Files in folder not read
+    static var transFileCount        = 0    // Transaction FILES read
+    static var junkFileCount         = 0    // FILES in folder not read
     static var origCatCount          = 0    // Count when CategoryLookup.txt was read in.
-    static var successfulLookupCount = 0    // Transactions where Cat found in CatFile.
+    static var successfulLookupCount = 0    // Transactions where Cat found in VendorCategoryLookup.
     static var addedCatCount         = 0    // Catagories added by program from a Transaction.
     static var changedCatCount       = 0    // Catagories overridden by program
     static var descWithNoCat         = 0    // Descs not in Catagory File & not added by Transaction

@@ -114,18 +114,22 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
         if let cV = dictVendorCatLookup[descKey] {
             catItemFromVendor = cV                  // ------ Here if Lookup by Vendor was successful
             (catItemPrefered, isClearWinner) = pickTheBestCat(catItemVendor: catItemFromVendor, catItemTransa: catItemFromTran)
-            lineItem.genCat = catItemPrefered.category    // Generated Cat is the prefered one
-            lineItem.catSource = catItemPrefered.source
+            if lineItem.genCat != catItemPrefered.category {
+                lineItem.genCat     = catItemPrefered.category    // Generated Cat is the prefered one
+                lineItem.catSource  = catItemPrefered.source
+            }
             //print("\(#line) Cat for \(descKey) = \(catItemFromVendor.category);  TransCat = \(catFromLineItem)  Chose: \(catItemPrefered.category)")
             Stats.successfulLookupCount += 1
+//            if cV.category.contains("?") {
+//                print("HandleCards#\(#line) \(lineItem.descKey) \(catItemPrefered.category) isClearWinner=\(isClearWinner)  VendorCat=\(catItemFromVendor.category) TransCat=\(catItemFromTran.category)")
+//            }
             uniqueCategoryCounts[descKey, default: 0] += 1
 
         } else {                   // ------ Here if NOT found in Category-Lookup-by-Vendor Dictionary
             findShorterDescKey(descKey) // Have we already found a truncated (shorter) version of descKey?
-            let source = cardType
             catItemFromVendor = CategoryItem(category: "?", source: "")
-            // If Transaction-Line has a Category, put it in the Vendor file.
 
+            // If Transaction-Line has a Category, put it in the Vendor file.
             if catFromTran.count < 3 { catFromTran = "" }
 
             if let catTran = dictMyCatAliases[catFromTran] {
@@ -135,12 +139,11 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
                 print("HandleCards#\(#line): Unknown Category: \"\(lineItem.rawCat)\" from \(descKey) (line#\(lineNum) in \(fileName))")
                 isClearWinner = false
             }
-            catItemFromTran = CategoryItem(category: catFromTran, source: source)
+            catItemFromTran = CategoryItem(category: catFromTran, source: cardType)
             catItemPrefered = catItemFromTran
             lineItem.genCat = catFromTran
             if gLearnMode {
-                dictVendorCatLookup[descKey] = CategoryItem(category: catFromTran, source: source) //Do Actual Insert
-
+                dictVendorCatLookup[descKey] = CategoryItem(category: catFromTran, source: cardType) //Do Actual Insert
                 Stats.addedCatCount += 1
             } else {
                 Stats.descWithNoCat += 1
@@ -148,14 +151,17 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
             // print("Category that was inserted = Key==> \(key) Value ==> \(self.rawCat) Source ==> \(source)")
         }//end if NOT found in Category-Lookup-by-Vendor Dictionary
 
+        // if we're not ignoring this vendor
+        if usrIgnoreVendors[lineItem.descKey] == nil {
 
-        if gUserInputMode && !isClearWinner && usrIgnoreVendors[lineItem.descKey] == nil {
-            showUserInputForm(lineItem: lineItem, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemPrefered)
-            catItemPrefered = usrCatItemReturned
-        }
-        if gLearnMode && catItemPrefered != catItemFromVendor {
-            dictVendorCatLookup[descKey] = catItemPrefered //Do Actual Insert
-            Stats.changedCatCount += 1
+            // if in User-Input-Mode && No Clear Winner
+            if gUserInputMode && !isClearWinner {
+                showUserInputForm(lineItem: lineItem, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemPrefered)
+                catItemPrefered = usrCatItemReturned
+            } else if gLearnMode && catItemPrefered != catItemFromVendor {
+                dictVendorCatLookup[descKey] = catItemPrefered  // Do Actual Insert into VendorCategoryLookup
+                Stats.changedCatCount += 1
+            }
         }
     } else {
         // debug trap
@@ -164,6 +170,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
     return lineItem
 }//end func makeLineItem
 
+// Allow User to intervene using the UserInputCat form
 func showUserInputForm(lineItem: LineItem, catItemFromVendor: CategoryItem, catItemFromTran: CategoryItem, catItemPrefered: CategoryItem) -> CategoryItem {
     usrLineItem = lineItem
     usrCatItemFromVendor = catItemFromVendor
@@ -175,22 +182,31 @@ func showUserInputForm(lineItem: LineItem, catItemFromVendor: CategoryItem, catI
         //let userVC = storyBoard.instantiateController(withIdentifier: "UserInput") as! UserInputVC
 
         let application = NSApplication.shared
-        let returnVal = application.runModal(for: userInputWindow) // <==  UserInputVC
+        let returnVal = application.runModal(for: userInputWindow) // <=================  UserInputVC
 
         userInputWindow.close()                     // Return here from userInputWindow
-        if returnVal == .abort { exit(101) }
-        if returnVal == .OK {
+        switch returnVal {
+        case .abort:
+             exit(101)
+        case .OK:
             if usrFixVendor && gLearnMode {
-                if lineItem.descKey.trim.isEmpty {
-                    // debug trap
-                }
                 dictVendorCatLookup[lineItem.descKey] = usrCatItemReturned
                 Stats.changedCatCount += 1
             } else {
                 let transKey = lineItem.transText
                 dictModifiedTrans[transKey] = usrCatItemReturned
             }
-        }
+        //case .cancel:
+
+        case .continue:
+            gUserInputMode =  false
+            //TODO: UnCheck User-Inputs
+        default:
+            if returnVal != .cancel {
+                print("HandleCards#\(#line) Unknown return value \(returnVal)")
+            }
+        }//end switch
+
     } else {
         handleError(codeFile: "HandleCards", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: "Could not open User-Input window.")
     }//end if let

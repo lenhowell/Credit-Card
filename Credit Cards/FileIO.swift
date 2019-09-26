@@ -188,8 +188,12 @@ func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
         //if !myCat.hasPrefix("?") { gMyCatNames.append(myCat) }
          gMyCatNames.append(myCat)
         //dictMyCatNames[myCat] = 0
-        for myCatAlias in myCatsArray {
-            dictMyCats[myCatAlias.trim.removeEnclosingQuotes()] = myCat
+
+        for myCatAliasRaw in myCatsArray {
+            let myCatAlias = myCatAliasRaw.trim.removeEnclosingQuotes()
+            if myCatAlias.count >= 3 {
+                dictMyCats[myCatAlias] = myCat
+            }
         }
     }//next line
     gMyCatNames.sort()
@@ -306,7 +310,7 @@ func loadVendorShortNames(url: URL) -> [String: String]  {
 
 func writeVendorShortNames(url: URL, dictVendorShortNames: [String: String]) {
     saveBackupFile(url: url)
-    var text = "// Machine-generated file\n"
+    var text = "// Machine-generated, user-editable file\n"
     text += "// ShortName (prefix),   Full Description Key\n"
     for (shortName, fullDescKey) in dictVendorShortNames {
         let shortNameInQuotes = "\"\(shortName)\""
@@ -362,7 +366,7 @@ func writeVendorCategoriesToFile(url: URL, dictCat: [String: CategoryItem]) {
 
     saveBackupFile(url: url)
 
-    var text = "// Category keys are up to \(descKeyLength) chars long.\n"
+    var text = "// Description keys are up to \(descKeyLength) chars long.\n"
     text += "// Apostrophies are removed, and other extraneous punctuation changed to spaces.\n"
     text += "// Prefix of \"SQ *\" or any other \"???*\" is removed if result > 9 chars.\n"
     text += "// When a double-space is found, the rest is truncated.\n"

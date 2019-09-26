@@ -20,7 +20,7 @@
 {\list\listtemplateid15\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{square\}}{\leveltext\leveltemplateid1401\'01\uc0\u9642 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid15}
 {\list\listtemplateid16\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{square\}}{\leveltext\leveltemplateid1501\'01\uc0\u9642 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid16}
 {\list\listtemplateid17\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{square\}}{\leveltext\leveltemplateid1601\'01\uc0\u9642 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid17}
-{\list\listtemplateid18\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{check\}}{\leveltext\leveltemplateid1701\'01\uc0\u10003 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid18}
+{\list\listtemplateid18\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{square\}}{\leveltext\leveltemplateid1701\'01\uc0\u9642 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid18}
 {\list\listtemplateid19\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{check\}}{\leveltext\leveltemplateid1801\'01\uc0\u10003 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid19}
 {\list\listtemplateid20\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{check\}}{\leveltext\leveltemplateid1901\'01\uc0\u10003 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid20}
 {\list\listtemplateid21\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{check\}}{\leveltext\leveltemplateid2001\'01\uc0\u10003 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid21}
@@ -36,8 +36,10 @@
 \f1\b \
 Bugs:\
 
-\f0\b0 Duplicate transactions are not being removed.\
-Categories on non-modified transactions corupted.\
+\f0\b0 Duplicate transactions are not all being removed.\
+Categories on non-modified transactions  corrupted.\
+Counts are off. (and add Dupe count)\
+"ATK GOLF TASHUA KN" => "ATK GOLF TASHUA KNOLLS" should cover "ATK GOLF TASHUA KNOL"\
 --------------------------------------------------------------
 \f1\b \
 
@@ -207,19 +209,31 @@ In
 \ls17\ilvl0
 \f3 \cf0 {\listtext	\uc0\u9642 	}
 \f0 Provide starter 
-\f4\fs22 "VendorShortNames.txt" & "MyCategories.txt" in Bundle\
+\f4\fs22 "VendorShortNames.txt" in Bundle\
 {\listtext	\uc0\u9642 	}Provide an automated "Setup" (see below))\
-{\listtext	\uc0\u9642 	}Allow user to change VendorDescription when running in User-Input mode.\
+{\listtext	\uc0\u9642 	}Allow user to change Vendor shortName when running in User-Input mode.\
+\pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
+\ls18\ilvl0\cf0 {\listtext	\uc0\u9642 	}Allow user to Add Category when running in User-Input mode.\
+{\listtext	\uc0\u9642 	}Add traceback to filename & line# to all machine generated files.\
+{\listtext	\uc0\u9642 	}Selective editing (same vendor, same cat, date-range, card-type)\
+{\listtext	\uc0\u9642 	}Allow user to change Category-Name in both VendorCategoryLookup.txt & MyCategories.txt\
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 \cf0 \
 \pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
-\ls18\ilvl0\cf0 {\listtext	\uc0\u10003 	}Allow user to change initials used to mark changes in VendorCategoryLookup\
-{\listtext	\uc0\u10003 	}Allow user to reset all User Defaults for a clean startup.
-\f0\fs24 \
+\ls19\ilvl0
+\f3\fs24 \cf0 {\listtext	\uc0\u10003 	}
+\f0 Provide starter
+\f4\fs22  "MyCategories.txt" in Bundle\
 \pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
-\ls19\ilvl0\cf0 {\listtext	
+\ls19\ilvl0
+\f0\fs24 \cf0 {\listtext	
 \f3 \uc0\u10003 
 \f0 	}Change Card ID from [1st 3 chars] to [all chars before 1st hyphen].  \
+\pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
+\ls20\ilvl0
+\f4\fs22 \cf0 {\listtext	\uc0\u10003 	}Allow user to change initials used to mark changes in VendorCategoryLookup\
+{\listtext	\uc0\u10003 	}Allow user to reset all User Defaults for a clean startup.
+\f0\fs24 \
 \pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
 \ls20\ilvl0\cf0 {\listtext	
 \f3 \uc0\u10003 

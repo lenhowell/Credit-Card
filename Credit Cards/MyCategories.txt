@@ -9,6 +9,7 @@ Art-Other
 
 ?Automobile,           Gas/Automotive, Automotive Expenses,  Automotive
 Auto-Gas,              Gasoline,       Gasoline/Fuel
+Auto-DMV
 Auto-Maintenance
 Auto-Tolls/Parking
 Auto-Purchase
@@ -46,6 +47,8 @@ Food-Other
 Gift-Family
 Gift-Spouse
 Gift-Other
+
+Golf
 
 Hobby-Equipment
 Hobby-Supplies
@@ -88,6 +91,8 @@ Photo-Processing
 Photo-Other
 
 Postage/Shipping,      Postage and Shipping
+
+Taxes
 
 ?Travel,               Travel,         Other Travel
 Travel-Airline,        Airfare
