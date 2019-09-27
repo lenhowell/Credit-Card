@@ -399,9 +399,9 @@ func writeVendorCategoriesToFile(url: URL, dictCat: [String: CategoryItem]) {
 //---- outputTranactions - uses: handleError(F), workingFolderUrl(I)
 func outputTranactions(outputFileURL: URL, lineItemArray: [LineItem]) {
     
-    var outPutStr = "Card Type\tTranDate\tDescKey\tDesc\tDebit\tCredit\tCategory\tRaw Category\tCategory Source\n"
+    var outPutStr = "Card Type\tTranDate\tDescKey\tDesc\tDebit\tCredit\tCategory\tRaw Category\tCategory Source\tFile LineNum\n"
     for xX in lineItemArray {
-        let text = "\(xX.cardType)\t\(xX.tranDate)\t\(xX.descKey)\t\(xX.desc)\t\(xX.debit)\t\(xX.credit)\t\(xX.genCat)\t\(xX.rawCat)\t\(xX.catSource)\n"
+        let text = "\(xX.cardType)\t\(xX.tranDate)\t\(xX.descKey)\t\(xX.desc)\t\(xX.debit)\t\(xX.credit)\t\(xX.genCat)\t\(xX.rawCat)\t\(xX.catSource)\t\(xX.auditTrail)\n"
         outPutStr += text
     }
     

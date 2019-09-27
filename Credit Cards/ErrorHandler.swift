@@ -13,10 +13,10 @@ import Foundation
 
 public var allowAlerts = true
 
-public enum notificationName {
+public enum NotificationName {
     static let errPosted = "ErrorPosted"
 }
-public enum notificationKey {
+public enum NotificationKey {
     static let errMsg = "ErrMsg"
 }
 
@@ -53,12 +53,12 @@ func handleError(codeFile: String, codeLineNum: Int, type: ErrType, action: ErrA
     //print("ErrMsg: \"\(errMsg)\" sent by ErrorHandler to NotificationCenter")
     //Note: it is preferable to define your notification names as static strings in an enum or struct to avoid typos.
 
-    NotificationCenter.default.post(name: NSNotification.Name(notificationName.errPosted), object: nil, userInfo: [notificationKey.errMsg: errMsg])
+    NotificationCenter.default.post(name: NSNotification.Name(NotificationName.errPosted), object: nil, userInfo: [NotificationKey.errMsg: errMsg])
 
     if allowAlerts {
         if action == .alert || action == .alertAndDisplay {
             _ = GBox.alert(errMsg, style: .information)
         }
     }
-}
+}//end func handleError
 

@@ -9,6 +9,8 @@
 import Cocoa
 
 class UserInputVC: NSViewController, NSWindowDelegate {
+
+    //MARK:- Instance Variables
 //    weak var delegate: UserInputVcDelegate?          //delegate <— (2)
     var t        = LineItem()
     var catItemFromVendor = CategoryItem()
@@ -17,9 +19,8 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     var catItemCurrent    = CategoryItem()
     var textPassed        = ""
     var unlockedSource    = ""
-    //TODO: Blank out "$" & "?" checkboxes if user is not changing CategoryLookup
-    //TODO: Add "Ignore this vendor for now"
 
+    //MARK:- Overrides & Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
@@ -48,6 +49,30 @@ class UserInputVC: NSViewController, NSWindowDelegate {
         view.window!.delegate = self
     }
 
+    //---- viewWillDisappear - Set gCityNum to positive value. Send changed-flags back to delegate in main ViewController
+    override func viewWillDisappear() {
+        //        if gHasUnSavedChanges {
+        //            let buttonNumber = dialog2or3(text: "There are Unsaved Changes", subText: "Do you want to close anyway?",  btnTxt1: "Close without Saving",
+        //                                          btnTxt2: "Save Changes")
+        //            if buttonNumber == 2 {                      // Save Changes
+        //                let success = saveCurrentSelections()
+        //                if success { gHasUnSavedChanges = false }
+        //            }
+        //        }
+        //        let changesWereMade = false
+        //        let hasUnSavedChanges = false
+        //        delegate?.userInputDone(changesWereMade: changesWereMade, unSavedChanges: hasUnSavedChanges) //delegate <— (3)
+    }
+
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        print("✅ windowShouldClose")
+        let application = NSApplication.shared
+        application.stopModal()
+        return true
+    }
+
+
+    //MARK:- @IBOutlets
     @IBOutlet var lblFile:          NSTextField!
     @IBOutlet var lblLineItem:      NSTextField!
     @IBOutlet var lblDesc:          NSTextField!
@@ -65,6 +90,8 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     @IBOutlet var radioFileVendor:      NSButton!
     
 
+    //MARK:- @IBActions
+    
     @IBAction func radioCatChange(_ sender: Any) {
         if radioCatPrefered.state == .on {
             catItemCurrent = usrCatItemPrefered
@@ -141,31 +168,9 @@ class UserInputVC: NSViewController, NSWindowDelegate {
         }
     }
 
+    //MARK: funcs
 
-    //---- viewWillDisappear - Set gCityNum to positive value. Send changed-flags back to delegate in main ViewController
-    override func viewWillDisappear() {
-//        if gHasUnSavedChanges {
-//            let buttonNumber = dialog2or3(text: "There are Unsaved Changes", subText: "Do you want to close anyway?",  btnTxt1: "Close without Saving",
-//                                          btnTxt2: "Save Changes")
-//            if buttonNumber == 2 {                      // Save Changes
-//                let success = saveCurrentSelections()
-//                if success { gHasUnSavedChanges = false }
-//            }
-//        }
-//        let changesWereMade = false
-//        let hasUnSavedChanges = false
-//        delegate?.userInputDone(changesWereMade: changesWereMade, unSavedChanges: hasUnSavedChanges) //delegate <— (3)
-    }
-
-
-    func windowShouldClose(_ sender: NSWindow) -> Bool {
-        print("✅ windowShouldClose")
-        let application = NSApplication.shared
-        application.stopModal()
-        return true
-    }
-
-    func updateAfterCatChange(newCatItem: CategoryItem) {
+    private func updateAfterCatChange(newCatItem: CategoryItem) {
         let newCat = newCatItem.category
         cboCats.stringValue = newCat
         chkQuestionMark.state = (newCat.hasPrefix("?")) ? .on : .off

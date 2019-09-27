@@ -9,7 +9,8 @@
 import Cocoa
 
 class UserInputShortNameVC: NSViewController, NSWindowDelegate {
-    //TODO: CLEAN UP UI
+
+    //MARK:- Overrides & Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
@@ -21,7 +22,6 @@ class UserInputShortNameVC: NSViewController, NSWindowDelegate {
         txtFullDescKey.stringValue = usrVendrLongName
         lblPrefixChars.stringValue = "\(txtPrefix.stringValue.count) letters"
         lblFullDescKeyChars.stringValue = "\(txtFullDescKey.stringValue.count) letters"
-
     }//end func
 
     override func viewDidAppear() {
@@ -36,6 +36,7 @@ class UserInputShortNameVC: NSViewController, NSWindowDelegate {
         return true
     }
     
+    //MARK:- @IBOutlets
     @IBOutlet var lblPrefix:        NSTextField!
     @IBOutlet var lblFullDescKey:   NSTextField!
     @IBOutlet var txtPrefix:        NSTextField!
@@ -43,6 +44,7 @@ class UserInputShortNameVC: NSViewController, NSWindowDelegate {
     @IBOutlet var lblPrefixChars:      NSTextField!
     @IBOutlet var lblFullDescKeyChars: NSTextField!
 
+    //MARK:- @IBActions
 
     @IBAction func btnAbort(_ sender: Any) {
         let answer = GBox.alert("Do you want to save the results so far", style: .yesNo)
@@ -65,6 +67,7 @@ class UserInputShortNameVC: NSViewController, NSWindowDelegate {
     
 }//end class
 
+//MARK: NSTextFieldDelegate
 // Allow ViewController to see when a TextField changes.
 extension UserInputShortNameVC: NSTextFieldDelegate {
 

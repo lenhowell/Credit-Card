@@ -18,6 +18,7 @@ struct Stats {
     static var descWithNoCat         = 0    // Descs not in Catagory File & not added by Transaction
     static var userModTransUsed      = 0    // Number of User-Modified transactions used.
     static var processedCount        = 0    // Transactions processed
+    static var duplicateCount        = 0    // Duplicate Transactions
 
     static func clearAll() {
         transFileCount          = 0
@@ -29,5 +30,6 @@ struct Stats {
         descWithNoCat           = 0
         userModTransUsed        = 0
         processedCount          = 0
+        duplicateCount          = 0
     }
 }

@@ -60,7 +60,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], dictVe
     //MARK: Read Transactions
 
     while lineNum < cardArrayCount {
-        let tran = cardArray[lineNum]
+        let tran = cardArray[lineNum].trim
         lineNum += 1
         if tran.trim.count < 16 { continue }    // Blank line or ",,,,,,,,,,,"
 
@@ -70,13 +70,17 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], dictVe
         if !lineItem.desc.isEmpty || !lineItem.postDate.isEmpty || lineItem.debit != 0  || lineItem.credit != 0 {
             // Check for duplicate from another file
             //FIXME: Not all dupes are picked up
-            if dictTranDupes[tran] == nil || dictTranDupes[tran] == fileName {
-                dictTranDupes[tran] = fileName      // mark for dupes check
+            let signature = makeSignature(lineItem: lineItem)
+            if dictTranDupes[signature] == nil || dictTranDupes[signature] == fileName {
+                if tran.contains("VAZZYS OSTERIA") && tran.contains("18.83") {
+                    //
+                }
+                dictTranDupes[signature] = fileName      // mark for dupes check
                 lineItemArray.append(lineItem)          // Add new output Record
             } else {
-                let msg = "Duplicate transaction of one from \(dictTranDupes[tran]!)"
+                let msg = "Duplicate transaction of one from \(dictTranDupes[signature]!)"
                 handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .display, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: msg)
-                //
+                Stats.duplicateCount += 1
             }
         } else {
             // debug trap - empty line
@@ -85,6 +89,31 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], dictVe
 
     return lineItemArray
 }//end func handleCards
+
+func makeSignature(lineItem: LineItem) -> String {
+    var dateStr = ""
+    let da = lineItem.tranDate
+    if da.contains("/") {
+        let comps = da.components(separatedBy: "/")
+        var yy = comps[2].trim
+        if yy.count <= 2 { yy = "20" + yy }
+        var mm = comps[0].trim
+        if mm.count < 2 { mm = "0" + mm }
+        var dd = comps[1].trim
+        if dd.count < 2 { dd = "0" + dd }
+        dateStr = "\(yy)-\(mm)-\(dd)"
+    } else if da.contains("-") {
+        dateStr = da
+    } else {
+        //
+    }
+    let vendr = lineItem.descKey.prefix(4)
+    let cardNum = lineItem.cardNum
+    let credit =  String(format: "%.2f", lineItem.credit)//  lineItem.credit)
+    let debit =  String(format: "%.2f", lineItem.debit)
+    let signature = "\(dateStr),\(cardNum),\(vendr),\(credit),\(debit)"
+    return signature
+}
 
 //MARK:---- makeLineItem - 89-163 = 74-lines
 // uses Global Vars: dictVendorCatLookup(I/O), Stats(I/O)
@@ -188,7 +217,8 @@ func showUserInputForm(lineItem: LineItem, catItemFromVendor: CategoryItem, catI
         switch returnVal {
         case .abort:
              exit(101)
-        case .OK:
+
+        case .OK:                                   // .OK - Make changes requested by user
             if usrFixVendor && gLearnMode {
                 dictVendorCatLookup[lineItem.descKey] = usrCatItemReturned
                 Stats.changedCatCount += 1
@@ -196,12 +226,13 @@ func showUserInputForm(lineItem: LineItem, catItemFromVendor: CategoryItem, catI
                 let transKey = lineItem.transText
                 dictModifiedTrans[transKey] = usrCatItemReturned
             }
-        //case .cancel:
 
-        case .continue:
+        //case .cancel:                             // .cancel - Do nothing
+
+        case .continue:                             // .continuw - Continue app with no user input
             gUserInputMode =  false
-            //TODO: UnCheck User-Inputs
-        default:
+
+        default:                                    // Except for .cancel, we should not be here
             if returnVal != .cancel {
                 print("HandleCards#\(#line) Unknown return value \(returnVal)")
             }

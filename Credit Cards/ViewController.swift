@@ -83,7 +83,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         // Create NotificationCenter Observer to listen for post from handleError
         NotificationCenter.default.addObserver( self,
                                                 selector: #selector(self.errorPostedFromNotification(_:)),
-                                                name:     NSNotification.Name(notificationName.errPosted),
+                                                name:     NSNotification.Name(NotificationName.errPosted),
                                                 object:   nil
         )
 
@@ -114,7 +114,6 @@ class ViewController: NSViewController, NSWindowDelegate {
         gLearnMode          = UserDefaults.standard.bool(forKey: UDKey.learningMode)
         gUserInputMode      = UserDefaults.standard.bool(forKey: UDKey.userInputMode)
 
-        //TODO: Allow User to change his initials.
         gUserInitials       = UserDefaults.standard.string(forKey: UDKey.userInitials) ?? ""
         if gUserInitials.isEmpty {
             let homeURL = FileManager.default.homeDirectoryForCurrentUser
@@ -164,24 +163,24 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     // Called by NotificationCenter Observer getting post from handleError. Sets lblErrMsg
     @objc func errorPostedFromNotification(_ notification: Notification) {
-        guard let msg = notification.userInfo?[notificationKey.errMsg] as? String else { return }
+        guard let msg = notification.userInfo?[NotificationKey.errMsg] as? String else { return }
         lblErrMsg.stringValue = msg
         //print ("ErrMsg: \"\(msg)\" received from ErrorHandler via NotificationCenter")
     }
 
     //MARK:- @IBOutlets
     
+    @IBOutlet var txtTransationFolder: NSTextField!
+    @IBOutlet var txtSupportFolder:    NSTextField!
+    @IBOutlet var txtOutputFolder:     NSTextField!
     @IBOutlet weak var lblErrMsg:   NSTextField!
     @IBOutlet weak var lblResults:  NSTextField!
     @IBOutlet weak var lblRunTime:  NSTextField!
     @IBOutlet var lblTranFileCount: NSTextField!
-    @IBOutlet var txtTransationFolder: NSTextField!
-    @IBOutlet var txtSupportFolder:    NSTextField!
-    @IBOutlet var txtOutputFolder:     NSTextField!
     @IBOutlet weak var btnStart:    NSButton!
     @IBOutlet var chkLearningMode:  NSButton!
     @IBOutlet var chkUserInput:     NSButton!
-    @IBOutlet var cboFiles: NSComboBox!
+    @IBOutlet var cboFiles:     NSComboBox!
 
     //MARK:- @IBActions
 
@@ -376,6 +375,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
         statString += "\n \(lineItemArray.count) CREDIT CARD Transactions PROCESSED."
         statString += "\n Of These:"
+        statString += "\n(a)\(String(Stats.duplicateCount).rightJust(5)       ) were duplicates.                  ←"
         statString += "\n(a)\(String(Stats.successfulLookupCount).rightJust(5)) were found in Category File.      ←"
         statString += "\n(b)\(String(Stats.addedCatCount).rightJust(5)        ) were inserted into Category File. ←"
         statString += "\n(b)\(String(Stats.changedCatCount).rightJust(5)      ) were changed in Category File.    ←"

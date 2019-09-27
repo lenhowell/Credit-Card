@@ -22,12 +22,12 @@ public struct LineItem: Equatable, Hashable {
     var genCat   = ""       // Generated Category
     var catSource = ""      // Source of Generated Category (including "$" for "LOCKED")
     var transText = ""      // Original Transaction Line from file
+    var auditTrail = ""     // Original FileName, Line#
 
     init() {
     }
 
     //MARK:- init - 33-120 = 87-lines
-    //  fileName & lineNum only needed for err handling
     //TODO: Allow LineItem.init to throw errors
     // Create a LineItem from a Transaction-File line
     init(fromTransFileLine: String, dictColNums: [String: Int], fileName: String, lineNum: Int) {
@@ -117,10 +117,11 @@ public struct LineItem: Equatable, Hashable {
                 self.debit = abs(Double(amt) ?? 0)
             }
         }
+        self.auditTrail = "\"\(fileName)\" #\(lineNum)"
     }//end init
 
 
-    // Equatable - Ignore Category-info & truncate desc
+    // Equatable - Ignore Category-info & truncate desc & auditTrail
     static public func == (lhs: LineItem, rhs: LineItem) -> Bool {
         return lhs.cardType == rhs.cardType &&
             lhs.tranDate    == rhs.tranDate &&
@@ -130,7 +131,7 @@ public struct LineItem: Equatable, Hashable {
             lhs.credit      == rhs.credit
     }
 
-    // Hashable - Ignore Category-info & truncate desc
+    // Hashable - Ignore Category-info & truncate desc & auditTrail
     public func hash(into hasher: inout Hasher) {
         hasher.combine(cardType)
         hasher.combine(tranDate)
