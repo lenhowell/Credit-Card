@@ -115,12 +115,15 @@ func makeSignature(lineItem: LineItem) -> String {
     return signature
 }
 
-//MARK:---- makeLineItem - 89-163 = 74-lines
-// uses Global Vars: dictVendorCatLookup(I/O), Stats(I/O)
+//MARK: makeLineItem - 89-163 = 74-lines
+//---- makeLineItem - uses Global Vars: dictVendorCatLookup(I/O), Stats(I/O)
 internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int], dictVendorShortNames: [String: String], cardType: String, hasCatHeader: Bool, fileName: String, lineNum: Int) -> LineItem {
 
     var lineItem = LineItem(fromTransFileLine: fromTransFileLine, dictColNums: dictColNums, fileName: fileName, lineNum: lineNum)
     lineItem.cardType = cardType
+
+    let descKey = makeDescKey(from: lineItem.desc, dictVendorShortNames: dictVendorShortNames, fileName: fileName)
+    lineItem.descKey = descKey
 
     // Check for Modified Transaction
     let modTranKey = fromTransFileLine.trim
@@ -137,69 +140,63 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
     var catFromTran     = dictMyCatAliases[lineItem.rawCat] ?? "?" + lineItem.rawCat
     var catItemFromTran = CategoryItem(category: catFromTran, source: cardType)
 
-    let descKey = makeDescKey(from: lineItem.desc, dictVendorShortNames: dictVendorShortNames, fileName: fileName)
-    lineItem.descKey = descKey
-    if !descKey.isEmpty {
-        if let cV = dictVendorCatLookup[descKey] {
-            catItemFromVendor = cV                  // ------ Here if Lookup by Vendor was successful
-            (catItemPrefered, isClearWinner) = pickTheBestCat(catItemVendor: catItemFromVendor, catItemTransa: catItemFromTran)
-            if lineItem.genCat != catItemPrefered.category {
-                lineItem.genCat     = catItemPrefered.category    // Generated Cat is the prefered one
-                lineItem.catSource  = catItemPrefered.source
-            }
-            //print("\(#line) Cat for \(descKey) = \(catItemFromVendor.category);  TransCat = \(catFromLineItem)  Chose: \(catItemPrefered.category)")
-            Stats.successfulLookupCount += 1
-//            if cV.category.contains("?") {
-//                print("HandleCards#\(#line) \(lineItem.descKey) \(catItemPrefered.category) isClearWinner=\(isClearWinner)  VendorCat=\(catItemFromVendor.category) TransCat=\(catItemFromTran.category)")
-//            }
-            uniqueCategoryCounts[descKey, default: 0] += 1
+    if descKey.isEmpty { return lineItem }    // Missing descKey
 
-        } else {                   // ------ Here if NOT found in Category-Lookup-by-Vendor Dictionary
-            findShorterDescKey(descKey) // Have we already found a truncated (shorter) version of descKey?
-            catItemFromVendor = CategoryItem(category: "?", source: "")
-
-            // If Transaction-Line has a Category, put it in the Vendor file.
-            if catFromTran.count < 3 { catFromTran = "" }
-
-            if let catTran = dictMyCatAliases[catFromTran] {
-                catFromTran = catTran
-                isClearWinner = !catFromTran.hasPrefix("?") // if no "?", we have a winner
-            } else {
-                print("HandleCards#\(#line): Unknown Category: \"\(lineItem.rawCat)\" from \(descKey) (line#\(lineNum) in \(fileName))")
-                isClearWinner = false
-            }
-            catItemFromTran = CategoryItem(category: catFromTran, source: cardType)
-            catItemPrefered = catItemFromTran
-            lineItem.genCat = catFromTran
-            if gLearnMode {
-                dictVendorCatLookup[descKey] = CategoryItem(category: catFromTran, source: cardType) //Do Actual Insert
-                Stats.addedCatCount += 1
-            } else {
-                Stats.descWithNoCat += 1
-            }
-            // print("Category that was inserted = Key==> \(key) Value ==> \(self.rawCat) Source ==> \(source)")
-        }//end if NOT found in Category-Lookup-by-Vendor Dictionary
-
-        // if we're not ignoring this vendor
-        if usrIgnoreVendors[lineItem.descKey] == nil {
-
-            // if in User-Input-Mode && No Clear Winner
-            if gUserInputMode && !isClearWinner {
-                showUserInputForm(lineItem: lineItem, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemPrefered)
-                catItemPrefered = usrCatItemReturned
-            } else if gLearnMode && catItemPrefered != catItemFromVendor {
-                dictVendorCatLookup[descKey] = catItemPrefered  // Do Actual Insert into VendorCategoryLookup
-                Stats.changedCatCount += 1
-            }
+    if let cV = dictVendorCatLookup[descKey] {
+        catItemFromVendor = cV                  // ------ Here if Lookup by Vendor was successful
+        (catItemPrefered, isClearWinner) = pickTheBestCat(catItemVendor: catItemFromVendor, catItemTransa: catItemFromTran)
+        if lineItem.genCat != catItemPrefered.category {
+            lineItem.genCat     = catItemPrefered.category    // Generated Cat is the prefered one
+            lineItem.catSource  = catItemPrefered.source
         }
-    } else {
-        // debug trap
-    }//endif descKey empty or not
+        Stats.successfulLookupCount += 1
+        // print("HandleCards#\(#line) \(lineItem.descKey) \(catItemPrefered.category) isClearWinner=\(isClearWinner)  VendorCat=\(catItemFromVendor.category) TransCat=\(catItemFromTran.category)")
+        uniqueCategoryCounts[descKey, default: 0] += 1
+
+    } else {                   // ------ Here if NOT found in Category-Lookup-by-Vendor Dictionary
+        findShorterDescKey(descKey) // Does nothing?
+        catItemFromVendor = CategoryItem(category: "?", source: "")
+
+        // If Transaction-Line has a Category, put it in the Vendor file.
+        if catFromTran.count < 3 { catFromTran = "" }
+
+        if let catTran = dictMyCatAliases[catFromTran] {
+            catFromTran = catTran
+            isClearWinner = !catFromTran.hasPrefix("?") // if no "?", we have a winner
+        } else {
+            print("HandleCards#\(#line): Unknown Category: \"\(lineItem.rawCat)\" from \(descKey) (line#\(lineNum) in \(fileName))")
+            isClearWinner = false
+        }
+        catItemFromTran = CategoryItem(category: catFromTran, source: cardType)
+        catItemPrefered = catItemFromTran
+        lineItem.genCat = catFromTran
+        if gLearnMode {
+            dictVendorCatLookup[descKey] = CategoryItem(category: catFromTran, source: cardType) //Do Actual Insert
+            Stats.addedCatCount += 1
+        } else {
+            Stats.descWithNoCat += 1
+        }
+        // print("Category that was inserted = Key==> \(key) Value ==> \(self.rawCat) Source ==> \(source)")
+    }//end if NOT found in Category-Lookup-by-Vendor Dictionary
+
+    // if we're not ignoring this vendor
+    if usrIgnoreVendors[lineItem.descKey] == nil {
+
+        // if in User-Input-Mode && No Clear Winner
+        if gUserInputMode && !isClearWinner {
+            showUserInputForm(lineItem: lineItem, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemPrefered)
+            catItemPrefered = usrCatItemReturned
+        } else if gLearnMode && catItemPrefered.category != catItemFromVendor.category && isClearWinner {
+            dictVendorCatLookup[descKey] = catItemPrefered  // Do Actual Insert into VendorCategoryLookup
+            Stats.changedVendrCatCount += 1
+        }
+    }
 
     return lineItem
 }//end func makeLineItem
 
-// Allow User to intervene using the UserInputCat form
+
+//---- showUserInputForm - Allow User to intervene using the UserInputCat form
 func showUserInputForm(lineItem: LineItem, catItemFromVendor: CategoryItem, catItemFromTran: CategoryItem, catItemPrefered: CategoryItem) -> CategoryItem {
     usrLineItem = lineItem
     usrCatItemFromVendor = catItemFromVendor
@@ -219,23 +216,24 @@ func showUserInputForm(lineItem: LineItem, catItemFromVendor: CategoryItem, catI
              exit(101)
 
         case .OK:                                   // .OK - Make changes requested by user
-            if usrFixVendor && gLearnMode {
-                dictVendorCatLookup[lineItem.descKey] = usrCatItemReturned
-                Stats.changedCatCount += 1
-            } else {
-                let transKey = lineItem.transText
-                dictModifiedTrans[transKey] = usrCatItemReturned
+            if gLearnMode {
+                if usrFixVendor {                   // Fix VendorCategoryLookup value
+                    dictVendorCatLookup[lineItem.descKey] = usrCatItemReturned
+                    Stats.changedVendrCatCount += 1
+                } else {                            // New category for this transaction only.
+                    let transKey = lineItem.transText
+                    dictModifiedTrans[transKey] = usrCatItemReturned
+                }
             }
 
-        //case .cancel:                             // .cancel - Do nothing
+        case .cancel:                             // .cancel - Do nothing
+            break
 
         case .continue:                             // .continuw - Continue app with no user input
             gUserInputMode =  false
 
         default:                                    // Except for .cancel, we should not be here
-            if returnVal != .cancel {
-                print("HandleCards#\(#line) Unknown return value \(returnVal)")
-            }
+            print("HandleCards#\(#line) Unknown return value \(returnVal)")
         }//end switch
 
     } else {
@@ -267,6 +265,7 @@ internal func makeDictColNums(headers: [String]) -> [String: Int] {
     return dictColNums
 }//end func
 
+//---- findShorterDescKey - Does nothing yet
 internal func findShorterDescKey(_ descKey: String) {
     let descKeyCount = descKey.count
     for (key, value) in dictVendorCatLookup {

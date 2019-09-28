@@ -751,7 +751,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <comboBox verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DP0-U9-YMZ">
-                                <rect key="frame" x="451" y="198" width="146" height="26"/>
+                                <rect key="frame" x="435" y="198" width="162" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" completes="NO" numberOfVisibleItems="16" id="kSl-5o-irM">
                                     <font key="font" metaFont="system"/>
@@ -790,7 +790,7 @@ Gw
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WBO-u6-2d6">
-                                <rect key="frame" x="449" y="170" width="132" height="18"/>
+                                <rect key="frame" x="433" y="172" width="132" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="&quot;?&quot; Question Mark" bezelStyle="regularSquare" imagePosition="left" inset="2" id="IFr-Xg-VG6">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -809,17 +809,6 @@ Gw
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5vi-kI-JnO">
-                                <rect key="frame" x="449" y="105" width="132" height="18"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="&quot;$&quot; to Lock in " bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="pXa-e4-GnB">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="chkLockInClick:" target="5se-PX-5kl" id="hs1-2A-sVj"/>
-                                </connections>
-                            </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="y9r-ja-tGY">
                                 <rect key="frame" x="388" y="75" width="208" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
@@ -851,6 +840,17 @@ Gw
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5vi-kI-JnO">
+                                <rect key="frame" x="433" y="105" width="132" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="&quot;$&quot; to Lock in " bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="pXa-e4-GnB">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="chkLockInClick:" target="5se-PX-5kl" id="hs1-2A-sVj"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>

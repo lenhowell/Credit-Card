@@ -36,7 +36,11 @@ Clothing,              Clothing/Shoes
 Cable/Internet,        Cable/Satellite Services
 Education
 ?Electronics,          Electronics
-Entertainment,         Entertainment/Recreation
+
+?Entertainment,        Entertainment/Recreation
+Entertainment-Golf
+Entertainment-Movies
+Entertainment-TV
 
 Food-Alcohol
 Food-Groceries,        Supermarkets
@@ -47,8 +51,6 @@ Food-Other
 Gift-Family
 Gift-Spouse
 Gift-Other
-
-Golf
 
 Hobby-Equipment
 Hobby-Supplies
@@ -66,7 +68,12 @@ Insurance-Business,    Beach Cove Insurance
 Insurance-Home,        Insurance - 1450
 Insurance-Other
 
-Investments
+?Investment
+Investment-Fees
+Investment-Purchase
+Investment-Income
+Investment-Other
+Investment-Trainingß
 
 Laundry/DryClean,
 Lawyer
@@ -92,7 +99,16 @@ Photo-Other
 
 Postage/Shipping,      Postage and Shipping
 
-Taxes
+?Taxes
+Tax-Property
+Tax-IRS
+Tax-CT
+Tax-NJ
+Tax-PA
+Tax-FL
+Tax-SC
+Tax-State
+Tax-Business
 
 ?Travel,               Travel,         Other Travel
 Travel-Airline,        Airfare

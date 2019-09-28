@@ -312,7 +312,7 @@ func writeVendorShortNames(url: URL, dictVendorShortNames: [String: String]) {
     saveBackupFile(url: url)
     var text = "// Machine-generated, user-editable file\n"
     text += "// ShortName (prefix),   Full Description Key\n"
-    for (shortName, fullDescKey) in dictVendorShortNames {
+    for (shortName, fullDescKey) in dictVendorShortNames.sorted(by: {$0.key < $1.key}) {
         let shortNameInQuotes = "\"\(shortName)\""
         text += "\(shortNameInQuotes.PadRight(descKeyLength, truncate: false)), \(fullDescKey)\n"
     }
@@ -379,7 +379,7 @@ func writeVendorCategoriesToFile(url: URL, dictCat: [String: CategoryItem]) {
 
         let first10 = String(catItem.key.prefix(15))
         if first10 == prevCat.prefix(15) {
-            print("😡 \"\(prevCat)\" (\(prevCat.count))     \"\(catItem.key)\" (\(catItem.key.count))")
+            print("😡 \"\(prevCat)\" (\(prevCat.count)-chars)     \"\(catItem.key)\" (\(catItem.key.count)-chars)")
         }
         prevCat = catItem.key
     }
