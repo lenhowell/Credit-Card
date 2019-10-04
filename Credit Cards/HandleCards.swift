@@ -91,8 +91,18 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], dictVe
 }//end func handleCards
 
 func makeSignature(lineItem: LineItem) -> String {
+    let dateStr = makeYYYYMMDD(dateTxt: lineItem.tranDate)
+    let vendr = lineItem.descKey.prefix(4)
+    let cardNum = lineItem.cardNum
+    let credit =  String(format: "%.2f", lineItem.credit)//  lineItem.credit)
+    let debit =  String(format: "%.2f", lineItem.debit)
+    let signature = "\(dateStr),\(cardNum),\(vendr),\(credit),\(debit)"
+    return signature
+}
+
+func makeYYYYMMDD(dateTxt: String) -> String {
     var dateStr = ""
-    let da = lineItem.tranDate
+    let da = dateTxt
     if da.contains("/") {
         let comps = da.components(separatedBy: "/")
         var yy = comps[2].trim
@@ -107,12 +117,7 @@ func makeSignature(lineItem: LineItem) -> String {
     } else {
         //
     }
-    let vendr = lineItem.descKey.prefix(4)
-    let cardNum = lineItem.cardNum
-    let credit =  String(format: "%.2f", lineItem.credit)//  lineItem.credit)
-    let debit =  String(format: "%.2f", lineItem.debit)
-    let signature = "\(dateStr),\(cardNum),\(vendr),\(credit),\(debit)"
-    return signature
+    return dateStr
 }
 
 //MARK: makeLineItem - 89-163 = 74-lines
@@ -246,16 +251,19 @@ func showUserInputForm(lineItem: LineItem, catItemFromVendor: CategoryItem, catI
 
 //---- makeDictColNums - Infer which columns have the relevant data based in the Header row. Returns dictColNums
 internal func makeDictColNums(headers: [String]) -> [String: Int] {
+    // "Check Number", "Date Written", "Date Cleared", "Payee", "Amount"
     var dictColNums = [String: Int]()
     for colNum in 0..<headers.count {
         let rawKey = headers[colNum].uppercased().trim.replacingOccurrences(of: "\"", with: "")
         let key: String
-        if rawKey == "DATE" {                                                   // "Date"
-            key = "TRAN"
-        } else if rawKey.hasPrefix("ORIG") && rawKey.hasSuffix("DESCRIPTION") { // "Original Description"
-            key = "DESC"
-        } else if rawKey.hasPrefix("MERCH") && rawKey.hasSuffix("CATEGORY") {   // "Merchant Category"
-            key = "CATE"
+        if rawKey == "DATE" || rawKey.hasSuffix("WRITTEN") {                                                   // "Date"
+            key = "TRAN"    // Transaction Date
+        } else if  rawKey == "PAYEE" || (rawKey.hasPrefix("ORIG") && rawKey.hasSuffix("DESCRIPTION")) { // "Original Description"
+            key = "DESC"    // DESCRIPTION
+        } else if (rawKey.hasPrefix("MERCH") && rawKey.hasSuffix("CATEGORY")) {   // "Merchant Category"
+            key = "CATE"    // CATEGORY
+        } else if rawKey.hasSuffix("NUMBER") {   // "Merchant Category"
+            key = "NUMBER"  // CHECK NUMBER
         } else {
             key = String(rawKey.replacingOccurrences(of: "\"", with: "").prefix(4))
         }

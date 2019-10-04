@@ -203,6 +203,20 @@ class ViewController: NSViewController, NSWindowDelegate {
         print("UserInputMode = \(gUserInputMode)")
     }
 
+    @IBAction func btnShowTable(_ sender: Any) {
+        let storyBoard = NSStoryboard(name: "Spreadsheet", bundle: nil)
+        let tableWindowController = storyBoard.instantiateController(withIdentifier: "SpreadsheetWindowController") as! NSWindowController
+        if let tableWindow = tableWindowController.window {
+            //let tableVC = tableWindow.contentViewController as! TableVC
+            //gLineItemArray = lineItemArray
+            let application = NSApplication.shared
+            application.runModal(for: tableWindow)
+
+            tableWindow.close()
+        }//end if let
+    }//end func
+
+
     // MARK:- IBActions - MenuBar
 
     @IBAction func mnuResetUserDefaults(_ sender: Any) {
@@ -294,7 +308,6 @@ class ViewController: NSViewController, NSWindowDelegate {
         Stats.origVendrCatCount = dictVendorCatLookup.count
 
         var fileContents    = ""                        // Where All Transactions in a File go
-        var lineItemArray   = [LineItem]()
         dictTranDupes = [:]
         lblErrMsg.stringValue = ""
         
@@ -335,7 +348,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             
             // Check which Credit Card Transactions we are currently processing
             if cardType.count >= 2 &&  cardType.count <= 8  {
-                lineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray, dictVendorShortNames: &dictVendorShortNames)
+                gLineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray, dictVendorShortNames: &dictVendorShortNames)
                 chkUserInput.state = gUserInputMode ? .on : .off
                 Stats.transFileCount += 1
             } else {
@@ -343,7 +356,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             }
         }//next fileURL
 
-        outputTranactions(outputFileURL: outputFileURL, lineItemArray: lineItemArray)
+        outputTranactions(outputFileURL: outputFileURL, lineItemArray: gLineItemArray)
 
         print("\n--- Description-Key algorithms ---")
         for (key, val) in dictDescKeyAlgorithm.sorted(by: <) {
@@ -378,7 +391,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         if Stats.junkFileCount > 0 {
             statString += "\n\(Stats.junkFileCount) NOT Recognized as a Credit Card Transaction"
         }
-        statString += "\n \(lineItemArray.count + Stats.duplicateCount) CREDIT CARD Transactions PROCESSED."
+        statString += "\n \(gLineItemArray.count + Stats.duplicateCount) CREDIT CARD Transactions PROCESSED."
         statString += "\n Of These:"
         statString += "\n(a)\(String(Stats.duplicateCount).rightJust(5)       ) were duplicates.                  ←"
         statString += "\n(b)\(String(Stats.successfulLookupCount).rightJust(5)) were found in Category File.      ←"

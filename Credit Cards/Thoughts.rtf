@@ -218,7 +218,8 @@ In
 {\listtext	\uc0\u9642 	}Selective editing (same vendor, same cat, date-range, card-type)\
 {\listtext	\uc0\u9642 	}Allow user to change Category-Name in both VendorCategoryLookup.txt & MyCategories.txt\
 {\listtext	\uc0\u9642 	}Some gas stations differentiate cats "Automobile" vs "Merchandise"\
-{\listtext	\uc0\u9642 	}Allow cat differentiation based on $ amount\
+{\listtext	\uc0\u9642 	}Allow category differentiation based on $-amount.\
+{\listtext	\uc0\u9642 	}Flag transaction as possible fraud, based on category & $-amount.\
 {\listtext	\uc0\u9642 	}Suppress "Submit" button unless all 3 folder selectors point to valid folders AND initials entered.\
 {\listtext	\uc0\u9642 	}Generate report for date-range: by vendor, by category\
 {\listtext	\uc0\u9642 	}In UserInputCatVC, generate a short list of probable categories, based in description & rawCat & VendorCatLookup.\
@@ -269,14 +270,22 @@ In
 \ls23\ilvl0
 \f0\b0 \cf0 {\listtext	
 \f3 \uc0\u9642 
-\f0 	}Merrill 	+Amount is Debit		21+ 	08/07/2018\
+\f0 	}Merrill 	
+\f1\b +
+\f0\b0 Amount is Debit		21+ 	08/07/2018\
 \pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
 \ls24\ilvl0\cf0 {\listtext	
 \f3 \uc0\u9642 
-\f0 	}Discover	+Amount is Debit		69+	08/07/2018\
+\f0 	}Discover	
+\f1\b +
+\f0\b0 Amount is Debit		69+	08/07/2018\
 {\listtext	
 \f3 \uc0\u9642 
-\f0 	}BofA	+Amount is Credit		40	8/7/18\
+\f0 	}BofA	
+\f1\b +
+\f0\b0 Amount is 
+\f1\b Credit
+\f0\b0 		40	8/7/18\
 {\listtext	
 \f3 \uc0\u9642 
 \f0 	}Cap1	Debit/Credit both +		22	2018-08-07\

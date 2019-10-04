@@ -56,6 +56,8 @@ Hobby-Equipment
 Hobby-Supplies
 Hobby-Other
 
+Home-Electric
+Home-Pool
 Home-Improvement
 Home-Maintenance,      Home Improvement
 Home-Purchase
@@ -73,7 +75,7 @@ Investment-Fees
 Investment-Purchase
 Investment-Income
 Investment-Other
-Investment-Trainingß
+Investment-Training
 
 Laundry/DryClean,
 Lawyer
@@ -98,6 +100,7 @@ Photo-Processing
 Photo-Other
 
 Postage/Shipping,      Postage and Shipping
+Professionals
 
 ?Taxes
 Tax-Property
