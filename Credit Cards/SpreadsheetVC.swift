@@ -43,6 +43,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
             tableView.doubleAction = #selector(tableViewDoubleClick(_:))
 
             loadTableSortDescriptors()
+            syncColWidths()
         }
 
         override func viewDidAppear() {
@@ -288,7 +289,10 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
                 //var image: NSImage?
 
                 guard let colID = tableColumn?.identifier.rawValue else { print("⛔️ Table Column nil"); return nil }
-                guard let text = dict[colID] else { print("⛔️ No Value found for \(colID)"); return nil }
+                guard let text = dict[colID] else {
+                    print("⛔️ No Value found for \(colID)")
+                    return nil
+                }
                 let cellIdentifier = colID
 
                 if let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: cellIdentifier), owner: nil) as? NSTableCellView {
@@ -301,8 +305,11 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
             // Summary (Totals) table
             if tableView == self.tableViewSum {
                 guard let colID = tableColumn?.identifier.rawValue else { print("⛔️ Table Column nil"); return nil }
-                guard let text = tableSumDict[colID] else { print("⛔️ No Value found for \(colID)"); return nil }
-                let cellIdentifier = "sCell"
+                guard let text = tableSumDict[colID] else {
+                    print("⛔️ No Value found for \(colID)")
+                    return nil
+                }
+                let cellIdentifier = colID
                 if let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: cellIdentifier), owner: nil) as? NSTableCellView {
                     cell.textField?.stringValue = text
                     return cell

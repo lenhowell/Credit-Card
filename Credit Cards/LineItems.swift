@@ -93,7 +93,7 @@ public struct LineItem: Equatable, Hashable {
                 self.rawCat = myCat
             }
         }
-        //TODO: Detect & report corrupt $values rather than crashing
+        //TODO: Detect & report corrupt $values rather than silently setting to $0
         if let colNum = dictColNums["AMOU"] {   // AMOUNT
             if colNum < columnCount {
                 let amt = columns[colNum].replacingOccurrences(of: ";", with: "") //"0" is for empty fields
