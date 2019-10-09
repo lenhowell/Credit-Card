@@ -8,16 +8,14 @@
 
 import Cocoa
 
-var gLineItemArray   = [LineItem]()
+var gFilteredLineItemArray = [LineItem]()  // Filtered list of transactions - used in SummaryTableVC
 
 class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
-    //  class TableVC: NSViewController, NSWindowDelegate {
-
     //MARK: Instance Variables
-    let codeFile = "SpreadsheetVC"
-    var tableDicts   = [[String : String]]()    // Array of Dictionaries
-    var tableSumDict = [String : String]()      // Sumation Dictionary
+    let codeFile    = "SpreadsheetVC"
+    var tableDicts  = [[String : String]]()     // Array of Dictionaries
+    var tableSumDict = [String : String]()      // Totals Dictionary
     var totalCredit = 0.0
     var totalDebit  = 0.0
     var iSortBy     = ColID.cardType
@@ -34,11 +32,10 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     //MARK:- IBOutlets
 
-    @IBOutlet weak var tableView:    NSTableView!
-    @IBOutlet weak var tableViewSum: NSTableView!
-    @IBOutlet weak var chkShowAll: NSButton!
-    @IBOutlet weak var lblStatus:  NSTextField!
-
+    @IBOutlet var tableView:    NSTableView!
+    @IBOutlet var tableViewSum: NSTableView!
+    @IBOutlet var chkShowAll:   NSButton!
+    @IBOutlet var lblStatus:    NSTextField!
 
     @IBOutlet var txtDate1:     NSTextField!
     @IBOutlet var txtDate2:     NSTextField!
@@ -46,7 +43,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     @IBOutlet var txtDollar2:   NSTextField!
     @IBOutlet var txtCardType:  NSTextField!
     @IBOutlet var txtCategory:  NSTextField!
-    @IBOutlet var txtVendor:       NSTextField!
+    @IBOutlet var txtVendor:    NSTextField!
 
 
     //MARK:- Lifecycle funcs
@@ -91,7 +88,19 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
             let msg = "Error in Filter item"
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alert, errorMsg: msg)
         }
+    }
 
+    @IBAction func btnSummaries(_ sender: Any) {
+        let storyBoard = NSStoryboard(name: "SummaryTable", bundle: nil)
+        let UserInputWindowController = storyBoard.instantiateController(withIdentifier: "SummaryWindowController") as! NSWindowController
+        if let userInputWindow = UserInputWindowController.window {
+            //let userVC = storyBoard.instantiateController(withIdentifier: "UserInput") as! UserInputVC
+
+            let application = NSApplication.shared
+            let returnVal = application.runModal(for: userInputWindow) // <=================  UserInputVC
+
+            userInputWindow.close()                     // Return here from userInputWindow
+        }
     }
 
     // Not used
@@ -115,7 +124,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         }
     }//end func
 
-    //- not used --- syncColWidths - Make Summary Column widths = Main Column widths
+    //---- syncColWidths - Make Summary Column widths = Main Column widths
     func syncColWidths() {
         for (idx, column) in tableView.tableColumns.enumerated() {
             tableViewSum.tableColumns[idx].width = column.width
@@ -140,10 +149,12 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         txtDate2.stringValue = filtDate2
     }//end func
 
+    // is responsible for global "gFilteredLineItemArray"
     //---- loadTable - Select stocks to be displayed & Create tableDicts array. Also fill "Totals" labels.
     private func loadTable(lineItemArray: [LineItem]) {  // 97-133 = 36-lines
         var sumLine = LineItem()
-        tableDicts   = []
+        tableDicts  = []
+        gFilteredLineItemArray = []
         tableSumDict.removeAll()
         if lineItemArray.isEmpty { return }
 
@@ -153,6 +164,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
         for lineItem in lineItemArray {
             if applyFilter(lineItem: lineItem) {
+                gFilteredLineItemArray.append(lineItem)
                 let dict = makeRowDict(lineItem: lineItem)
                 tableDicts.append(dict)
                 totalCredit += lineItem.credit
@@ -169,6 +181,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     }//end func loadTable
 
+    //---- setFilter - Setup the filters based on the tsxtView entries
     private func setFilter() -> Bool {
         filtDate1 = makeYYYYMMDD(dateTxt: txtDate1.stringValue)
         filtDate2 = makeYYYYMMDD(dateTxt: txtDate2.stringValue)
@@ -179,6 +192,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         return true
     }
 
+    //---- applyFilter - Returns true if lineItem meets all the filter criteria
     private func applyFilter(lineItem: LineItem) -> Bool {
         if lineItem.credit + lineItem.debit < filtDollar1 { return false }
         if lineItem.credit + lineItem.debit > filtDollar2 { return false }
@@ -190,6 +204,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         if !lineItem.genCat.uppercased().hasPrefix(txtCategory.stringValue.uppercased()) { return false }
         return true
     }
+
     //---- makeRowDict - Create a dictionary entry for loadTable
     func makeRowDict(lineItem: LineItem) -> [String : String] { // 136-161 = 25-lines
         var dict = [String : String]()
@@ -209,97 +224,32 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     //---- reloadTable - reloads the table for tableDicts, sorted by ColID
     private func reloadTable(sortBy: String, ascending: Bool) {
-        tableDicts.sort { compare(lft: $0[sortBy]!, rgt: $1[sortBy]!, ascending: ascending) }
+        tableDicts.sort { compareTextNum(lft: $0[sortBy]!, rgt: $1[sortBy]!, ascending: ascending) }
         tableView.reloadData()
         tableViewSum.reloadData()   // Not always needed
         iSortBy    = sortBy         // Remember Sort order
         iAscending = ascending
     }
 
-    //---- compare - compares 2 strings either numerically or case-insensitive.
-    private func compare(lft: String, rgt: String, ascending: Bool) -> Bool {
-        let lStripped = sortStr(lft)
-        let rStripped = sortStr(rgt)
-        if Double(lStripped) == nil || Double(rStripped) == nil {
-            if ascending  && lft < rgt { return true }
-            if !ascending && lft > rgt { return true }
-            return false
-        }
-        let lVal = Double(lStripped) ?? 0
-        let rVal = Double(rStripped) ?? 0
-        if ascending  && lVal < rVal { return true }
-        if !ascending && lVal > rVal { return true }
-        return false
-    }
-
-    //---- sortStr - returns a string that is sortable, either numerically or case-insensitive.
-    private func sortStr(_ str: String) -> String {
-        var txt = str
-        txt = txt.replacingOccurrences(of: "$", with: "")
-        txt = txt.replacingOccurrences(of: "%", with: "")
-        txt = txt.replacingOccurrences(of: ",", with: "").trim
-        if txt.hasPrefix("(") && txt.hasSuffix(")") { txt = "-" + String(txt.dropFirst().dropLast()) }
-        return txt.uppercased()
-    }
-
-    //---- updateCompanyNameLabel - Update lblStatus with selected TransDate Name
-    func updateCompanyNameLabel() {
-        let text: String
-        let itemsSelected = tableView.selectedRowIndexes.count
-
-        switch itemsSelected {
-        case 0:
-            text = "No Selection"
-        case 1:
-            let stockDict = tableDicts[tableView.selectedRowIndexes.first!]
-            let symbTxt = stockDict[ColID.cardType]  ?? "Missing cardType"
-            let nameTxt = stockDict[ColID.transDate] ?? "Missing TransDate Name"
-            text = "\(symbTxt)   \(nameTxt)"
-        default:
-            text = "Multiple Selections"
-        }//end switch
-
-        //lblStatus.stringValue = text
-    }//end func
-
-    public enum FormatType {
-        case None, Number, Percent, Dollar, NoDollar, Comma
-    }
-    //---- formatCell -
-    public func formatCell(_ value: Double,formatType: FormatType, digits: Int,
-                           onlyIf: Bool = true, emptyCell: String = "") -> String {
-        if !onlyIf { return emptyCell }
-        var format = ""
-        switch formatType {
-        case .Number:                                       // -1234.5
-            format = "%.\(digits)f"   // "%.2f%" -> "#.00"
-            return String(format: format, value)
-        case .Percent:                                      // -123.4%
-            format = "%.\(digits)f%%" // "%.1f%%" -> "#.0%"
-            return String(format: format, value*100)
-        case .Dollar:                                       // ($1,234.5)
-            if value == 0 { return "" }
-            let formatter = NumberFormatter()
-            formatter.numberStyle  = .currencyAccounting
-            formatter.maximumFractionDigits = digits
-            return formatter.string(for: value) ?? "?Dollar?"
-        case .NoDollar:                                     // (1,234.5)
-            let formatter = NumberFormatter()
-            formatter.numberStyle  = .currencyAccounting
-            formatter.maximumFractionDigits = digits
-            let str = formatter.string(for: value) ?? "$?Dollar?"
-            let str2 = String(str.dropFirst())
-            return str2
-        case .Comma:                                        // -1,234.5
-            let formatter = NumberFormatter()
-            formatter.numberStyle  = .decimal
-            formatter.maximumFractionDigits = digits
-            return formatter.string(for: value) ?? "?Comma?"
-        default:
-            return "\(value)"                               // -1234.567
-        }
-
-    }//end func
+//    //---- updateCompanyNameLabel - Update lblStatus with selected TransDate Name
+//    func updateCompanyNameLabel() {
+//        let text: String
+//        let itemsSelected = tableView.selectedRowIndexes.count
+//
+//        switch itemsSelected {
+//        case 0:
+//            text = "No Selection"
+//        case 1:
+//            let stockDict = tableDicts[tableView.selectedRowIndexes.first!]
+//            let symbTxt = stockDict[ColID.cardType]  ?? "Missing cardType"
+//            let nameTxt = stockDict[ColID.transDate] ?? "Missing TransDate Name"
+//            text = "\(symbTxt)   \(nameTxt)"
+//        default:
+//            text = "Multiple Selections"
+//        }//end switch
+//
+//        //lblStatus.stringValue = text
+//    }//end func
 
 }//end class
 
@@ -358,7 +308,7 @@ extension SpreadsheetVC: NSTableViewDelegate {
 
             guard let colID = tableColumn?.identifier.rawValue else { print("⛔️ Table Column nil"); return nil }
             guard let text = dict[colID] else {
-                print("⛔️ No Value found for \(colID)")
+                print("⛔️ \(codeFile)#\(#line) No Value found for \(colID)")
                 return nil
             }
             let cellIdentifier = colID
@@ -374,7 +324,7 @@ extension SpreadsheetVC: NSTableViewDelegate {
         if tableView == self.tableViewSum {
             guard let colID = tableColumn?.identifier.rawValue else { print("⛔️ Table Column nil"); return nil }
             guard let text = tableSumDict[colID] else {
-                print("⛔️ No Value found for \(colID)")
+                print("⛔️ \(codeFile)#\(#line) No Value found for \(colID)")
                 return nil
             }
             let cellIdentifier = colID
@@ -391,7 +341,7 @@ extension SpreadsheetVC: NSTableViewDelegate {
     //---- tableViewSelectionDidChange -
     func tableViewSelectionDidChange(_ notification: Notification){
         if tableView == self.tableView {
-            updateCompanyNameLabel()
+            //updateCompanyNameLabel()
         }//tableView
     }
 

@@ -29,6 +29,8 @@
 		CE95CC9B23367191008363B7 /* UserInputShortNameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE95CC9A23367191008363B7 /* UserInputShortNameVC.swift */; };
 		CE95CC9D2336D722008363B7 /* VendorShortNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE95CC9C2336D722008363B7 /* VendorShortNames.swift */; };
 		CE9FFEBB2302F3DF00261390 /* Thoughts.rtf in Resources */ = {isa = PBXBuildFile; fileRef = CE9FFEBA2302F3DF00261390 /* Thoughts.rtf */; };
+		CEA3DF26234B75770021A712 /* SummaryTable.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CEA3DF25234B75770021A712 /* SummaryTable.storyboard */; };
+		CEA3DF28234B76730021A712 /* SummaryTableVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA3DF27234B76730021A712 /* SummaryTableVC.swift */; };
 		CEA62D302306232C00160DEB /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA62D2F2306232C00160DEB /* Alerts.swift */; };
 		CEB315962321607E00D88759 /* UserInputCatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB315942321607E00D88759 /* UserInputCatVC.swift */; };
 		CEB84F282308EB20001485C5 /* Credit_Cards_UnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB84F272308EB20001485C5 /* Credit_Cards_UnitTests.swift */; };
@@ -90,6 +92,8 @@
 		CE95CC9A23367191008363B7 /* UserInputShortNameVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInputShortNameVC.swift; sourceTree = "<group>"; };
 		CE95CC9C2336D722008363B7 /* VendorShortNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorShortNames.swift; sourceTree = "<group>"; };
 		CE9FFEBA2302F3DF00261390 /* Thoughts.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Thoughts.rtf; sourceTree = "<group>"; };
+		CEA3DF25234B75770021A712 /* SummaryTable.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SummaryTable.storyboard; sourceTree = "<group>"; };
+		CEA3DF27234B76730021A712 /* SummaryTableVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryTableVC.swift; sourceTree = "<group>"; };
 		CEA62D2F2306232C00160DEB /* Alerts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alerts.swift; sourceTree = "<group>"; };
 		CEB315942321607E00D88759 /* UserInputCatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInputCatVC.swift; sourceTree = "<group>"; };
 		CEB84F252308EB20001485C5 /* Credit Cards UnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Credit Cards UnitTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -174,6 +178,8 @@
 				CE1F7EC723317453004765E7 /* MyCategories.txt */,
 				CED5662723459C90002DD645 /* Spreadsheet.storyboard */,
 				CE8AEB9323459E6F00337A73 /* SpreadsheetVC.swift */,
+				CEA3DF25234B75770021A712 /* SummaryTable.storyboard */,
+				CEA3DF27234B76730021A712 /* SummaryTableVC.swift */,
 				CE9FFEBA2302F3DF00261390 /* Thoughts.rtf */,
 				BF9DD30922F1370200C22E41 /* StringExtension.swift */,
 				BF992C4B22EE56420089DAB8 /* Assets.xcassets */,
@@ -348,6 +354,7 @@
 				BF992C4C22EE56420089DAB8 /* Assets.xcassets in Resources */,
 				BF992C4F22EE56420089DAB8 /* Main.storyboard in Resources */,
 				CE1F7EC823317453004765E7 /* MyCategories.txt in Resources */,
+				CEA3DF26234B75770021A712 /* SummaryTable.storyboard in Resources */,
 				CE9FFEBB2302F3DF00261390 /* Thoughts.rtf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -392,6 +399,7 @@
 				BFA770DF22FD10BE00BA15B6 /* ErrorHandler.swift in Sources */,
 				BF9DD30C22F793EA00C22E41 /* CategoryItem.swift in Sources */,
 				BF5D549C22EF458500111875 /* LineItems.swift in Sources */,
+				CEA3DF28234B76730021A712 /* SummaryTableVC.swift in Sources */,
 				BFECDEDF22FDBC2F00F1BF5E /* FreeFuncs.swift in Sources */,
 				CEB315962321607E00D88759 /* UserInputCatVC.swift in Sources */,
 				CEA62D302306232C00160DEB /* Alerts.swift in Sources */,
@@ -579,14 +587,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 510;
+				CURRENT_PROJECT_VERSION = 533;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.4;
+				MARKETING_VERSION = 1.5.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -600,14 +608,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 510;
+				CURRENT_PROJECT_VERSION = 533;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.4;
+				MARKETING_VERSION = 1.5.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

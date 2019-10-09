@@ -1130,6 +1130,17 @@
                                     <action selector="btnFilter:" target="s51-x1-exx" id="yhM-gj-wD7"/>
                                 </connections>
                             </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Gt0-QW-d71">
+                                <rect key="frame" x="0.0" y="69" width="108" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="Summaries" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="E6x-Jq-T5J">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="btnSummaries:" target="s51-x1-exx" id="5CC-6D-QXs"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="DEN-9s-ZbB" firstAttribute="leading" secondItem="3px-H6-o2P" secondAttribute="leading" id="Efb-z0-0of"/>
@@ -1155,7 +1166,7 @@
                 </viewController>
                 <customObject id="JLn-RX-XgC" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="169" y="55.5"/>
+            <point key="canvasLocation" x="150" y="53"/>
         </scene>
     </scenes>
 </document>

@@ -16,6 +16,7 @@ import Cocoa
 
 // Global Variables
 var gUserInitials           = "User"    // (UserInputVC.swift-2) Initials used for "Category Source" when Cat is changes by user.
+var gLineItemArray          = [LineItem]()  // Entire list of transactions - used here & SpreadsheetVC
 var gTransFilename          = ""                // (UserInputVC.swift-viewDidLoad) Current Transaction Filename
 var gMyCatNames             = [String]()            // (loadMyCats, UserInputVC.swift-viewDidLoad) Array of Category Names (MyCategories.txt)
 var dictMyCatAliases        = [String: String]()        // (LineItems.init, etc) Hash of Category Synonyms
@@ -303,7 +304,8 @@ class ViewController: NSViewController, NSWindowDelegate {
         UserDefaults.standard.set(gUserInputMode,     forKey: UDKey.userInputMode)
         UserDefaults.standard.set(gLearnMode,         forKey: UDKey.learningMode)
 
-        Stats.clearAll()
+        Stats.clearAll()        // Clear the Stats
+        gLineItemArray = []     // Clear the global lineItemArray
         dictVendorCatLookup = loadVendorCategories(url: vendorCatLookupFileURL) // Re-read Categories Dictionary
         Stats.origVendrCatCount = dictVendorCatLookup.count
 
