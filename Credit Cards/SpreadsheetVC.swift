@@ -112,7 +112,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     //MARK:- Regular funcs
 
     //---- loadTableSortDescriptors - for column-based sort - Modifies tableView, colWidDict
-    func loadTableSortDescriptors() {
+    internal func loadTableSortDescriptors() {
         colWidDict.removeAll()
         for column in tableView.tableColumns {
             let key = column.identifier.rawValue
@@ -125,7 +125,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     }//end func
 
     //---- syncColWidths - Make Summary Column widths = Main Column widths
-    func syncColWidths() {
+    private func syncColWidths() {
         for (idx, column) in tableView.tableColumns.enumerated() {
             tableViewSum.tableColumns[idx].width = column.width
         }
@@ -151,7 +151,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     // is responsible for global "gFilteredLineItemArray"
     //---- loadTable - Select stocks to be displayed & Create tableDicts array. Also fill "Totals" labels.
-    private func loadTable(lineItemArray: [LineItem]) {  // 97-133 = 36-lines
+    private func loadTable(lineItemArray: [LineItem]) {  // 154-182 = 28-lines
         var sumLine = LineItem()
         tableDicts  = []
         gFilteredLineItemArray = []
@@ -206,7 +206,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     }
 
     //---- makeRowDict - Create a dictionary entry for loadTable
-    func makeRowDict(lineItem: LineItem) -> [String : String] { // 136-161 = 25-lines
+    func makeRowDict(lineItem: LineItem) -> [String : String] {
         var dict = [String : String]()
 
         dict[ColID.cardType]    = lineItem.cardType

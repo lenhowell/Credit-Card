@@ -11,28 +11,29 @@ import Cocoa
 class SummaryTableVC: NSViewController, NSWindowDelegate {
 
     enum SummarizeBy {
-        case none, category, vendor, cardType, month
+        case none, category, subCategory, vendor, cardType, month, quarter
     }
 
     var summarizeBy = SummarizeBy.category
     let codeFile    = "SummaryTableVC"
-    var tableDicts   = [[String : String]]()    // Array of Dictionaries
+    var tableDicts  = [[String : String]]()    // Array of Dictionaries
+    var iSortBy     = ColID.debit
     var totalCredit = 0.0
     var totalDebit  = 0.0
-    //var iSortBy     = ColID.cardType
-    var iAscending  = true
+    var iAscending  = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
         radioCategory.state = .on
+        loadTableSortDescriptors()
         loadTable(lineItemArray: gFilteredLineItemArray, summarizeBy : .category)
     }
 
     override func viewDidAppear() {
         super.viewDidAppear()
         view.window!.delegate = self
-        //reloadTable(sortBy: iSortBy, ascending: iAscending)
+        reloadTable(sortBy: iSortBy, ascending: iAscending)
     }
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {
@@ -47,7 +48,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     @IBOutlet var radioVendor:      NSButton!
     @IBOutlet var radioCardType:    NSButton!
     @IBOutlet var radioMonth:       NSButton!
-    @IBOutlet var tableView:    NSTableView!
+    @IBOutlet var tableView:     NSTableView!
     
     //MARK:- IBActions
 
@@ -66,16 +67,28 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
 
         } else {
             summarizeBy = .none
-
         }
-        //updateAfterCatChange(sortBy: sortBy)
+        loadTable(lineItemArray: gFilteredLineItemArray, summarizeBy : summarizeBy)
     }
 
     //MARK:- Regular funcs
 
+    //---- loadTableSortDescriptors - for column-based sort - Modifies tableView, colWidDict
+    private func loadTableSortDescriptors() {
+        for column in tableView.tableColumns {
+            let key = column.identifier.rawValue
+            let ascending: Bool
+            ascending = (key == ColID.name) // ascending for cardType; descending for the rest.
+            let sortDescriptor  = NSSortDescriptor(key: key,  ascending: ascending)
+            column.sortDescriptorPrototype = sortDescriptor
+        }
+    }//end func
+
     //---- loadTable - Select stocks to be displayed & Create tableDicts array. Also fill "Totals" labels.
-    private func loadTable(lineItemArray: [LineItem], summarizeBy : SummarizeBy) {  // 97-133 = 36-lines
-        let sortedLineItemArray = lineItemArray.sorted(by:{$0.genCat < $1.genCat})
+    private func loadTable(lineItemArray: [LineItem], summarizeBy : SummarizeBy) {  // 88-127 = 39-lines
+
+        let sortedLineItemArray = lineItemArray.sorted(by: { compareST(lft: $0, rgt: $1, summarizeBy: summarizeBy) })  //**
+
         tableDicts  = []
         if lineItemArray.isEmpty { return }
 
@@ -87,51 +100,89 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         var namedCredit = 0.0
         var namedDebit  = 0.0
         var oldName = ""
-        for lineItem in sortedLineItemArray {
-            if lineItem.genCat == oldName {
-                namedCount  += 1
+        for i in 0..<sortedLineItemArray.count {
+            let lineItem = sortedLineItemArray[i]
+            let newName = summarizeName(lineItem: lineItem, summarizeBy: summarizeBy) //**
+            if newName == oldName {         // Still working on oldName
+                namedCount  += 1            //      so add to totals
                 namedDebit  += lineItem.debit
                 namedCredit += lineItem.credit
             } else {
-                let name = oldName
-                oldName = lineItem.genCat
-                let strCredit = formatCell(namedCredit, formatType: .Dollar,  digits: 2)
-                let strDebit  = formatCell(namedDebit,  formatType: .Dollar,  digits: 2)
-                let dict = [ColID.name: name, ColID.count: String(namedCount), ColID.debit: strDebit, ColID.credit: strCredit]
-                namedCount  = 0
-                namedCredit = 0.0
-                namedDebit  = 0.0
-                tableDicts.append(dict)
-                totalCredit += lineItem.credit
-                totalDebit  += lineItem.debit
+                appendToTableDicts(name: oldName, count: namedCount, credit: namedCredit, debit: namedDebit)
+                namedCount  = 1
+                namedCredit = lineItem.credit
+                namedDebit  = lineItem.debit
+                oldName     = newName
             }
+            totalCredit += lineItem.credit
+            totalDebit  += lineItem.debit
         }//next
+        appendToTableDicts(name: oldName, count: namedCount, credit: namedCredit, debit: namedDebit)
+
         //tableDicts = tableDicts.sorted(by: { $0[ColID.debit]! > $1[ColID.debit]! })
-        let sortBy = ColID.debit
+        let sortBy = iSortBy
         tableDicts.sort { compareTextNum(lft: $0[sortBy]!, rgt: $1[sortBy]!, ascending: false) }
 
         tableView.reloadData()
     }//end func loadTable
 
+    //**
+    func compareST(lft: LineItem, rgt: LineItem, summarizeBy: SummarizeBy) -> Bool {
+        switch summarizeBy {
+        case .category:
+            return lft.genCat   < rgt.genCat
+        case .cardType:
+            return lft.cardType < rgt.cardType
+        case .vendor:
+            return lft.descKey  < rgt.descKey
+        case .month:
+            return makeYYYYMMDD(dateTxt: lft.tranDate)  < makeYYYYMMDD(dateTxt: rgt.tranDate)
+        default:
+            return false
+        }
+    }
 
-//---- makeRowDict - Create a dictionary entry for loadTable
-func makeRowDicts(lineItem: LineItem) -> [String : String] { // 136-161 = 25-lines
-    var dict = [String : String]()
-    dict[ColID.name]    = lineItem.genCat
+    func summarizeName(lineItem: LineItem, summarizeBy: SummarizeBy) -> String {
+        switch summarizeBy {
+        case .category:
+            return lineItem.genCat
+        case .cardType:
+            return lineItem.cardType
+        case .vendor:
+            return lineItem.descKey
+        case .month:
+            return String(makeYYYYMMDD(dateTxt: lineItem.tranDate).prefix(7))
+        default:
+            return "?name?"
+        }
+    }
 
-    return dict
-}// end func
+    //---- reloadTable - reloads the table for tableDicts, sorted by ColID
+    private func reloadTable(sortBy: String, ascending: Bool) {
+        tableDicts.sort { compareTextNum(lft: $0[sortBy]!, rgt: $1[sortBy]!, ascending: ascending) }
+        tableView.reloadData()
+        iSortBy    = sortBy         // Remember Sort order
+        iAscending = ascending
+    }
+
+    //---- makeRowDict - Create a dictionary entry for loadTable & appends to tableDicts
+    private func appendToTableDicts(name: String, count: Int, credit: Double, debit: Double) {
+        if !name.isEmpty {
+            let strCredit = formatCell(credit, formatType: .Dollar,  digits: 2)
+            let strDebit  = formatCell(debit,  formatType: .Dollar,  digits: 2)
+            let dict      = [ColID.name: name, ColID.count: String(count), ColID.debit: strDebit, ColID.credit: strCredit]
+            tableDicts.append(dict)
+        }
+    }// end func
+
+    fileprivate enum ColID: CaseIterable {
+        static let name     = "Name"
+        static let count    = "Count"
+        static let debit    = "Debit"
+        static let credit   = "Credit"
+    }
 
 }//end class
-
-//              Name        ID          Width   Col#    Totals
-fileprivate enum ColID: CaseIterable {
-    static let name     = "Name"
-    static let count    = "Count"
-    static let debit    = "Debit"
-    static let credit   = "Credit"
-}
-
 
 //MARK:- NSTableViewDataSource
 
@@ -143,12 +194,12 @@ extension SummaryTableVC: NSTableViewDataSource {
         return tableDicts.count
     }
 
-//    //---- tableView sortDescriptorsDidChange - Column SORT
-//    func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
-//            guard let sortDescriptor = tableView.sortDescriptors.first else { return }
-//            //print("⬆️\(sortDescriptor.key!) \(sortDescriptor.ascending)")
-//            reloadTable(sortBy: sortDescriptor.key!, ascending: sortDescriptor.ascending)
-//    }
+    //---- tableView sortDescriptorsDidChange - Column SORT
+    func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
+        guard let sortDescriptor = tableView.sortDescriptors.first else { return }
+        //print("⬆️\(sortDescriptor.key!) \(sortDescriptor.ascending)")
+        reloadTable(sortBy: sortDescriptor.key!, ascending: sortDescriptor.ascending)
+    }
 
 }//end extension
 
@@ -156,7 +207,7 @@ extension SummaryTableVC: NSTableViewDataSource {
 
 extension SummaryTableVC: NSTableViewDelegate {
 
-//---- tableView viewFor - Creates each Cell when called by tableView
+    //---- tableView viewFor - Creates each Cell when called by tableView
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
 
         let dict = tableDicts[row]
