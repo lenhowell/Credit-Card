@@ -9,9 +9,8 @@
 import Foundation
 
 //MARK:- Globals
-let descKeysuppressionList = " \";_@/,#*-"
 let descKeyLength          = 24
-var dictDescKeyAlgorithm = [String: Int]()
+var dictDescKeyAlgorithm   = [String: Int]()
 
 //MARK:- makeDescKey 18-225 = 207-lines
 //---- makeDescKey - Make a CategoryLookup key from the transaction "Description"
@@ -177,6 +176,7 @@ public func makeDescKey(from desc: String, dictVendorShortNames: [String: String
     }
 
     //-- Replace chars in suppression list with spaces -- [STEAK-N-SHAKE] -> [STEAK N SHAKE]
+    let descKeysuppressionList = " \";_@/,#*-"
     key2 = descKeyLong.replacingOccurrences(of: "["+descKeysuppressionList+"]", with: " ", options: .regularExpression, range: nil)
     descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "17.Char Suppression List.")
 
@@ -231,13 +231,13 @@ public func makeDescKey(from desc: String, dictVendorShortNames: [String: String
 
 //MARK:- Helper funcs
 
-// if multiple words: remove ast word
+// if multiple words: remove last word
 // if only one word:
 internal func stripTrailingNumber(_ keyIn: String, fileName: String = "") -> String {
     var key = keyIn
     var key2 = key
 
-    // Replace [(spc) (2 or more digits) (word boundry)] with spc
+    // Replace [(spc)+(2 or more digits)+(word boundry)] with spc
     key2 = key.replacingOccurrences(of:  #" \d\d+\b"#, with: " ", options: .regularExpression, range: nil).trim
     if key2 != key {    // "PILOT 00337", "SUPER 8", "STAR SHOWER 2", "DTGC 1", "JETBLUE     2"
         print("🔹 1 ",fileName, key, "=>" , key2)   // CIRCLE B 10 => CIRCLE B (# was too short)

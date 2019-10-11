@@ -73,7 +73,7 @@ public func removeUserFromPath(_ fullPath: String) -> String {
     return path
 }
 
-public func saveBackupFile(url: URL, multiple: Bool = false) {
+public func saveBackupFile(url: URL, multiple: Bool = false, addonName: String = "BU") {
     // Create a FileManager instance
     let fileManager = FileManager.default
     // Rename the existing file to "CategoryLookup yyyy-MM-dd HHmm.txt"
@@ -86,15 +86,15 @@ public func saveBackupFile(url: URL, multiple: Bool = false) {
     } else {
         ext = ""
     }
-    var adder = "BU"
+    var adder = addonName
     if multiple {
         //for multiple backups, use the creation dates instead of "BU" in the names
         let fileAttributes = FileAttributes.getFileInfo(url: url)
         let modDate = fileAttributes.modificationDate
-        adder = modDate?.toString("yyyy-MM-dd HHmm") ?? "BU"
+        adder = modDate?.toString("yyyy-MM-dd HHmm") ?? addonName
     }
 
-    let newName = oldName + " " + adder + ext
+    let newName = oldName + adder + ext
     let newPath = url.deletingLastPathComponent().path + "/" + newName
 
     if fileManager.fileExists(atPath: newPath) {
@@ -185,9 +185,7 @@ func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
         // Create an Array of line components the seperator being a ","
         let myCatsArray = line.components(separatedBy: ",")
         let myCat = myCatsArray[0].trim.removeEnclosingQuotes()
-        //if !myCat.hasPrefix("?") { gMyCatNames.append(myCat) }
          gMyCatNames.append(myCat)
-        //dictMyCatNames[myCat] = 0
 
         for myCatAliasRaw in myCatsArray {
             let myCatAlias = myCatAliasRaw.trim.removeEnclosingQuotes()
@@ -200,6 +198,8 @@ func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
     return dictMyCats
 }//end func loadMyCats
 
+//---- writeMyCats - Used only when a starter verion from bundle is read in
+//TODO: Change writeMyCats to accommidate user mods
 func writeMyCats(url: URL) {
     saveBackupFile(url: url)
     var text = "// Machine-generated file\n"
@@ -235,7 +235,7 @@ func loadMyModifiedTrans(myModifiedTranURL: URL) -> [String: CategoryItem]  {
         if line.trim.isEmpty || line.hasPrefix("//") {
             continue
         }
-        //TODO: Check for out-of-bounds
+        //TODO: MyModifiedTrans - Check for out-of-bounds
         let comps = line.components(separatedBy: "\t").map{$0.trim}
         let genCat = comps[0]
         let catSource = comps[1]
@@ -434,4 +434,20 @@ public func getTransFileList(transDirURL: URL) -> [URL] {
     }
     return []
 }//end func
+
+func deleteSupportFile(url: URL, fileName: String) -> Bool {
+    var didSomething = false
+    let fileManager = FileManager.default
+    if fileManager.fileExists(atPath: url.path) {
+        let response = GBox.alert("Do you want to delete \(fileName)?", style: .yesNo)
+        if response == .yes {
+            if url.path.hasSuffix("\(fileName)") {
+                //fileManager.removeItem(at: url)
+                saveBackupFile(url: url, addonName: "-Deleted")
+                didSomething = true
+            }
+        }
+    }
+    return didSomething
+}
 

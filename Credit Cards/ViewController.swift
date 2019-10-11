@@ -6,8 +6,6 @@
 //  Copyright © 2019 Lenard Howell. All rights reserved.
 //
 
-// TODO: Check for overlaps & gaps in card transaction file list.
-
 import Cocoa
 
 //MARK:- Global Variables
@@ -25,9 +23,9 @@ var dictTranDupes           = [String: String]()        // (handleCards) Hash fo
 var dictModifiedTrans       = [String: CategoryItem]()  // (MyModifiedTransactions.txt) Hash for user-modified transactions
 var uniqueCategoryCounts    = [String: Int]()           // Hash for Unique Category Counts
 var gMyCategoryContent      = ""
-var gIsUnitTesting   = false
-var gLearnMode       = true
-var gUserInputMode   = true
+var gIsUnitTesting      = false     // Not used
+var gLearnMode          = true      // Used here & HandleCards.swift
+var gUserInputMode      = true      // Used here & HandleCards.swift
 
 //MARK:- ViewController
 class ViewController: NSViewController, NSWindowDelegate {
@@ -35,12 +33,12 @@ class ViewController: NSViewController, NSWindowDelegate {
     //MARK:- Instance Variables
     
     // Constants
+    let codeFile    = "ViewController"
     let myFileNameOut           = "Combined-Creditcard-Master.txt" // Only used in outputTranactions
-    let VendorCatLookupFilename = "VendorCategoryLookup.txt"
+    let vendorCatLookupFilename = "VendorCategoryLookup.txt"
     let vendorShortNameFilename = "VendorShortNames.txt"
     let myCatsFilename          = "MyCategories.txt"
     let myModifiedTranFilename  = "MyModifiedTransactions.txt"
-    let codeFile    = "ViewController"
 
     // Variables
     var dictVendorShortNames    = [String: String]()        // (VendorShortNames.txt) Hash for VendorShortNames Lookup
@@ -172,13 +170,16 @@ class ViewController: NSViewController, NSWindowDelegate {
     @IBOutlet var txtTransationFolder: NSTextField!
     @IBOutlet var txtSupportFolder:    NSTextField!
     @IBOutlet var txtOutputFolder:     NSTextField!
+
     @IBOutlet weak var lblErrMsg:   NSTextField!
     @IBOutlet weak var lblResults:  NSTextField!
     @IBOutlet weak var lblRunTime:  NSTextField!
     @IBOutlet var lblTranFileCount: NSTextField!
+
     @IBOutlet weak var btnStart:    NSButton!
     @IBOutlet var chkLearningMode:  NSButton!
     @IBOutlet var chkUserInput:     NSButton!
+    
     @IBOutlet var cboFiles:     NSComboBox!
 
     //MARK:- @IBActions
@@ -221,9 +222,27 @@ class ViewController: NSViewController, NSWindowDelegate {
     // MARK:- IBActions - MenuBar
 
     @IBAction func mnuResetUserDefaults(_ sender: Any) {
-        let response = GBox.alert("Are you sure you want to reset all User Defaults?", style: .yesNo)
+        var didSomething = 0
+        var response = GBox.alert("Are you sure you want to reset all User Defaults?", style: .yesNo)
         if response == .yes {
-            resetUserDefaults()
+            if resetUserDefaults() {
+                didSomething += 1
+            } else {
+                let msg = "Could not reset User Defaults!"
+                handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
+            }
+
+        }
+
+        if deleteSupportFile(url: myCatsFileURL, fileName: myCatsFilename) { didSomething += 1 }
+        if deleteSupportFile(url: vendorCatLookupFileURL, fileName: vendorCatLookupFilename) { didSomething += 1 }
+        if deleteSupportFile(url: vendorShortNamesFileURL, fileName: vendorShortNameFilename) { didSomething += 1 }
+        if deleteSupportFile(url: myModifiedTransURL, fileName: myModifiedTranFilename) { didSomething += 1 }
+
+        if didSomething > 0 {
+            let msg = "User Defaults reset. Restart program to enter setup mode."
+            _ = GBox.inputBox(prompt: msg, defaultText: "", maxChars: 0)
+            NSApplication.shared.terminate(self)
         }
     }
 
@@ -257,9 +276,9 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
 
-    //MARK:- Main Program
+    //MARK:- Main Program 149-lines
     
-    func main() {
+    func main() {   // 265-414 = 149-lines
         verifyFolders()
         if !gotItem.contains(GotItem.allDirs) {
             let errMsg = makeMissingItemsMsg(got: gotItem)
@@ -481,7 +500,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         var errTxt = ""
 
         // "CategoryLookup.txt"
-        (vendorCatLookupFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: VendorCatLookupFilename)
+        (vendorCatLookupFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: vendorCatLookupFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "Category" + errTxt)
         }
@@ -526,13 +545,16 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     //---- resetUserDefaults - Reset all User Defaults to provide a clean startup
     //TODO: resetUserDefaults - Allow user to delete support files
-    func resetUserDefaults() {
+    func resetUserDefaults() -> Bool {
         if let appDomain = Bundle.main.bundleIdentifier {
             UserDefaults.standard.removePersistentDomain(forName: appDomain)
+            return true
+
             let msg = "User Defaults reset. Restart program to enter setup mode."
             _ = GBox.inputBox(prompt: msg, defaultText: "", maxChars: 0)
             NSApplication.shared.terminate(self)
         } else {
+            return false
             let msg = "Could not reset User Defaults!"
             handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
         }

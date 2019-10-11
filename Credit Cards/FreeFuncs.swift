@@ -29,8 +29,10 @@ public enum FormatType {
 }
 //---- formatCell -
 public func formatCell(_ value: Double, formatType: FormatType, digits: Int,
-                       onlyIf: Bool = true, emptyCell: String = "") -> String {
-    if !onlyIf { return emptyCell }
+                       doReplaceZero: Bool = true, zeroCell: String = "") -> String {
+    if doReplaceZero && value == 0.0 {
+        return ""
+    }
     var format = ""
     switch formatType {
     case .Number:                                       // -1234.5
@@ -40,7 +42,6 @@ public func formatCell(_ value: Double, formatType: FormatType, digits: Int,
         format = "%.\(digits)f%%" // "%.1f%%" -> "#.0%"
         return String(format: format, value*100)
     case .Dollar:                                       // ($1,234.5)
-        if value == 0 { return "" }
         let formatter = NumberFormatter()
         formatter.numberStyle  = .currencyAccounting
         formatter.maximumFractionDigits = digits
@@ -50,7 +51,7 @@ public func formatCell(_ value: Double, formatType: FormatType, digits: Int,
         formatter.numberStyle  = .currencyAccounting
         formatter.maximumFractionDigits = digits
         let str = formatter.string(for: value) ?? "$?Dollar?"
-        let str2 = String(str.dropFirst())
+        let str2 = str.replacingOccurrences(of: "$", with: "")
         return str2
     case .Comma:                                        // -1,234.5
         let formatter = NumberFormatter()
@@ -63,7 +64,7 @@ public func formatCell(_ value: Double, formatType: FormatType, digits: Int,
 
 }//end func
 
-//---- compare - compares 2 strings either numerically or case-insensitive.
+//---- compareTextNum - compares 2 strings either numerically or case-insensitive.
 public func compareTextNum(lft: String, rgt: String, ascending: Bool) -> Bool {
     let lStripped = sortStr(lft)
     let rStripped = sortStr(rgt)

@@ -26,6 +26,28 @@ class Credit_Cards_UnitTests: XCTestCase {
     }
 
     // MARK:- Freefuncs.swift
+
+    func test_formatCell() {
+        var result = ""
+        var num = 0.0
+        result = formatCell(num,  formatType: .Number,    digits: 2)
+        XCTAssertEqual(result, "")
+
+        num = -1234.567
+        result = formatCell(num,  formatType: .Number,    digits: 2)
+        XCTAssertEqual(result, "-1234.57")
+        result = formatCell(num,  formatType: .Dollar,    digits: 2)
+        XCTAssertEqual(result, "($1,234.57)")
+        result = formatCell(num,  formatType: .NoDollar,  digits: 2)
+        XCTAssertEqual(result, "(1,234.57)")
+        result = formatCell(num,  formatType: .Percent,   digits: 2)
+        XCTAssertEqual(result, "-123456.70%")
+        result = formatCell(num,  formatType: .Comma,     digits: 2)
+        XCTAssertEqual(result, "-1,234.57")
+        result = formatCell(num,  formatType: .None,     digits: 2)
+        XCTAssertEqual(result, "-1234.567")
+    }
+
     func testPasteboard() {
         // This is an example of a functional test case.
         let text = "This is test #13"
@@ -33,6 +55,19 @@ class Credit_Cards_UnitTests: XCTestCase {
         let result = getStringFromClipBoard()
         XCTAssertEqual(text, result)
         // Use XCTAssert and related functions to verify your tests produce the correct results.
+    }
+
+    func testcompareTextNum() {
+        var result = false
+        var lft = "987.45"
+        let rgt = "$1,234"
+        result = compareTextNum(lft: lft, rgt: rgt, ascending: true)
+        XCTAssertTrue(result)
+        result = compareTextNum(lft: lft, rgt: rgt, ascending: false)
+        XCTAssertFalse(result)
+        lft = "987.45X"
+        result = compareTextNum(lft: lft, rgt: rgt, ascending: true)
+        XCTAssertFalse(result)
     }
 
     func testDateExtensions() {
@@ -75,7 +110,7 @@ class Credit_Cards_UnitTests: XCTestCase {
         XCTAssertEqual(lineItem.cardType, "TEst")
         XCTAssertEqual(lineItem.credit, 31.85)
         XCTAssertEqual(lineItem.rawCat, "Bad Category")
-        XCTAssertEqual(lineItem.genCat, "?Bad Category")
+        XCTAssertEqual(lineItem.genCat, "Bad Category?")
 
         // Bad Line - Run AFTER creating "Cat inserted for LX FITNESS" above
         tran = "2018-08-25,2018-08-27,8772,LX FITNESS,This is a TEST,31.85"
@@ -84,7 +119,7 @@ class Credit_Cards_UnitTests: XCTestCase {
         XCTAssertEqual(lineItem.credit, 0)
         XCTAssertEqual(lineItem.debit, 31.85)
         XCTAssertEqual(lineItem.rawCat, "This is a TEST")
-        XCTAssertEqual(lineItem.genCat, "?This is a TEST")
+        XCTAssertEqual(lineItem.genCat, "This is a TEST?")
 
     }
 

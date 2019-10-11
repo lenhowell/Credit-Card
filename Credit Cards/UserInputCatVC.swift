@@ -12,7 +12,6 @@ class UserInputVC: NSViewController, NSWindowDelegate {
 
     //MARK:- Instance Variables
 //    weak var delegate: UserInputVcDelegate?          //delegate <— (2)
-    var t        = LineItem()
     var catItemFromVendor = CategoryItem()
     var catItemFromTran   = CategoryItem()
     var catItemPrefered   = CategoryItem()
@@ -28,11 +27,11 @@ class UserInputVC: NSViewController, NSWindowDelegate {
         chkQuestionMark.state = .off
 
         lblFile.stringValue = gTransFilename
-        t = usrLineItem
-        let amt = t.debit - t.credit
+        let lineItem = usrLineItem
+        let amt = lineItem.debit - lineItem.credit
         let strDebit = String(format:"%.2f", amt)
-        let desc = t.desc.PadRight(40, truncate: true, useEllipsis: true, fillChr: " ")
-        lblLineItem.stringValue      = "\(t.tranDate)  \"\(t.descKey)\"   $\(strDebit)"
+        let desc = lineItem.desc.PadRight(40, truncate: true, useEllipsis: true, fillChr: " ")
+        lblLineItem.stringValue      = "\(lineItem.tranDate)  \"\(lineItem.descKey)\"   $\(strDebit)"
         lblDesc.stringValue          = "              \(desc)"
         lblcatFromTran.stringValue   = usrCatItemFromTran.category
         lblcatFromVendor.stringValue = usrCatItemFromVendor.category
@@ -119,12 +118,12 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     @IBAction func chkQuestionMarkClick(_ sender: Any) {
         let myCat = catItemCurrent.category
         if chkQuestionMark.state == .on {
-            if !myCat.hasPrefix("?") {
-                catItemCurrent.category = "?" + myCat
+            if !myCat.hasSuffix("?") {
+                catItemCurrent.category = myCat + "?"
             }
         } else {
-            if myCat.hasPrefix("?") {
-                catItemCurrent.category = String(myCat.dropFirst())
+            if myCat.hasSuffix("?") {
+                catItemCurrent.category = String(myCat.dropLast())
             }
         }
         updateAfterCatChange(newCatItem: catItemCurrent)
@@ -173,7 +172,7 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     private func updateAfterCatChange(newCatItem: CategoryItem) {
         let newCat = newCatItem.category
         cboCats.stringValue = newCat
-        chkQuestionMark.state = (newCat.hasPrefix("?")) ? .on : .off
+        chkQuestionMark.state = (newCat.hasSuffix("?")) ? .on : .off
     }//end func
 
     //------ loadComboBoxCats - load ComboBoxCatss with myCategories

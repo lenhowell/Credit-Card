@@ -213,7 +213,10 @@ extension SummaryTableVC: NSTableViewDelegate {
         let dict = tableDicts[row]
         //var image: NSImage?
 
-        guard let colID = tableColumn?.identifier.rawValue else { print("⛔️ Table Column nil"); return nil }
+        guard let colID = tableColumn?.identifier.rawValue else {
+            print("⛔️ Table Column nil")
+            return nil
+        }
         guard let text = dict[colID] else {
             print("⛔️ \(codeFile)#\(#line) No Value found for \(colID)")
             return nil

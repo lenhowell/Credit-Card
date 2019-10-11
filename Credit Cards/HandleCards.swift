@@ -142,7 +142,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
     var catItemFromVendor   = CategoryItem()
     var catItemPrefered     = CategoryItem()
     var isClearWinner       = false
-    var catFromTran     = dictMyCatAliases[lineItem.rawCat] ?? "?" + lineItem.rawCat
+    var catFromTran     = dictMyCatAliases[lineItem.rawCat] ?? lineItem.rawCat + "?"
     var catItemFromTran = CategoryItem(category: catFromTran, source: cardType)
 
     if descKey.isEmpty { return lineItem }    // Missing descKey
@@ -167,7 +167,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
 
         if let catTran = dictMyCatAliases[catFromTran] {
             catFromTran = catTran
-            isClearWinner = !catFromTran.hasPrefix("?") // if no "?", we have a winner
+            isClearWinner = !catFromTran.hasSuffix("?") // if no "?", we have a winner
         } else {
             print("HandleCards#\(#line): Unknown Category: \"\(lineItem.rawCat)\" from \(descKey) (line#\(lineNum) in \(fileName))")
             isClearWinner = false
@@ -301,8 +301,8 @@ internal func pickTheBestCat(catItemVendor: CategoryItem, catItemTransa: Categor
     let catVendor = catItemVendor.category
     let catTransa = catItemTransa.category
     if catItemVendor.source.hasPrefix("$")                  { return (catItemVendor, strong) }  // User modified
-    let catVendStrong = !catVendor.isEmpty && !catVendor.hasPrefix("?") && !catVendor.contains("Unkno") && !catVendor.contains("Merch")
-    let catTranStrong = !catTransa.isEmpty && !catTransa.hasPrefix("?") && !catTransa.contains("Unkno") && !catTransa.contains("Merch")
+    let catVendStrong = !catVendor.isEmpty && !catVendor.hasSuffix("?") && !catVendor.contains("Unkno") && !catVendor.contains("Merch")
+    let catTranStrong = !catTransa.isEmpty && !catTransa.hasSuffix("?") && !catTransa.contains("Unkno") && !catTransa.contains("Merch")
 
     if (catVendor == catTransa)                             { return (catItemTransa, catTranStrong) } // Both the same.
 
@@ -312,8 +312,8 @@ internal func pickTheBestCat(catItemVendor: CategoryItem, catItemTransa: Categor
 
     if catVendor.isEmpty || catVendor == "?"                { return (catItemTransa, weak) }    // catVendor missing
     if catTransa.isEmpty || catTransa == "?"                { return (catItemVendor, weak) }    // catTransa missing
-    if catVendor.hasPrefix("?") && !catTransa.hasPrefix("?") { return (catItemTransa, weak) }   // use the cat with no "?"
-    if catTransa.hasPrefix("?") && !catVendor.hasPrefix("?") { return (catItemVendor, weak) }   //      "
+    if catVendor.hasPrefix("?") && !catTransa.hasSuffix("?") { return (catItemTransa, weak) }   // use the cat with no "?"
+    if catTransa.hasPrefix("?") && !catVendor.hasSuffix("?") { return (catItemVendor, weak) }   //      "
     if catTransa.contains("Unkno")                          { return (catItemVendor, weak) }    // "Unknown"
     if catVendor.contains("Unkno")                          { return (catItemTransa, weak) }    //      "
     if catTransa.contains("Merch")                          { return (catItemVendor, weak) }    // "Merchandise" is weak
