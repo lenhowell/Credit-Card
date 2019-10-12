@@ -20,7 +20,7 @@ var usrFixVendor        = true
 var usrIgnoreVendors    = [String: Int]()
 
 
-//MARK:---- handleCards - 25-85 = 60-lines
+//MARK:---- handleCards - 25-91 = 66-lines
 
 func handleCards(fileName: String, cardType: String, cardArray: [String], dictVendorShortNames: inout [String: String]) -> [LineItem] {
     let cardArrayCount = cardArray.count
@@ -120,7 +120,7 @@ func makeYYYYMMDD(dateTxt: String) -> String {
     return dateStr
 }
 
-//MARK: makeLineItem - 89-163 = 74-lines
+//MARK: makeLineItem - 125-201 = 76-lines
 //---- makeLineItem - uses Global Vars: dictVendorCatLookup(I/O), Stats(I/O)
 internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int], dictVendorShortNames: [String: String], cardType: String, hasCatHeader: Bool, fileName: String, lineNum: Int) -> LineItem {
 
@@ -247,7 +247,7 @@ func showUserInputForm(lineItem: LineItem, catItemFromVendor: CategoryItem, catI
     return catItemPrefered
 }//end func
 
-//MARK:---- makeDictColNums - 200-218 = 18-lines
+//MARK:---- makeDictColNums - 253-274 = 21-lines
 
 //---- makeDictColNums - Infer which columns have the relevant data based in the Header row. Returns dictColNums
 internal func makeDictColNums(headers: [String]) -> [String: Int] {
@@ -312,8 +312,8 @@ internal func pickTheBestCat(catItemVendor: CategoryItem, catItemTransa: Categor
 
     if catVendor.isEmpty || catVendor == "?"                { return (catItemTransa, weak) }    // catVendor missing
     if catTransa.isEmpty || catTransa == "?"                { return (catItemVendor, weak) }    // catTransa missing
-    if catVendor.hasPrefix("?") && !catTransa.hasSuffix("?") { return (catItemTransa, weak) }   // use the cat with no "?"
-    if catTransa.hasPrefix("?") && !catVendor.hasSuffix("?") { return (catItemVendor, weak) }   //      "
+    if catVendor.hasSuffix("?") && !catTransa.hasSuffix("?") { return (catItemTransa, weak) }   // use the cat with no "?"
+    if catTransa.hasSuffix("?") && !catVendor.hasSuffix("?") { return (catItemVendor, weak) }   //      "
     if catTransa.contains("Unkno")                          { return (catItemVendor, weak) }    // "Unknown"
     if catVendor.contains("Unkno")                          { return (catItemTransa, weak) }    //      "
     if catTransa.contains("Merch")                          { return (catItemVendor, weak) }    // "Merchandise" is weak

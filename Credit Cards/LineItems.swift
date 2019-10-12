@@ -27,7 +27,7 @@ public struct LineItem: Equatable, Hashable {
     init() {
     }
 
-    //MARK:- init - 33-120 = 87-lines
+    //MARK:- init - 33-121 = 88-lines
     //TODO: Allow LineItem.init to throw errors
     // Create a LineItem from a Transaction-File line
     init(fromTransFileLine: String, dictColNums: [String: Int], fileName: String, lineNum: Int) {

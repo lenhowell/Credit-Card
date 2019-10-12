@@ -278,7 +278,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     //MARK:- Main Program 149-lines
     
-    func main() {   // 265-414 = 149-lines
+    func main() {   // 281-430 = 149-lines
         verifyFolders()
         if !gotItem.contains(GotItem.allDirs) {
             let errMsg = makeMissingItemsMsg(got: gotItem)

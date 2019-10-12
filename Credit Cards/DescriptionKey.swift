@@ -12,7 +12,7 @@ import Foundation
 let descKeyLength          = 24
 var dictDescKeyAlgorithm   = [String: Int]()
 
-//MARK:- makeDescKey 18-225 = 207-lines
+//MARK:- makeDescKey 17-229 = 212-lines
 //---- makeDescKey - Make a CategoryLookup key from the transaction "Description"
 public func makeDescKey(from desc: String, dictVendorShortNames: [String: String], fileName: String = "") -> String {
     var descKeyLong = desc.trim

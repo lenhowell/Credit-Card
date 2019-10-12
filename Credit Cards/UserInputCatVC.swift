@@ -119,10 +119,12 @@ class UserInputVC: NSViewController, NSWindowDelegate {
         let myCat = catItemCurrent.category
         if chkQuestionMark.state == .on {
             if !myCat.hasSuffix("?") {
-                catItemCurrent.category = myCat + "?"
+                catItemCurrent.category = myCat + "-?"
             }
         } else {
-            if myCat.hasSuffix("?") {
+            if myCat.hasSuffix("-?") {
+                catItemCurrent.category = String(myCat.dropLast(2))
+            } else if myCat.hasSuffix("?") {
                 catItemCurrent.category = String(myCat.dropLast())
             }
         }
@@ -142,8 +144,12 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     @IBAction func btnOK(_ sender: Any) {
         usrFixVendor = (radioFileVendor.state == .on)
         usrCatItemReturned = catItemCurrent
-        if chkLockIn.state == .on {
-            usrCatItemReturned.source = "$" + gUserInitials
+        if radioFileVendor.state == .on {
+            if chkLockIn.state == .on {
+                usrCatItemReturned.source = "$" + gUserInitials
+            }
+        } else {
+            usrCatItemReturned.source = "*" + gUserInitials
         }
         print("UserInputCatVC#\(#line) return \(usrCatItemReturned.category) \(usrCatItemReturned.source)")
         NSApplication.shared.stopModal(withCode: .OK)

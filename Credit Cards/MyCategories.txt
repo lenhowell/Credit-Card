@@ -5,12 +5,12 @@
 // A category with a question-mark signals a need for user-input.
 
 // My Name,          alias1,        alias2,    ...
-Art?
+Art-?
 Art-Equipment
 Art-Supplies
 Art-Other
 
-Auto?,                 Gas/Automotive, Automotive Expenses,  Automotive
+Auto-?,                Gas/Automotive, Automotive Expenses,  Automotive
 Auto-Gas,              Gasoline,       Gasoline/Fuel
 Auto-DMV
 Auto-Maintenance
@@ -18,20 +18,23 @@ Auto-Tolls/Parking
 Auto-Purchase
 Auto-Other
 
-Aviation?
+Aviation-?
 Aviation-Club
+Aviation-FlyIn
 Aviation-Fuel/Tiedown, Aircraft fuel & Tiedown
 Aviation-Maintenance
 Aviation-Training
 Aviation-Purchase
 Aviation-Other
 
-Boat?
+Boat-?
 Boat-Maintenance
 Boat-Purchase
 Boat-Other
 
-Computer?,             Computer
+Business-?
+
+Computer-?,            Computer
 Computer-Repair
 Computer-Hardware
 Computer-Software
@@ -47,14 +50,14 @@ Cable/Internet,        Cable/Satellite Services
 
 Education
 
-Electronics?,          Electronics
+Electronics-?,         Electronics
 
-Entertainment?,        Entertainment/Recreation
+Entertainment-?,       Entertainment/Recreation
 Entertainment-Golf
 Entertainment-Movies
 Entertainment-TV
 
-Food?
+Food-?
 Food-Alcohol
 Food-Groceries,        Supermarkets
 Food-Restaurant,       Dining, Restaurants/Dining, Restaurants
@@ -63,17 +66,18 @@ Food-Other
 
 Fraud
 
-Gift?
+Gift-?
 Gift-Family
 Gift-Spouse
 Gift-Other
 
-Hobby?
+Hobby-?
 Hobby-Equipment
 Hobby-Supplies
 Hobby-Other
 
-Home?
+Home-?
+Home-Cleaning
 Home-Electric
 Home-Gas/Oil
 Home-Improvement
@@ -86,14 +90,14 @@ Home-Renovation
 Home-Rent
 Home-Other
 
-Insurance?,            Insurance
+Insurance-?,           Insurance
 Insurance-Auto
 Insurance-Aircraft
 Insurance-Business,    Beach Cove Insurance
 Insurance-Home,        Insurance - 1450
 Insurance-Other
 
-Investment?
+Investment-?
 Investment-Fees
 Investment-Purchase
 Investment-Income
@@ -104,36 +108,36 @@ Laundry/DryClean,
 
 Magazine
 
-Merchandise?,          Merchandise,    General Merchandise
+Merchandise-?,         Merchandise,    General Merchandise
 
-Personal?
+Personal-?
 Personal-Dental 
 Personal-Healthcare,   Health Care,    Healthcare/Medical
 Personal-Services
 Personal-Other
 
-Pet?
+Pet-?
 Pet-Purchase
 Pet-Healthcare
 Pet-Other
 
-Phone?
+Phone-?
 Phone-CellService,     Telephone Services
 Phone-Equipment
 Phone-Other
 
-Photo?
+Photo-?
 Photo-Equipment
 Photo-Processing
 Photo-Other
 
 Postage/Shipping,      Postage and Shipping
 
-Professional?
+Professional-?
 Professional-Accountant
 Professional-Lawyer
 
-Tax?
+Tax-?
 Tax-Property
 Tax-IRS
 Tax-CT
@@ -144,7 +148,7 @@ Tax-SC
 Tax-State
 Tax-Business
 
-Travel?,               Travel,         Other Travel
+Travel-?,              Travel,         Other Travel
 Travel-Airline,        Airfare
 Travel-Lodging
 Travel-CarRental,      Rent
@@ -156,6 +160,6 @@ Unknown?,              Other Services, Other/Unclassified, Other, Professional S
 
 Credit?,               Other Income, Payment/Credit, Payments and Credits
 
-CreditCard?
+CreditCard-?
 CreditCard-Fees,       Service Charges/Fees, Fee/Interest Charge
 CreditCard-Payment,    Credit Card Payments

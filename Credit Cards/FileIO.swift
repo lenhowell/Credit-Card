@@ -199,16 +199,12 @@ func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
 }//end func loadMyCats
 
 //---- writeMyCats - Used only when a starter verion from bundle is read in
+// only used to tranfer MyCategories.txt from bundle to user support files.
 //TODO: Change writeMyCats to accommidate user mods
 func writeMyCats(url: URL) {
     saveBackupFile(url: url)
     var text = "// Machine-generated file\n"
     text += "//Category,      alias,      alias,    ...\n"
-
-//    var catAliases = [String: String]()
-//    for catName in gMyCatNames {
-//        catAliases[catName] = ""
-//    }
 
     //— writing —
     do {
@@ -264,11 +260,8 @@ func loadMyModifiedTrans(myModifiedTranURL: URL) -> [String: CategoryItem]  {
 func writeModTransTofile(url: URL, dictModTrans: [String: CategoryItem]) {
     saveBackupFile(url: url)
     var text = "// Machine-generated file\n"
-    text += "//TranDate,        Desc,         Debit, Credit, Category, NewCat, Source\n"
+    text += "//Category <tab> Source <tab> (Debit, Credit, Category, NewCat, Source)\n"
     for (key, catItem) in dictModTrans {
-//        text += lineItem.tranDate + ", " + lineItem.desc + ", "
-//        text += String(lineItem.debit) + ", " + String(lineItem.credit) + ", "
-//        text += lineItem.rawCat + ", "
         text += catItem.category + "\t" + catItem.source + "\t" + key + "\n"
     }
     //— writing —
