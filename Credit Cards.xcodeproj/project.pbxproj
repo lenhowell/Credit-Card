@@ -24,6 +24,7 @@
 		CE1F7EC823317453004765E7 /* MyCategories.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE1F7EC723317453004765E7 /* MyCategories.txt */; };
 		CE4A27FD2301BEC500CA5A38 /* Stats.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4A27FC2301BEC500CA5A38 /* Stats.swift */; };
 		CE5B1E022304E03C00337C2F /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5B1E012304E03C00337C2F /* UserDefaults.swift */; };
+		CE6F1AE32352D576008CA720 /* VendorShortNames.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE6F1AE22352D576008CA720 /* VendorShortNames.txt */; };
 		CE7548132309DC0600FEDAFB /* DescriptionKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7548122309DC0600FEDAFB /* DescriptionKey.swift */; };
 		CE8AEB9423459E6F00337A73 /* SpreadsheetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8AEB9323459E6F00337A73 /* SpreadsheetVC.swift */; };
 		CE95CC9B23367191008363B7 /* UserInputShortNameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE95CC9A23367191008363B7 /* UserInputShortNameVC.swift */; };
@@ -87,6 +88,7 @@
 		CE1F7EC723317453004765E7 /* MyCategories.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MyCategories.txt; sourceTree = "<group>"; };
 		CE4A27FC2301BEC500CA5A38 /* Stats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stats.swift; sourceTree = "<group>"; };
 		CE5B1E012304E03C00337C2F /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
+		CE6F1AE22352D576008CA720 /* VendorShortNames.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = VendorShortNames.txt; sourceTree = "<group>"; };
 		CE7548122309DC0600FEDAFB /* DescriptionKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionKey.swift; sourceTree = "<group>"; };
 		CE8AEB9323459E6F00337A73 /* SpreadsheetVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpreadsheetVC.swift; sourceTree = "<group>"; };
 		CE95CC9A23367191008363B7 /* UserInputShortNameVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInputShortNameVC.swift; sourceTree = "<group>"; };
@@ -180,6 +182,7 @@
 				CEA3DF25234B75770021A712 /* SummaryTable.storyboard */,
 				CEA3DF27234B76730021A712 /* SummaryTableVC.swift */,
 				CE1F7EC723317453004765E7 /* MyCategories.txt */,
+				CE6F1AE22352D576008CA720 /* VendorShortNames.txt */,
 				CE9FFEBA2302F3DF00261390 /* Thoughts.rtf */,
 				BF9DD30922F1370200C22E41 /* StringExtension.swift */,
 				BF992C4B22EE56420089DAB8 /* Assets.xcassets */,
@@ -353,6 +356,7 @@
 				CED5662823459C90002DD645 /* Spreadsheet.storyboard in Resources */,
 				BF992C4C22EE56420089DAB8 /* Assets.xcassets in Resources */,
 				BF992C4F22EE56420089DAB8 /* Main.storyboard in Resources */,
+				CE6F1AE32352D576008CA720 /* VendorShortNames.txt in Resources */,
 				CE1F7EC823317453004765E7 /* MyCategories.txt in Resources */,
 				CEA3DF26234B75770021A712 /* SummaryTable.storyboard in Resources */,
 				CE9FFEBB2302F3DF00261390 /* Thoughts.rtf in Resources */,

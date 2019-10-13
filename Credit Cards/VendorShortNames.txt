@@ -1,0 +1,11 @@
+// Machine-generated, user-editable file
+// ShortName (prefix),   Full Description Key
+"AMAZON"                , AMAZON
+"AMZN"                  , AMAZON
+"PUBLIX"                , PUBLIX
+"VERIZON WRL"           , VERIZON WIRELESS
+"VZWRLSS"               , VERIZON WIRELESS
+"WAL MART"              , WALMART
+"WAL-MART"              , WALMART
+"WM SUPER"              , WALMART
+"WALMART"               , WALMART

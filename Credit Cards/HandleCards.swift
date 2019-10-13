@@ -189,7 +189,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
 
         // if in User-Input-Mode && No Clear Winner
         if gUserInputMode && !isClearWinner {
-            showUserInputForm(lineItem: lineItem, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemPrefered)
+            _ = showUserInputForm(lineItem: lineItem, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemPrefered)
             catItemPrefered = usrCatItemReturned
         } else if gLearnMode && catItemPrefered.category != catItemFromVendor.category && isClearWinner {
             dictVendorCatLookup[descKey] = catItemPrefered  // Do Actual Insert into VendorCategoryLookup

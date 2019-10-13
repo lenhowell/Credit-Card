@@ -4,7 +4,9 @@
 //
 //  Created by George Bauer on 10/11/17.
 //  Copyright © 2017-2019 GeorgeBauer. All rights reserved.
-//  Ver 1.7.4   8/22/2019 Add out-of-range protection for all Int subscripting
+
+//  Ver 1.8.0  10/12/2019 Add splitAtFirst(char:) to split a String at 1st occurrence of a Character
+//      1.7.4   8/22/2019 Add out-of-range protection for all Int subscripting
 //      1.7.3   7/09/2019 Add removeEnclosingQuotes()
 //      1.7.2   7/04/2019 PadRight now optionally truncates with ellipsis or does not truncate at all.
 //      1.7.1   4/23/2019 Depricate mid(). Add substring(begin,end) & substring(begin,length)
@@ -340,6 +342,17 @@ extension StringProtocol {
         return str
     }
 
+    //---- splitAtFirst(char - Split string at 1st occurence of char
+    public func splitAtFirst(char: Character) -> (lft: String, rgt: String) {
+        let idx = self.firstIndex(of: char)
+        guard let index1 = idx else {
+            return (String(self), "")
+        }
+        let ilft = String(self[self.startIndex..<index1])
+        let irgt = String(self[index(after: index1)..<endIndex])
+        return (ilft, irgt)
+    }
+    
     //---- pluralize - Pluralize a word (English) ------
     /// Pluralize an English word if count > 0
     /// - Parameter count: Triggers pluralization if > 0

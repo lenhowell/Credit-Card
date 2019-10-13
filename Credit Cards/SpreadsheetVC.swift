@@ -97,7 +97,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
             //let userVC = storyBoard.instantiateController(withIdentifier: "UserInput") as! UserInputVC
 
             let application = NSApplication.shared
-            let returnVal = application.runModal(for: userInputWindow) // <=================  UserInputVC
+            _ = application.runModal(for: userInputWindow) // <=================  UserInputVC
 
             userInputWindow.close()                     // Return here from userInputWindow
         }

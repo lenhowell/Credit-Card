@@ -18,11 +18,12 @@ var gLineItemArray          = [LineItem]()  // Entire list of transactions - use
 var gTransFilename          = ""                // (UserInputVC.swift-viewDidLoad) Current Transaction Filename
 var gMyCatNames             = [String]()            // (loadMyCats, UserInputVC.swift-viewDidLoad) Array of Category Names (MyCategories.txt)
 var dictMyCatAliases        = [String: String]()        // (LineItems.init, etc) Hash of Category Synonyms
+var dictMyCatAliasArray     = [String: [String]]()      // Synonyms for each cat name
 var dictVendorCatLookup     = [String: CategoryItem]()  // (HandleCards.swift-3) Hash for Category Lookup (CategoryLookup.txt)
 var dictTranDupes           = [String: String]()        // (handleCards) Hash for finding duplicate transactions
 var dictModifiedTrans       = [String: CategoryItem]()  // (MyModifiedTransactions.txt) Hash for user-modified transactions
 var uniqueCategoryCounts    = [String: Int]()           // Hash for Unique Category Counts
-var gMyCategoryContent      = ""
+var gMyCategoryHeader       = ""
 var gIsUnitTesting      = false     // Not used
 var gLearnMode          = true      // Used here & HandleCards.swift
 var gUserInputMode      = true      // Used here & HandleCards.swift
@@ -125,7 +126,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         txtOutputFolder.stringValue     = pathOutputDir
         txtSupportFolder.stringValue    = pathSupportDir
         txtTransationFolder.stringValue = pathTransactionDir
-        verifyFolders()
+        verifyFolders(gotItem: &gotItem)
         let errMsg = makeMissingItemsMsg(got: gotItem)
         if !errMsg.isEmpty { handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, fileName: "", dataLineNum: 0, lineText: "", errorMsg: errMsg) }
         if gotItem.contains(GotItem.dirSupport) {
@@ -223,7 +224,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     @IBAction func mnuResetUserDefaults(_ sender: Any) {
         var didSomething = 0
-        var response = GBox.alert("Are you sure you want to reset all User Defaults?", style: .yesNo)
+        let response = GBox.alert("Are you sure you want to reset all User Defaults?", style: .yesNo)
         if response == .yes {
             if resetUserDefaults() {
                 didSomething += 1
@@ -279,7 +280,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     //MARK:- Main Program 149-lines
     
     func main() {   // 281-430 = 149-lines
-        verifyFolders()
+        verifyFolders(gotItem: &gotItem)
         if !gotItem.contains(GotItem.allDirs) {
             let errMsg = makeMissingItemsMsg(got: gotItem)
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .alertAndDisplay, fileName: "", dataLineNum: 0, lineText: "", errorMsg: errMsg)
@@ -308,7 +309,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         pathSupportDir = txtSupportFolder.stringValue
 
         readSupportFiles()
-        verifyFolders()
+        verifyFolders(gotItem: &gotItem)
         let errMsg = makeMissingItemsMsg(got: gotItem)
         if !gotItem.contains(GotItem.requiredElements) {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .alertAndDisplay, fileName: "", dataLineNum: 0, lineText: "", errorMsg: errMsg)
@@ -467,7 +468,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
 
     // Reads Support & Output folder names from textViews, & verifies they exist
-    func verifyFolders() -> String {
+    func verifyFolders(gotItem: inout GotItem) {
         let supportPath = txtSupportFolder.stringValue.trim
         if supportPath.isEmpty || !folderExists(atPath: supportPath, isPartialPath: true) {
             //return "Support folder: \"\(txtSupportFolder.stringValue)\" doesn't exist."
@@ -493,13 +494,12 @@ class ViewController: NSViewController, NSWindowDelegate {
             gotItem = gotItem.union(GotItem.dirTrans)
         }
         pathTransactionDir = transPath
-        return ""
     }
 
     func readSupportFiles() {
         var errTxt = ""
 
-        // "CategoryLookup.txt"
+        // --------- "CategoryLookup.txt" -----------
         (vendorCatLookupFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: vendorCatLookupFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "Category" + errTxt)
@@ -507,7 +507,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         dictVendorCatLookup = loadVendorCategories(url: vendorCatLookupFileURL)       // Build Categories Dictionary
         Stats.origVendrCatCount = dictVendorCatLookup.count
 
-        // "VendorShortNames.txt"
+        // -------- "VendorShortNames.txt" ----------
         (vendorShortNamesFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: vendorShortNameFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "VendorShortNames " + errTxt)
@@ -515,8 +515,16 @@ class ViewController: NSViewController, NSWindowDelegate {
         dictVendorShortNames = loadVendorShortNames(url: vendorShortNamesFileURL)        // Build VendorShortNames Dictionary
         if dictVendorShortNames.count > 0 {
             gotItem = [gotItem, .fileVendorShortNames]
+        } else {
+            let path = Bundle.main.path(forResource: "VendorShortNames", ofType: "txt")!
+            let bundleCatsFileURL = URL(fileURLWithPath: path)
+            dictVendorShortNames = loadVendorShortNames(url: bundleCatsFileURL)
+            writeVendorShortNames(url: vendorShortNamesFileURL, dictVendorShortNames: dictVendorShortNames)
+            let msg = "A starter \"VendorShortNames.txt\" was placed in your support-files folder"
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, errorMsg: msg)
         }
-        // "MyCategories.txt"
+
+        // ---------- "MyCategories.txt" ------------
         (myCatsFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myCatsFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories " + errTxt)
@@ -524,6 +532,8 @@ class ViewController: NSViewController, NSWindowDelegate {
         dictMyCatAliases = loadMyCats(myCatsFileURL: myCatsFileURL)
         if dictMyCatAliases.count > 0 {
             gotItem = [gotItem, .fileMyCategories]
+            //writeMyCats(url: myCatsFileURL)
+
         } else {
             let path = Bundle.main.path(forResource: "MyCategories", ofType: "txt")!
             let bundleCatsFileURL = URL(fileURLWithPath: path)
@@ -534,7 +544,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
 
 
-        // "MyModifiedTransactions"
+        // -------- "MyModifiedTransactions" ----------
         (myModifiedTransURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myModifiedTranFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyModifiedTransactions " + errTxt)
@@ -544,19 +554,12 @@ class ViewController: NSViewController, NSWindowDelegate {
     }//end func
 
     //---- resetUserDefaults - Reset all User Defaults to provide a clean startup
-    //TODO: resetUserDefaults - Allow user to delete support files
     func resetUserDefaults() -> Bool {
         if let appDomain = Bundle.main.bundleIdentifier {
             UserDefaults.standard.removePersistentDomain(forName: appDomain)
             return true
-
-            let msg = "User Defaults reset. Restart program to enter setup mode."
-            _ = GBox.inputBox(prompt: msg, defaultText: "", maxChars: 0)
-            NSApplication.shared.terminate(self)
         } else {
             return false
-            let msg = "Could not reset User Defaults!"
-            handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
         }
     }
 

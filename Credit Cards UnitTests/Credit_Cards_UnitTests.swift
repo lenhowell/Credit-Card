@@ -81,7 +81,7 @@ class Credit_Cards_UnitTests: XCTestCase {
     }
 
     func testMakeLineItemAndDictColNums() {
-        var dictVendorShortNames = [String: String]()
+        let dictVendorShortNames = [String: String]()
         var headerLine = ""
         var headers: [String]
         var dictColNums = [String: Int]()

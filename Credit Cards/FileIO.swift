@@ -10,7 +10,7 @@ import Foundation
 
 public struct CategoryItem: Equatable {
     var category    = ""
-    var source      = ""  // Source of Category (including "$" for "LOCKED")
+    var source      = ""  // Source of Category (including "$" for "LOCKED" )
 }
 
 //MARK:- General Purpose
@@ -116,6 +116,23 @@ public func saveBackupFile(url: URL, multiple: Bool = false, addonName: String =
 
 }//end func saveBackupFile
 
+func deleteSupportFile(url: URL, fileName: String) -> Bool {
+    var didSomething = false
+    let fileManager = FileManager.default
+    if fileManager.fileExists(atPath: url.path) {
+        let response = GBox.alert("Do you want to delete \(fileName)?", style: .yesNo)
+        if response == .yes {
+            if url.path.hasSuffix("\(fileName)") {
+                //fileManager.removeItem(at: url)
+                saveBackupFile(url: url, addonName: "-Deleted")
+                didSomething = true
+            }
+        }
+    }
+    return didSomething
+}
+
+
 //MARK: FileAttributes struct
 //????? incorporate both getFileInfo() funcs into struct as inits
 public struct FileAttributes: Equatable {
@@ -160,10 +177,12 @@ public struct FileAttributes: Equatable {
 
 }// end struct FileAttributes
 
+
 //MARK:- My Catagories
 
 func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
     gMyCatNames = []
+    dictMyCatAliasArray = [String: [String]]()
     var dictMyCats = [String: String]()
     var contentof = ""
     do {
@@ -173,26 +192,41 @@ func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
         print(error.localizedDescription)
         //
     }
-    gMyCategoryContent = contentof
     let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
     var lineNum = 0
+    gMyCategoryHeader = ""
+    var inHeader = true
     for line in lines {
         lineNum += 1
-        if line.trim.isEmpty || line.trim.hasPrefix("//") {
+        // Capture header & ignore blanks
+        let linetrim = line.trim
+        if linetrim.isEmpty || linetrim.hasPrefix("//") || linetrim.hasPrefix("My Name") {
+            if inHeader {
+                gMyCategoryHeader += line + "\n"
+                if linetrim.isEmpty || linetrim.hasPrefix("My Name") {
+                    inHeader = false
+                }
+            }
             continue
         }
 
         // Create an Array of line components the seperator being a ","
         let myCatsArray = line.components(separatedBy: ",")
         let myCat = myCatsArray[0].trim.removeEnclosingQuotes()
+        var aliases = [String]()
          gMyCatNames.append(myCat)
 
         for myCatAliasRaw in myCatsArray {
             let myCatAlias = myCatAliasRaw.trim.removeEnclosingQuotes()
+
             if myCatAlias.count >= 3 {
+                if myCatAlias != myCat {
+                    aliases.append(myCatAlias)
+                }
                 dictMyCats[myCatAlias] = myCat
             }
         }
+        dictMyCatAliasArray[myCat] = aliases
     }//next line
     gMyCatNames.sort()
     return dictMyCats
@@ -203,17 +237,33 @@ func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
 //TODO: Change writeMyCats to accommidate user mods
 func writeMyCats(url: URL) {
     saveBackupFile(url: url)
-    var text = "// Machine-generated file\n"
-    text += "//Category,      alias,      alias,    ...\n"
+
+    var text = gMyCategoryHeader
+    text += "My Name,               alias1,        alias2,    ...\n"
+    var prevCat = ""
+    for (cat, array) in dictMyCatAliasArray.sorted(by: {$0.key < $1.key} ) {
+        if  cat.splitAtFirst(char: "-").lft != prevCat.splitAtFirst(char: "-").lft {
+            text += "\n"
+        }
+        prevCat = cat
+        text += cat
+        var spaceCount = 22 - cat.count
+        for alias in array {
+            text += "," + String(repeating: " ", count: spaceCount) + alias
+            spaceCount = 4
+        }
+        text += "\n"
+    }
 
     //— writing —
     do {
-        try gMyCategoryContent.write(to: url, atomically: false, encoding: .utf8)
-        print("\n😀 Successfully wrote MyCategories to: \(url.path)")
+        try text.write(to: url, atomically: false, encoding: .utf8)
+        print("\n😀 Successfully wrote new MyCategories to: \(url.path)")
     } catch {
         let msg = "Could not write new MyCategories file."
         handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: url.lastPathComponent, errorMsg: msg)
     }
+
 }//end func
 
 
@@ -427,20 +477,4 @@ public func getTransFileList(transDirURL: URL) -> [URL] {
     }
     return []
 }//end func
-
-func deleteSupportFile(url: URL, fileName: String) -> Bool {
-    var didSomething = false
-    let fileManager = FileManager.default
-    if fileManager.fileExists(atPath: url.path) {
-        let response = GBox.alert("Do you want to delete \(fileName)?", style: .yesNo)
-        if response == .yes {
-            if url.path.hasSuffix("\(fileName)") {
-                //fileManager.removeItem(at: url)
-                saveBackupFile(url: url, addonName: "-Deleted")
-                didSomething = true
-            }
-        }
-    }
-    return didSomething
-}
 
