@@ -202,10 +202,30 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableHeaderView>
                             </scrollView>
-                            <button identifier="Category" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JJL-DV-xgd">
-                                <rect key="frame" x="19" y="323" width="78" height="18"/>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fy2-5Q-vPR">
+                                <rect key="frame" x="11" y="350" width="94" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="radio" title="Category" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="NDM-3q-gMj">
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Summarize by:" id="q7s-fx-Sav">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button identifier="Category" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EAW-oI-TAj">
+                                <rect key="frame" x="12" y="321" width="131" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="radio" title="Category (overall)" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="9mO-SQ-m1L">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="radioCatChange:" target="igT-kg-E2n" id="Jkd-W3-qld"/>
+                                </connections>
+                            </button>
+                            <button identifier="Category" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JJL-DV-xgd">
+                                <rect key="frame" x="12" y="292" width="125" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="radio" title="Category (detail)" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="NDM-3q-gMj">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -214,7 +234,7 @@
                                 </connections>
                             </button>
                             <button identifier="Vendor" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cA8-wK-pmO">
-                                <rect key="frame" x="19" y="294" width="66" height="18"/>
+                                <rect key="frame" x="12" y="263" width="66" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="radio" title="Vendor" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="KHM-f5-268">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -225,7 +245,7 @@
                                 </connections>
                             </button>
                             <button identifier="Card Type" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bjc-VF-vgn">
-                                <rect key="frame" x="19" y="264" width="85" height="18"/>
+                                <rect key="frame" x="12" y="233" width="85" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="radio" title="Card Type" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="Cir-Y7-8ss">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -236,9 +256,9 @@
                                 </connections>
                             </button>
                             <button identifier="Month" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4mK-hk-CJB">
-                                <rect key="frame" x="19" y="234" width="61" height="18"/>
+                                <rect key="frame" x="12" y="203" width="49" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="radio" title="Month" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="8s8-4A-k4E">
+                                <buttonCell key="cell" type="radio" title="Year" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="8s8-4A-k4E">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -246,15 +266,17 @@
                                     <action selector="radioCatChange:" target="igT-kg-E2n" id="1W2-3l-3fq"/>
                                 </connections>
                             </button>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fy2-5Q-vPR">
-                                <rect key="frame" x="18" y="356" width="94" height="16"/>
+                            <button identifier="Month" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EoS-g6-ZJY">
+                                <rect key="frame" x="12" y="175" width="61" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Summarize by:" id="q7s-fx-Sav">
+                                <buttonCell key="cell" type="radio" title="Month" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="cWG-kJ-lr2">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="radioCatChange:" target="igT-kg-E2n" id="wGO-Pe-c7S"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="d5p-tA-fEf" firstAttribute="leading" secondItem="h7a-YN-YVP" secondAttribute="leading" constant="150" id="Ruw-kV-JjT"/>
@@ -265,15 +287,17 @@
                     </view>
                     <connections>
                         <outlet property="radioCardType" destination="bjc-VF-vgn" id="ZD8-7p-gYH"/>
-                        <outlet property="radioCategory" destination="JJL-DV-xgd" id="Bgf-aD-SlX"/>
-                        <outlet property="radioMonth" destination="4mK-hk-CJB" id="SSm-6d-1lc"/>
+                        <outlet property="radioGroupCategory" destination="EAW-oI-TAj" id="y1d-68-iSP"/>
+                        <outlet property="radioMonth" destination="EoS-g6-ZJY" id="P5K-Qy-Bg7"/>
+                        <outlet property="radioSubCategory" destination="JJL-DV-xgd" id="Bgf-aD-SlX"/>
                         <outlet property="radioVendor" destination="cA8-wK-pmO" id="OY8-Ji-sgW"/>
+                        <outlet property="radioYear" destination="4mK-hk-CJB" id="Dmt-xx-LWc"/>
                         <outlet property="tableView" destination="wnU-kp-GbC" id="cHP-65-nvc"/>
                     </connections>
                 </viewController>
                 <customObject id="vZv-xO-hoo" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-243" y="512"/>
+            <point key="canvasLocation" x="-243.5" y="512"/>
         </scene>
     </scenes>
 </document>

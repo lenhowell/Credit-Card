@@ -11,10 +11,10 @@ import Cocoa
 class SummaryTableVC: NSViewController, NSWindowDelegate {
 
     enum SummarizeBy {
-        case none, category, subCategory, vendor, cardType, month, quarter
+        case none, groupCategory, subCategory, vendor, cardType, month, year
     }
 
-    var summarizeBy = SummarizeBy.category
+    var summarizeBy = SummarizeBy.groupCategory
     let codeFile    = "SummaryTableVC"
     var tableDicts  = [[String : String]]()    // Array of Dictionaries
     var iSortBy     = ColID.debit
@@ -25,9 +25,9 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
-        radioCategory.state = .on
+        radioGroupCategory.state = .on
         loadTableSortDescriptors()
-        loadTable(lineItemArray: gFilteredLineItemArray, summarizeBy : .category)
+        loadTable(lineItemArray: gFilteredLineItemArray, summarizeBy : .groupCategory)
     }
 
     override func viewDidAppear() {
@@ -44,23 +44,32 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
 
     //MARK:- IBOutlets
 
-    @IBOutlet var radioCategory:    NSButton!
-    @IBOutlet var radioVendor:      NSButton!
-    @IBOutlet var radioCardType:    NSButton!
-    @IBOutlet var radioMonth:       NSButton!
-    @IBOutlet var tableView:     NSTableView!
+    @IBOutlet var radioGroupCategory: NSButton!
+    @IBOutlet var radioSubCategory:   NSButton!
+    @IBOutlet var radioVendor:        NSButton!
+    @IBOutlet var radioCardType:      NSButton!
+    @IBOutlet var radioYear:          NSButton!
+    @IBOutlet var radioMonth:         NSButton!
+
+    @IBOutlet var tableView:    NSTableView!
     
     //MARK:- IBActions
 
     @IBAction func radioCatChange(_ sender: Any) {
-        if radioCategory.state == .on {
-            summarizeBy = .category
+        if radioSubCategory.state == .on {
+            summarizeBy = .subCategory
+
+        } else if radioGroupCategory.state == .on {
+            summarizeBy = .groupCategory
 
         } else if radioVendor.state == .on {
             summarizeBy = .vendor
 
         } else if radioCardType.state == .on {
             summarizeBy = .cardType
+
+        } else if radioYear.state == .on {
+            summarizeBy = .year
 
         } else if radioMonth.state == .on {
             summarizeBy = .month
@@ -129,12 +138,18 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     //**
     func compareST(lft: LineItem, rgt: LineItem, summarizeBy: SummarizeBy) -> Bool {
         switch summarizeBy {
-        case .category:
+        case .groupCategory:
+            let group1 = lft.genCat.splitAtFirst(char: "-").0
+            let group2 = rgt.genCat.splitAtFirst(char: "-").0
+            return       group1 < group2
+        case .subCategory:
             return lft.genCat   < rgt.genCat
         case .cardType:
             return lft.cardType < rgt.cardType
         case .vendor:
             return lft.descKey  < rgt.descKey
+        case .year:
+            return makeYYYYMMDD(dateTxt: lft.tranDate)  < makeYYYYMMDD(dateTxt: rgt.tranDate)
         case .month:
             return makeYYYYMMDD(dateTxt: lft.tranDate)  < makeYYYYMMDD(dateTxt: rgt.tranDate)
         default:
@@ -144,12 +159,16 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
 
     func summarizeName(lineItem: LineItem, summarizeBy: SummarizeBy) -> String {
         switch summarizeBy {
-        case .category:
+        case .groupCategory:
+            return lineItem.genCat.splitAtFirst(char: "-").lft
+        case .subCategory:
             return lineItem.genCat
         case .cardType:
             return lineItem.cardType
         case .vendor:
             return lineItem.descKey
+        case .year:
+            return String(makeYYYYMMDD(dateTxt: lineItem.tranDate).prefix(4))
         case .month:
             return String(makeYYYYMMDD(dateTxt: lineItem.tranDate).prefix(7))
         default:
