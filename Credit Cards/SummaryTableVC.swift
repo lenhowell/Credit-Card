@@ -9,13 +9,13 @@
 import Cocoa
 
 class SummaryTableVC: NSViewController, NSWindowDelegate {
+    let codeFile    = "SummaryTableVC"
 
     enum SummarizeBy {
         case none, groupCategory, subCategory, vendor, cardType, month, year
     }
 
     var summarizeBy = SummarizeBy.groupCategory
-    let codeFile    = "SummaryTableVC"
     var tableDicts  = [[String : String]]()    // Array of Dictionaries
     var iSortBy     = ColID.debit
     var totalCredit = 0.0
@@ -37,7 +37,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     }
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {
-        print("✅ windowShouldClose")
+        print("✅(codeFile)#\(#line) windowShouldClose")
         NSApplication.shared.stopModal()
         return true
     }

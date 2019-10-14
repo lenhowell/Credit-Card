@@ -231,26 +231,6 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         iAscending = ascending
     }
 
-//    //---- updateCompanyNameLabel - Update lblStatus with selected TransDate Name
-//    func updateCompanyNameLabel() {
-//        let text: String
-//        let itemsSelected = tableView.selectedRowIndexes.count
-//
-//        switch itemsSelected {
-//        case 0:
-//            text = "No Selection"
-//        case 1:
-//            let stockDict = tableDicts[tableView.selectedRowIndexes.first!]
-//            let symbTxt = stockDict[ColID.cardType]  ?? "Missing cardType"
-//            let nameTxt = stockDict[ColID.transDate] ?? "Missing TransDate Name"
-//            text = "\(symbTxt)   \(nameTxt)"
-//        default:
-//            text = "Multiple Selections"
-//        }//end switch
-//
-//        //lblStatus.stringValue = text
-//    }//end func
-
 }//end class
 
 //              Name        ID          Width   Col#    Totals

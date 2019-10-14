@@ -22,11 +22,14 @@ var dictMyCatAliasArray     = [String: [String]]()      // Synonyms for each cat
 var dictVendorCatLookup     = [String: CategoryItem]()  // (HandleCards.swift-3) Hash for Category Lookup (CategoryLookup.txt)
 var dictTranDupes           = [String: String]()        // (handleCards) Hash for finding duplicate transactions
 var dictModifiedTrans       = [String: CategoryItem]()  // (MyModifiedTransactions.txt) Hash for user-modified transactions
+var gDictVendorShortNames   = [String: String]()        // (VendorShortNames.txt) Hash for VendorShortNames Lookup
 var uniqueCategoryCounts    = [String: Int]()           // Hash for Unique Category Counts
 var gMyCategoryHeader       = ""
 var gIsUnitTesting      = false     // Not used
 var gLearnMode          = true      // Used here & HandleCards.swift
 var gUserInputMode      = true      // Used here & HandleCards.swift
+
+var gVendorShortNamesFileURL = FileManager.default.homeDirectoryForCurrentUser
 
 //MARK:- ViewController
 class ViewController: NSViewController, NSWindowDelegate {
@@ -42,7 +45,6 @@ class ViewController: NSViewController, NSWindowDelegate {
     let myModifiedTranFilename  = "MyModifiedTransactions.txt"
 
     // Variables
-    var dictVendorShortNames    = [String: String]()        // (VendorShortNames.txt) Hash for VendorShortNames Lookup
     var transFileURLs           = [URL]()
     var pathTransactionDir      = "Downloads/Credit Card Trans"
     var pathSupportDir          = "Desktop/CreditCard/xxx"
@@ -50,7 +52,6 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     var transactionDirURL       = FileManager.default.homeDirectoryForCurrentUser
     var vendorCatLookupFileURL  = FileManager.default.homeDirectoryForCurrentUser
-    var vendorShortNamesFileURL = FileManager.default.homeDirectoryForCurrentUser
     var myCatsFileURL           = FileManager.default.homeDirectoryForCurrentUser
     var myModifiedTransURL      = FileManager.default.homeDirectoryForCurrentUser
     var outputFileURL           = FileManager.default.homeDirectoryForCurrentUser
@@ -127,8 +128,6 @@ class ViewController: NSViewController, NSWindowDelegate {
         txtSupportFolder.stringValue    = pathSupportDir
         txtTransationFolder.stringValue = pathTransactionDir
         verifyFolders(gotItem: &gotItem)
-        let errMsg = makeMissingItemsMsg(got: gotItem)
-        if !errMsg.isEmpty { handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, fileName: "", dataLineNum: 0, lineText: "", errorMsg: errMsg) }
         if gotItem.contains(GotItem.dirSupport) {
             readSupportFiles()
             let shortCatFilePath = removeUserFromPath(vendorCatLookupFileURL.path)
@@ -136,6 +135,8 @@ class ViewController: NSViewController, NSWindowDelegate {
         } else {
             lblResults.stringValue = "You will need to create a folder to hold support files before you can proceed."
         }
+        let errMsg = makeMissingItemsMsg(got: gotItem)
+        if !errMsg.isEmpty { handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, fileName: "", dataLineNum: 0, lineText: "", errorMsg: errMsg) }
 
         chkLearningMode.state = gLearnMode     ? .on : .off
         chkUserInput.state    = gUserInputMode ? .on : .off
@@ -191,9 +192,9 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     @IBAction func btnFindTruncatedDescs(_ sender: Any) {
         let vendorNameDescs = Array(dictVendorCatLookup.keys)
-        let doWrite = findTruncatedDescs(vendorNameDescs: vendorNameDescs, dictShortNames: &dictVendorShortNames)
+        let doWrite = findTruncatedDescs(vendorNameDescs: vendorNameDescs)
         if doWrite {
-            writeVendorShortNames(url: vendorShortNamesFileURL, dictVendorShortNames: dictVendorShortNames)
+            writeVendorShortNames(url: gVendorShortNamesFileURL, dictVendorShortNames: gDictVendorShortNames)
         }
     }
 
@@ -237,7 +238,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         if deleteSupportFile(url: myCatsFileURL, fileName: myCatsFilename) { didSomething += 1 }
         if deleteSupportFile(url: vendorCatLookupFileURL, fileName: vendorCatLookupFilename) { didSomething += 1 }
-        if deleteSupportFile(url: vendorShortNamesFileURL, fileName: vendorShortNameFilename) { didSomething += 1 }
+        if deleteSupportFile(url: gVendorShortNamesFileURL, fileName: vendorShortNameFilename) { didSomething += 1 }
         if deleteSupportFile(url: myModifiedTransURL, fileName: myModifiedTranFilename) { didSomething += 1 }
 
         if didSomething > 0 {
@@ -370,7 +371,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             
             // Check which Credit Card Transactions we are currently processing
             if cardType.count >= 2 &&  cardType.count <= 8  {
-                gLineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray, dictVendorShortNames: &dictVendorShortNames)
+                gLineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray)
                 chkUserInput.state = gUserInputMode ? .on : .off
                 Stats.transFileCount += 1
             } else {
@@ -469,9 +470,10 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     // Reads Support & Output folder names from textViews, & verifies they exist
     func verifyFolders(gotItem: inout GotItem) {
+
         let supportPath = txtSupportFolder.stringValue.trim
         if supportPath.isEmpty || !folderExists(atPath: supportPath, isPartialPath: true) {
-            //return "Support folder: \"\(txtSupportFolder.stringValue)\" doesn't exist."
+            print("ViewController#\(#line): Support folder: \"\(txtSupportFolder.stringValue)\" doesn't exist.")
             gotItem = gotItem.subtracting(GotItem.dirSupport)
         } else {
             gotItem = gotItem.union(GotItem.dirSupport)
@@ -480,7 +482,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         let outputPath = txtOutputFolder.stringValue.trim
         if outputPath.isEmpty || !folderExists(atPath: outputPath, isPartialPath: true) {
-            //return "Output folder: \"\(txtOutputFolder.stringValue)\" doesn't exist."
+            print("ViewController#\(#line): Output folder: \"\(txtOutputFolder.stringValue)\" doesn't exist.")
             gotItem = gotItem.subtracting(GotItem.dirOutput)
             } else {
                 gotItem = gotItem.union(GotItem.dirOutput)
@@ -489,6 +491,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         let transPath = txtTransationFolder.stringValue.trim
         if transPath.isEmpty || !folderExists(atPath: transPath, isPartialPath: true) {
+            print("ViewController#\(#line): Output folder: \"\(txtTransationFolder.stringValue)\" doesn't exist.")
             gotItem = gotItem.subtracting(GotItem.dirTrans)
         } else {
             gotItem = gotItem.union(GotItem.dirTrans)
@@ -508,18 +511,18 @@ class ViewController: NSViewController, NSWindowDelegate {
         Stats.origVendrCatCount = dictVendorCatLookup.count
 
         // -------- "VendorShortNames.txt" ----------
-        (vendorShortNamesFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: vendorShortNameFilename)
+        (gVendorShortNamesFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: vendorShortNameFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "VendorShortNames " + errTxt)
         }
-        dictVendorShortNames = loadVendorShortNames(url: vendorShortNamesFileURL)        // Build VendorShortNames Dictionary
-        if dictVendorShortNames.count > 0 {
+        gDictVendorShortNames = loadVendorShortNames(url: gVendorShortNamesFileURL)        // Build VendorShortNames Dictionary
+        if gDictVendorShortNames.count > 0 {
             gotItem = [gotItem, .fileVendorShortNames]
         } else {
             let path = Bundle.main.path(forResource: "VendorShortNames", ofType: "txt")!
             let bundleCatsFileURL = URL(fileURLWithPath: path)
-            dictVendorShortNames = loadVendorShortNames(url: bundleCatsFileURL)
-            writeVendorShortNames(url: vendorShortNamesFileURL, dictVendorShortNames: dictVendorShortNames)
+            gDictVendorShortNames = loadVendorShortNames(url: bundleCatsFileURL)
+            writeVendorShortNames(url: gVendorShortNamesFileURL, dictVendorShortNames: gDictVendorShortNames)
             let msg = "A starter \"VendorShortNames.txt\" was placed in your support-files folder"
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, errorMsg: msg)
         }

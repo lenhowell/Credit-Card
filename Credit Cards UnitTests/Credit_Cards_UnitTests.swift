@@ -125,6 +125,7 @@ class Credit_Cards_UnitTests: XCTestCase {
 
 
     func testHandleCards() {
+        gDictVendorShortNames = [:]
         var dictVendorShortNames = [String: String]()
         var lineItemArray = [LineItem]()
 
@@ -132,7 +133,7 @@ class Credit_Cards_UnitTests: XCTestCase {
         let contentGarbage = "\nGarbage\nGarbage\nGarbage\n"
         let cardArrayGarbage = contentGarbage.components(separatedBy: "\n")
         dictVendorShortNames = [String: String]()
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGarbage, dictVendorShortNames: &dictVendorShortNames)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGarbage)
         XCTAssertEqual(lineItemArray.isEmpty, true)
 
         let cardArrayC1R = [
@@ -140,7 +141,7 @@ class Credit_Cards_UnitTests: XCTestCase {
             "2018-08-11,2018-08-18,8772,MORRISSEYS FRONT PORCH,Dining,12.14,",
         ]
         dictVendorShortNames = [String: String]()
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayC1R, dictVendorShortNames: &dictVendorShortNames)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayC1R)
         XCTAssertEqual(lineItemArray.count, 1)
         XCTAssertEqual(lineItemArray[0].tranDate, "2018-08-11")
         XCTAssertEqual(lineItemArray[0].postDate, "2018-08-18")
@@ -159,7 +160,7 @@ class Credit_Cards_UnitTests: XCTestCase {
     """
         let cardArrayLHDC = contentLHDC.components(separatedBy: "\n")
         dictVendorShortNames = [String: String]()
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHDC, dictVendorShortNames: &dictVendorShortNames)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHDC)
         XCTAssertEqual(lineItemArray.count, 2)
         XCTAssertEqual(lineItemArray[0].tranDate, "04/04/2018")
         XCTAssertEqual(lineItemArray[0].postDate, "04/04/2018")
@@ -182,7 +183,7 @@ class Credit_Cards_UnitTests: XCTestCase {
     """
         let cardArrayLHCT = contentLHCT.components(separatedBy: "\n")
         dictVendorShortNames = [String: String]()
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHCT, dictVendorShortNames: &dictVendorShortNames)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHCT)
         XCTAssertEqual(lineItemArray.count, 2)
 
 
@@ -197,7 +198,7 @@ class Credit_Cards_UnitTests: XCTestCase {
     """
         let cardArrayLHC1V = contentLHC1V.components(separatedBy: "\n")
         dictVendorShortNames = [String: String]()
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHC1V, dictVendorShortNames: &dictVendorShortNames)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHC1V)
         XCTAssertEqual(lineItemArray.count, 4)
 
 
@@ -210,7 +211,7 @@ class Credit_Cards_UnitTests: XCTestCase {
     """
         let cardArrayGBBA = contentGBBA.components(separatedBy: "\n")
         dictVendorShortNames = [String: String]()
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGBBA, dictVendorShortNames: &dictVendorShortNames)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGBBA)
         XCTAssertEqual(lineItemArray.count, 2)
 
 
@@ -225,7 +226,7 @@ class Credit_Cards_UnitTests: XCTestCase {
     """
         let cardArrayGBML = contentGBML.components(separatedBy: "\n")
         dictVendorShortNames = [String: String]()
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGBML, dictVendorShortNames: &dictVendorShortNames)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGBML)
         XCTAssertEqual(lineItemArray.count, 3)
 
     }//end func testHandleCards

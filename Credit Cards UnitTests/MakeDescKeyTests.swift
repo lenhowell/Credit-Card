@@ -92,7 +92,7 @@ class MakeDescKeyTests: XCTestCase {
         result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "HUM HUMANN")
 
-        // Without dictVendorShortNames
+        // Without gDictVendorShortNames
         desc = "VZWRLSS*APOCC VISN"
         result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "VZWRLSS APOCC VISN")
@@ -108,7 +108,7 @@ class MakeDescKeyTests: XCTestCase {
 
         dictVendorShortNames = [ "VERIZON W": "VERIZON WIRELESS", "VZWRLSS": "VERIZON WIRELESS" ]
 
-        // With dictVendorShortNames
+        // With gDictVendorShortNames
         desc = "VZWRLSS*APOCC VISN"
         result = makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "VERIZON WIRELESS")

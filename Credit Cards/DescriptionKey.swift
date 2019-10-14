@@ -35,12 +35,6 @@ public func makeDescKey(from desc: String, dictVendorShortNames: [String: String
     if !match.fullDescKey.isEmpty {
         return match.fullDescKey
     }
-//    for (key, descKey) in dictVendorShortNames {
-//        let shortName = key.removeEnclosingQuotes()
-//        if descKeyUpper.hasPrefix(shortName) {
-//            return descKey
-//        }
-//    }//next
 
     //-- Remove spaces around " & " -- [STOP & SHOP 0620] -> [STOP&SHOP 0620]
     key2 = descKeyLong.replacingOccurrences(of: " ?& ?", with: "&", options: .regularExpression, range: nil)
@@ -224,6 +218,12 @@ public func makeDescKey(from desc: String, dictVendorShortNames: [String: String
     // Truncate
     key2 = String(descKeyLong.prefix(descKeyLength)).trim
     let descKey = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "23.Truncate to \(descKeyLength) chars")
+
+    let match2 = findPrefixMatch(name: descKey, dictShortNames: dictVendorShortNames)
+    if !match2.fullDescKey.isEmpty {
+        print("⚠️ DescriptionKey#\(#line) Prefix for \(desc) matches to \(match2.fullDescKey) only AFTER processing")
+        return match2.fullDescKey
+    }
 
     return descKey
 }//end func makeDescKey

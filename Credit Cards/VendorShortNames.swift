@@ -16,10 +16,9 @@ var usrVendrLongName = ""
 var usrVendrPrefix = ""
 var usrVendrFullDescKey = ""
 
-//MARK:- Vendor Description funcs
-
-//----findTruncatedDescs - In "VendorCategoryLookup.txt" find multiple names that are similar
-func findTruncatedDescs(vendorNameDescs: [String], dictShortNames: inout [String: String]) -> Bool {
+//MARK:- findTruncatedDescs
+//---- findTruncatedDescs - In "VendorCategoryLookup.txt" find multiple names that are similar
+func findTruncatedDescs(vendorNameDescs: [String]) -> Bool {
     // Sort by length - longest to shortest
     let vendorCatLookupSortedByLength = vendorNameDescs.sorted(by: {$0.count > $1.count})
     guard let minLen = vendorCatLookupSortedByLength.last?.count else {
@@ -38,18 +37,14 @@ func findTruncatedDescs(vendorNameDescs: [String], dictShortNames: inout [String
             let shortLen  = descShort.count
             if descLong.prefix(shortLen) == descShort {
                 let truncLong = descLong.dropFirst(shortLen)
-                let match = findPrefixMatch(name: descShort, dictShortNames: dictShortNames)
-
-                if descLong.prefix(2) == "AM" && descShort.prefix(2) == "AM" {
-                    //
-                }
+                let match = findPrefixMatch(name: descShort, dictShortNames: gDictVendorShortNames)
 
                 if match.fullDescKey.isEmpty {
                     if (shortLen > 9 || truncLong.hasPrefix(" ")) {
                         //print("Possible dupe \"\(descShort)\"(\(shortLen)) is part of \"\(descLong)\"(\(longLen))")
                         let returnVal = showUserInputShortNameForm(shortName: descShort, longName: descLong)
                         if returnVal == .OK {           // OK: Add (prefix,descKey) to list
-                            dictShortNames[usrVendrPrefix] = usrVendrFullDescKey
+                            gDictVendorShortNames[usrVendrPrefix] = usrVendrFullDescKey //move to showUserInputShortNameForm?
                         } else if returnVal == .cancel {// Ignore: Do nothing
                             // do nothing
                         } else if returnVal == .stop {  // Abort, but save the results so far
@@ -73,14 +68,15 @@ func findTruncatedDescs(vendorNameDescs: [String], dictShortNames: inout [String
 
         }//next i
     }//next desc
-    print("\nFreeFuncs#\(#line) findTruncatedDescs: dictShortNames.count = \(dictShortNames.count) ")
-    for (key,val) in dictShortNames.sorted(by: <) {
+    print("\nFreeFuncs#\(#line) findTruncatedDescs: gDictVendorShortNames.count = \(gDictVendorShortNames.count) ")
+    for (key,val) in gDictVendorShortNames.sorted(by: <) {
         print("\(val.PadRight(23, truncate: false)) <==    \(key)")
     }
     return true
 }//end func findTruncatedDescs
 
-
+//MARK:- Show Input-ShortName Form
+//---- showUserInputShortNameForm - Present UserInputShortName Window Controller
 func showUserInputShortNameForm(shortName: String, longName: String) -> NSApplication.ModalResponse {
     usrVendrShortName = shortName
     usrVendrLongName = longName
@@ -100,8 +96,11 @@ func showUserInputShortNameForm(shortName: String, longName: String) -> NSApplic
     return returnVal
 }//end func
 
+//MARK:- findPrefixMatch
+//---- findPrefixMatch - Go through the ShortName hash to find a match
 func findPrefixMatch(name: String, dictShortNames: [String: String]) -> (prefix: String, fullDescKey: String) {
     for (prefix, fullDescKey) in dictShortNames {
+        // There may be a space at the end of ShortName
         if name.hasPrefix(prefix) || name == prefix.trim {
             return (prefix, fullDescKey)
         }

@@ -9,6 +9,7 @@
 import Cocoa
 
 class UserInputShortNameVC: NSViewController, NSWindowDelegate {
+    let codeFile = "UserInputShortNameVC"
 
     //MARK:- Overrides & Lifecycle
     override func viewDidLoad() {
@@ -18,8 +19,8 @@ class UserInputShortNameVC: NSViewController, NSWindowDelegate {
         txtPrefix.delegate = self         // Allow ViewController to see when txtPrefix changes.
         txtFullDescKey.delegate = self    // Allow ViewController to see when txtFullDescKey changes.
 
-        txtPrefix.stringValue   = usrVendrShortName
-        txtFullDescKey.stringValue = usrVendrLongName
+        txtPrefix.stringValue   = String(usrVendrShortName.prefix(descKeyLength)).uppercased()
+        txtFullDescKey.stringValue = String(usrVendrLongName.prefix(descKeyLength)).uppercased()
         lblPrefixChars.stringValue = "\(txtPrefix.stringValue.count) letters"
         lblFullDescKeyChars.stringValue = "\(txtFullDescKey.stringValue.count) letters"
     }//end func
@@ -30,7 +31,7 @@ class UserInputShortNameVC: NSViewController, NSWindowDelegate {
     }
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {
-        //print("✅ windowShouldClose")
+        //print("✅(codeFile)#\(#line) windowShouldClose")
         let application = NSApplication.shared
         application.stopModal()
         return true
@@ -60,6 +61,21 @@ class UserInputShortNameVC: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func btnOK(_ sender: Any) {
+        let prefixCount = txtPrefix.stringValue.count
+        if prefixCount < 4 || prefixCount > descKeyLength {
+            let msg = "The common prefix must be between 4 and \(prefixCount) characters"
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .alert, errorMsg: msg)
+            return
+        }
+
+        let descKey = makeDescKey(from: txtFullDescKey.stringValue, dictVendorShortNames: [:], fileName: "")
+        if txtFullDescKey.stringValue != descKey {
+            let msg = "\(txtFullDescKey.stringValue) is not acceptable.\nSubstituting \(descKey)."
+            txtFullDescKey.stringValue = descKey
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .alert, errorMsg: msg)
+            return
+        }
+
         usrVendrPrefix = txtPrefix.stringValue
         usrVendrFullDescKey = txtFullDescKey.stringValue
         NSApplication.shared.stopModal(withCode: .OK)
@@ -76,18 +92,16 @@ extension UserInputShortNameVC: NSTextFieldDelegate {
         guard let textView = obj.object as? NSTextField else {
             return      // Not a TextField
         }
-        if txtPrefix.stringValue.count > usrVendrShortName.count {
-            txtPrefix.stringValue = usrVendrShortName
+        let prefixU = String(txtPrefix.stringValue.prefix(descKeyLength)).uppercased()
+        if txtPrefix.stringValue != prefixU {
+            txtPrefix.stringValue = prefixU
         }
-        if txtPrefix.stringValue.count < 4 {
-            txtPrefix.stringValue = String(usrVendrShortName.prefix(4))
+
+        let descKey = String(txtFullDescKey.stringValue.prefix(descKeyLength)).uppercased()
+        if txtFullDescKey.stringValue != descKey {
+            txtFullDescKey.stringValue = descKey
         }
-        if txtPrefix.stringValue != usrVendrShortName.prefix(txtPrefix.stringValue.count) {
-            txtPrefix.stringValue = String(usrVendrShortName.prefix(txtPrefix.stringValue.count))
-        }
-        if txtFullDescKey.stringValue.count > descKeyLength {
-            txtFullDescKey.stringValue = String(txtFullDescKey.stringValue.prefix(descKeyLength))
-        }
+
         lblPrefixChars.stringValue = "\(txtPrefix.stringValue.count) letters"
         lblFullDescKeyChars.stringValue = "\(txtFullDescKey.stringValue.count) letters"
 

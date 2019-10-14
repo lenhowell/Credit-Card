@@ -22,7 +22,7 @@ var usrIgnoreVendors    = [String: Int]()
 
 //MARK:---- handleCards - 25-91 = 66-lines
 
-func handleCards(fileName: String, cardType: String, cardArray: [String], dictVendorShortNames: inout [String: String]) -> [LineItem] {
+func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [LineItem] {
     let cardArrayCount = cardArray.count
     var lineItemArray = [LineItem]()                // Create Array variable(lineItemArray) Type lineItem.
     var lineNum = 0
@@ -65,7 +65,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], dictVe
         if tran.trim.count < 16 { continue }    // Blank line or ",,,,,,,,,,,"
 
         Stats.processedCount += 1
-        let lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: dictVendorShortNames, cardType: cardType, hasCatHeader: hasCatHeader, fileName: fileName, lineNum: lineNum)
+        let lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: gDictVendorShortNames, cardType: cardType, hasCatHeader: hasCatHeader, fileName: fileName, lineNum: lineNum)
 
         if !lineItem.desc.isEmpty || !lineItem.postDate.isEmpty || lineItem.debit != 0  || lineItem.credit != 0 {
             // Check for duplicate from another file

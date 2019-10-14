@@ -15,7 +15,6 @@
 		BF992C5B22EE56420089DAB8 /* Credit_CardsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF992C5A22EE56420089DAB8 /* Credit_CardsTests.swift */; };
 		BF992C6622EE56430089DAB8 /* Credit_CardsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF992C6522EE56430089DAB8 /* Credit_CardsUITests.swift */; };
 		BF9DD30A22F1370200C22E41 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9DD30922F1370200C22E41 /* StringExtension.swift */; };
-		BF9DD30C22F793EA00C22E41 /* CategoryItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9DD30B22F793EA00C22E41 /* CategoryItem.swift */; };
 		BFA770DF22FD10BE00BA15B6 /* ErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */; };
 		BFECDEDF22FDBC2F00F1BF5E /* FreeFuncs.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFECDEDE22FDBC2F00F1BF5E /* FreeFuncs.swift */; };
 		BFECDEE122FDBED400F1BF5E /* FileIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFECDEE022FDBED400F1BF5E /* FileIO.swift */; };
@@ -79,7 +78,6 @@
 		BF992C6522EE56430089DAB8 /* Credit_CardsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Credit_CardsUITests.swift; sourceTree = "<group>"; };
 		BF992C6722EE56430089DAB8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BF9DD30922F1370200C22E41 /* StringExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
-		BF9DD30B22F793EA00C22E41 /* CategoryItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryItem.swift; sourceTree = "<group>"; };
 		BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorHandler.swift; sourceTree = "<group>"; };
 		BFECDEDE22FDBC2F00F1BF5E /* FreeFuncs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeFuncs.swift; sourceTree = "<group>"; };
 		BFECDEE022FDBED400F1BF5E /* FileIO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileIO.swift; sourceTree = "<group>"; };
@@ -167,7 +165,6 @@
 				CEB315942321607E00D88759 /* UserInputCatVC.swift */,
 				CE95CC9A23367191008363B7 /* UserInputShortNameVC.swift */,
 				CEA62D2F2306232C00160DEB /* Alerts.swift */,
-				BF9DD30B22F793EA00C22E41 /* CategoryItem.swift */,
 				BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */,
 				BFECDEE022FDBED400F1BF5E /* FileIO.swift */,
 				BFECDEDE22FDBC2F00F1BF5E /* FreeFuncs.swift */,
@@ -401,7 +398,6 @@
 				BF992C4A22EE56410089DAB8 /* ViewController.swift in Sources */,
 				BF992C4822EE56410089DAB8 /* AppDelegate.swift in Sources */,
 				BFA770DF22FD10BE00BA15B6 /* ErrorHandler.swift in Sources */,
-				BF9DD30C22F793EA00C22E41 /* CategoryItem.swift in Sources */,
 				BF5D549C22EF458500111875 /* LineItems.swift in Sources */,
 				CEA3DF28234B76730021A712 /* SummaryTableVC.swift in Sources */,
 				BFECDEDF22FDBC2F00F1BF5E /* FreeFuncs.swift in Sources */,
@@ -591,14 +587,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 570;
+				CURRENT_PROJECT_VERSION = 580;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.6.3;
+				MARKETING_VERSION = 1.6.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -612,14 +608,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 570;
+				CURRENT_PROJECT_VERSION = 580;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.6.3;
+				MARKETING_VERSION = 1.6.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

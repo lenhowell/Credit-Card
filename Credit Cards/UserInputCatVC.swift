@@ -12,6 +12,7 @@ class UserInputVC: NSViewController, NSWindowDelegate {
 
     //MARK:- Instance Variables
 //    weak var delegate: UserInputVcDelegate?          //delegate <— (2)
+    let codeFile    = "UserInputCatVC"
     var catItemFromVendor = CategoryItem()
     var catItemFromTran   = CategoryItem()
     var catItemPrefered   = CategoryItem()
@@ -64,7 +65,7 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     }
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {
-        print("✅ windowShouldClose")
+        print("✅(codeFile)#\(#line) windowShouldClose")
         let application = NSApplication.shared
         application.stopModal()
         return true
@@ -105,7 +106,7 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func cboCatsChange(_ sender: Any) {
-        print("cboCatsChange \(cboCats.stringValue)")
+        print("(codeFile)#\(#line) cboCatsChange \(cboCats.stringValue)")
         catItemCurrent.category = cboCats.stringValue
         catItemCurrent.source = gUserInitials
         updateAfterCatChange(newCatItem: catItemCurrent)
@@ -141,6 +142,14 @@ class UserInputVC: NSViewController, NSWindowDelegate {
         }
     }//end func
 
+    @IBAction func btnAddShortName(_ sender: Any) {
+        let returnVal = showUserInputShortNameForm(shortName: usrLineItem.desc, longName: usrLineItem.descKey) //$$$
+        if returnVal == .OK {           // OK: Add (prefix,descKey) to list
+            gDictVendorShortNames[usrVendrPrefix] = usrVendrFullDescKey //move to showUserInputShortNameForm?
+            writeVendorShortNames(url: gVendorShortNamesFileURL, dictVendorShortNames: gDictVendorShortNames)
+        }
+    }
+
     @IBAction func btnOK(_ sender: Any) {
         usrFixVendor = (radioFileVendor.state == .on)
         usrCatItemReturned = catItemCurrent
@@ -151,7 +160,7 @@ class UserInputVC: NSViewController, NSWindowDelegate {
         } else {
             usrCatItemReturned.source = "*" + gUserInitials
         }
-        print("UserInputCatVC#\(#line) return \(usrCatItemReturned.category) \(usrCatItemReturned.source)")
+        print("(codeFile)#\(#line) return \(usrCatItemReturned.category) \(usrCatItemReturned.source)")
         NSApplication.shared.stopModal(withCode: .OK)
     }//end func
 
@@ -185,7 +194,7 @@ class UserInputVC: NSViewController, NSWindowDelegate {
     private func loadComboBoxCats() {
         cboCats.removeAllItems()
         cboCats.addItems(withObjectValues: gMyCatNames)
-        //print("🤣cboCats has \(cboCats.numberOfItems) items.")
+        //print("🤣(codeFile)#\(#line) cboCats has \(cboCats.numberOfItems) items.")
     }//end func loadComboBoxFiles
 
 
