@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class UserInputVC: NSViewController, NSWindowDelegate {
+class UserInputCatVC: NSViewController, NSWindowDelegate {
 
     //MARK:- Instance Variables
 //    weak var delegate: UserInputVcDelegate?          //delegate <— (2)
@@ -150,7 +150,39 @@ class UserInputVC: NSViewController, NSWindowDelegate {
         }
     }
 
+    @IBAction func btnAddCategory(_ sender: Any) {
+        let newCat = cboCats.stringValue.trim
+        if dictMyCatAliases[newCat] == nil {
+            //TODO: Check for count etc.
+            let response = GBox.alert("\(cboCats.stringValue) is not recognized.\nDo you want to add it to the list?", style: .yesNo)
+            if response == .yes {
+               addCategory(newCat)
+            }
+            return
+        } else {
+            _ = GBox.alert("\(cboCats.stringValue) is already recognized.\nType the new category into the ComboBox", style: .information)
+        }
+        return
+
+    }
+
     @IBAction func btnOK(_ sender: Any) {
+        // Categories are found in MyCategories.txt, MyModifiedTransactions.txt, VendorCategoryLookup.txt
+        // Adding a category should only affect MyCategories.txt
+        // Internal:
+        //      dictMyCatAliases:  [String: String]     alias: catName
+        //      gMyCatNames: [String]                   catName
+        //      dictMyCatAliasArray: [String: [String]] catName: aliasArray
+        // Must call writeMyCats()
+        let newCat = cboCats.stringValue.trim
+        if dictMyCatAliases[newCat] == nil {
+            //TODO: Check for count etc.
+            let response = GBox.alert("\(cboCats.stringValue) is not recognized.\nDo you want to add it to the list?", style: .yesNo)
+            if response == .yes {
+               addCategory(newCat)
+            }
+            return
+        }
         usrFixVendor = (radioFileVendor.state == .on)
         usrCatItemReturned = catItemCurrent
         if radioFileVendor.state == .on {
@@ -184,6 +216,17 @@ class UserInputVC: NSViewController, NSWindowDelegate {
 
     //MARK: funcs
 
+    //
+    func addCategory(_ newCat: String) {
+        dictMyCatAliases[newCat] = newCat
+        dictMyCatAliasArray[newCat] = []
+        gMyCatNames.append(newCat)
+        gMyCatNames.sort()
+        loadComboBoxCats()
+        writeMyCats(url: gMyCatsFileURL)
+    }
+
+    // Sets ComboBox-String and chkQuestionMark.state
     private func updateAfterCatChange(newCatItem: CategoryItem) {
         let newCat = newCatItem.category
         cboCats.stringValue = newCat

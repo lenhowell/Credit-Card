@@ -162,8 +162,7 @@
 				BF5D549A22EF1EFF00111875 /* Credit Cards.entitlements */,
 				BF992C4722EE56410089DAB8 /* AppDelegate.swift */,
 				BF992C4922EE56410089DAB8 /* ViewController.swift */,
-				CEB315942321607E00D88759 /* UserInputCatVC.swift */,
-				CE95CC9A23367191008363B7 /* UserInputShortNameVC.swift */,
+				CE6F1AE423561C85008CA720 /* VCs&Storyboards */,
 				CEA62D2F2306232C00160DEB /* Alerts.swift */,
 				BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */,
 				BFECDEE022FDBED400F1BF5E /* FileIO.swift */,
@@ -174,16 +173,11 @@
 				CE95CC9C2336D722008363B7 /* VendorShortNames.swift */,
 				CE4A27FC2301BEC500CA5A38 /* Stats.swift */,
 				CE5B1E012304E03C00337C2F /* UserDefaults.swift */,
-				CED5662723459C90002DD645 /* Spreadsheet.storyboard */,
-				CE8AEB9323459E6F00337A73 /* SpreadsheetVC.swift */,
-				CEA3DF25234B75770021A712 /* SummaryTable.storyboard */,
-				CEA3DF27234B76730021A712 /* SummaryTableVC.swift */,
 				CE1F7EC723317453004765E7 /* MyCategories.txt */,
 				CE6F1AE22352D576008CA720 /* VendorShortNames.txt */,
 				CE9FFEBA2302F3DF00261390 /* Thoughts.rtf */,
 				BF9DD30922F1370200C22E41 /* StringExtension.swift */,
 				BF992C4B22EE56420089DAB8 /* Assets.xcassets */,
-				BF992C4D22EE56420089DAB8 /* Main.storyboard */,
 				BF992C5022EE56420089DAB8 /* Info.plist */,
 				BF992C5122EE56420089DAB8 /* Credit_Cards.entitlements */,
 			);
@@ -206,6 +200,20 @@
 				BF992C6722EE56430089DAB8 /* Info.plist */,
 			);
 			path = "Credit CardsUITests";
+			sourceTree = "<group>";
+		};
+		CE6F1AE423561C85008CA720 /* VCs&Storyboards */ = {
+			isa = PBXGroup;
+			children = (
+				BF992C4D22EE56420089DAB8 /* Main.storyboard */,
+				CEB315942321607E00D88759 /* UserInputCatVC.swift */,
+				CE95CC9A23367191008363B7 /* UserInputShortNameVC.swift */,
+				CED5662723459C90002DD645 /* Spreadsheet.storyboard */,
+				CE8AEB9323459E6F00337A73 /* SpreadsheetVC.swift */,
+				CEA3DF25234B75770021A712 /* SummaryTable.storyboard */,
+				CEA3DF27234B76730021A712 /* SummaryTableVC.swift */,
+			);
+			path = "VCs&Storyboards";
 			sourceTree = "<group>";
 		};
 		CEB84F262308EB20001485C5 /* Credit Cards UnitTests */ = {
@@ -587,14 +595,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 580;
+				CURRENT_PROJECT_VERSION = 590;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.6.4;
+				MARKETING_VERSION = 1.6.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -608,14 +616,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 580;
+				CURRENT_PROJECT_VERSION = 590;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.6.4;
+				MARKETING_VERSION = 1.6.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

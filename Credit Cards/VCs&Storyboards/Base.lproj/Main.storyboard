@@ -641,10 +641,10 @@ Gw
             </objects>
             <point key="canvasLocation" x="366" y="1820.5"/>
         </scene>
-        <!--User InputVC-->
+        <!--User Input CatVC-->
         <scene sceneID="Smz-HM-qbR">
             <objects>
-                <viewController identifier="UserInput" storyboardIdentifier="UserInput" id="5se-PX-5kl" customClass="UserInputVC" customModule="Credit_Cards" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController identifier="UserInput" storyboardIdentifier="UserInput" id="5se-PX-5kl" customClass="UserInputCatVC" customModule="Credit_Cards" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="ANN-f8-FkD">
                         <rect key="frame" x="0.0" y="0.0" width="614" height="317"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -871,6 +871,17 @@ Gw
                                 </buttonCell>
                                 <connections>
                                     <action selector="btnAddShortName:" target="5se-PX-5kl" id="ILU-Qm-g9s"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ete-QH-2EM">
+                                <rect key="frame" x="214" y="115" width="124" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="Add Category" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="cX6-8H-Qis">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="btnAddCategory:" target="5se-PX-5kl" id="d0w-FI-Ipv"/>
                                 </connections>
                             </button>
                         </subviews>

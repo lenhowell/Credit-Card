@@ -30,6 +30,7 @@ var gLearnMode          = true      // Used here & HandleCards.swift
 var gUserInputMode      = true      // Used here & HandleCards.swift
 
 var gVendorShortNamesFileURL = FileManager.default.homeDirectoryForCurrentUser
+var gMyCatsFileURL           = FileManager.default.homeDirectoryForCurrentUser
 
 //MARK:- ViewController
 class ViewController: NSViewController, NSWindowDelegate {
@@ -52,7 +53,6 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     var transactionDirURL       = FileManager.default.homeDirectoryForCurrentUser
     var vendorCatLookupFileURL  = FileManager.default.homeDirectoryForCurrentUser
-    var myCatsFileURL           = FileManager.default.homeDirectoryForCurrentUser
     var myModifiedTransURL      = FileManager.default.homeDirectoryForCurrentUser
     var outputFileURL           = FileManager.default.homeDirectoryForCurrentUser
     var gotItem: GotItem        = .empty
@@ -236,7 +236,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         }
 
-        if deleteSupportFile(url: myCatsFileURL, fileName: myCatsFilename) { didSomething += 1 }
+        if deleteSupportFile(url: gMyCatsFileURL, fileName: myCatsFilename) { didSomething += 1 }
         if deleteSupportFile(url: vendorCatLookupFileURL, fileName: vendorCatLookupFilename) { didSomething += 1 }
         if deleteSupportFile(url: gVendorShortNamesFileURL, fileName: vendorShortNameFilename) { didSomething += 1 }
         if deleteSupportFile(url: myModifiedTransURL, fileName: myModifiedTranFilename) { didSomething += 1 }
@@ -528,20 +528,19 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
 
         // ---------- "MyCategories.txt" ------------
-        (myCatsFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myCatsFilename)
+        (gMyCatsFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myCatsFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories " + errTxt)
         }
-        dictMyCatAliases = loadMyCats(myCatsFileURL: myCatsFileURL)
+        dictMyCatAliases = loadMyCats(myCatsFileURL: gMyCatsFileURL)
         if dictMyCatAliases.count > 0 {
             gotItem = [gotItem, .fileMyCategories]
-            //writeMyCats(url: myCatsFileURL)
 
         } else {
             let path = Bundle.main.path(forResource: "MyCategories", ofType: "txt")!
             let bundleCatsFileURL = URL(fileURLWithPath: path)
             dictMyCatAliases = loadMyCats(myCatsFileURL: bundleCatsFileURL)
-            writeMyCats(url: myCatsFileURL)
+            writeMyCats(url: gMyCatsFileURL)
             let msg = "A starter \"MyCategories.txt\" was placed in your support-files folder"
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, errorMsg: msg)
         }

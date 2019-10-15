@@ -142,7 +142,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
     var catItemFromVendor   = CategoryItem()
     var catItemPrefered     = CategoryItem()
     var isClearWinner       = false
-    var catFromTran     = dictMyCatAliases[lineItem.rawCat] ?? lineItem.rawCat + "?"
+    var catFromTran     = dictMyCatAliases[lineItem.rawCat] ?? lineItem.rawCat + "-?"
     var catItemFromTran = CategoryItem(category: catFromTran, source: cardType)
 
     if descKey.isEmpty { return lineItem }    // Missing descKey
@@ -189,7 +189,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
 
         // if in User-Input-Mode && No Clear Winner
         if gUserInputMode && !isClearWinner {
-            _ = showUserInputForm(lineItem: lineItem, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemPrefered)
+            _ = showUserInputVendorCatForm(lineItem: lineItem, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemPrefered)
             catItemPrefered = usrCatItemReturned
         } else if gLearnMode && catItemPrefered.category != catItemFromVendor.category && isClearWinner {
             dictVendorCatLookup[descKey] = catItemPrefered  // Do Actual Insert into VendorCategoryLookup
@@ -201,8 +201,8 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
 }//end func makeLineItem
 
 
-//---- showUserInputForm - Allow User to intervene using the UserInputCat form
-func showUserInputForm(lineItem: LineItem, catItemFromVendor: CategoryItem, catItemFromTran: CategoryItem, catItemPrefered: CategoryItem) -> CategoryItem {
+//---- showUserInputVendorCatForm - Allow User to intervene using the UserInputCat form
+func showUserInputVendorCatForm(lineItem: LineItem, catItemFromVendor: CategoryItem, catItemFromTran: CategoryItem, catItemPrefered: CategoryItem) -> CategoryItem {
     usrLineItem = lineItem
     usrCatItemFromVendor = catItemFromVendor
     usrCatItemFromTran   = catItemFromTran
@@ -301,8 +301,8 @@ internal func pickTheBestCat(catItemVendor: CategoryItem, catItemTransa: Categor
     let catVendor = catItemVendor.category
     let catTransa = catItemTransa.category
     if catItemVendor.source.hasPrefix("$")                  { return (catItemVendor, strong) }  // User modified
-    let catVendStrong = !catVendor.isEmpty && !catVendor.hasSuffix("?") && !catVendor.contains("Unkno") && !catVendor.contains("Merch")
-    let catTranStrong = !catTransa.isEmpty && !catTransa.hasSuffix("?") && !catTransa.contains("Unkno") && !catTransa.contains("Merch")
+    let catVendStrong = !catVendor.isEmpty && !catVendor.hasSuffix("?") && !catVendor.contains("Unknow") // && !catVendor.contains("Merch")
+    let catTranStrong = !catTransa.isEmpty && !catTransa.hasSuffix("?") && !catTransa.contains("Unknow") // && !catTransa.contains("Merch")
 
     if (catVendor == catTransa)                             { return (catItemTransa, catTranStrong) } // Both the same.
 
