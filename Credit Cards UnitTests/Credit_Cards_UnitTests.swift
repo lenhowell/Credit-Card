@@ -30,21 +30,21 @@ class Credit_Cards_UnitTests: XCTestCase {
     func test_formatCell() {
         var result = ""
         var num = 0.0
-        result = formatCell(num,  formatType: .Number,    digits: 2)
+        result = formatCell(num,  formatType: .number,    digits: 2)
         XCTAssertEqual(result, "")
 
         num = -1234.567
-        result = formatCell(num,  formatType: .Number,    digits: 2)
+        result = formatCell(num,  formatType: .number,    digits: 2)
         XCTAssertEqual(result, "-1234.57")
-        result = formatCell(num,  formatType: .Dollar,    digits: 2)
+        result = formatCell(num,  formatType: .dollar,    digits: 2)
         XCTAssertEqual(result, "($1,234.57)")
-        result = formatCell(num,  formatType: .NoDollar,  digits: 2)
+        result = formatCell(num,  formatType: .noDollar,  digits: 2)
         XCTAssertEqual(result, "(1,234.57)")
-        result = formatCell(num,  formatType: .Percent,   digits: 2)
+        result = formatCell(num,  formatType: .percent,   digits: 2)
         XCTAssertEqual(result, "-123456.70%")
-        result = formatCell(num,  formatType: .Comma,     digits: 2)
+        result = formatCell(num,  formatType: .comma,     digits: 2)
         XCTAssertEqual(result, "-1,234.57")
-        result = formatCell(num,  formatType: .None,     digits: 2)
+        result = formatCell(num,  formatType: .none,     digits: 2)
         XCTAssertEqual(result, "-1234.567")
     }
 

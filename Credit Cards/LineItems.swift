@@ -89,7 +89,7 @@ public struct LineItem: Equatable, Hashable {
         if let colNum = dictColNums["CATE"] {   // CATEGORY
             if colNum < columnCount {
                 let assignedCat =  columns[colNum]
-                let myCat = dictMyCatAliases[assignedCat] ?? assignedCat
+                let myCat = gDictMyCatAliases[assignedCat] ?? assignedCat
                 self.rawCat = myCat
             }
         }

@@ -25,7 +25,7 @@ public func getStringFromClipBoard() -> String {
 }
 
 public enum FormatType {
-    case None, Number, Percent, Dollar, NoDollar, Comma
+    case none, number, percent, dollar, noDollar, comma
 }
 //---- formatCell -
 public func formatCell(_ value: Double, formatType: FormatType, digits: Int,
@@ -35,25 +35,25 @@ public func formatCell(_ value: Double, formatType: FormatType, digits: Int,
     }
     var format = ""
     switch formatType {
-    case .Number:                                       // -1234.5
+    case .number:                                       // -1234.5
         format = "%.\(digits)f"   // "%.2f%" -> "#.00"
         return String(format: format, value)
-    case .Percent:                                      // -123.4%
+    case .percent:                                      // -123.4%
         format = "%.\(digits)f%%" // "%.1f%%" -> "#.0%"
         return String(format: format, value*100)
-    case .Dollar:                                       // ($1,234.5)
+    case .dollar:                                       // ($1,234.5)
         let formatter = NumberFormatter()
         formatter.numberStyle  = .currencyAccounting
         formatter.maximumFractionDigits = digits
         return formatter.string(for: value) ?? "?Dollar?"
-    case .NoDollar:                                     // (1,234.5)
+    case .noDollar:                                     // (1,234.5)
         let formatter = NumberFormatter()
         formatter.numberStyle  = .currencyAccounting
         formatter.maximumFractionDigits = digits
         let str = formatter.string(for: value) ?? "$?Dollar?"
         let str2 = str.replacingOccurrences(of: "$", with: "")
         return str2
-    case .Comma:                                        // -1,234.5
+    case .comma:                                        // -1,234.5
         let formatter = NumberFormatter()
         formatter.numberStyle  = .decimal
         formatter.maximumFractionDigits = digits

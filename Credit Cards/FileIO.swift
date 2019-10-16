@@ -182,7 +182,7 @@ public struct FileAttributes: Equatable {
 
 func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
     gMyCatNames = []
-    dictMyCatAliasArray = [String: [String]]()
+    gDictMyCatAliasArray = [String: [String]]()
     var dictMyCats = [String: String]()
     var contentof = ""
     do {
@@ -226,22 +226,20 @@ func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
                 dictMyCats[myCatAlias] = myCat
             }
         }
-        dictMyCatAliasArray[myCat] = aliases
+        gDictMyCatAliasArray[myCat] = aliases
     }//next line
     gMyCatNames.sort()
     return dictMyCats
 }//end func loadMyCats
 
 //---- writeMyCats - Used only when a starter verion from bundle is read in
-// only used to tranfer MyCategories.txt from bundle to user support files.
-//TODO: Change writeMyCats to accommidate user mods
 func writeMyCats(url: URL) {
     saveBackupFile(url: url)
 
     var text = gMyCategoryHeader
     text += "My Name,               alias1,        alias2,    ...\n"
     var prevCat = ""
-    for (cat, array) in dictMyCatAliasArray.sorted(by: {$0.key < $1.key} ) {
+    for (cat, array) in gDictMyCatAliasArray.sorted(by: {$0.key < $1.key} ) {
         if  cat.splitAtFirst(char: "-").lft != prevCat.splitAtFirst(char: "-").lft {
             text += "\n"
         }

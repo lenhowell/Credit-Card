@@ -92,8 +92,8 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     @IBAction func btnSummaries(_ sender: Any) {
         let storyBoard = NSStoryboard(name: "SummaryTable", bundle: nil)
-        let UserInputWindowController = storyBoard.instantiateController(withIdentifier: "SummaryWindowController") as! NSWindowController
-        if let userInputWindow = UserInputWindowController.window {
+        let userInputWindowController = storyBoard.instantiateController(withIdentifier: "SummaryWindowController") as! NSWindowController
+        if let userInputWindow = userInputWindowController.window {
             //let userVC = storyBoard.instantiateController(withIdentifier: "UserInput") as! UserInputVC
 
             let application = NSApplication.shared
@@ -162,10 +162,11 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         totalCredit = 0
         totalDebit  = 0
 
-        for lineItem in lineItemArray {
+        for (idx,lineItem) in lineItemArray.enumerated() {
             if applyFilter(lineItem: lineItem) {
                 gFilteredLineItemArray.append(lineItem)
-                let dict = makeRowDict(lineItem: lineItem)
+                let dict = makeRowDict(lineItem: lineItem, idx: idx)
+
                 tableDicts.append(dict)
                 totalCredit += lineItem.credit
                 totalDebit  += lineItem.debit
@@ -206,19 +207,20 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     }
 
     //---- makeRowDict - Create a dictionary entry for loadTable
-    func makeRowDict(lineItem: LineItem) -> [String : String] {
+    func makeRowDict(lineItem: LineItem, idx: Int = -1) -> [String : String] {
         var dict = [String : String]()
 
         dict[ColID.cardType]    = lineItem.cardType
         dict[ColID.transDate]   = makeYYYYMMDD(dateTxt: lineItem.tranDate)
         dict[ColID.descKey]     = lineItem.descKey
         dict[ColID.fullDesc]    = lineItem.desc
-        dict[ColID.debit]       = formatCell(lineItem.debit,  formatType: .Dollar,  digits: 2)
-        dict[ColID.credit]      = formatCell(lineItem.credit, formatType: .Dollar,  digits: 2)
+        dict[ColID.debit]       = formatCell(lineItem.debit,  formatType: .dollar,  digits: 2)
+        dict[ColID.credit]      = formatCell(lineItem.credit, formatType: .dollar,  digits: 2)
         dict[ColID.category]    = lineItem.genCat
         dict[ColID.rawCat]      = lineItem.rawCat
         dict[ColID.catSource]   = lineItem.catSource
         dict[ColID.file_LineNum] = lineItem.auditTrail
+        dict["idx"] = String(idx)
         return dict
     }// end func
 
@@ -286,7 +288,10 @@ extension SpreadsheetVC: NSTableViewDelegate {
             let dict = tableDicts[row]
             //var image: NSImage?
 
-            guard let colID = tableColumn?.identifier.rawValue else { print("⛔️ Table Column nil"); return nil }
+            guard let colID = tableColumn?.identifier.rawValue else {
+                print("⛔️ Table Column nil")
+                return nil
+            }
             guard let text = dict[colID] else {
                 print("⛔️ \(codeFile)#\(#line) No Value found for \(colID)")
                 return nil
@@ -302,7 +307,10 @@ extension SpreadsheetVC: NSTableViewDelegate {
 
         // Summary (Totals) table
         if tableView == self.tableViewSum {
-            guard let colID = tableColumn?.identifier.rawValue else { print("⛔️ Table Column nil"); return nil }
+            guard let colID = tableColumn?.identifier.rawValue else {
+                print("⛔️ Table Column nil")
+                return nil
+            }
             guard let text = tableSumDict[colID] else {
                 print("⛔️ \(codeFile)#\(#line) No Value found for \(colID)")
                 return nil
@@ -355,7 +363,15 @@ extension SpreadsheetVC: NSTableViewDelegate {
     @objc func tableViewDoubleClick(_ sender:AnyObject) {
         // 1
         guard tableView.selectedRow >= 0 else { return }
-        print("DoubleClicked on Row # \(tableView.selectedRow)")
+        let rowDict = tableDicts[tableView.selectedRow]
+        let idxStr = rowDict["idx"] ?? ""
+        let idx = Int(idxStr) ?? -1
+        print("DoubleClicked on Row # \(tableView.selectedRow).  idx = \(idx)")
+        let lineItem = gLineItemArray[idx]
+        print("\(lineItem.tranDate) \(lineItem.descKey) \(lineItem.debit)")
+        let catItemFromVendor = CategoryItem(category: lineItem.genCat, source: lineItem.catSource)
+        let catItemFromTran   = CategoryItem(category: lineItem.rawCat, source: lineItem.catSource)
+        //showUserInputVendorCatForm(lineItem: lineItem, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemFromVendor)
     }//end func
 
 }//end extension

@@ -152,7 +152,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
 
     @IBAction func btnAddCategory(_ sender: Any) {
         let newCat = cboCats.stringValue.trim
-        if dictMyCatAliases[newCat] == nil {
+        if gDictMyCatAliases[newCat] == nil {
             //TODO: Check for count etc.
             let response = GBox.alert("\(cboCats.stringValue) is not recognized.\nDo you want to add it to the list?", style: .yesNo)
             if response == .yes {
@@ -170,12 +170,12 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         // Categories are found in MyCategories.txt, MyModifiedTransactions.txt, VendorCategoryLookup.txt
         // Adding a category should only affect MyCategories.txt
         // Internal:
-        //      dictMyCatAliases:  [String: String]     alias: catName
+        //      gDictMyCatAliases:  [String: String]     alias: catName
         //      gMyCatNames: [String]                   catName
-        //      dictMyCatAliasArray: [String: [String]] catName: aliasArray
+        //      gDictMyCatAliasArray: [String: [String]] catName: aliasArray
         // Must call writeMyCats()
         let newCat = cboCats.stringValue.trim
-        if dictMyCatAliases[newCat] == nil {
+        if gDictMyCatAliases[newCat] == nil {
             //TODO: Check for count etc.
             let response = GBox.alert("\(cboCats.stringValue) is not recognized.\nDo you want to add it to the list?", style: .yesNo)
             if response == .yes {
@@ -218,8 +218,8 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
 
     //
     func addCategory(_ newCat: String) {
-        dictMyCatAliases[newCat] = newCat
-        dictMyCatAliasArray[newCat] = []
+        gDictMyCatAliases[newCat] = newCat
+        gDictMyCatAliasArray[newCat] = []
         gMyCatNames.append(newCat)
         gMyCatNames.sort()
         loadComboBoxCats()

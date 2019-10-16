@@ -8,13 +8,13 @@
 
 import Cocoa    // needed to access NSStoryboard & NSWindowController for segue
 
-//MARK:- Globals for UserInputs
-// Parameters for UserInputs
+//MARK:- Globals for UserInputVendorCatForm
+// Parameters for UserInputVendorCatForm
 var usrLineItem          = LineItem()
 var usrCatItemFromVendor = CategoryItem()
 var usrCatItemFromTran   = CategoryItem()
 var usrCatItemPrefered   = CategoryItem()
-// Returns from UserInputs
+// Returns from UserInputVendorCatForm
 var usrCatItemReturned  = CategoryItem()
 var usrFixVendor        = true
 var usrIgnoreVendors    = [String: Int]()
@@ -71,14 +71,14 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
             // Check for duplicate from another file
             //FIXME: Not all dupes are picked up
             let signature = makeSignature(lineItem: lineItem)
-            if dictTranDupes[signature] == nil || dictTranDupes[signature] == fileName {
+            if gDictTranDupes[signature] == nil || gDictTranDupes[signature] == fileName {
                 if tran.contains("VAZZYS OSTERIA") && tran.contains("18.83") {
                     //
                 }
-                dictTranDupes[signature] = fileName      // mark for dupes check
+                gDictTranDupes[signature] = fileName      // mark for dupes check
                 lineItemArray.append(lineItem)          // Add new output Record
             } else {
-                let msg = "Duplicate transaction of one from \(dictTranDupes[signature]!)"
+                let msg = "Duplicate transaction of one from \(gDictTranDupes[signature]!)"
                 handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .display, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: msg)
                 Stats.duplicateCount += 1
             }
@@ -132,7 +132,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
 
     // Check for Modified Transaction
     let modTranKey = fromTransFileLine.trim
-    if let modTrans = dictModifiedTrans[modTranKey] {
+    if let modTrans = gDictModifiedTrans[modTranKey] {
         lineItem.genCat = modTrans.category             // Here if found this transaction in MyModifiedTransactions.txt
         lineItem.catSource = modTrans.source
         Stats.userModTransUsed += 1
@@ -142,12 +142,12 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
     var catItemFromVendor   = CategoryItem()
     var catItemPrefered     = CategoryItem()
     var isClearWinner       = false
-    var catFromTran     = dictMyCatAliases[lineItem.rawCat] ?? lineItem.rawCat + "-?"
+    var catFromTran     = gDictMyCatAliases[lineItem.rawCat] ?? lineItem.rawCat + "-?"
     var catItemFromTran = CategoryItem(category: catFromTran, source: cardType)
 
     if descKey.isEmpty { return lineItem }    // Missing descKey
 
-    if let cV = dictVendorCatLookup[descKey] {
+    if let cV = gDictVendorCatLookup[descKey] {
         catItemFromVendor = cV                  // ------ Here if Lookup by Vendor was successful
         (catItemPrefered, isClearWinner) = pickTheBestCat(catItemVendor: catItemFromVendor, catItemTransa: catItemFromTran)
         if lineItem.genCat != catItemPrefered.category {
@@ -156,7 +156,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
         }
         Stats.successfulLookupCount += 1
         // print("HandleCards#\(#line) \(lineItem.descKey) \(catItemPrefered.category) isClearWinner=\(isClearWinner)  VendorCat=\(catItemFromVendor.category) TransCat=\(catItemFromTran.category)")
-        uniqueCategoryCounts[descKey, default: 0] += 1
+        gUniqueCategoryCounts[descKey, default: 0] += 1
 
     } else {                   // ------ Here if NOT found in Category-Lookup-by-Vendor Dictionary
         findShorterDescKey(descKey) // Does nothing?
@@ -165,7 +165,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
         // If Transaction-Line has a Category, put it in the Vendor file.
         if catFromTran.count < 3 { catFromTran = "" }
 
-        if let catTran = dictMyCatAliases[catFromTran] {
+        if let catTran = gDictMyCatAliases[catFromTran] {
             catFromTran = catTran
             isClearWinner = !catFromTran.hasSuffix("?") // if no "?", we have a winner
         } else {
@@ -176,7 +176,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
         catItemPrefered = catItemFromTran
         lineItem.genCat = catFromTran
         if gLearnMode {
-            dictVendorCatLookup[descKey] = CategoryItem(category: catFromTran, source: cardType) //Do Actual Insert
+            gDictVendorCatLookup[descKey] = CategoryItem(category: catFromTran, source: cardType) //Do Actual Insert
             Stats.addedCatCount += 1
         } else {
             Stats.descWithNoCat += 1
@@ -192,7 +192,7 @@ internal func makeLineItem(fromTransFileLine: String, dictColNums: [String: Int]
             _ = showUserInputVendorCatForm(lineItem: lineItem, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemPrefered)
             catItemPrefered = usrCatItemReturned
         } else if gLearnMode && catItemPrefered.category != catItemFromVendor.category && isClearWinner {
-            dictVendorCatLookup[descKey] = catItemPrefered  // Do Actual Insert into VendorCategoryLookup
+            gDictVendorCatLookup[descKey] = catItemPrefered  // Do Actual Insert into VendorCategoryLookup
             Stats.changedVendrCatCount += 1
         }
     }
@@ -208,8 +208,8 @@ func showUserInputVendorCatForm(lineItem: LineItem, catItemFromVendor: CategoryI
     usrCatItemFromTran   = catItemFromTran
     usrCatItemPrefered   = catItemPrefered
     let storyBoard = NSStoryboard(name: "Main", bundle: nil)
-    let UserInputWindowController = storyBoard.instantiateController(withIdentifier: "UserInputWindowController") as! NSWindowController
-    if let userInputWindow = UserInputWindowController.window {
+    let userInputWindowController = storyBoard.instantiateController(withIdentifier: "UserInputWindowController") as! NSWindowController
+    if let userInputWindow = userInputWindowController.window {
         //let userVC = storyBoard.instantiateController(withIdentifier: "UserInput") as! UserInputVC
 
         let application = NSApplication.shared
@@ -223,11 +223,11 @@ func showUserInputVendorCatForm(lineItem: LineItem, catItemFromVendor: CategoryI
         case .OK:                                   // .OK - Make changes requested by user
             if gLearnMode {
                 if usrFixVendor {                   // Fix VendorCategoryLookup value
-                    dictVendorCatLookup[lineItem.descKey] = usrCatItemReturned
+                    gDictVendorCatLookup[lineItem.descKey] = usrCatItemReturned
                     Stats.changedVendrCatCount += 1
                 } else {                            // New category for this transaction only.
                     let transKey = lineItem.transText
-                    dictModifiedTrans[transKey] = usrCatItemReturned
+                    gDictModifiedTrans[transKey] = usrCatItemReturned
                 }
             }
 
@@ -276,7 +276,7 @@ internal func makeDictColNums(headers: [String]) -> [String: Int] {
 //---- findShorterDescKey - Does nothing yet
 internal func findShorterDescKey(_ descKey: String) {
     let descKeyCount = descKey.count
-    for (key, value) in dictVendorCatLookup {
+    for (key, value) in gDictVendorCatLookup {
         let keyCount = key.count
         if descKeyCount < keyCount && descKeyCount > 3 {
             if key.prefix(descKeyCount) == descKey {

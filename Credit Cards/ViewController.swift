@@ -17,13 +17,13 @@ var gUserInitials           = "User"    // (UserInputVC.swift-2) Initials used f
 var gLineItemArray          = [LineItem]()  // Entire list of transactions - used here & SpreadsheetVC
 var gTransFilename          = ""                // (UserInputVC.swift-viewDidLoad) Current Transaction Filename
 var gMyCatNames             = [String]()            // (loadMyCats, UserInputVC.swift-viewDidLoad) Array of Category Names (MyCategories.txt)
-var dictMyCatAliases        = [String: String]()        // (LineItems.init, etc) Hash of Category Synonyms
-var dictMyCatAliasArray     = [String: [String]]()      // Synonyms for each cat name
-var dictVendorCatLookup     = [String: CategoryItem]()  // (HandleCards.swift-3) Hash for Category Lookup (CategoryLookup.txt)
-var dictTranDupes           = [String: String]()        // (handleCards) Hash for finding duplicate transactions
-var dictModifiedTrans       = [String: CategoryItem]()  // (MyModifiedTransactions.txt) Hash for user-modified transactions
+var gDictMyCatAliases       = [String: String]()        // (LineItems.init, etc) Hash of Category Synonyms
+var gDictMyCatAliasArray    = [String: [String]]()      // Synonyms for each cat name
+var gDictVendorCatLookup    = [String: CategoryItem]()  // (HandleCards.swift-3) Hash for Category Lookup (CategoryLookup.txt)
+var gDictTranDupes          = [String: String]()        // (handleCards) Hash for finding duplicate transactions
+var gDictModifiedTrans      = [String: CategoryItem]()  // (MyModifiedTransactions.txt) Hash for user-modified transactions
 var gDictVendorShortNames   = [String: String]()        // (VendorShortNames.txt) Hash for VendorShortNames Lookup
-var uniqueCategoryCounts    = [String: Int]()           // Hash for Unique Category Counts
+var gUniqueCategoryCounts   = [String: Int]()           // Hash for Unique Category Counts
 var gMyCategoryHeader       = ""
 var gIsUnitTesting      = false     // Not used
 var gLearnMode          = true      // Used here & HandleCards.swift
@@ -191,7 +191,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func btnFindTruncatedDescs(_ sender: Any) {
-        let vendorNameDescs = Array(dictVendorCatLookup.keys)
+        let vendorNameDescs = Array(gDictVendorCatLookup.keys)
         let doWrite = findTruncatedDescs(vendorNameDescs: vendorNameDescs)
         if doWrite {
             writeVendorShortNames(url: gVendorShortNamesFileURL, dictVendorShortNames: gDictVendorShortNames)
@@ -326,12 +326,12 @@ class ViewController: NSViewController, NSWindowDelegate {
         UserDefaults.standard.set(gLearnMode,         forKey: UDKey.learningMode)
 
         Stats.clearAll()        // Clear the Stats
-        gLineItemArray = []     // Clear the global lineItemArray
-        dictVendorCatLookup = loadVendorCategories(url: vendorCatLookupFileURL) // Re-read Categories Dictionary
-        Stats.origVendrCatCount = dictVendorCatLookup.count
+        gLineItemArray = []     // Clear the global gLineItemArray
+        gDictVendorCatLookup = loadVendorCategories(url: vendorCatLookupFileURL) // Re-read Categories Dictionary
+        Stats.origVendrCatCount = gDictVendorCatLookup.count
 
         var fileContents    = ""                        // Where All Transactions in a File go
-        dictTranDupes = [:]
+        gDictTranDupes = [:]
         lblErrMsg.stringValue = ""
         
         if !FileManager.default.fileExists(atPath: transactionDirURL.path) {
@@ -382,21 +382,21 @@ class ViewController: NSViewController, NSWindowDelegate {
         outputTranactions(outputFileURL: outputFileURL, lineItemArray: gLineItemArray)
 
         print("\n--- Description-Key algorithms ---")
-        for (key, val) in dictDescKeyAlgorithm.sorted(by: <) {
+        for (key, val) in gDictDescKeyAlgorithm.sorted(by: <) {
             print("\(key.PadRight(40))\(val)")
         }
 
-        let uniqueCategoryCountsSorted = uniqueCategoryCounts.sorted(by: <)
-        print("\n\(uniqueCategoryCounts.count) uniqueCategoryCountsSorted by description (vendor)")
+        let uniqueCategoryCountsSorted = gUniqueCategoryCounts.sorted(by: <)
+        print("\n\(gUniqueCategoryCounts.count) uniqueCategoryCountsSorted by description (vendor)")
         print (uniqueCategoryCountsSorted)
-        print("\n\(uniqueCategoryCounts.count) uniqueCategoryCounts.sorted by count")
-        print (uniqueCategoryCounts.sorted {$0.value > $1.value})
+        print("\n\(gUniqueCategoryCounts.count) gUniqueCategoryCounts.sorted by count")
+        print (gUniqueCategoryCounts.sorted {$0.value > $1.value})
         if Stats.addedCatCount > 0 || Stats.changedVendrCatCount > 0 {
             if gLearnMode {
-                writeVendorCategoriesToFile(url: vendorCatLookupFileURL, dictCat: dictVendorCatLookup)
+                writeVendorCategoriesToFile(url: vendorCatLookupFileURL, dictCat: gDictVendorCatLookup)
             }
         }
-        writeModTransTofile(url: myModifiedTransURL, dictModTrans: dictModifiedTrans)
+        writeModTransTofile(url: myModifiedTransURL, dictModTrans: gDictModifiedTrans)
 
         var statString = ""
 
@@ -507,8 +507,8 @@ class ViewController: NSViewController, NSWindowDelegate {
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "Category" + errTxt)
         }
-        dictVendorCatLookup = loadVendorCategories(url: vendorCatLookupFileURL)       // Build Categories Dictionary
-        Stats.origVendrCatCount = dictVendorCatLookup.count
+        gDictVendorCatLookup = loadVendorCategories(url: vendorCatLookupFileURL)       // Build Categories Dictionary
+        Stats.origVendrCatCount = gDictVendorCatLookup.count
 
         // -------- "VendorShortNames.txt" ----------
         (gVendorShortNamesFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: vendorShortNameFilename)
@@ -532,14 +532,14 @@ class ViewController: NSViewController, NSWindowDelegate {
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories " + errTxt)
         }
-        dictMyCatAliases = loadMyCats(myCatsFileURL: gMyCatsFileURL)
-        if dictMyCatAliases.count > 0 {
+        gDictMyCatAliases = loadMyCats(myCatsFileURL: gMyCatsFileURL)
+        if gDictMyCatAliases.count > 0 {
             gotItem = [gotItem, .fileMyCategories]
 
         } else {
             let path = Bundle.main.path(forResource: "MyCategories", ofType: "txt")!
             let bundleCatsFileURL = URL(fileURLWithPath: path)
-            dictMyCatAliases = loadMyCats(myCatsFileURL: bundleCatsFileURL)
+            gDictMyCatAliases = loadMyCats(myCatsFileURL: bundleCatsFileURL)
             writeMyCats(url: gMyCatsFileURL)
             let msg = "A starter \"MyCategories.txt\" was placed in your support-files folder"
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, errorMsg: msg)
@@ -551,8 +551,8 @@ class ViewController: NSViewController, NSWindowDelegate {
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyModifiedTransactions " + errTxt)
         }
-        dictModifiedTrans = loadMyModifiedTrans(myModifiedTranURL: myModifiedTransURL)
-        if dictModifiedTrans.count > 0 {gotItem = [gotItem, .fileMyModifiedTrans]}
+        gDictModifiedTrans = loadMyModifiedTrans(myModifiedTranURL: myModifiedTransURL)
+        if gDictModifiedTrans.count > 0 {gotItem = [gotItem, .fileMyModifiedTrans]}
     }//end func
 
     //---- resetUserDefaults - Reset all User Defaults to provide a clean startup

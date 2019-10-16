@@ -10,7 +10,7 @@ import Foundation
 
 //MARK:- Globals
 let descKeyLength          = 24
-var dictDescKeyAlgorithm   = [String: Int]()
+var gDictDescKeyAlgorithm  = [String: Int]()
 
 //MARK:- makeDescKey 17-229 = 212-lines
 //---- makeDescKey - Make a CategoryLookup key from the transaction "Description"
@@ -268,7 +268,7 @@ func checkDif(newStr: String, oldStr: String, doPrint: Bool, comment: String) ->
             print("🍎 [\(oldStr)] -> [\(newStr)]  \(comment)")
             // Debug Trap
         }
-        dictDescKeyAlgorithm[comment, default: 0] += 1
+        gDictDescKeyAlgorithm[comment, default: 0] += 1
         return newStr
     }
     return oldStr

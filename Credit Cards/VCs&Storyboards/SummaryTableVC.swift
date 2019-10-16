@@ -187,8 +187,8 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     //---- makeRowDict - Create a dictionary entry for loadTable & appends to tableDicts
     private func appendToTableDicts(name: String, count: Int, credit: Double, debit: Double) {
         if !name.isEmpty {
-            let strCredit = formatCell(credit, formatType: .Dollar,  digits: 2)
-            let strDebit  = formatCell(debit,  formatType: .Dollar,  digits: 2)
+            let strCredit = formatCell(credit, formatType: .dollar,  digits: 2)
+            let strDebit  = formatCell(debit,  formatType: .dollar,  digits: 2)
             let dict      = [ColID.name: name, ColID.count: String(count), ColID.debit: strDebit, ColID.credit: strCredit]
             tableDicts.append(dict)
         }
