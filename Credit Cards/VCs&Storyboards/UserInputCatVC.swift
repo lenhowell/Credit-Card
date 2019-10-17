@@ -38,6 +38,10 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         lblcatFromVendor.stringValue = usrCatItemFromVendor.category
         lblcatPrefered.stringValue   = usrCatItemPrefered.category
         lblProcessed.stringValue     = String(Stats.processedCount)
+        btnAbort.isHidden            = !usrBatchMode
+        btnIgnore.isHidden           = !usrBatchMode
+        lblIgnore.isHidden           = !usrBatchMode
+        btnCancel.title              = usrBatchMode ? "Pass" : "Cancel"
 
         loadComboBoxCats()
         catItemCurrent = usrCatItemPrefered
@@ -88,7 +92,11 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
     @IBOutlet var chkLockIn:            NSButton!
     @IBOutlet var radioFileTransac:     NSButton!
     @IBOutlet var radioFileVendor:      NSButton!
-    
+    @IBOutlet var btnAbort:             NSButton!
+    @IBOutlet var btnIgnore:            NSButton!
+    @IBOutlet var btnCancel:            NSButton!
+    @IBOutlet var lblIgnore:         NSTextField!
+
 
     //MARK:- @IBActions
     

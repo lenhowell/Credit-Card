@@ -211,8 +211,8 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <button identifier="Category" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EAW-oI-TAj">
-                                <rect key="frame" x="12" y="321" width="131" height="16"/>
+                            <button identifier="CategoryOverall" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EAW-oI-TAj">
+                                <rect key="frame" x="12" y="321" width="131" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="radio" title="Category (overall)" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="9mO-SQ-m1L">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -222,7 +222,7 @@
                                     <action selector="radioCatChange:" target="igT-kg-E2n" id="Jkd-W3-qld"/>
                                 </connections>
                             </button>
-                            <button identifier="Category" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JJL-DV-xgd">
+                            <button identifier="CategoryDetail" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JJL-DV-xgd">
                                 <rect key="frame" x="12" y="292" width="125" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="radio" title="Category (detail)" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="NDM-3q-gMj">

@@ -221,7 +221,7 @@ public func makeDescKey(from desc: String, dictVendorShortNames: [String: String
 
     let match2 = findPrefixMatch(name: descKey, dictShortNames: dictVendorShortNames)
     if !match2.fullDescKey.isEmpty {
-        print("⚠️ DescriptionKey#\(#line) Prefix for \(desc) matches to \(match2.fullDescKey) only AFTER processing")
+        //print("⚠️ DescriptionKey#\(#line) Prefix for \(desc) matches to \(match2.fullDescKey) only AFTER processing")
         return match2.fullDescKey
     }
 

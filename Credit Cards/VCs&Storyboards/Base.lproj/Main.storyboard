@@ -418,7 +418,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vWS-7S-9w2">
-                                <rect key="frame" x="23" y="565" width="105" height="21"/>
+                                <rect key="frame" x="17" y="565" width="117" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="Spreadsheet" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="EoR-bI-p7p">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -733,7 +733,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="V1e-nv-MRP">
-                                <rect key="frame" x="12" y="54" width="37" height="17"/>
+                                <rect key="frame" x="12" y="54" width="101" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="# processed" id="AFo-uW-63P">
                                     <font key="font" metaFont="system"/>
@@ -887,11 +887,15 @@ Gw
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="btnAbort" destination="s1s-Ny-IUT" id="kOV-W1-cc9"/>
+                        <outlet property="btnCancel" destination="ssp-Z2-Jvb" id="1NK-Q2-Ncw"/>
+                        <outlet property="btnIgnore" destination="48n-f8-elU" id="e4q-wa-T5v"/>
                         <outlet property="cboCats" destination="DP0-U9-YMZ" id="K2Q-hQ-nIp"/>
                         <outlet property="chkLockIn" destination="5vi-kI-JnO" id="J4p-U9-zef"/>
                         <outlet property="chkQuestionMark" destination="WBO-u6-2d6" id="jEK-jU-wk4"/>
                         <outlet property="lblDesc" destination="yke-LT-ZLL" id="r8O-gj-NJH"/>
                         <outlet property="lblFile" destination="kyJ-32-oZs" id="xFG-T3-6QQ"/>
+                        <outlet property="lblIgnore" destination="lZd-fa-7K0" id="Cip-Wh-7Im"/>
                         <outlet property="lblLineItem" destination="xZz-c5-B01" id="duQ-aV-8h8"/>
                         <outlet property="lblProcessed" destination="V1e-nv-MRP" id="iUW-RR-MTg"/>
                         <outlet property="lblcatFromTran" destination="CZc-Jh-KgQ" id="cYF-fF-lLL"/>
@@ -906,7 +910,7 @@ Gw
                 </viewController>
                 <customObject id="Px0-g5-byd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="418" y="1475"/>
+            <point key="canvasLocation" x="418" y="1474.5"/>
         </scene>
     </scenes>
 </document>

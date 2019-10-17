@@ -371,7 +371,12 @@ extension SpreadsheetVC: NSTableViewDelegate {
         print("\(lineItem.tranDate) \(lineItem.descKey) \(lineItem.debit)")
         let catItemFromVendor = CategoryItem(category: lineItem.genCat, source: lineItem.catSource)
         let catItemFromTran   = CategoryItem(category: lineItem.rawCat, source: lineItem.catSource)
-        //showUserInputVendorCatForm(lineItem: lineItem, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemFromVendor)
+        let catItem = showUserInputVendorCatForm(lineItem: lineItem, batchMode: false, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemFromVendor)
+        // ...and we're back.
+        gLineItemArray[idx].genCat    = catItem.category
+        gLineItemArray[idx].catSource = catItem.source
+        loadTable(lineItemArray: gLineItemArray)
+        tableView.reloadData()
     }//end func
 
 }//end extension

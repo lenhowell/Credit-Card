@@ -22,15 +22,21 @@ var gDictMyCatAliasArray    = [String: [String]]()      // Synonyms for each cat
 var gDictVendorCatLookup    = [String: CategoryItem]()  // (HandleCards.swift-3) Hash for Category Lookup (CategoryLookup.txt)
 var gDictTranDupes          = [String: String]()        // (handleCards) Hash for finding duplicate transactions
 var gDictModifiedTrans      = [String: CategoryItem]()  // (MyModifiedTransactions.txt) Hash for user-modified transactions
-var gDictVendorShortNames   = [String: String]()        // (VendorShortNames.txt) Hash for VendorShortNames Lookup
+
+
 var gUniqueCategoryCounts   = [String: Int]()           // Hash for Unique Category Counts
 var gMyCategoryHeader       = ""
 var gIsUnitTesting      = false     // Not used
 var gLearnMode          = true      // Used here & HandleCards.swift
 var gUserInputMode      = true      // Used here & HandleCards.swift
 
+var gDictVendorShortNames   = [String: String]()        // (VendorShortNames.txt) Hash for VendorShortNames Lookup
 var gVendorShortNamesFileURL = FileManager.default.homeDirectoryForCurrentUser
+
 var gMyCatsFileURL           = FileManager.default.homeDirectoryForCurrentUser
+var gMyModifiedTransURL      = FileManager.default.homeDirectoryForCurrentUser
+var gVendorCatLookupFileURL  = FileManager.default.homeDirectoryForCurrentUser
+
 
 //MARK:- ViewController
 class ViewController: NSViewController, NSWindowDelegate {
@@ -41,9 +47,10 @@ class ViewController: NSViewController, NSWindowDelegate {
     let codeFile    = "ViewController"
     let myFileNameOut           = "Combined-Creditcard-Master.txt" // Only used in outputTranactions
     let vendorCatLookupFilename = "VendorCategoryLookup.txt"
-    let vendorShortNameFilename = "VendorShortNames.txt"
     let myCatsFilename          = "MyCategories.txt"
     let myModifiedTranFilename  = "MyModifiedTransactions.txt"
+
+    let vendorShortNameFilename = "VendorShortNames.txt"
 
     // Variables
     var transFileURLs           = [URL]()
@@ -52,8 +59,6 @@ class ViewController: NSViewController, NSWindowDelegate {
     var pathOutputDir           = "Desktop/CreditCard"
 
     var transactionDirURL       = FileManager.default.homeDirectoryForCurrentUser
-    var vendorCatLookupFileURL  = FileManager.default.homeDirectoryForCurrentUser
-    var myModifiedTransURL      = FileManager.default.homeDirectoryForCurrentUser
     var outputFileURL           = FileManager.default.homeDirectoryForCurrentUser
     var gotItem: GotItem        = .empty
 
@@ -130,7 +135,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         verifyFolders(gotItem: &gotItem)
         if gotItem.contains(GotItem.dirSupport) {
             readSupportFiles()
-            let shortCatFilePath = removeUserFromPath(vendorCatLookupFileURL.path)
+            let shortCatFilePath = removeUserFromPath(gVendorCatLookupFileURL.path)
             lblResults.stringValue = "Category Lookup File \"\(shortCatFilePath)\" loaded with \(Stats.origVendrCatCount) items.\n"
         } else {
             lblResults.stringValue = "You will need to create a folder to hold support files before you can proceed."
@@ -237,9 +242,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
 
         if deleteSupportFile(url: gMyCatsFileURL, fileName: myCatsFilename) { didSomething += 1 }
-        if deleteSupportFile(url: vendorCatLookupFileURL, fileName: vendorCatLookupFilename) { didSomething += 1 }
+        if deleteSupportFile(url: gVendorCatLookupFileURL, fileName: vendorCatLookupFilename) { didSomething += 1 }
         if deleteSupportFile(url: gVendorShortNamesFileURL, fileName: vendorShortNameFilename) { didSomething += 1 }
-        if deleteSupportFile(url: myModifiedTransURL, fileName: myModifiedTranFilename) { didSomething += 1 }
+        if deleteSupportFile(url: gMyModifiedTransURL, fileName: myModifiedTranFilename) { didSomething += 1 }
 
         if didSomething > 0 {
             let msg = "User Defaults reset. Restart program to enter setup mode."
@@ -327,7 +332,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         Stats.clearAll()        // Clear the Stats
         gLineItemArray = []     // Clear the global gLineItemArray
-        gDictVendorCatLookup = loadVendorCategories(url: vendorCatLookupFileURL) // Re-read Categories Dictionary
+        gDictVendorCatLookup = loadVendorCategories(url: gVendorCatLookupFileURL) // Re-read Categories Dictionary
         Stats.origVendrCatCount = gDictVendorCatLookup.count
 
         var fileContents    = ""                        // Where All Transactions in a File go
@@ -393,14 +398,14 @@ class ViewController: NSViewController, NSWindowDelegate {
         print (gUniqueCategoryCounts.sorted {$0.value > $1.value})
         if Stats.addedCatCount > 0 || Stats.changedVendrCatCount > 0 {
             if gLearnMode {
-                writeVendorCategoriesToFile(url: vendorCatLookupFileURL, dictCat: gDictVendorCatLookup)
+                writeVendorCategoriesToFile(url: gVendorCatLookupFileURL, dictCat: gDictVendorCatLookup)
             }
         }
-        writeModTransTofile(url: myModifiedTransURL, dictModTrans: gDictModifiedTrans)
+        writeModTransTofile(url: gMyModifiedTransURL, dictModTrans: gDictModifiedTrans)
 
         var statString = ""
 
-        let shortCatFilePath = removeUserFromPath(vendorCatLookupFileURL.path)
+        let shortCatFilePath = removeUserFromPath(gVendorCatLookupFileURL.path)
         statString += "Category File \"\(shortCatFilePath)\" loaded with \(Stats.origVendrCatCount) items.\n"
 
         if filesToProcessURLs.count == 1 {
@@ -503,11 +508,11 @@ class ViewController: NSViewController, NSWindowDelegate {
         var errTxt = ""
 
         // --------- "CategoryLookup.txt" -----------
-        (vendorCatLookupFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: vendorCatLookupFilename)
+        (gVendorCatLookupFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: vendorCatLookupFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "Category" + errTxt)
         }
-        gDictVendorCatLookup = loadVendorCategories(url: vendorCatLookupFileURL)       // Build Categories Dictionary
+        gDictVendorCatLookup = loadVendorCategories(url: gVendorCatLookupFileURL)       // Build Categories Dictionary
         Stats.origVendrCatCount = gDictVendorCatLookup.count
 
         // -------- "VendorShortNames.txt" ----------
@@ -547,11 +552,11 @@ class ViewController: NSViewController, NSWindowDelegate {
 
 
         // -------- "MyModifiedTransactions" ----------
-        (myModifiedTransURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myModifiedTranFilename)
+        (gMyModifiedTransURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myModifiedTranFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyModifiedTransactions " + errTxt)
         }
-        gDictModifiedTrans = loadMyModifiedTrans(myModifiedTranURL: myModifiedTransURL)
+        gDictModifiedTrans = loadMyModifiedTrans(myModifiedTranURL: gMyModifiedTransURL)
         if gDictModifiedTrans.count > 0 {gotItem = [gotItem, .fileMyModifiedTrans]}
     }//end func
 

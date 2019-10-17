@@ -367,6 +367,11 @@ func writeVendorShortNames(url: URL, dictVendorShortNames: [String: String]) {
     }
 }//end func
 
+public struct VendorShortNames {
+    var dictVendorShortNames    = [String: String]()        // (VendorShortNames.txt) Hash for VendorShortNames Lookup
+    var vendorShortNamesFileURL = FileManager.default.homeDirectoryForCurrentUser
+
+}
 
 //MARK:- Vendor Category Lookup
 
