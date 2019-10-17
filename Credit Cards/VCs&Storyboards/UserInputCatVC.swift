@@ -38,6 +38,11 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         lblcatFromVendor.stringValue = usrCatItemFromVendor.category
         lblcatPrefered.stringValue   = usrCatItemPrefered.category
         lblProcessed.stringValue     = String(Stats.processedCount)
+        if usrBatchMode {
+            radioFileVendor.state = .on     // Default to setting VendorCat in batch mode
+        } else {
+            radioFileTransac.state = .on    // Default to modifying Transaction otherwise
+        }
         btnAbort.isHidden            = !usrBatchMode
         btnIgnore.isHidden           = !usrBatchMode
         lblIgnore.isHidden           = !usrBatchMode
@@ -51,21 +56,6 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
     override func viewDidAppear() {
         super.viewDidAppear()
         view.window!.delegate = self
-    }
-
-    //---- viewWillDisappear - Set gCityNum to positive value. Send changed-flags back to delegate in main ViewController
-    override func viewWillDisappear() {
-        //        if gHasUnSavedChanges {
-        //            let buttonNumber = dialog2or3(text: "There are Unsaved Changes", subText: "Do you want to close anyway?",  btnTxt1: "Close without Saving",
-        //                                          btnTxt2: "Save Changes")
-        //            if buttonNumber == 2 {                      // Save Changes
-        //                let success = saveCurrentSelections()
-        //                if success { gHasUnSavedChanges = false }
-        //            }
-        //        }
-        //        let changesWereMade = false
-        //        let hasUnSavedChanges = false
-        //        delegate?.userInputDone(changesWereMade: changesWereMade, unSavedChanges: hasUnSavedChanges) //delegate <— (3)
     }
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {

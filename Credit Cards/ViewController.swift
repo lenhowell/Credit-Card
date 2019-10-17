@@ -240,15 +240,16 @@ class ViewController: NSViewController, NSWindowDelegate {
             }
 
         }
-
+        if gotItem.contains(.dirSupport) {
         if deleteSupportFile(url: gMyCatsFileURL, fileName: myCatsFilename) { didSomething += 1 }
         if deleteSupportFile(url: gVendorCatLookupFileURL, fileName: vendorCatLookupFilename) { didSomething += 1 }
         if deleteSupportFile(url: gVendorShortNamesFileURL, fileName: vendorShortNameFilename) { didSomething += 1 }
         if deleteSupportFile(url: gMyModifiedTransURL, fileName: myModifiedTranFilename) { didSomething += 1 }
+        }
 
         if didSomething > 0 {
             let msg = "User Defaults reset. Restart program to enter setup mode."
-            _ = GBox.inputBox(prompt: msg, defaultText: "", maxChars: 0)
+            GBox.alert(msg)
             NSApplication.shared.terminate(self)
         }
     }
@@ -473,7 +474,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     }//end func loadComboBoxFiles
 
 
-    // Reads Support & Output folder names from textViews, & verifies they exist
+    // Reads Support & Output folder names from textViews, & verifies they exist in gotItem
     func verifyFolders(gotItem: inout GotItem) {
 
         let supportPath = txtSupportFolder.stringValue.trim

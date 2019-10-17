@@ -595,14 +595,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 606;
+				CURRENT_PROJECT_VERSION = 612;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.7.0;
+				MARKETING_VERSION = 1.7.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -616,14 +616,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 606;
+				CURRENT_PROJECT_VERSION = 612;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.7.0;
+				MARKETING_VERSION = 1.7.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

@@ -21,6 +21,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     var iSortBy     = ColID.cardType
     var iAscending  = true
     var colWidDict  = [String : CGFloat]()
+
     var filtDate1   = "2999-12-31"
     var filtDate2   = "0000-00-00"
     var filtDollar1 = 9999999.0
@@ -184,14 +185,47 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     //---- setFilter - Setup the filters based on the tsxtView entries
     private func setFilter() -> Bool {
-        filtDate1 = makeYYYYMMDD(dateTxt: txtDate1.stringValue)
-        filtDate2 = makeYYYYMMDD(dateTxt: txtDate2.stringValue)
-        filtDollar1 = Double(txtDollar1.stringValue) ?? -1
-        filtDollar2 = Double(txtDollar2.stringValue) ?? -1
-        if !filtDate1.hasPrefix("20") || !filtDate2.hasPrefix("20") { return false }
+        filtDate1 = getFilterDate(txtField: txtDate1, isMin: true)
+        filtDate2 = getFilterDate(txtField: txtDate2, isMin: false)
+
+        if txtDollar1.stringValue.trim.isEmpty {
+            filtDollar1 = 0.0
+        } else {
+            filtDollar1 = Double(txtDollar1.stringValue) ?? -1
+        }
+        if txtDollar2.stringValue.trim.isEmpty {
+            filtDollar2 = 99999999.0
+        } else {
+            filtDollar2 = Double(txtDollar2.stringValue) ?? -1
+        }
         if filtDollar1 < 0 || filtDollar2 < 0 { return false }
         return true
     }
+
+    private func getFilterDate(txtField: NSTextField, isMin: Bool) -> String {
+        var txt = txtField.stringValue.trim
+        if isMin {
+            if txt.isEmpty {
+                return "2000-01-01"
+                } else if txt.count == 4 {
+                    txt += "-01-01"
+            } else if txt.count == 7 && txt[4] == "-"  {
+                txt += "-01"
+            }
+
+        } else {
+            if txt.isEmpty {
+                return "2100-12-31"
+            } else if txt.count == 4 {
+                txt += "-12-31"
+            } else if txt.count == 7 && txt[4] == "-"  {
+                txt += "-31"
+            }
+
+        }
+        return makeYYYYMMDD(dateTxt: txt)
+
+    }//end func
 
     //---- applyFilter - Returns true if lineItem meets all the filter criteria
     private func applyFilter(lineItem: LineItem) -> Bool {

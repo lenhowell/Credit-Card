@@ -73,11 +73,8 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
             //FIXME: Not all dupes are picked up
             let signature = makeSignature(lineItem: lineItem)
             if gDictTranDupes[signature] == nil || gDictTranDupes[signature] == fileName {
-                if tran.contains("VAZZYS OSTERIA") && tran.contains("18.83") {
-                    //
-                }
-                gDictTranDupes[signature] = fileName      // mark for dupes check
-                lineItemArray.append(lineItem)          // Add new output Record
+                gDictTranDupes[signature] = fileName        // mark for dupes check
+                lineItemArray.append(lineItem)              // Add new output Record
             } else {
                 let msg = "Duplicate transaction of one from \(gDictTranDupes[signature]!)"
                 handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .display, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: msg)

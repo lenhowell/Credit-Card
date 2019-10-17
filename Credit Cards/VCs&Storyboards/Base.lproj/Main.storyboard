@@ -25,16 +25,17 @@
                                         <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
                                         <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW"/>
                                         <menuItem isSeparatorItem="YES" id="wFC-TO-SCJ"/>
-                                        <menuItem title="Reset all User Defaults" id="8vk-Av-YP7">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="mnuResetUserDefaults:" target="Ady-hI-5gd" id="Gfs-sc-Jc1"/>
-                                            </connections>
-                                        </menuItem>
                                         <menuItem title="Change your Intitials" id="mlQ-Rk-rl4">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="mnuChangeUserInitials:" target="Ady-hI-5gd" id="Gf8-ZF-Phm"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="dPZ-P6-msS"/>
+                                        <menuItem title="Reset User Defaults" id="8vk-Av-YP7">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="mnuResetUserDefaults:" target="Ady-hI-5gd" id="Gfs-sc-Jc1"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="hah-Th-vAp"/>

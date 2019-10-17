@@ -26,12 +26,12 @@ public class GBox {
     // string, title
     static public func alert(_ str: String, title: String = "") {
         print("Alert: ", str)
-        DispatchQueue.main.async {
+        //DispatchQueue.main.async {
             let alert = NSAlert()
             if !title.isEmpty { alert.messageText = title }
             alert.informativeText = str
             alert.runModal()
-        }
+        //}
         return
     }
 

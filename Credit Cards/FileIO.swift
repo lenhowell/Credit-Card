@@ -116,8 +116,8 @@ public func saveBackupFile(url: URL, multiple: Bool = false, addonName: String =
 
 }//end func saveBackupFile
 
+//---- deleteSupportFile -
 func deleteSupportFile(url: URL, fileName: String) -> Bool {
-    var didSomething = false
     let fileManager = FileManager.default
     if fileManager.fileExists(atPath: url.path) {
         let response = GBox.alert("Do you want to delete \(fileName)?", style: .yesNo)
@@ -125,11 +125,11 @@ func deleteSupportFile(url: URL, fileName: String) -> Bool {
             if url.path.hasSuffix("\(fileName)") {
                 //fileManager.removeItem(at: url)
                 saveBackupFile(url: url, addonName: "-Deleted")
-                didSomething = true
+                return true
             }
         }
     }
-    return didSomething
+    return false
 }
 
 
@@ -368,9 +368,9 @@ func writeVendorShortNames(url: URL, dictVendorShortNames: [String: String]) {
 }//end func
 
 public struct VendorShortNames {
-    var dictVendorShortNames    = [String: String]()        // (VendorShortNames.txt) Hash for VendorShortNames Lookup
-    var vendorShortNamesFileURL = FileManager.default.homeDirectoryForCurrentUser
-
+    let filename = "VendorShortNames.txt"
+    var dict     = [String: String]()        // Hash for VendorShortNames Lookup
+    var url      = FileManager.default.homeDirectoryForCurrentUser
 }
 
 //MARK:- Vendor Category Lookup
