@@ -467,6 +467,7 @@ DQ
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="btnSpreadsheet" destination="vWS-7S-9w2" id="7Md-0R-KP2"/>
                         <outlet property="btnStart" destination="D0v-vZ-h7M" id="pu9-yt-ERf"/>
                         <outlet property="cboFiles" destination="bRm-TN-6sx" id="4AR-IO-NWm"/>
                         <outlet property="chkLearningMode" destination="GY1-RP-4M3" id="a1w-C9-IbY"/>

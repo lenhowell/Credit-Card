@@ -117,10 +117,10 @@ public func saveBackupFile(url: URL, multiple: Bool = false, addonName: String =
 }//end func saveBackupFile
 
 //---- deleteSupportFile -
-func deleteSupportFile(url: URL, fileName: String) -> Bool {
+func deleteSupportFile(url: URL, fileName: String, msg: String) -> Bool {
     let fileManager = FileManager.default
     if fileManager.fileExists(atPath: url.path) {
-        let response = GBox.alert("Do you want to delete \(fileName)?", style: .yesNo)
+        let response = GBox.alert("Do you want to delete \(fileName)?\nYou will loose any\n\(msg)", style: .yesNo)
         if response == .yes {
             if url.path.hasSuffix("\(fileName)") {
                 //fileManager.removeItem(at: url)
@@ -287,20 +287,7 @@ func loadMyModifiedTrans(myModifiedTranURL: URL) -> [String: CategoryItem]  {
         let catItem = CategoryItem(category: genCat, source: catSource)
         dictTrans[key] = catItem
     }//next line
-    /*
-     tranDate, desc, Debit, Credit, rawCat
-     var cardType = ""       //     Identifies the Credit-Card account
-     var tranDate = ""       // 0! Transaction-Date String
-     var postDate = ""       //     Post-Date String
-     var cardNum  = ""       //     Card Number (last 4)
-     var descKey  = ""       //     Generated Key for this desc. (vendor)
-     var desc     = ""       // 1! Description (Vendor)
-     var debit    = 0.0      // 2! Debit (payments to vendors, etc.)
-     var credit   = 0.0      // 3! Credit (Credit-Card payments, refunds, etc.)
-     var rawCat   = ""       // 4! Category from Transaction
-     var genCat   = ""       //     Generated Category
-     var catSource = ""      //     Source of Generated Category (including "$" for "LOCKED")
-     */
+
     return dictTrans
 }//end func loadMyModifiedTrans
 
@@ -468,7 +455,7 @@ public func getTransFileList(transDirURL: URL) -> [URL] {
     do {
         let fileURLs = try FileManager.default.contentsOfDirectory(at: transDirURL, includingPropertiesForKeys: [], options:  [.skipsHiddenFiles, .skipsSubdirectoryDescendants])
         let csvURLs = fileURLs.filter{ $0.pathExtension.lowercased() == "csv" }
-        let transURLs = csvURLs.filter{ $0.lastPathComponent.components(separatedBy: "-")[0].count <= 6 }
+        let transURLs = csvURLs.filter{ $0.lastPathComponent.components(separatedBy: "-")[0].count <= maxCardTypeLen }
         print("\(transURLs.count) Transaction Files found.")
         for url in transURLs {
             print(url.path)

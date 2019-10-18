@@ -71,7 +71,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
         if !lineItem.desc.isEmpty || !lineItem.postDate.isEmpty || lineItem.debit != 0  || lineItem.credit != 0 {
             // Check for duplicate from another file
             //FIXME: Not all dupes are picked up
-            let signature = makeSignature(lineItem: lineItem)
+            let signature = lineItem.signature()
             if gDictTranDupes[signature] == nil || gDictTranDupes[signature] == fileName {
                 gDictTranDupes[signature] = fileName        // mark for dupes check
                 lineItemArray.append(lineItem)              // Add new output Record
@@ -87,16 +87,6 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
 
     return lineItemArray
 }//end func handleCards
-
-func makeSignature(lineItem: LineItem) -> String {
-    let dateStr = makeYYYYMMDD(dateTxt: lineItem.tranDate)
-    let vendr = lineItem.descKey.prefix(4)
-    let cardNum = lineItem.cardNum
-    let credit =  String(format: "%.2f", lineItem.credit)//  lineItem.credit)
-    let debit =  String(format: "%.2f", lineItem.debit)
-    let signature = "\(dateStr),\(cardNum),\(vendr),\(credit),\(debit)"
-    return signature
-}
 
 func makeYYYYMMDD(dateTxt: String) -> String {
     var dateStr = ""
@@ -139,7 +129,7 @@ internal func makeLineItem(fromTransFileLine: String,
     lineItem.cardType = cardType
 
     // Check for Modified Transaction
-    let modTranKey = fromTransFileLine.trim
+    let modTranKey = lineItem.signature()
     if let modTrans = gDictModifiedTrans[modTranKey] {
         lineItem.genCat = modTrans.category     // Here if found transaction in MyModifiedTransactions.txt
         lineItem.catSource = modTrans.source
@@ -245,7 +235,7 @@ func showUserInputVendorCatForm(lineItem: LineItem,
                     writeVendorCategoriesToFile(url: gVendorCatLookupFileURL, dictCat: gDictVendorCatLookup)
                 }
             } else {                                // New category for this transaction only.
-                let transKey = lineItem.transText
+                let transKey = lineItem.signature()
                 gDictModifiedTrans[transKey] = usrCatItemReturned
                 writeModTransTofile(url: gMyModifiedTransURL, dictModTrans: gDictModifiedTrans)
             }

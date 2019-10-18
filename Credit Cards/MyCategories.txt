@@ -1,9 +1,10 @@
 // This is a "Starter" file.
-// You can replace it or edit it, as needed
+// You can replace it or edit it, as needed.
 // Each comma-delimited line starts with your category name,
 // followed by a list of caegory names used by the card providers.
 // A category with a question-mark signals a need for user-input.
-// Reading will begin after a line that starts with "My Name"
+// Reading will begin after the line that starts with "My Name"
+// Editing this file will not fix VenderCategoryLookup.txt or MyModifiedTransactions.txt
 
 My Name,               alias1,        alias2,    ...
 
@@ -42,7 +43,7 @@ Charity,               Charitable Giving
 
 Clothing,              Clothing/Shoes
 
-Computer-?,            Computer
+Computer-?,            Computer,       Internet
 Computer-Education
 Computer-Hardware
 Computer-Other
@@ -67,7 +68,7 @@ Entertainment-TV
 
 Food-?
 Food-Alcohol
-Food-Groceries,        Supermarkets
+Food-Groceries,        Groceries, Supermarkets
 Food-Other
 Food-Restaurant,       Dining,    Restaurants/Dining,    Restaurants
 Food-Suppliments
@@ -84,14 +85,14 @@ Hobby-Equipment
 Hobby-Other
 Hobby-Supplies
 
-Home-?
+Home-?,               Home Improvement
 Home-Cleaning
 Home-Electric
 Home-Gas/Oil
 Home-Improvement
 Home-Landscape
 Home-Lawn
-Home-Maintenance,      Home Improvement
+Home-Maintenance
 Home-Other
 Home-Pool
 Home-Purchase
@@ -101,8 +102,8 @@ Home-Rent
 Insurance-?,           Insurance
 Insurance-Aircraft
 Insurance-Auto
-Insurance-Business,    Beach Cove Insurance
-Insurance-Home,        Insurance - 1450
+Insurance-Business
+Insurance-Home
 Insurance-Other
 
 Investment-?
@@ -119,8 +120,8 @@ Magazine
 Merchandise-?,         Merchandise,    General Merchandise
 
 Personal-?
-Personal-Dental
-Personal-Healthcare,   Health Care,    Healthcare/Medical
+Personal-Dental        Dental
+Personal-Healthcare,   Health Care,   Healthcare,    Healthcare/Medical
 Personal-Other
 Personal-Services
 
@@ -164,4 +165,5 @@ Travel-Lodging
 Travel-Other
 Travel-Train
 
+Undone
 Unknown?,              Other Services,    Other/Unclassified,    Other,    Other Expenses,    Online Services

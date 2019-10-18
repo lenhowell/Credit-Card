@@ -13,7 +13,7 @@ public struct LineItem: Equatable, Hashable {
     var cardType = ""       // Identifies the Credit-Card account
     var tranDate = ""       // Transaction-Date String
     var postDate = ""       // Post-Date String
-    var cardNum  = ""       // Card Number (last 4)
+    var idNumber = ""       // Card Number (last 4) or Check Number
     var descKey  = ""       // Generated Key for this desc. (vendor)
     var desc     = ""       // Description (Vendor)
     var debit    = 0.0      // Debit (payments to vendors, etc.)
@@ -83,7 +83,20 @@ public struct LineItem: Equatable, Hashable {
         }
         if let colNum = dictColNums["CARD"] {   // CARD NUMBER
             if colNum < columnCount {
-                self.cardNum = columns[colNum]
+                self.idNumber = columns[colNum]
+            }
+        }
+        if let colNum = dictColNums["NUMBER"] { // CHECK NUMBER
+            if colNum < columnCount {
+                var num = columns[colNum]
+                num = num.replacingOccurrences(of: "*", with: "")
+                num = num.replacingOccurrences(of: "#", with: "").trim
+                if let int = Int(num) {
+                    if int == 0 {num = ""} else {num = String(int)}
+                } else {
+                    //num = "? " + num
+                }
+                self.idNumber = columns[colNum]
             }
         }
         if let colNum = dictColNums["CATE"] {   // CATEGORY
@@ -120,12 +133,20 @@ public struct LineItem: Equatable, Hashable {
         self.auditTrail = "\"\(fileName)\" #\(lineNum)"
     }//end init
 
+    func signature() -> String {
+        let dateStr = makeYYYYMMDD(dateTxt: self.tranDate)
+        let vendr = self.descKey.prefix(4)
+        let credit =  String(format: "%.2f", self.credit)//  self.credit)
+        let debit =  String(format: "%.2f", self.debit)
+        let sig = "\(self.cardType)|\(dateStr)|\(self.idNumber)|\(vendr)|\(credit)|\(debit)"
+        return sig
+    }
 
     // Equatable - Ignore Category-info & truncate desc & auditTrail
     static public func == (lhs: LineItem, rhs: LineItem) -> Bool {
         return lhs.cardType == rhs.cardType &&
             lhs.tranDate    == rhs.tranDate &&
-            lhs.cardNum     == rhs.cardNum &&
+            lhs.idNumber    == rhs.idNumber &&
             lhs.desc.prefix(8) == rhs.desc.prefix(8)  &&
             lhs.debit       == rhs.debit &&
             lhs.credit      == rhs.credit
@@ -135,7 +156,7 @@ public struct LineItem: Equatable, Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(cardType)
         hasher.combine(tranDate)
-        hasher.combine(cardNum)
+        hasher.combine(idNumber)
         hasher.combine(desc.prefix(8))
         hasher.combine(debit)
         hasher.combine(credit)

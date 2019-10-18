@@ -35,7 +35,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     @IBOutlet var tableView:    NSTableView!
     @IBOutlet var tableViewSum: NSTableView!
-    @IBOutlet var chkShowAll:   NSButton!
+    @IBOutlet var btnFilter:    NSButton!
     @IBOutlet var lblStatus:    NSTextField!
 
     @IBOutlet var txtDate1:     NSTextField!
@@ -55,6 +55,16 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
         //tableView.delegate   = self       // Done in IB (ctl-Drag Table to VC Icon)
         //tableView.dataSource = self       // Done in IB
+
+        // Set txtTransationFolder.delegate
+        txtDate1.delegate = self    // Allow ViewController to see when txtDate1 changes.
+        txtDate2.delegate = self    // Allow ViewController to see when txtDate2 changes.
+        txtDollar1.delegate = self  // Allow ViewController to see when txtDollar1 changes.
+        txtDollar2.delegate = self  // Allow ViewController to see when txtDollar2 changes.
+        txtCardType.delegate = self // Allow ViewController to see when txtCardType changes.
+        txtCategory.delegate = self // Allow ViewController to see when txtCategory changes.
+        txtVendor.delegate = self   // Allow ViewController to see when txtVendor changes.
+
         getMinMax(lineItemArray: gLineItemArray)
         loadTable(lineItemArray: gLineItemArray)
         tableView.target = self
@@ -82,6 +92,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     @IBAction func btnFilter(_ sender: Any) {
         if setFilter() {
+            btnFilter.keyEquivalent = ""
             loadTable(lineItemArray: gLineItemArray)
             tableView.reloadData()
             tableViewSum.reloadData()
@@ -204,6 +215,10 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     private func getFilterDate(txtField: NSTextField, isMin: Bool) -> String {
         var txt = txtField.stringValue.trim
+        if txt.count == 6 && txt[4] == "-" {
+            txt = txt.prefix(4) + "-0" + txt.suffix(1)
+            txtField.stringValue = txt
+        }
         if isMin {
             if txt.isEmpty {
                 return "2000-01-01"
@@ -282,6 +297,21 @@ fileprivate enum ColID: CaseIterable {
     static let catSource    = "Category Source"     // 60    7
     static let file_LineNum = "File/LineNumber"     // 90    8
 }
+
+//MARK:- NSTextFieldDelegate
+// Allow SpreadsheetVC to see when a TextField changes.
+extension SpreadsheetVC: NSTextFieldDelegate {
+
+    //---- controlTextDidChange - Called when a textField (with SpreadsheetVC as its delegate) changes.
+    func controlTextDidChange(_ obj: Notification) {
+        guard let textView = obj.object as? NSTextField else {
+            return
+        }
+        //print("\(codeFile)#\(#line) \(textView.stringValue)")
+        btnFilter.keyEquivalent = "\r"
+    }
+
+}//end extension ViewController: NSTextFieldDelegate
 
 //MARK:- NSTableViewDataSource
 
@@ -405,10 +435,13 @@ extension SpreadsheetVC: NSTableViewDelegate {
         print("\(lineItem.tranDate) \(lineItem.descKey) \(lineItem.debit)")
         let catItemFromVendor = CategoryItem(category: lineItem.genCat, source: lineItem.catSource)
         let catItemFromTran   = CategoryItem(category: lineItem.rawCat, source: lineItem.catSource)
+
         let catItem = showUserInputVendorCatForm(lineItem: lineItem, batchMode: false, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemFromVendor)
         // ...and we're back.
+
         gLineItemArray[idx].genCat    = catItem.category
         gLineItemArray[idx].catSource = catItem.source
+
         loadTable(lineItemArray: gLineItemArray)
         tableView.reloadData()
     }//end func

@@ -11,6 +11,7 @@ import Cocoa
 //MARK:- Global Variables
 
 // Global Constants
+let maxCardTypeLen = 10
 
 // Global Variables
 var gUserInitials           = "User"    // (UserInputVC.swift-2) Initials used for "Category Source" when Cat is changes by user.
@@ -117,8 +118,13 @@ class ViewController: NSViewController, NSWindowDelegate {
             }
         }
 
-        gLearnMode          = UserDefaults.standard.bool(forKey: UDKey.learningMode)
-        gUserInputMode      = UserDefaults.standard.bool(forKey: UDKey.userInputMode)
+        btnSpreadsheet.isEnabled = false
+
+        gLearnMode            = false //UserDefaults.standard.bool(forKey: UDKey.learningMode)
+        gUserInputMode        = false //UserDefaults.standard.bool(forKey: UDKey.userInputMode)
+        chkLearningMode.state = gLearnMode     ? .on : .off
+        chkUserInput.state    = gUserInputMode ? .on : .off
+
 
         gUserInitials       = UserDefaults.standard.string(forKey: UDKey.userInitials) ?? ""
         if !gUserInitials.isEmpty {
@@ -142,9 +148,6 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
         let errMsg = makeMissingItemsMsg(got: gotItem)
         if !errMsg.isEmpty { handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, fileName: "", dataLineNum: 0, lineText: "", errorMsg: errMsg) }
-
-        chkLearningMode.state = gLearnMode     ? .on : .off
-        chkUserInput.state    = gUserInputMode ? .on : .off
 
     }//end func viewDidLoad
     
@@ -183,9 +186,10 @@ class ViewController: NSViewController, NSWindowDelegate {
     @IBOutlet weak var lblRunTime:  NSTextField!
     @IBOutlet var lblTranFileCount: NSTextField!
 
-    @IBOutlet weak var btnStart:    NSButton!
-    @IBOutlet var chkLearningMode:  NSButton!
-    @IBOutlet var chkUserInput:     NSButton!
+    @IBOutlet weak var btnSpreadsheet:  NSButton!
+    @IBOutlet weak var btnStart:        NSButton!
+    @IBOutlet var chkLearningMode:      NSButton!
+    @IBOutlet var chkUserInput:         NSButton!
     
     @IBOutlet var cboFiles:     NSComboBox!
 
@@ -241,10 +245,23 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         }
         if gotItem.contains(.dirSupport) {
-        if deleteSupportFile(url: gMyCatsFileURL, fileName: myCatsFilename) { didSomething += 1 }
-        if deleteSupportFile(url: gVendorCatLookupFileURL, fileName: vendorCatLookupFilename) { didSomething += 1 }
-        if deleteSupportFile(url: gVendorShortNamesFileURL, fileName: vendorShortNameFilename) { didSomething += 1 }
-        if deleteSupportFile(url: gMyModifiedTransURL, fileName: myModifiedTranFilename) { didSomething += 1 }
+            var msg = ""
+            msg = "custom categories & aliases."
+            if deleteSupportFile(url: gMyCatsFileURL, fileName: myCatsFilename, msg: msg) {
+                didSomething += 1
+            }
+            msg = "vendor default categories."
+            if deleteSupportFile(url: gVendorCatLookupFileURL, fileName: vendorCatLookupFilename, msg: msg) {
+                didSomething += 1
+            }
+            msg = "custom vendor names."
+            if deleteSupportFile(url: gVendorShortNamesFileURL, fileName: vendorShortNameFilename, msg: msg) {
+                didSomething += 1
+            }
+            msg = "mods to your transaction files."
+            if deleteSupportFile(url: gMyModifiedTransURL, fileName: myModifiedTranFilename, msg: msg) {
+                didSomething += 1
+            }
         }
 
         if didSomething > 0 {
@@ -252,7 +269,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             GBox.alert(msg)
             NSApplication.shared.terminate(self)
         }
-    }
+    }//end func
 
     @IBAction func mnuChangeUserInitials(_ sender: Any) {
         var isValid = false
@@ -286,7 +303,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     //MARK:- Main Program 149-lines
     
-    func main() {   // 281-430 = 149-lines
+    func main() {   // 302-451 = 149-lines
         verifyFolders(gotItem: &gotItem)
         if !gotItem.contains(GotItem.allDirs) {
             let errMsg = makeMissingItemsMsg(got: gotItem)
@@ -376,7 +393,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             let cardArray = fileContents.components(separatedBy: "\n")
             
             // Check which Credit Card Transactions we are currently processing
-            if cardType.count >= 2 &&  cardType.count <= 8  {
+            if cardType.count >= 2 &&  cardType.count <= maxCardTypeLen  {
                 gLineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray)
                 chkUserInput.state = gUserInputMode ? .on : .off
                 Stats.transFileCount += 1
@@ -385,6 +402,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             }
         }//next fileURL
 
+        btnSpreadsheet.isEnabled = true
         outputTranactions(outputFileURL: outputFileURL, lineItemArray: gLineItemArray)
 
         print("\n--- Description-Key algorithms ---")

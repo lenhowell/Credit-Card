@@ -186,7 +186,7 @@
                                                                     </tableView>
                                                                 </subviews>
                                                             </clipView>
-                                                            <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="0.95918367346938771" horizontal="YES" id="elK-AI-HLC">
+                                                            <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="elK-AI-HLC">
                                                                 <rect key="frame" x="1" y="54" width="64" height="15"/>
                                                                 <autoresizingMask key="autoresizingMask"/>
                                                             </scroller>
@@ -1153,6 +1153,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="btnFilter" destination="a3p-DE-SJP" id="jIT-O5-nHv"/>
                         <outlet property="tableView" destination="0Va-J0-BTQ" id="nJT-ad-k0M"/>
                         <outlet property="tableViewSum" destination="i7W-35-TiY" id="9bg-Se-ufw"/>
                         <outlet property="txtCardType" destination="jzx-zk-8Ad" id="h0x-lq-SOv"/>
