@@ -48,6 +48,7 @@ Bugs:\
 
 \f0\b0 Counts are off.\
 When app is run, making changes; it must be run again to fully implement those changes.\
+Spreadsheet loses sort order after an edit\
 \pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
 
 \f2\b\fs22 \cf0 UserInputCat
@@ -357,22 +358,19 @@ In
 \f3\b0 Show ValueError col, ModifiedTransaction col.\
 {\listtext	\uc0\u9642 	}
 \f2\b Spreadsheet: 
-\f3\b0 Replace FullDesc, RawCat, & File/Line# columns with details pane.\
-{\listtext	\uc0\u9642 	}
-\f2\b Spreadsheet: 
-\f3\b0 Show total number of lines.\
-{\listtext	\uc0\u9642 	}
-\f2\b Summary: 
-\f3\b0 Fix initial column-sorting.\
+\f3\b0 Fix column-sorting after edit or filter.\
 {\listtext	\uc0\u9642 	}
 \f2\b Summary: 
 \f3\b0 Allow user to change filters or at least show filters.\
 {\listtext	\uc0\u9642 	}
 \f2\b Summary: 
+\f3\b0 Implement double-click -> Sub-Cats or individual transactions.\
+{\listtext	\uc0\u9642 	}
+\f2\b Summary: 
 \f3\b0 Add "Net Debit" column, and default sort on it.\
 {\listtext	\uc0\u9642 	}
 \f2\b Summary: 
-\f3\b0 Show total number of lines.\
+\f3\b0 Show total number of rows.\
 {\listtext	\uc0\u9642 	}Place \cf2 \cb3 UserInputCat\cf0 \cb1  & \cf2 \cb3 UserInputShortName\cf0 \cb1  each in their own storyboard.\
 {\listtext	\uc0\u9642 	}Reduce "
 \f2\b Globals
@@ -390,6 +388,15 @@ In
 {\listtext	\uc0\u10003 	}Remove check boxes from User-Defaults; LearnMode & UserInputMode are now always off at startup.\
 {\listtext	\uc0\u10003 	}
 \f2\b Spreadsheet: 
+\f3\b0 Show Check-Number in Status-Bar\
+{\listtext	\uc0\u10003 	}
+\f2\b Spreadsheet: 
+\f3\b0 Show total number of rows.\
+{\listtext	\uc0\u10003 	}
+\f2\b Spreadsheet: 
+\f3\b0 Replace FullDesc, RawCat, & File/Line# columns with status bar.\
+{\listtext	\uc0\u10003 	}
+\f2\b Spreadsheet: 
 \f3\b0 "Clear Filters" button.\
 \pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
 \ls30\ilvl0
@@ -397,11 +404,11 @@ In
 \f3\b0  KeyEquivalent "Enter" triggers "Filter" button if textFields have changed.\
 \pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
 \ls31\ilvl0\cf0 {\listtext	\uc0\u10003 	}
-\f2\b Suppress "Spreadsheet" button
-\f3\b0  until transactions are loaded.\
-{\listtext	\uc0\u10003 	}
 \f2\b Spreadsheet: 
 \f3\b0 Allow Date-Filter to accept Year-only & YearMonth-only.\
+{\listtext	\uc0\u10003 	}
+\f2\b Suppress "Spreadsheet" button
+\f3\b0  until transactions are loaded.\
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 
 \f0\fs24 \cf0 \

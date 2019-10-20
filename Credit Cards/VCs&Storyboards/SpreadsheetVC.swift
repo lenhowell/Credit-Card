@@ -74,7 +74,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         loadTableSortDescriptors()
         syncColWidths()
 
-        btnClear.isHidden = true
+        btnClear.isEnabled = false
     }
 
     override func viewDidAppear() {
@@ -117,7 +117,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
             loadTable(lineItemArray: gLineItemArray)
             tableView.reloadData()
             tableViewSum.reloadData()
-            btnClear.isHidden = true
+            btnClear.isEnabled = false
         }
     }
 
@@ -206,6 +206,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
         // Display Total and Averages
 
+        sumLine.descKey = "\(tableDicts.count) transactions"
         sumLine.credit = totalCredit
         sumLine.debit  = totalDebit
 
@@ -282,6 +283,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         dict[ColID.transDate]   = makeYYYYMMDD(dateTxt: lineItem.tranDate)
         dict[ColID.descKey]     = lineItem.descKey
         dict[ColID.fullDesc]    = lineItem.desc
+        dict[ColID.idNumber]    = lineItem.idNumber
         dict[ColID.debit]       = formatCell(lineItem.debit,  formatType: .dollar,  digits: 2)
         dict[ColID.credit]      = formatCell(lineItem.credit, formatType: .dollar,  digits: 2)
         dict[ColID.category]    = lineItem.genCat
@@ -306,6 +308,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 //              Name        ID          Width   Col#    Totals
 fileprivate enum ColID: CaseIterable {
     static let cardType     = "CardType"            // 60    0      -
+    static let idNumber     = "Number"
     static let transDate    = "TransDate"           // --   --
     static let descKey      = "DescKey"             // 60    1
     static let fullDesc     = "Full Description"    // 70    2
@@ -335,7 +338,7 @@ extension SpreadsheetVC: NSTextFieldDelegate {
         txtCardType.stringValue.isEmpty &&
         txtCategory.stringValue.isEmpty &&
         txtVendor.stringValue.isEmpty
-        btnClear.isHidden = allEmpty
+        btnClear.isEnabled = !allEmpty
     }
 
 }//end extension ViewController: NSTextFieldDelegate
@@ -417,13 +420,24 @@ extension SpreadsheetVC: NSTableViewDelegate {
     }//end func
 
 
-    //---- tableViewSelectionDidChange -
+    //---- tableViewSelectionDidChange -  When user selects a row, show data in status bar
     func tableViewSelectionDidChange(_ notification: Notification){
         if tableView == self.tableView {
+            if tableView.selectedRow < 0 {
+                lblStatus.stringValue = ""
+                return
+            }
+            let iRow = tableView.selectedRow
+            let dict = tableDicts[iRow]
+            var id = dict[ColID.idNumber] ?? ""
+            if !id.isEmpty { id = "  #" + id + "  " }
+            let fileAndLine = (dict[ColID.file_LineNum] ?? "").replacingOccurrences(of: "#", with: "line#")
+            lblStatus.stringValue = "\(iRow+1) \(id)   desc:\"\(dict[ColID.fullDesc] ?? "")\"     orig.cat:\"\(dict[ColID.rawCat] ?? "")\"       file:\(fileAndLine)"
             //updateCompanyNameLabel()
         }//tableView
     }
 
+    //---- tableViewColumnDidMove - When user moves a column, also move the "totals" column.
     func tableViewColumnDidMove(_ notification: Notification) {
         if notification.object as? NSTableView == self.tableView {
             print("tableViewColumnDidMove")
@@ -436,19 +450,19 @@ extension SpreadsheetVC: NSTableViewDelegate {
         }//tableView
     }
 
-    //---- tableViewColumnDidResize - When user resizes a column, also resize the totals column.
+    //---- tableViewColumnDidResize - When user resizes a column, also resize the "totals" column.
     func tableViewColumnDidResize(_ notification: Notification) {
         //notification.debugDescription
         if notification.object as? NSTableView == self.tableView {
             let column = notification.userInfo!["NSTableColumn"] as! NSTableColumn
             let id = column.identifier
             let idx = tableView.column(withIdentifier: id)
-            print("↔️ tableViewColumnDidResize Col#\(idx): \(id.rawValue) to a width of \(column.width)")
+            //print("↔️ tableViewColumnDidResize Col#\(idx): \(id.rawValue) to a width of \(column.width)")
             tableViewSum.tableColumns[idx].width = column.width
         }//tableView
     }
 
-    //---- tableViewDoubleClick - Detected doubleClick
+    //---- tableViewDoubleClick - Detected doubleClick: showUserInputVendorCatForm
     //viewDidLoad has tableView.target = self
     // & tableView.doubleAction = #selector(tableViewDoubleClick(_:))
     @objc func tableViewDoubleClick(_ sender:AnyObject) {
