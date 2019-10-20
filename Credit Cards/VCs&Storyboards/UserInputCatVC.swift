@@ -27,29 +27,32 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         chkLockIn.state       = .off
         chkQuestionMark.state = .off
 
-        lblFile.stringValue = gTransFilename
-        let lineItem = usrLineItem
-        let amt = lineItem.debit - lineItem.credit
-        let strDebit = String(format:"%.2f", amt)
-        let desc = lineItem.desc.PadRight(40, truncate: true, useEllipsis: true, fillChr: " ")
+        lblFile.stringValue = gTransFilename + "    " + usrLineItem.idNumber
+        let lineItem        = usrLineItem
+        let amt             = lineItem.debit - lineItem.credit
+        let strDebit        = String(format:"%.2f", amt)
+        let desc            = lineItem.desc.PadRight(40, truncate: true, useEllipsis: true, fillChr: " ")
         lblLineItem.stringValue      = "\(lineItem.tranDate)  \"\(lineItem.descKey)\"   $\(strDebit)"
         lblDesc.stringValue          = "              \(desc)"
         lblcatFromTran.stringValue   = usrCatItemFromTran.category
         lblcatFromVendor.stringValue = usrCatItemFromVendor.category
         lblcatPrefered.stringValue   = usrCatItemPrefered.category
-        lblProcessed.stringValue     = String(Stats.processedCount)
         if usrBatchMode {
-            radioFileVendor.state = .on     // Default to setting VendorCat in batch mode
+            lblProcessed.stringValue = "\(Stats.lineItemNumber) of \(Stats.lineItemCount),   file \(Stats.transFileNumber) of \(Stats.transFileCount)"
+            radioFileVendor.state    = .on   // Default to setting VendorCat in batch mode
         } else {
-            radioFileTransac.state = .on    // Default to modifying Transaction otherwise
+            lblProcessed.stringValue = ""
+            radioFileTransac.state   = .on   // Default to modifying Transaction otherwise
         }
-        btnAbort.isHidden            = !usrBatchMode
-        btnIgnore.isHidden           = !usrBatchMode
-        lblIgnore.isHidden           = !usrBatchMode
-        btnCancel.title              = usrBatchMode ? "Pass" : "Cancel"
+        configureUI()
+
+        btnAbort.isHidden   = !usrBatchMode
+        btnIgnore.isHidden  = !usrBatchMode
+        lblIgnore.isHidden  = !usrBatchMode
+        btnCancel.title     = usrBatchMode ? "Pass" : "Cancel"
 
         loadComboBoxCats()
-        catItemCurrent = usrCatItemPrefered
+        catItemCurrent      = usrCatItemPrefered
         updateAfterCatChange(newCatItem: catItemCurrent)
     }
 
@@ -74,7 +77,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
     @IBOutlet var lblcatPrefered:   NSTextField!
     @IBOutlet var lblcatFromVendor: NSTextField!
     @IBOutlet var lblProcessed:     NSTextField!
-    @IBOutlet var cboCats: NSComboBox!
+    @IBOutlet var cboCats:      NSComboBox!
     @IBOutlet var radioCatFromTran:     NSButton!
     @IBOutlet var radioCatFromVendor:   NSButton!
     @IBOutlet var radioCatPrefered:     NSButton!
@@ -86,7 +89,6 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
     @IBOutlet var btnIgnore:            NSButton!
     @IBOutlet var btnCancel:            NSButton!
     @IBOutlet var lblIgnore:         NSTextField!
-
 
     //MARK:- @IBActions
     
@@ -131,14 +133,8 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func radioFileChange(_ sender: Any) {
-        if radioFileTransac.state == .on {
-            chkLockIn.isHidden = true
-            chkQuestionMark.isHidden = true
-        } else {
-            chkLockIn.isHidden = false
-            chkQuestionMark.isHidden = false
-        }
-    }//end func
+        configureUI()
+    }
 
     @IBAction func btnAddShortName(_ sender: Any) {
         let returnVal = showUserInputShortNameForm(shortName: usrLineItem.desc, longName: usrLineItem.descKey) //$$$
@@ -214,7 +210,18 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
 
     //MARK: funcs
 
-    //
+    //---- configureUI - Configure the UI based on VendorCat vs. Transaction
+    private func configureUI() {
+        if radioFileTransac.state == .on {
+            chkLockIn.isHidden = true
+            chkQuestionMark.isHidden = true
+        } else {
+            chkLockIn.isHidden = false
+            chkQuestionMark.isHidden = false
+        }
+    }//end func
+
+    //---- addCategory - Add a new user-input category to MyCategories
     func addCategory(_ newCat: String) {
         gDictMyCatAliases[newCat] = newCat
         gDictMyCatAliasArray[newCat] = []

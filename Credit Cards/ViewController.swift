@@ -27,9 +27,9 @@ var gDictModifiedTrans      = [String: CategoryItem]()  // (MyModifiedTransactio
 
 var gUniqueCategoryCounts   = [String: Int]()           // Hash for Unique Category Counts
 var gMyCategoryHeader       = ""
-var gIsUnitTesting      = false     // Not used
-var gLearnMode          = true      // Used here & HandleCards.swift
-var gUserInputMode      = true      // Used here & HandleCards.swift
+var gIsUnitTesting          = false     // Not used
+var gLearnMode              = true      // Used here & HandleCards.swift
+var gUserInputMode          = true      // Used here & HandleCards.swift
 
 var gDictVendorShortNames   = [String: String]()        // (VendorShortNames.txt) Hash for VendorShortNames Lookup
 var gVendorShortNamesFileURL = FileManager.default.homeDirectoryForCurrentUser
@@ -74,7 +74,6 @@ class ViewController: NSViewController, NSWindowDelegate {
         static let fileVendorShortNames = GotItem(rawValue: 1 << 4)
         static let fileMyCategories     = GotItem(rawValue: 1 << 5)
         static let fileMyModifiedTrans  = GotItem(rawValue: 1 << 6)
-        // "VendorShortNames.txt" "MyCategories.txt" "MyModifiedTransactions"
 
         static let userInitials = GotItem(rawValue: 1 << 9)
 
@@ -350,6 +349,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         Stats.clearAll()        // Clear the Stats
         gLineItemArray = []     // Clear the global gLineItemArray
+        usrIgnoreVendors = [String: Int]()  // Clear the "Ignore-Vendor" list
         gDictVendorCatLookup = loadVendorCategories(url: gVendorCatLookupFileURL) // Re-read Categories Dictionary
         Stats.origVendrCatCount = gDictVendorCatLookup.count
 
@@ -370,8 +370,9 @@ class ViewController: NSViewController, NSWindowDelegate {
             let fileURL = transactionDirURL.appendingPathComponent(nameWithExt)
             filesToProcessURLs = [fileURL]
         }
+        Stats.transFileCount = filesToProcessURLs.count
 
-        for fileURL in filesToProcessURLs {
+        for (fileNum, fileURL) in filesToProcessURLs.enumerated() {
             let fileName    = fileURL.lastPathComponent
             gTransFilename  = fileURL.lastPathComponent
             let nameComps   = fileName.components(separatedBy: "-")
@@ -394,11 +395,11 @@ class ViewController: NSViewController, NSWindowDelegate {
             
             // Check which Credit Card Transactions we are currently processing
             if cardType.count >= 2 &&  cardType.count <= maxCardTypeLen  {
+                Stats.transFileNumber = fileNum + 1
                 gLineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray)
                 chkUserInput.state = gUserInputMode ? .on : .off
-                Stats.transFileCount += 1
             } else {
-                Stats.junkFileCount += 1
+                //Stats.junkFileCount += 1
             }
         }//next fileURL
 
@@ -435,9 +436,6 @@ class ViewController: NSViewController, NSWindowDelegate {
             statString += "\(Stats.transFileCount) Files from \"\(shortTransFilePath)/\" Processed."
         }
 
-        if Stats.junkFileCount > 0 {
-            statString += "\n\(Stats.junkFileCount) NOT Recognized as a Credit Card Transaction"
-        }
         statString += "\n \(gLineItemArray.count + Stats.duplicateCount) CREDIT CARD Transactions PROCESSED."
         statString += "\n Of These:"
         statString += "\n(a)\(String(Stats.duplicateCount).rightJust(5)       ) were duplicates.                  ←"

@@ -36,6 +36,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     @IBOutlet var tableView:    NSTableView!
     @IBOutlet var tableViewSum: NSTableView!
     @IBOutlet var btnFilter:    NSButton!
+    @IBOutlet var btnClear:     NSButton!
     @IBOutlet var lblStatus:    NSTextField!
 
     @IBOutlet var txtDate1:     NSTextField!
@@ -57,13 +58,13 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         //tableView.dataSource = self       // Done in IB
 
         // Set txtTransationFolder.delegate
-        txtDate1.delegate = self    // Allow ViewController to see when txtDate1 changes.
-        txtDate2.delegate = self    // Allow ViewController to see when txtDate2 changes.
-        txtDollar1.delegate = self  // Allow ViewController to see when txtDollar1 changes.
-        txtDollar2.delegate = self  // Allow ViewController to see when txtDollar2 changes.
+        txtDate1.delegate    = self // Allow ViewController to see when txtDate1 changes.
+        txtDate2.delegate    = self // Allow ViewController to see when txtDate2 changes.
+        txtDollar1.delegate  = self // Allow ViewController to see when txtDollar1 changes.
+        txtDollar2.delegate  = self // Allow ViewController to see when txtDollar2 changes.
         txtCardType.delegate = self // Allow ViewController to see when txtCardType changes.
         txtCategory.delegate = self // Allow ViewController to see when txtCategory changes.
-        txtVendor.delegate = self   // Allow ViewController to see when txtVendor changes.
+        txtVendor.delegate   = self // Allow ViewController to see when txtVendor changes.
 
         getMinMax(lineItemArray: gLineItemArray)
         loadTable(lineItemArray: gLineItemArray)
@@ -72,6 +73,8 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
         loadTableSortDescriptors()
         syncColWidths()
+
+        btnClear.isHidden = true
     }
 
     override func viewDidAppear() {
@@ -99,6 +102,22 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         } else {
             let msg = "Error in Filter item"
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alert, errorMsg: msg)
+        }
+    }
+
+    @IBAction func btnClear(_ sender: Any) {
+        txtDate1.stringValue    = ""
+        txtDate2.stringValue    = ""
+        txtDollar1.stringValue  = ""
+        txtDollar2.stringValue  = ""
+        txtCardType.stringValue = ""
+        txtCategory.stringValue = ""
+        txtVendor.stringValue   = ""
+        if setFilter() {
+            loadTable(lineItemArray: gLineItemArray)
+            tableView.reloadData()
+            tableViewSum.reloadData()
+            btnClear.isHidden = true
         }
     }
 
@@ -309,6 +328,14 @@ extension SpreadsheetVC: NSTextFieldDelegate {
         }
         //print("\(codeFile)#\(#line) \(textView.stringValue)")
         btnFilter.keyEquivalent = "\r"
+        let allEmpty = txtDate1.stringValue.isEmpty &&
+        txtDate2.stringValue.isEmpty &&
+        txtDollar1.stringValue.isEmpty &&
+        txtDollar2.stringValue.isEmpty &&
+        txtCardType.stringValue.isEmpty &&
+        txtCategory.stringValue.isEmpty &&
+        txtVendor.stringValue.isEmpty
+        btnClear.isHidden = allEmpty
     }
 
 }//end extension ViewController: NSTextFieldDelegate

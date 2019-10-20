@@ -62,17 +62,20 @@ public struct LineItem: Equatable, Hashable {
             let msg = "\(columnCount) in transaction; should be \(expectedColumnCount)"
             handleError(codeFile: "LineItems", codeLineNum: #line, type: .dataError, action: .display,  fileName: fileName, dataLineNum: lineNum, lineText: fromTransFileLine, errorMsg: msg)
         }
+
         // Building the lineitem record
         if let colNum = dictColNums["TRAN"] {   // TRANACTION DATE
             if colNum < columnCount {
                 self.tranDate = columns[colNum]
             }
         }
+
         if let colNum = dictColNums["POST"] {   // POST DATE
             if colNum < columnCount {
                 self.postDate = columns[colNum]
             }
         }
+
         if let colNum = dictColNums["DESC"] {   // DESCRIPTION
             if colNum < columnCount {
                 self.desc = columns[colNum].replacingOccurrences(of: "\"", with: "")
@@ -86,19 +89,21 @@ public struct LineItem: Equatable, Hashable {
                 self.idNumber = columns[colNum]
             }
         }
+
         if let colNum = dictColNums["NUMBER"] { // CHECK NUMBER
             if colNum < columnCount {
                 var num = columns[colNum]
-                num = num.replacingOccurrences(of: "*", with: "")
-                num = num.replacingOccurrences(of: "#", with: "").trim
-                if let int = Int(num) {
-                    if int == 0 {num = ""} else {num = String(int)}
+                num = num.replacingOccurrences(of: "[*#,$]", with: "", options: .regularExpression, range: nil).trim
+                num = String(num.suffix(6))
+                if num == "0" || num == "00" || (num.prefix(3) == "000" && num.suffix(3) == "000") {
+                    num = ""
                 } else {
-                    //num = "? " + num
+                    //num = num
                 }
-                self.idNumber = columns[colNum]
+                self.idNumber = num
             }
         }
+
         if let colNum = dictColNums["CATE"] {   // CATEGORY
             if colNum < columnCount {
                 let assignedCat =  columns[colNum]

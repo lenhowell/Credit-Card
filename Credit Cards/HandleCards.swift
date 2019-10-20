@@ -32,6 +32,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
     // Derive a Dictionary of Column Numbers from header
     var headerLine = ""
     var headers = [String]()
+    Stats.lineItemCount = cardArrayCount
     while lineNum < cardArrayCount {
         headerLine = cardArray[lineNum]
         lineNum += 1
@@ -66,6 +67,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
         if tran.trim.count < 16 { continue }    // Blank line or ",,,,,,,,,,,"
 
         Stats.processedCount += 1
+        Stats.lineItemNumber = lineNum
         let lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: gDictVendorShortNames, cardType: cardType, hasCatHeader: hasCatHeader, fileName: fileName, lineNum: lineNum)
 
         if !lineItem.desc.isEmpty || !lineItem.postDate.isEmpty || lineItem.debit != 0  || lineItem.credit != 0 {
