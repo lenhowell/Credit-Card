@@ -26,6 +26,7 @@
 		CE6F1AE32352D576008CA720 /* VendorShortNames.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE6F1AE22352D576008CA720 /* VendorShortNames.txt */; };
 		CE7548132309DC0600FEDAFB /* DescriptionKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7548122309DC0600FEDAFB /* DescriptionKey.swift */; };
 		CE8AEB9423459E6F00337A73 /* SpreadsheetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8AEB9323459E6F00337A73 /* SpreadsheetVC.swift */; };
+		CE90E6DB235F814900184BEF /* FileIO_UnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE90E6DA235F814900184BEF /* FileIO_UnitTests.swift */; };
 		CE95CC9B23367191008363B7 /* UserInputShortNameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE95CC9A23367191008363B7 /* UserInputShortNameVC.swift */; };
 		CE95CC9D2336D722008363B7 /* VendorShortNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE95CC9C2336D722008363B7 /* VendorShortNames.swift */; };
 		CE9FFEBB2302F3DF00261390 /* Thoughts.rtf in Resources */ = {isa = PBXBuildFile; fileRef = CE9FFEBA2302F3DF00261390 /* Thoughts.rtf */; };
@@ -89,6 +90,7 @@
 		CE6F1AE22352D576008CA720 /* VendorShortNames.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = VendorShortNames.txt; sourceTree = "<group>"; };
 		CE7548122309DC0600FEDAFB /* DescriptionKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionKey.swift; sourceTree = "<group>"; };
 		CE8AEB9323459E6F00337A73 /* SpreadsheetVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpreadsheetVC.swift; sourceTree = "<group>"; };
+		CE90E6DA235F814900184BEF /* FileIO_UnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileIO_UnitTests.swift; sourceTree = "<group>"; };
 		CE95CC9A23367191008363B7 /* UserInputShortNameVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInputShortNameVC.swift; sourceTree = "<group>"; };
 		CE95CC9C2336D722008363B7 /* VendorShortNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorShortNames.swift; sourceTree = "<group>"; };
 		CE9FFEBA2302F3DF00261390 /* Thoughts.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Thoughts.rtf; sourceTree = "<group>"; };
@@ -222,6 +224,7 @@
 				CEB84F272308EB20001485C5 /* Credit_Cards_UnitTests.swift */,
 				CE0A86FB230B4AF500FD1ECD /* MakeDescKeyTests.swift */,
 				CEB84F292308EB20001485C5 /* Info.plist */,
+				CE90E6DA235F814900184BEF /* FileIO_UnitTests.swift */,
 			);
 			path = "Credit Cards UnitTests";
 			sourceTree = "<group>";
@@ -436,6 +439,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE90E6DB235F814900184BEF /* FileIO_UnitTests.swift in Sources */,
 				CE0A86FC230B4AF500FD1ECD /* MakeDescKeyTests.swift in Sources */,
 				CEB84F282308EB20001485C5 /* Credit_Cards_UnitTests.swift in Sources */,
 			);
@@ -595,14 +599,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 650;
+				CURRENT_PROJECT_VERSION = 666;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.9.1;
+				MARKETING_VERSION = 1.9.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -616,14 +620,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 650;
+				CURRENT_PROJECT_VERSION = 666;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.9.1;
+				MARKETING_VERSION = 1.9.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

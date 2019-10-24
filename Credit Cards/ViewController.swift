@@ -100,19 +100,19 @@ class ViewController: NSViewController, NSWindowDelegate {
         // Get UserDefaults
         if let dir = UserDefaults.standard.string(forKey: UDKey.supportFolder) {
             pathSupportDir = dir
-            if !dir.isEmpty && folderExists(atPath: dir, isPartialPath: true) {
+            if !dir.isEmpty && FileIO.folderExists(atPath: dir, isPartialPath: true) {
                 gotItem = [gotItem, .dirSupport]
             }
         }
         if let dir = UserDefaults.standard.string(forKey: UDKey.outputFolder) {
             pathOutputDir = dir
-            if !dir.isEmpty && folderExists(atPath: dir, isPartialPath: true) {
+            if !dir.isEmpty && FileIO.folderExists(atPath: dir, isPartialPath: true) {
                 gotItem = [gotItem, .dirOutput]
             }
         }
         if let dir = UserDefaults.standard.string(forKey: UDKey.transactionFolder) {
             pathTransactionDir = dir
-            if !dir.isEmpty && folderExists(atPath: dir, isPartialPath: true) {
+            if !dir.isEmpty && FileIO.folderExists(atPath: dir, isPartialPath: true) {
                 gotItem = [gotItem, .dirTrans]
             }
         }
@@ -140,7 +140,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         verifyFolders(gotItem: &gotItem)
         if gotItem.contains(GotItem.dirSupport) {
             readSupportFiles()
-            let shortCatFilePath = removeUserFromPath(gVendorCatLookupFileURL.path)
+            let shortCatFilePath = FileIO.removeUserFromPath(gVendorCatLookupFileURL.path)
             lblResults.stringValue = "Category Lookup File \"\(shortCatFilePath)\" loaded with \(Stats.origVendrCatCount) items.\n"
         } else {
             lblResults.stringValue = "You will need to create a folder to hold support files before you can proceed."
@@ -316,13 +316,13 @@ class ViewController: NSViewController, NSWindowDelegate {
         var errTxt = ""
 
         pathTransactionDir = txtTransationFolder.stringValue
-        (transactionDirURL, errTxt)  = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
+        (transactionDirURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Transaction" + errTxt)
             return
         }
 
-        (outputFileURL, errTxt)  = makeFileURL(pathFileDir: pathOutputDir, fileName: myFileNameOut)
+        (outputFileURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathOutputDir, fileName: myFileNameOut)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Output" + errTxt)
             return
@@ -358,7 +358,8 @@ class ViewController: NSViewController, NSWindowDelegate {
         lblErrMsg.stringValue = ""
         
         if !FileManager.default.fileExists(atPath: transactionDirURL.path) {
-            handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay,  fileName: transactionDirURL.path, dataLineNum: 0, lineText: "", errorMsg: "Directory does not exist")
+            let msg = "Folder does not exist"
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay,  fileName: transactionDirURL.path, dataLineNum: 0, lineText: "", errorMsg: msg)
         }
 
         let filesToProcessURLs: [URL]
@@ -371,6 +372,11 @@ class ViewController: NSViewController, NSWindowDelegate {
             filesToProcessURLs = [fileURL]
         }
         Stats.transFileCount = filesToProcessURLs.count
+        if Stats.transFileCount == 0 {
+            let msg = "No files in the form of Card-2018-12.csv found,\nwhere Card is 2-8 characters."
+            GBox.alert(msg)
+            return
+        }
 
         for (fileNum, fileURL) in filesToProcessURLs.enumerated() {
             let fileName    = fileURL.lastPathComponent
@@ -425,14 +431,14 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         var statString = ""
 
-        let shortCatFilePath = removeUserFromPath(gVendorCatLookupFileURL.path)
+        let shortCatFilePath = FileIO.removeUserFromPath(gVendorCatLookupFileURL.path)
         statString += "Category File \"\(shortCatFilePath)\" loaded with \(Stats.origVendrCatCount) items.\n"
 
         if filesToProcessURLs.count == 1 {
-            let shortTransFilePath = removeUserFromPath(filesToProcessURLs[0].path)
+            let shortTransFilePath = FileIO.removeUserFromPath(filesToProcessURLs[0].path)
             statString += "\(Stats.transFileCount) File named \"\(shortTransFilePath)/\" Processed."
         } else {
-            let shortTransFilePath = removeUserFromPath(transactionDirURL.path)
+            let shortTransFilePath = FileIO.removeUserFromPath(transactionDirURL.path)
             statString += "\(Stats.transFileCount) Files from \"\(shortTransFilePath)/\" Processed."
         }
 
@@ -494,7 +500,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     func verifyFolders(gotItem: inout GotItem) {
 
         let supportPath = txtSupportFolder.stringValue.trim
-        if supportPath.isEmpty || !folderExists(atPath: supportPath, isPartialPath: true) {
+        if supportPath.isEmpty || !FileIO.folderExists(atPath: supportPath, isPartialPath: true) {
             print("ViewController#\(#line): Support folder: \"\(txtSupportFolder.stringValue)\" doesn't exist.")
             gotItem = gotItem.subtracting(GotItem.dirSupport)
         } else {
@@ -503,7 +509,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         pathSupportDir = supportPath
 
         let outputPath = txtOutputFolder.stringValue.trim
-        if outputPath.isEmpty || !folderExists(atPath: outputPath, isPartialPath: true) {
+        if outputPath.isEmpty || !FileIO.folderExists(atPath: outputPath, isPartialPath: true) {
             print("ViewController#\(#line): Output folder: \"\(txtOutputFolder.stringValue)\" doesn't exist.")
             gotItem = gotItem.subtracting(GotItem.dirOutput)
             } else {
@@ -512,7 +518,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         pathOutputDir  = outputPath
 
         let transPath = txtTransationFolder.stringValue.trim
-        if transPath.isEmpty || !folderExists(atPath: transPath, isPartialPath: true) {
+        if transPath.isEmpty || !FileIO.folderExists(atPath: transPath, isPartialPath: true) {
             print("ViewController#\(#line): Output folder: \"\(txtTransationFolder.stringValue)\" doesn't exist.")
             gotItem = gotItem.subtracting(GotItem.dirTrans)
         } else {
@@ -525,7 +531,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         var errTxt = ""
 
         // --------- "CategoryLookup.txt" -----------
-        (gVendorCatLookupFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: vendorCatLookupFilename)
+        (gVendorCatLookupFileURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportDir, fileName: vendorCatLookupFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "Category" + errTxt)
         }
@@ -533,7 +539,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         Stats.origVendrCatCount = gDictVendorCatLookup.count
 
         // -------- "VendorShortNames.txt" ----------
-        (gVendorShortNamesFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: vendorShortNameFilename)
+        (gVendorShortNamesFileURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportDir, fileName: vendorShortNameFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "VendorShortNames " + errTxt)
         }
@@ -550,7 +556,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
 
         // ---------- "MyCategories.txt" ------------
-        (gMyCatsFileURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myCatsFilename)
+        (gMyCatsFileURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportDir, fileName: myCatsFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories " + errTxt)
         }
@@ -569,7 +575,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
 
         // -------- "MyModifiedTransactions" ----------
-        (gMyModifiedTransURL, errTxt)  = makeFileURL(pathFileDir: pathSupportDir, fileName: myModifiedTranFilename)
+        (gMyModifiedTransURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportDir, fileName: myModifiedTranFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyModifiedTransactions " + errTxt)
         }
@@ -589,10 +595,10 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     func gotNewTranactionFolder() {
         var errText = ""
-        (transactionDirURL, errText)  = makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
+        (transactionDirURL, errText)  = FileIO.makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
         if errText.isEmpty {             // Transaction Folder Exists
             btnStart.isEnabled = true
-            transFileURLs = getTransFileList(transDirURL: transactionDirURL)
+            transFileURLs = FileIO.getTransFileList(transDirURL: transactionDirURL)
             if transFileURLs.count > 0 {
                 gotItem = gotItem.union(GotItem.fileTransactions)
             }

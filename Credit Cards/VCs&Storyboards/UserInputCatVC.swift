@@ -147,7 +147,6 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
     @IBAction func btnAddCategory(_ sender: Any) {
         let newCat = cboCats.stringValue.trim
         if gDictMyCatAliases[newCat] == nil {
-            //TODO: Check for count etc.
             let response = GBox.alert("\(cboCats.stringValue) is not recognized.\nDo you want to add it to the list?", style: .yesNo)
             if response == .yes {
                addCategory(newCat)
@@ -170,7 +169,6 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         // Must call writeMyCats()
         let newCat = cboCats.stringValue.trim
         if gDictMyCatAliases[newCat] == nil {
-            //TODO: Check for count etc.
             let response = GBox.alert("\(cboCats.stringValue) is not recognized.\nDo you want to add it to the list?", style: .yesNo)
             if response == .yes {
                addCategory(newCat)

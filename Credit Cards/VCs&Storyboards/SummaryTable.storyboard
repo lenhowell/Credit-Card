@@ -255,7 +255,7 @@
                                     <action selector="radioCatChange:" target="igT-kg-E2n" id="2nu-DJ-tMl"/>
                                 </connections>
                             </button>
-                            <button identifier="Month" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4mK-hk-CJB">
+                            <button identifier="Year" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4mK-hk-CJB">
                                 <rect key="frame" x="12" y="203" width="49" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="radio" title="Year" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="8s8-4A-k4E">

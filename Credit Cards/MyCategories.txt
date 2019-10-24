@@ -1,9 +1,10 @@
 // This is a "Starter" file.
 // You can replace it or edit it, as needed.
 // Each comma-delimited line starts with your category name,
-// followed by a list of caegory names used by the card providers.
-// A category with a question-mark signals a need for user-input.
-// Reading will begin after the line that starts with "My Name"
+// followed by a list of category names used by the card providers.
+// A category ending with a question-mark signals a need for user-input.
+// Each Category that has a hyphen (-), contains major & minor parts.
+// Reading will begin after the line that starts with "My Name".
 // Editing this file will not fix VenderCategoryLookup.txt or MyModifiedTransactions.txt
 
 My Name,               alias1,        alias2,    ...

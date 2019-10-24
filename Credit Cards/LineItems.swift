@@ -135,14 +135,18 @@ public struct LineItem: Equatable, Hashable {
                 self.debit = abs(Double(amt) ?? 0)
             }
         }
-        self.auditTrail = "\"\(fileName)\" #\(lineNum)"
+
+        let (cleanName, _) = fileName.splitAtFirst(char: ".")
+        self.auditTrail = "\(cleanName)#\(lineNum)"
     }//end init
 
     func signature() -> String {
+        //let (cleanName, _) = self.auditTrail.splitAtFirst(char: "#")
+        //let useName = cleanName.replacingOccurrences(of: "-", with: "")
         let dateStr = makeYYYYMMDD(dateTxt: self.tranDate)
-        let vendr = self.descKey.prefix(4)
-        let credit =  String(format: "%.2f", self.credit)//  self.credit)
-        let debit =  String(format: "%.2f", self.debit)
+        let vendr   = self.descKey.prefix(4)
+        let credit  =  String(format: "%.2f", self.credit)
+        let debit   =  String(format: "%.2f", self.debit)
         let sig = "\(self.cardType)|\(dateStr)|\(self.idNumber)|\(vendr)|\(credit)|\(debit)"
         return sig
     }
