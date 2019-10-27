@@ -17,8 +17,8 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
     var catItemFromTran   = CategoryItem()
     var catItemPrefered   = CategoryItem()
     var catItemCurrent    = CategoryItem()
-    var textPassed        = ""
     var unlockedSource    = ""
+    var passMe          = ""    // Not used
 
     //MARK:- Overrides & Lifecycle
     override func viewDidLoad() {
@@ -116,6 +116,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
 
     }
 
+    //FIXME: When user types-in Category, catItemCurrent.category != cboCats.stringValue
     @IBAction func chkQuestionMarkClick(_ sender: Any) {
         let myCat = catItemCurrent.category
         if chkQuestionMark.state == .on {

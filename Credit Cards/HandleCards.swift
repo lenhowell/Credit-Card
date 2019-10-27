@@ -133,6 +133,7 @@ internal func makeLineItem(fromTransFileLine: String,
     // Check for Modified Transaction
     let modTranKey = lineItem.signature()
     if let modTrans = gDictModifiedTrans[modTranKey] {
+        //TODO: Add Note to transaction
         lineItem.genCat = modTrans.category     // Here if found transaction in MyModifiedTransactions.txt
         lineItem.catSource = modTrans.source
         Stats.userModTransUsed += 1

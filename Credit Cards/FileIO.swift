@@ -45,7 +45,7 @@ public struct FileIO {
             return (fileURL, "")
         }
         //print("⛔️ \(#line) \(dirURL.path) does NOT exist!")
-        return (dirURL, " Folder \"\(dirURL.path)\" does NOT exist!")
+        return (dirURL, "Folder \"\(dirURL.path)\" does NOT exist!")
     }
 
     static func removeUserFromPath(_ fullPath: String) -> String {
@@ -273,7 +273,7 @@ func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
     return dictMyCats
 }//end func loadMyCats
 
-//---- writeMyCats - Used only when a starter verion from bundle is read in
+//---- writeMyCats - 
 func writeMyCats(url: URL) {
     FileIO.saveBackupFile(url: url)
 
@@ -320,11 +320,15 @@ func loadMyModifiedTrans(myModifiedTranURL: URL) -> [String: CategoryItem]  {
         if line.trim.isEmpty || line.hasPrefix("//") {
             continue
         }
-        //TODO: MyModifiedTrans - Check for out-of-bounds
         let comps = line.components(separatedBy: "\t").map{$0.trim}
-        let genCat = comps[0]
-        let catSource = comps[1]
-        let key = comps[2]
+        if comps.count < 3 {
+            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: myModifiedTranURL.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "missing <tab>(s)")
+            continue
+        }
+        let genCat      = comps[0]
+        let catSource   = comps[1]
+        let key         = comps[2]
+        //TODO: Add Note to dictTrans
         let catItem = CategoryItem(category: genCat, source: catSource)
         dictTrans[key] = catItem
     }//next line
@@ -338,6 +342,7 @@ func writeModTransTofile(url: URL, dictModTrans: [String: CategoryItem]) {
     var text = "// Machine-generated file\n"
     text += "//Category     <tab> Source <tab> (Type|Date|Num|Credit|Debit)\n"
     for (key, catItem) in dictModTrans.sorted(by: {$0.key < $1.key}) {
+        //TODO: Add Note to dictModTrans
         let cat = catItem.category.PadRight(20)
         text += cat + "\t" + catItem.source + "\t" + key + "\n"
     }

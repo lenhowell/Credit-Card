@@ -22,6 +22,7 @@ public struct LineItem: Equatable, Hashable {
     var genCat   = ""       // Generated Category
     var catSource = ""      // Source of Generated Category (including "$" for "LOCKED")
     var transText = ""      // Original Transaction Line from file
+    var note      = ""
     var auditTrail = ""     // Original FileName, Line#
 
     init() {

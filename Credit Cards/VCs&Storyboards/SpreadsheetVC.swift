@@ -8,12 +8,12 @@
 
 import Cocoa
 
-var gFilteredLineItemArray = [LineItem]()  // Filtered list of transactions - used in SummaryTableVC
 
 class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     //MARK: Instance Variables
     let codeFile    = "SpreadsheetVC"
+    var filteredLineItemArray = [LineItem]()  // Filtered list of transactions - used in SummaryTableVC
     var tableDicts  = [[String : String]]()     // Array of Dictionaries
     var tableSumDict = [String : String]()      // Totals Dictionary
     var totalCredit = 0.0
@@ -67,7 +67,8 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         txtVendor.delegate   = self // Allow ViewController to see when txtVendor changes.
 
         getMinMax(lineItemArray: gLineItemArray)
-        loadTable(lineItemArray: gLineItemArray)
+        loadTableDictsArray(lineItemArray: gLineItemArray)
+
         tableView.target = self
         tableView.doubleAction = #selector(tableViewDoubleClick(_:))
 
@@ -80,7 +81,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     override func viewDidAppear() {
         super.viewDidAppear()
         view.window!.delegate = self
-        reloadTable(sortBy: iSortBy, ascending: iAscending)
+        reloadTableSorted(sortBy: iSortBy, ascending: iAscending)
     }
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {
@@ -96,8 +97,8 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     @IBAction func btnFilter(_ sender: Any) {
         if setFilter() {
             btnFilter.keyEquivalent = ""
-            loadTable(lineItemArray: gLineItemArray)
-            tableView.reloadData()
+            loadTableDictsArray(lineItemArray: gLineItemArray)
+            reloadTableSorted(sortBy: iSortBy, ascending: iAscending)
             tableViewSum.reloadData()
         } else {
             let msg = "Error in Filter item"
@@ -114,30 +115,41 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         txtCategory.stringValue = ""
         txtVendor.stringValue   = ""
         if setFilter() {
-            loadTable(lineItemArray: gLineItemArray)
-            tableView.reloadData()
+            loadTableDictsArray(lineItemArray: gLineItemArray)
+            reloadTableSorted(sortBy: iSortBy, ascending: iAscending)
             tableViewSum.reloadData()
             btnClear.isEnabled = false
         }
     }
 
     @IBAction func btnSummaries(_ sender: Any) {
+        gPassToSummary = PassToSummary(filtDate1: txtDate1.stringValue,
+                                       filtDate2: txtDate2.stringValue,
+                                       filtDollar1: txtDollar1.stringValue,
+                                       filtDollar2: txtDollar2.stringValue,
+                                       filtCardTyp: txtCardType.stringValue,
+                                       filtCategor: txtCategory.stringValue,
+                                       filtVendor: txtVendor.stringValue,
+                                       calledBy: "Spreadsheet",
+                                       summarizeBy: SummarizeBy.groupCategory,
+                                       sortBy: SummarizeSort(column: SmColID.debit, ascending: false))
+
         let storyBoard = NSStoryboard(name: "SummaryTable", bundle: nil)
-        let userInputWindowController = storyBoard.instantiateController(withIdentifier: "SummaryWindowController") as! NSWindowController
-        if let userInputWindow = userInputWindowController.window {
-            //let userVC = storyBoard.instantiateController(withIdentifier: "UserInput") as! UserInputVC
-
+        let summaryWindowController = storyBoard.instantiateController(withIdentifier: "SummaryWindowController") as! NSWindowController
+        if let summaryWindow = summaryWindowController.window {
+            //let summaryTableVC = storyBoard.instantiateController(withIdentifier: "SummaryTableVC") as! SummaryTableVC
+            print("btnSummaries", gPassToSummary)
             let application = NSApplication.shared
-            _ = application.runModal(for: userInputWindow) // <=================  UserInputVC
+            _ = application.runModal(for: summaryWindow) // <=================  UserInputVC
 
-            userInputWindow.close()                     // Return here from userInputWindow
+            summaryWindow.close()                     // Return here from userInputWindow
         }
     }
 
     // Not used
     @IBAction func chkShowAllChanged(_ sender: Any) {  // Handles chkShowAll.CheckedChanged
-        loadTable(lineItemArray: gLineItemArray)
-        reloadTable(sortBy: iSortBy, ascending: iAscending)
+        loadTableDictsArray(lineItemArray: gLineItemArray)
+        reloadTableSorted(sortBy: iSortBy, ascending: iAscending)
     }//end func
 
     //MARK:- Regular funcs
@@ -150,6 +162,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
             let ascending: Bool
             ascending = (key == ColID.cardType) // ascending for cardType; descending for the rest.
             let sortDescriptor  = NSSortDescriptor(key: key,  ascending: ascending)
+            print("⬆️ sortDescriptor key: \(sortDescriptor.key!)   ascending: \(sortDescriptor.ascending)")
             column.sortDescriptorPrototype = sortDescriptor
             colWidDict[key] = column.width
         }
@@ -180,12 +193,12 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         txtDate2.stringValue = filtDate2
     }//end func
 
-    // is responsible for global "gFilteredLineItemArray"
-    //---- loadTable - Select stocks to be displayed & Create tableDicts array. Also fill "Totals" labels.
-    private func loadTable(lineItemArray: [LineItem]) {  // 154-182 = 28-lines
+    // is responsible for instance-vbl "filteredLineItemArray"
+    //---- loadTableDictsArray - Select stocks to be displayed & Create tableDicts array. Also fill "Totals" labels.
+    private func loadTableDictsArray(lineItemArray: [LineItem]) {  // 154-182 = 28-lines
         var sumLine = LineItem()
         tableDicts  = []
-        gFilteredLineItemArray = []
+        filteredLineItemArray = []
         tableSumDict.removeAll()
         if lineItemArray.isEmpty { return }
 
@@ -195,7 +208,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
         for (idx,lineItem) in lineItemArray.enumerated() {
             if applyFilter(lineItem: lineItem) {
-                gFilteredLineItemArray.append(lineItem)
+                filteredLineItemArray.append(lineItem)
                 let dict = makeRowDict(lineItem: lineItem, idx: idx)
 
                 tableDicts.append(dict)
@@ -212,7 +225,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
         tableSumDict = makeRowDict(lineItem: sumLine)
 
-    }//end func loadTable
+    }//end func loadTableDictsArray
 
     //---- setFilter - Setup the filters based on the tsxtView entries
     private func setFilter() -> Bool {
@@ -275,7 +288,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         return true
     }
 
-    //---- makeRowDict - Create a dictionary entry for loadTable
+    //---- makeRowDict - Create a dictionary entry for loadTableDictsArray
     func makeRowDict(lineItem: LineItem, idx: Int = -1) -> [String : String] {
         var dict = [String : String]()
 
@@ -294,8 +307,8 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         return dict
     }// end func
 
-    //---- reloadTable - reloads the table for tableDicts, sorted by ColID
-    private func reloadTable(sortBy: String, ascending: Bool) {
+    //---- reloadTableSorted - reloads the table for tableDicts, sorting by ColID
+    private func reloadTableSorted(sortBy: String, ascending: Bool) {
         tableDicts.sort { compareTextNum(lft: $0[sortBy]!, rgt: $1[sortBy]!, ascending: ascending) }
         tableView.reloadData()
         tableViewSum.reloadData()   // Not always needed
@@ -363,8 +376,8 @@ extension SpreadsheetVC: NSTableViewDataSource {
     func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
         if tableView == self.tableView {
             guard let sortDescriptor = tableView.sortDescriptors.first else { return }
-            //print("⬆️\(sortDescriptor.key!) \(sortDescriptor.ascending)")
-            reloadTable(sortBy: sortDescriptor.key!, ascending: sortDescriptor.ascending)
+            print("⬆️ sortDescriptor key: \(sortDescriptor.key!)   ascending: \(sortDescriptor.ascending)")
+            reloadTableSorted(sortBy: sortDescriptor.key!, ascending: sortDescriptor.ascending)
         }
     }
 
@@ -483,8 +496,8 @@ extension SpreadsheetVC: NSTableViewDelegate {
         gLineItemArray[idx].genCat    = catItem.category
         gLineItemArray[idx].catSource = catItem.source
 
-        loadTable(lineItemArray: gLineItemArray)
-        tableView.reloadData()
+        loadTableDictsArray(lineItemArray: gLineItemArray)
+        reloadTableSorted(sortBy: iSortBy, ascending: iAscending)
     }//end func
 
 }//end extension

@@ -45,7 +45,9 @@ class FileIO__UnitTests: XCTestCase {
         url = URL(fileURLWithPath: "/aaa/ccc.ext")
         result = FileIO.makeBackupFilePath(url: url, multiple: true, addonName: "Bak")
         XCTAssertEqual(result, "/aaa/cccBak.ext")
-    }
+        url = URL(fileURLWithPath: "/aaa/ccc")
+        result = FileIO.makeBackupFilePath(url: url, multiple: true, addonName: "Bak")
+        XCTAssertEqual(result, "/aaa/cccBak")    }
 
     func test_qualifyTransFileName() {
         var result = false
@@ -83,6 +85,25 @@ class FileIO__UnitTests: XCTestCase {
         var url = FileManager.default.homeDirectoryForCurrentUser
         var msg = ""
         (url, msg) = FileIO.makeFileURL(pathFileDir: "xxx", fileName: "xxx")
-        XCTAssertEqual(msg, " Folder \"/Users/georgebauer/xxx\" does NOT exist!")
+        XCTAssertEqual(msg, "Folder \"/Users/georgebauer/xxx\" does NOT exist!")
     }
+
+    func test_VendorShortNames() {
+        let content = """
+// ShortName (prefix),  Full Description Key
+
+If desc has this prefix,DescKey
+Missing comma
+"2nd entry" ,           Number 2
+3rd entry ,            "Number 3"
+prefix,prefix
+"""
+        let vendorShortNames = VendorShortNames(content: content)
+        XCTAssertEqual(vendorShortNames.dict.count, 4)
+        XCTAssertEqual(vendorShortNames.dict["If desc has this prefix"], "DescKey")
+        XCTAssertEqual(vendorShortNames.dict["2nd entry"], "Number 2")
+        XCTAssertEqual(vendorShortNames.dict["3rd entry"], "Number 3")
+        XCTAssertEqual(vendorShortNames.dict["prefix"], "prefix")
+    }
+
 }//end class
