@@ -6,8 +6,7 @@
 //  Copyright © 2019 George Bauer. All rights reserved.
 //
 
-// TODO: Append Error message to Error File
-// TODO: Terminate app if ErrType == .codeFatal or .dataFatal
+// TODO: Append Error message to Error-Log File
 
 import Foundation
 

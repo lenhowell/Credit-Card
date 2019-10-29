@@ -328,7 +328,7 @@ func loadMyModifiedTrans(myModifiedTranURL: URL) -> [String: CategoryItem]  {
         let genCat      = comps[0]
         let catSource   = comps[1]
         let key         = comps[2]
-        //TODO: Add Note to dictTrans
+        //TODO: Add Memo to dictTrans
         let catItem = CategoryItem(category: genCat, source: catSource)
         dictTrans[key] = catItem
     }//next line
@@ -342,7 +342,7 @@ func writeModTransTofile(url: URL, dictModTrans: [String: CategoryItem]) {
     var text = "// Machine-generated file\n"
     text += "//Category     <tab> Source <tab> (Type|Date|Num|Credit|Debit)\n"
     for (key, catItem) in dictModTrans.sorted(by: {$0.key < $1.key}) {
-        //TODO: Add Note to dictModTrans
+        //TODO: Add Memo to dictModTrans
         let cat = catItem.category.PadRight(20)
         text += cat + "\t" + catItem.source + "\t" + key + "\n"
     }

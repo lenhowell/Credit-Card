@@ -8,7 +8,6 @@
 
 import Cocoa
 
-
 class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     //MARK: Instance Variables
@@ -230,6 +229,10 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     //---- setFilter - Setup the filters based on the tsxtView entries
     private func setFilter() -> Bool {
         filtDate1 = getFilterDate(txtField: txtDate1, isMin: true)
+        let date1Count = txtDate1.stringValue.trim.count
+        if date1Count >= 4 && date1Count <= 7 && txtDate2.stringValue.trim.isEmpty {
+            txtDate2.stringValue = txtDate1.stringValue.trim
+        }
         filtDate2 = getFilterDate(txtField: txtDate2, isMin: false)
 
         if txtDollar1.stringValue.trim.isEmpty {

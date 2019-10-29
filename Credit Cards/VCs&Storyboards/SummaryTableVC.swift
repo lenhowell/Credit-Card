@@ -36,7 +36,7 @@ public struct PassToSummary {
     var sortBy      = SummarizeSort(column: "", ascending: true)
 }//end struct
 
-public var gPassToSummary = PassToSummary()
+public var gPassToSummary = PassToSummary()     // Pass info from Spreadsheet or SummaryTable to next SummaryTable
 
 class SummaryTableVC: NSViewController, NSWindowDelegate {
 
@@ -56,6 +56,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     var filtCardTyp = ""
     var filtCategor = ""
     var filtVendor  = ""
+    var calledBy    = ""
 
 
     //MARK:- IBOutlets
@@ -184,10 +185,12 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         default:
             break
         }
+        calledBy                = summaryData.calledBy
         iSortBy                 = summaryData.sortBy.column
         iAscending              = summaryData.sortBy.ascending
         txtVendor.stringValue   = summaryData.filtVendor
         txtCategory.stringValue = summaryData.filtCategor
+        txtCardType.stringValue = summaryData.filtCardTyp
         txtDate1.stringValue    = summaryData.filtDate1
         txtDate2.stringValue    = summaryData.filtDate2
         txtDollar1.stringValue  = summaryData.filtDollar1
@@ -297,9 +300,13 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         }
     }
 
-    //---- setFilter - Setup the filters based on the tsxtView entries
+    //---- setFilter - Setup the filters based on the textView entries
     private func setFilter() -> Bool {
         filtDate1 = getFilterDate(txtField: txtDate1, isMin: true)
+        let date1Count = txtDate1.stringValue.trim.count
+        if date1Count >= 4 && date1Count <= 7 && txtDate2.stringValue.trim.isEmpty {
+            txtDate2.stringValue = txtDate1.stringValue.trim
+        }
         filtDate2 = getFilterDate(txtField: txtDate2, isMin: false)
 
         if txtDollar1.stringValue.trim.isEmpty {
@@ -453,7 +460,9 @@ extension SummaryTableVC: NSTableViewDelegate {
     //viewDidLoad has tableView.target = self
     // & tableView.doubleAction = #selector(tableViewDoubleClick(_:))
     @objc func tableViewDoubleClick(_ sender:AnyObject) {
-        guard tableView.selectedRow >= 0 else { return }
+        let caller = "SummaryTable"
+        guard tableView.selectedRow >= 0 else   { return }  // Bail if Bogus row#
+        if calledBy == caller                   { return }  // Bail if called by self
         let rowDict = tableDicts[tableView.selectedRow]
         let idxStr = rowDict["idx"] ?? ""
         let idx = Int(idxStr) ?? -1
@@ -500,8 +509,8 @@ extension SummaryTableVC: NSTableViewDelegate {
                                        filtDollar2: txtDollar2.stringValue,
                                        filtCardTyp: filterCardType,
                                        filtCategor: filterCategory,
-                                       filtVendor: filterVendor,
-                                       calledBy: "SummaryTable",
+                                       filtVendor:  filterVendor,
+                                       calledBy: caller,
                                        summarizeBy: summarizeNew,
                                        sortBy: SummarizeSort(column: SmColID.debit, ascending: false))
 
@@ -514,21 +523,6 @@ extension SummaryTableVC: NSTableViewDelegate {
             
             summaryWindow.close()                     // Return here from userInputWindow
         }
-
-        //        let lineItem = gLineItemArray[idx]
-//        print("\(lineItem.tranDate) \(lineItem.descKey) \(lineItem.debit)")
-//        let catItemFromVendor = CategoryItem(category: lineItem.genCat, source: lineItem.catSource)
-//        let catItemFromTran   = CategoryItem(category: lineItem.rawCat, source: lineItem.catSource)
-//
-//        let catItem = showUserInputVendorCatForm(lineItem: lineItem, batchMode: false, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemFromVendor)
-//        // ...and we're back.
-//
-//        gLineItemArray[idx].genCat    = catItem.category
-//        gLineItemArray[idx].catSource = catItem.source
-
-//        loadTable(lineItemArray: gLineItemArray)
-//        tableView.reloadData()
     }//end func
-
 
 }//end extension

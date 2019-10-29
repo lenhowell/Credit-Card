@@ -133,7 +133,7 @@ internal func makeLineItem(fromTransFileLine: String,
     // Check for Modified Transaction
     let modTranKey = lineItem.signature()
     if let modTrans = gDictModifiedTrans[modTranKey] {
-        //TODO: Add Note to transaction
+        //TODO: Add Memo to transaction
         lineItem.genCat = modTrans.category     // Here if found transaction in MyModifiedTransactions.txt
         lineItem.catSource = modTrans.source
         Stats.userModTransUsed += 1
@@ -276,8 +276,10 @@ internal func makeDictColNums(headers: [String]) -> [String: Int] {
             key = "DESC"    // DESCRIPTION
         } else if (rawKey.hasPrefix("MERCH") && rawKey.hasSuffix("CATEGORY")) {   // "Merchant Category"
             key = "CATE"    // CATEGORY
-        } else if rawKey.hasSuffix("NUMBER") {   // "Merchant Category"
+        } else if rawKey.hasSuffix("NUMBER") {
             key = "NUMBER"  // CHECK NUMBER
+        } else if rawKey.contains("NOTE") { 
+            key = "MEMO"    // MEMO
         } else {
             key = String(rawKey.replacingOccurrences(of: "\"", with: "").prefix(4))
         }

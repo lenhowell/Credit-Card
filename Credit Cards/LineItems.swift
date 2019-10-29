@@ -22,7 +22,7 @@ public struct LineItem: Equatable, Hashable {
     var genCat   = ""       // Generated Category
     var catSource = ""      // Source of Generated Category (including "$" for "LOCKED")
     var transText = ""      // Original Transaction Line from file
-    var note      = ""
+    var memo      = ""
     var auditTrail = ""     // Original FileName, Line#
 
     init() {
@@ -36,7 +36,12 @@ public struct LineItem: Equatable, Hashable {
 
         //TODO: Make debitSign a property of CreditCardType
         let debitSign: Double
-        if fileName.hasPrefix("BA") {debitSign = -1} else {debitSign = 1}
+        if fileName.hasPrefix("BA") || fileName.hasPrefix("MLCMA") {
+            debitSign = -1
+        }
+        else {
+            debitSign = 1
+        }
 
         var transaction = fromTransFileLine.trim
         self.transText = transaction

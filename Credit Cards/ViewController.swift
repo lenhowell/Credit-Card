@@ -22,7 +22,7 @@ var gDictMyCatAliases       = [String: String]()        // (LineItems.init, etc)
 var gDictMyCatAliasArray    = [String: [String]]()      // Synonyms for each cat name
 var gDictVendorCatLookup    = [String: CategoryItem]()  // (HandleCards.swift-3) Hash for Category Lookup (CategoryLookup.txt)
 var gDictTranDupes          = [String: String]()        // (handleCards) Hash for finding duplicate transactions
-//TODO: Add Note to gDictModifiedTrans
+//TODO: Add Memo to gDictModifiedTrans
 var gDictModifiedTrans      = [String: CategoryItem]()  // (MyModifiedTransactions.txt) Hash for user-modified transactions
 
 
