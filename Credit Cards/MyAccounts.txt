@@ -1,0 +1,12 @@
+//Code    , +Amount   , Type       , Name 
+SAMPLE    , Credit    , DebitCard  , "Sample Card"
+C1R       , Debit     , CreditCard , "CapitalOne Rewards"
+C1V       , Debit     , CreditCard , "CapitalOne Venture"
+CIT       , Debit     , CreditCard , "CitiBank"
+DIS       , Debit     , CreditCard , "Discover"
+
+// Each line must have 4 comma-separated entries:
+// Code:    Prefix (up to \"-\", 10-letters max) of Transaction fileName
+// +Amount: if Transaction file has "Amount", is a positive value "Debit" or "Credit"? 
+// Type:    CreditCard, DebitCard, Activity, or Checks
+// Name:    Name of the account (or card)

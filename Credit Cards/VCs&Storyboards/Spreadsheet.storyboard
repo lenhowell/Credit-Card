@@ -187,7 +187,7 @@
                                                                     </tableView>
                                                                 </subviews>
                                                             </clipView>
-                                                            <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="0.94736842105263153" horizontal="YES" id="elK-AI-HLC">
+                                                            <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="elK-AI-HLC">
                                                                 <rect key="frame" x="1" y="29" width="86" height="15"/>
                                                                 <autoresizingMask key="autoresizingMask"/>
                                                             </scroller>

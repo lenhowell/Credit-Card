@@ -23,10 +23,17 @@ var usrIgnoreVendors    = [String: Int]()
 
 //MARK:---- handleCards - 25-91 = 66-lines
 
-func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [LineItem] {
+func handleCards(fileName: String, cardType: String, cardArray: [String], acct: Account?) -> [LineItem] {
     let cardArrayCount = cardArray.count
     var lineItemArray = [LineItem]()                // Create Array variable(lineItemArray) Type lineItem.
     var lineNum = 0
+
+    var signAmount = 1.0
+    if let acct = acct {
+        if acct.amount == .credit {
+            signAmount = -1.0
+        }
+    }
 
     //MARK: Read Header
     // Derive a Dictionary of Column Numbers from header
@@ -68,7 +75,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String]) -> [Li
 
         Stats.processedCount += 1
         Stats.lineItemNumber = lineNum
-        let lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: gDictVendorShortNames, cardType: cardType, hasCatHeader: hasCatHeader, fileName: fileName, lineNum: lineNum)
+        let lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: gDictVendorShortNames, cardType: cardType, hasCatHeader: hasCatHeader, fileName: fileName, lineNum: lineNum, signAmount: signAmount)
 
         if !lineItem.desc.isEmpty || !lineItem.postDate.isEmpty || lineItem.debit != 0  || lineItem.credit != 0 {
             // Check for duplicate from another file
@@ -118,12 +125,13 @@ internal func makeLineItem(fromTransFileLine: String,
                            cardType: String,
                            hasCatHeader: Bool,
                            fileName: String,
-                           lineNum: Int) -> LineItem {
+                           lineNum: Int,
+                           signAmount: Double) -> LineItem {
     // Uses Globals: gLearnMode, gUserInputMode, gDictModifiedTrans, gDictMyCatAliases
     // Modifies Gloabals: gDictVendorCatLookup, gUniqueCategoryCounts, Stats
 
     // Use LineItem.init to tranlate the transaction entry to a LineItem.
-    var lineItem = LineItem(fromTransFileLine: fromTransFileLine, dictColNums: dictColNums, fileName: fileName, lineNum: lineNum)
+    var lineItem = LineItem(fromTransFileLine: fromTransFileLine, dictColNums: dictColNums, fileName: fileName, lineNum: lineNum, signAmount: signAmount)
 
     // Add descKey & cardType
     let descKey = makeDescKey(from: lineItem.desc, dictVendorShortNames: dictVendorShortNames, fileName: fileName)

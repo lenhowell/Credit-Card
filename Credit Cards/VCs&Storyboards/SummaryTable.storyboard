@@ -318,7 +318,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TvR-fV-tyC">
-                                <rect key="frame" x="13" y="85" width="96" height="21"/>
+                                <rect key="frame" x="13" y="85" width="128" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="GOe-jg-q4K">
                                     <font key="font" metaFont="system"/>
@@ -363,7 +363,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Nc2-ER-kCN">
-                                <rect key="frame" x="13" y="129" width="96" height="21"/>
+                                <rect key="frame" x="13" y="129" width="129" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="zFG-gp-1RU">
                                     <font key="font" metaFont="system"/>
@@ -436,7 +436,7 @@
                 </viewController>
                 <customObject id="vZv-xO-hoo" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-244" y="600"/>
+            <point key="canvasLocation" x="-244" y="599.5"/>
         </scene>
     </scenes>
 </document>

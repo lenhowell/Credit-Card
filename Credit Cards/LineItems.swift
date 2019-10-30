@@ -31,17 +31,8 @@ public struct LineItem: Equatable, Hashable {
     //MARK:- init - 33-121 = 88-lines
     //TODO: Allow LineItem.init to throw errors
     // Create a LineItem from a Transaction-File line
-    init(fromTransFileLine: String, dictColNums: [String: Int], fileName: String, lineNum: Int) {
+    init(fromTransFileLine: String, dictColNums: [String: Int], fileName: String, lineNum: Int, signAmount: Double) {
         let expectedColumnCount = dictColNums.count
-
-        //TODO: Make debitSign a property of CreditCardType
-        let debitSign: Double
-        if fileName.hasPrefix("BA") || fileName.hasPrefix("MLCMA") {
-            debitSign = -1
-        }
-        else {
-            debitSign = 1
-        }
 
         var transaction = fromTransFileLine.trim
         self.transText = transaction
@@ -122,7 +113,7 @@ public struct LineItem: Equatable, Hashable {
             if colNum < columnCount {
                 let amt = columns[colNum].replacingOccurrences(of: ";", with: "") //"0" is for empty fields
                 let amount = Double(amt) ?? 0
-                if amount*debitSign < 0 {
+                if amount*signAmount < 0 {
                     self.credit = abs(amount)
                 } else {
                     self.debit = abs(amount)

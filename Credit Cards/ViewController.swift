@@ -22,6 +22,7 @@ var gDictMyCatAliases       = [String: String]()        // (LineItems.init, etc)
 var gDictMyCatAliasArray    = [String: [String]]()      // Synonyms for each cat name
 var gDictVendorCatLookup    = [String: CategoryItem]()  // (HandleCards.swift-3) Hash for Category Lookup (CategoryLookup.txt)
 var gDictTranDupes          = [String: String]()        // (handleCards) Hash for finding duplicate transactions
+var gAccounts               = Accounts()
 //TODO: Add Memo to gDictModifiedTrans
 var gDictModifiedTrans      = [String: CategoryItem]()  // (MyModifiedTransactions.txt) Hash for user-modified transactions
 
@@ -35,6 +36,7 @@ var gUserInputMode          = true      // Used here & HandleCards.swift
 var gDictVendorShortNames   = [String: String]()        // (VendorShortNames.txt) Hash for VendorShortNames Lookup
 var gVendorShortNamesFileURL = FileManager.default.homeDirectoryForCurrentUser
 
+var gMyAccountsURL           = FileManager.default.homeDirectoryForCurrentUser
 var gMyCatsFileURL           = FileManager.default.homeDirectoryForCurrentUser
 var gMyModifiedTransURL      = FileManager.default.homeDirectoryForCurrentUser
 var gVendorCatLookupFileURL  = FileManager.default.homeDirectoryForCurrentUser
@@ -67,14 +69,15 @@ class ViewController: NSViewController, NSWindowDelegate {
     struct GotItem: OptionSet {
         let rawValue: Int
         static let empty        = GotItem(rawValue: 0)
-        static let dirSupport   = GotItem(rawValue: 1 << 0)
-        static let dirOutput    = GotItem(rawValue: 1 << 1)
-        static let dirTrans     = GotItem(rawValue: 1 << 2)
+        static let dirSupport   = GotItem(rawValue: 1 << 0)     // bit 0 (=1) if got Support folder
+        static let dirOutput    = GotItem(rawValue: 1 << 1)     // bit 1 (=2) if got Output folder
+        static let dirTrans     = GotItem(rawValue: 1 << 2)     // bit 2 (=4) if got Transaction folder
 
-        static let fileTransactions     = GotItem(rawValue: 1 << 3)
-        static let fileVendorShortNames = GotItem(rawValue: 1 << 4)
+        static let fileTransactions     = GotItem(rawValue: 1 << 3) // bit 3 if got at least 1 Transaction file
+        static let fileVendorShortNames = GotItem(rawValue: 1 << 4) // bit 4 if got VendorShortNames file
         static let fileMyCategories     = GotItem(rawValue: 1 << 5)
         static let fileMyModifiedTrans  = GotItem(rawValue: 1 << 6)
+        static let fileMyAccounts       = GotItem(rawValue: 1 << 7)
 
         static let userInitials = GotItem(rawValue: 1 << 9)
 
@@ -99,19 +102,19 @@ class ViewController: NSViewController, NSWindowDelegate {
 
 
         // Get UserDefaults
-        if let dir = UserDefaults.standard.string(forKey: UDKey.supportFolder) {
+        if let dir = UserDefaults.standard.string(forKey: UDKey.supportFolder) {    // Support Folder
             pathSupportDir = dir
             if !dir.isEmpty && FileIO.folderExists(atPath: dir, isPartialPath: true) {
                 gotItem = [gotItem, .dirSupport]
             }
         }
-        if let dir = UserDefaults.standard.string(forKey: UDKey.outputFolder) {
+        if let dir = UserDefaults.standard.string(forKey: UDKey.outputFolder) {    // Output Folder
             pathOutputDir = dir
             if !dir.isEmpty && FileIO.folderExists(atPath: dir, isPartialPath: true) {
                 gotItem = [gotItem, .dirOutput]
             }
         }
-        if let dir = UserDefaults.standard.string(forKey: UDKey.transactionFolder) {
+        if let dir = UserDefaults.standard.string(forKey: UDKey.transactionFolder) {    // Transactions Folder
             pathTransactionDir = dir
             if !dir.isEmpty && FileIO.folderExists(atPath: dir, isPartialPath: true) {
                 gotItem = [gotItem, .dirTrans]
@@ -154,7 +157,8 @@ class ViewController: NSViewController, NSWindowDelegate {
     override func viewDidAppear() {
         self.view.window?.delegate = self
     }
-    
+
+    // Not used
     override var representedObject: Any? {
         didSet {
             // Update the view, if already loaded.
@@ -162,6 +166,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
     }
 
+    // Terminate program if this window closes
     func windowShouldClose(_ sender: NSWindow) -> Bool {
         NSApplication.shared.terminate(self)
         return true
@@ -380,6 +385,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             return
         }
 
+        //MARK: Loop through Files
         for (fileNum, fileURL) in filesToProcessURLs.enumerated() {
             let fileName    = fileURL.lastPathComponent
             gTransFilename  = fileURL.lastPathComponent
@@ -404,7 +410,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             // Check which Credit Card Transactions we are currently processing
             if cardType.count >= 2 &&  cardType.count <= maxCardTypeLen  {
                 Stats.transFileNumber = fileNum + 1
-                gLineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray)
+                gLineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray, acct: gAccounts.dict[cardType])
                 chkUserInput.state = gUserInputMode ? .on : .off
             } else {
                 //Stats.junkFileCount += 1
@@ -482,7 +488,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         if !got.contains(GotItem.dirOutput)     { msg += " Output Folder," }
 
-        msg = String(msg.dropLast())
+        msg = String(msg.dropLast())    // Drop the trailing comma
         return msg
     }
     
@@ -572,6 +578,25 @@ class ViewController: NSViewController, NSWindowDelegate {
             gDictMyCatAliases = loadMyCats(myCatsFileURL: bundleCatsFileURL)
             writeMyCats(url: gMyCatsFileURL)
             let msg = "A starter \"MyCategories.txt\" was placed in your support-files folder"
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, errorMsg: msg)
+        }
+
+        // ---------- "MyAccounts.txt" ------------
+        (gMyAccountsURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportDir, fileName: Accounts.filename)
+        if !errTxt.isEmpty {
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories " + errTxt)
+        }
+        gAccounts = Accounts(url: gMyAccountsURL)
+        if gAccounts.dict.count > 0 {
+            gotItem = [gotItem, .fileMyAccounts]
+
+        } else {
+            let path = Bundle.main.path(forResource: "MyAccounts", ofType: "txt")!
+            let bundleAccountsFileURL = URL(fileURLWithPath: path)
+            gAccounts = Accounts(url: bundleAccountsFileURL)
+            gAccounts.url = gMyAccountsURL
+            gAccounts.writeToFile() //= //writeMyCats(url: gMyCatsFileURL)
+            let msg = "A starter \"MyAccounts.txt\" was placed in your support-files folder"
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, errorMsg: msg)
         }
 

@@ -221,6 +221,9 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
             }
         }//next
 
+        //TODO: Change Summary Title based on filter
+        //self.view.window?.title = "Change title here!!!"
+
         let sortedLineItemArray = filteredLineItemArray.sorted(by: { compareST(lft: $0, rgt: $1, summarizeBy: summarizeBy) })  //**
 
         if sortedLineItemArray.isEmpty { return }
@@ -462,7 +465,7 @@ extension SummaryTableVC: NSTableViewDelegate {
     @objc func tableViewDoubleClick(_ sender:AnyObject) {
         let caller = "SummaryTable"
         guard tableView.selectedRow >= 0 else   { return }  // Bail if Bogus row#
-        if calledBy == caller                   { return }  // Bail if called by self
+        //if calledBy == caller                   { return }  // Bail if called by self
         let rowDict = tableDicts[tableView.selectedRow]
         let idxStr = rowDict["idx"] ?? ""
         let idx = Int(idxStr) ?? -1

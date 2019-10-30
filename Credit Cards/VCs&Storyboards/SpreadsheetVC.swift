@@ -177,10 +177,9 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     private func getMinMax(lineItemArray: [LineItem]) {
         for lineItem in lineItemArray {
             let dollar = lineItem.credit + lineItem.debit
-            if dollar > 0.0 {
-                if dollar < filtDollar1 { filtDollar1 = dollar }
-                if dollar > filtDollar2 { filtDollar2 = dollar }
-            }
+
+            if dollar < filtDollar1 { filtDollar1 = dollar }
+            if dollar > filtDollar2 { filtDollar2 = dollar }
 
             let date = makeYYYYMMDD(dateTxt: lineItem.tranDate)
             if date < filtDate1 { filtDate1 = date }
@@ -213,8 +212,18 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
                 tableDicts.append(dict)
                 totalCredit += lineItem.credit
                 totalDebit  += lineItem.debit
+            } else {
+                // debug trap filtered-out lineItem
             }
         }//next
+
+        let totCount = lineItemArray.count
+        let filteredCount = filteredLineItemArray.count
+        if totCount == filteredCount {
+            self.view.window?.title = "Transaction Spreadsheet - \(totCount) rows"
+        } else {
+            self.view.window?.title = "Transaction Spreadsheet - filtered (\(filteredCount) of \(totCount))"
+        }
 
         // Display Total and Averages
 
@@ -399,7 +408,7 @@ extension SpreadsheetVC: NSTableViewDelegate {
             //var image: NSImage?
 
             guard let colID = tableColumn?.identifier.rawValue else {
-                print("⛔️ Table Column nil")
+                print("⛔️ \(codeFile)#\(#line) Table Column nil")
                 return nil
             }
             guard let text = dict[colID] else {
@@ -418,7 +427,7 @@ extension SpreadsheetVC: NSTableViewDelegate {
         // Summary (Totals) table
         if tableView == self.tableViewSum {
             guard let colID = tableColumn?.identifier.rawValue else {
-                print("⛔️ Table Column nil")
+                print("⛔️ \(codeFile)#\(#line) Table Column nil")
                 return nil
             }
             guard let text = tableSumDict[colID] else {

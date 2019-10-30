@@ -99,14 +99,14 @@ class Credit_Cards_UnitTests: XCTestCase {
         var lineItem = LineItem()
 
         tran = "2018-08-25,2018-08-27,8772,LA FITNESS,Exterm,31.85,"
-        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: dictVendorShortNames, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666)
+        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: dictVendorShortNames, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666, signAmount: 1.0)
         XCTAssertEqual(lineItem.cardType, "TEst")
         XCTAssertEqual(lineItem.debit, 31.85)
         XCTAssertEqual(lineItem.rawCat, "Exterm")
         //XCTAssertEqual(lineItem.genCat, "Entertainment")
 
         tran = "2018-08-25,2018-08-27,8772,LX FITNESS,Bad Category,,31.85"
-        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: dictVendorShortNames, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666)
+        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: dictVendorShortNames, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666, signAmount: 1.0)
         XCTAssertEqual(lineItem.cardType, "TEst")
         XCTAssertEqual(lineItem.credit, 31.85)
         XCTAssertEqual(lineItem.rawCat, "Bad Category")
@@ -114,7 +114,7 @@ class Credit_Cards_UnitTests: XCTestCase {
 
         // Bad Line - Run AFTER creating "Cat inserted for LX FITNESS" above
         tran = "2018-08-25,2018-08-27,8772,LX FITNESS,This is a TEST,31.85"
-        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: dictVendorShortNames, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666)
+        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: dictVendorShortNames, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666, signAmount: 1.0)
         XCTAssertEqual(lineItem.cardType, "TEst")
         XCTAssertEqual(lineItem.credit, 0)
         XCTAssertEqual(lineItem.debit, 31.85)
@@ -133,7 +133,7 @@ class Credit_Cards_UnitTests: XCTestCase {
         let contentGarbage = "\nGarbage\nGarbage\nGarbage\n"
         let cardArrayGarbage = contentGarbage.components(separatedBy: "\n")
         gDictVendorShortNames = [String: String]()
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGarbage)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGarbage, acct: nil)
         XCTAssertEqual(lineItemArray.isEmpty, true)
 
         let cardArrayC1R = [
@@ -141,7 +141,7 @@ class Credit_Cards_UnitTests: XCTestCase {
             "2018-08-11,2018-08-18,8772,MORRISSEYS FRONT PORCH,Dining,12.14,",
         ]
         gDictVendorShortNames = [String: String]()
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayC1R)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayC1R, acct: nil)
         XCTAssertEqual(lineItemArray.count, 1)
         XCTAssertEqual(lineItemArray[0].tranDate, "2018-08-11")
         XCTAssertEqual(lineItemArray[0].postDate, "2018-08-18")
@@ -160,7 +160,7 @@ class Credit_Cards_UnitTests: XCTestCase {
     """
         let cardArrayLHDC = contentLHDC.components(separatedBy: "\n")
         gDictVendorShortNames = [String: String]()
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHDC)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHDC, acct: nil)
         XCTAssertEqual(lineItemArray.count, 2)
         XCTAssertEqual(lineItemArray[0].tranDate, "04/04/2018")
         XCTAssertEqual(lineItemArray[0].postDate, "04/04/2018")
@@ -183,7 +183,7 @@ class Credit_Cards_UnitTests: XCTestCase {
     """
         let cardArrayLHCT = contentLHCT.components(separatedBy: "\n")
         gDictVendorShortNames = [String: String]()
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHCT)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHCT, acct: nil)
         XCTAssertEqual(lineItemArray.count, 2)
 
 
@@ -198,7 +198,7 @@ class Credit_Cards_UnitTests: XCTestCase {
     """
         let cardArrayLHC1V = contentLHC1V.components(separatedBy: "\n")
         gDictVendorShortNames = [String: String]()
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHC1V)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHC1V, acct: nil)
         XCTAssertEqual(lineItemArray.count, 4)
 
 
@@ -211,7 +211,7 @@ class Credit_Cards_UnitTests: XCTestCase {
     """
         let cardArrayGBBA = contentGBBA.components(separatedBy: "\n")
         gDictVendorShortNames = [String: String]()
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGBBA)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGBBA, acct: nil)
         XCTAssertEqual(lineItemArray.count, 2)
 
 
@@ -226,7 +226,7 @@ class Credit_Cards_UnitTests: XCTestCase {
     """
         let cardArrayGBML = contentGBML.components(separatedBy: "\n")
         gDictVendorShortNames = [String: String]()
-        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGBML)
+        lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayGBML, acct: nil)
         XCTAssertEqual(lineItemArray.count, 3)
 
     }//end func testHandleCards

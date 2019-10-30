@@ -471,6 +471,133 @@ public struct VendorShortNames {
 
 }//end struct
 
+// MARK:- Accounts
+
+public struct Account {
+    public enum AmountDefault: String {case debit,credit }
+    public enum AcctType: String { case creditCard, debitCard, check, activity }
+
+    public var code = ""
+    public var name = ""
+    public var type: AcctType        = .creditCard
+    public var amount: AmountDefault = .debit
+    public var lineForFile: String {
+        return "\(code.PadRight(10)), \(amount.rawValue.PadRight(10)), \(type.rawValue.PadRight(11)), \"\(name)\""
+        //SAMPLE    , Debit     , CreditCard , "Sample Credit Card"
+    }
+
+    init?(fromCsvLine line: String) {
+        // Create an Array of line components the seperator being a ","
+        let items = line.components(separatedBy: ",")
+        if items.count < 3 {
+            return nil
+        }
+        code = items[0].trim.removeEnclosingQuotes()
+
+        let strAmount = items[1].trim.removeEnclosingQuotes().uppercased()
+        if strAmount.isEmpty || strAmount.hasPrefix("DEB") {
+            amount = .debit
+        } else if strAmount.hasPrefix("CRED") {
+            amount = .credit
+        } else {
+            return nil
+        }
+
+        let strType = items[2].trim.removeEnclosingQuotes().uppercased().prefix(5)
+        switch strType {
+        case "CREDI":
+            type = .creditCard
+        case "DEBIT":
+            type = .debitCard
+        case "CHECK":
+            type = .check
+        case "ACTIV", "MIXED":
+            type = .activity
+        default:
+            return nil
+        }
+        if items.count < 4 { return }
+        let strName = items[3].trim.removeEnclosingQuotes()
+        name = strName
+    }
+}
+
+
+public struct Accounts {
+
+    static var filename = "MyAccounts.txt"
+    var dict     = [String: Account]()        // Hash for VendorShortNames Lookup
+    var url: URL?
+
+    init(lines: [String]) {
+        dict = [:]
+        var lineNum = 0
+        for line in lines {
+            lineNum += 1
+            if line.trim.isEmpty || line.hasPrefix("//") {
+                continue
+            }
+
+            if let account = Account(fromCsvLine: line) {
+                dict[account.code] = account
+            } else {
+                let msg = "Bad data"
+                handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: Accounts.filename, dataLineNum: lineNum, lineText: line, errorMsg: msg)
+            }
+        }
+    }//end init from String array
+
+    init() {
+        self.init(content: "")
+    }
+
+    init(content: String) {
+        let lines = content.components(separatedBy: "\n") // Create var lines containing Entry for each line.
+        self.init(lines: lines)
+    }
+
+    init(url: URL) {
+        //TODO: If url is not a file, append default filename
+        let content = (try? String(contentsOf: url)) ?? ""
+        self.init(content: content)
+        self.url = url
+        Accounts.filename = url.lastPathComponent
+    }//end init from URL
+
+    func writeToFile(urlOverride: URL? = nil) {
+        var urlOpt = urlOverride
+        if urlOpt == nil {
+            urlOpt = self.url
+        }
+        guard let url = url else {
+            let msg = "Could not write new MyModifiesTransactions file."
+            handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: "-missing URL-", errorMsg: msg)
+            return
+        }
+        FileIO.saveBackupFile(url: url)
+        var text = "// Machine-generated, user-editable file\n"
+        text += "//Code    , Amount    , Type       , Name\n"
+        for (_, value) in self.dict.sorted(by: {$0.key < $1.key}) {
+            text += "\(value.lineForFile)\n"
+        }
+        text += "\n"
+        text += "// Each line must have 3-4 comma-separated entries:\n"
+        text += "// Code:   Prefix (up to \"-\", 10-letters max) of Transaction fileName\n"
+        text += "// Amount: if Transaction file has \"Amount\", is a positive value \"Debit\" or \"Credit\"?\n"
+        text += "// Type:   CreditCard, DebitCard, Activity, or Check\n"
+        text += "// Name:   optional Name of the account (or card)\n"
+        //— writing —
+        do {
+            try text.write(to: url, atomically: false, encoding: .utf8)
+            print("\n😀 Successfully wrote \(self.dict.count) transactions to: \(url.path)")
+        } catch {
+            let msg = "Could not write new MyModifiesTransactions file."
+            handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: url.lastPathComponent, errorMsg: msg)
+        }
+    }//end method
+
+}//end struct Accounts
+
 //MARK:- Vendor Category Lookup
 
 func loadVendorCategories(url: URL) -> [String: CategoryItem]  {
