@@ -99,14 +99,14 @@ class Credit_Cards_UnitTests: XCTestCase {
         var lineItem = LineItem()
 
         tran = "2018-08-25,2018-08-27,8772,LA FITNESS,Exterm,31.85,"
-        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: dictVendorShortNames, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666, signAmount: 1.0)
+        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: dictVendorShortNames, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666, acct: nil)
         XCTAssertEqual(lineItem.cardType, "TEst")
         XCTAssertEqual(lineItem.debit, 31.85)
         XCTAssertEqual(lineItem.rawCat, "Exterm")
         //XCTAssertEqual(lineItem.genCat, "Entertainment")
 
         tran = "2018-08-25,2018-08-27,8772,LX FITNESS,Bad Category,,31.85"
-        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: dictVendorShortNames, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666, signAmount: 1.0)
+        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: dictVendorShortNames, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666, acct: nil)
         XCTAssertEqual(lineItem.cardType, "TEst")
         XCTAssertEqual(lineItem.credit, 31.85)
         XCTAssertEqual(lineItem.rawCat, "Bad Category")
@@ -114,15 +114,80 @@ class Credit_Cards_UnitTests: XCTestCase {
 
         // Bad Line - Run AFTER creating "Cat inserted for LX FITNESS" above
         tran = "2018-08-25,2018-08-27,8772,LX FITNESS,This is a TEST,31.85"
-        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: dictVendorShortNames, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666, signAmount: 1.0)
+        lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: dictVendorShortNames, cardType: "TEst", hasCatHeader: true, fileName: "fileName", lineNum: 666, acct: nil)
         XCTAssertEqual(lineItem.cardType, "TEst")
         XCTAssertEqual(lineItem.credit, 0)
         XCTAssertEqual(lineItem.debit, 31.85)
         XCTAssertEqual(lineItem.rawCat, "This is a TEST")
         XCTAssertEqual(lineItem.genCat, "This is a TEST-?")
 
-    }
+    }//end func
 
+    func test_pickTheBestCat() {
+
+        // VendorCat Locked-in
+        var catItemVendor = CategoryItem(category: "FromV?", source: "$VEND")
+        var catItemTransa = CategoryItem(category: "FromT?", source: "TRAN")
+        var tuple = pickTheBestCat(catItemVendor: catItemVendor, catItemTransa: catItemTransa)
+        XCTAssertEqual(tuple.catItem, catItemVendor)
+        XCTAssertEqual(tuple.isStrong, true)
+
+        // Both weak
+        catItemVendor.source = "VEND"
+        tuple = pickTheBestCat(catItemVendor: catItemVendor, catItemTransa: catItemTransa)
+        XCTAssertEqual(tuple.catItem, catItemTransa)
+        XCTAssertEqual(tuple.isStrong, false)
+
+        // Both Strong
+        catItemTransa.category = "FromT"
+        catItemVendor.category = "FromV"
+        tuple = pickTheBestCat(catItemVendor: catItemVendor, catItemTransa: catItemTransa)
+        XCTAssertEqual(tuple.catItem, catItemTransa)
+        XCTAssertEqual(tuple.isStrong, false)
+
+        // Equal
+        catItemVendor.category = "FromT"
+        tuple = pickTheBestCat(catItemVendor: catItemVendor, catItemTransa: catItemTransa)
+        XCTAssertEqual(tuple.catItem.category, catItemVendor.category)
+        XCTAssertEqual(tuple.isStrong, true)
+
+        catItemVendor.category = "FromV?"
+        catItemTransa.category = "FromT"
+        tuple = pickTheBestCat(catItemVendor: catItemVendor, catItemTransa: catItemTransa)
+        XCTAssertEqual(tuple.catItem, catItemTransa)
+        XCTAssertEqual(tuple.isStrong, true)
+
+        catItemVendor.category = "FromV"
+        catItemTransa.category = "FromT?"
+        tuple = pickTheBestCat(catItemVendor: catItemVendor, catItemTransa: catItemTransa)
+        XCTAssertEqual(tuple.catItem, catItemVendor)
+        XCTAssertEqual(tuple.isStrong, true)
+
+        catItemVendor.category = ""
+        catItemTransa.category = "FromT?"
+        tuple = pickTheBestCat(catItemVendor: catItemVendor, catItemTransa: catItemTransa)
+        XCTAssertEqual(tuple.catItem, catItemTransa)
+        XCTAssertEqual(tuple.isStrong, false)
+
+        catItemVendor.category = "FromV?"
+        catItemTransa.category = ""
+        tuple = pickTheBestCat(catItemVendor: catItemVendor, catItemTransa: catItemTransa)
+        XCTAssertEqual(tuple.catItem, catItemVendor)
+        XCTAssertEqual(tuple.isStrong, false)
+
+        catItemVendor.category = "FromV?"
+        catItemTransa.category = "Unknow?"
+        tuple = pickTheBestCat(catItemVendor: catItemVendor, catItemTransa: catItemTransa)
+        XCTAssertEqual(tuple.catItem, catItemVendor)
+        XCTAssertEqual(tuple.isStrong, false)
+
+        catItemVendor.category = "Unknow?"
+        catItemTransa.category = "FromT?"
+        tuple = pickTheBestCat(catItemVendor: catItemVendor, catItemTransa: catItemTransa)
+        XCTAssertEqual(tuple.catItem, catItemTransa)
+        XCTAssertEqual(tuple.isStrong, false)
+
+    }
 
     func testHandleCards() {
         gDictVendorShortNames = [:]
@@ -302,8 +367,7 @@ class Credit_Cards_UnitTests: XCTestCase {
 //        XCTAssertEqual(dictShortNames["PILOTWORKSHOPS"],  nil)
 //        XCTAssertEqual(dictShortNames["UBERTIS FISH MARKET"],  nil)
 
-
-    }
+    }//end func testFindTruncatedDescs
 
     
 //    func testPerformanceExample() {
@@ -313,4 +377,4 @@ class Credit_Cards_UnitTests: XCTestCase {
 //        }
 //    }
 
-}
+}//end class

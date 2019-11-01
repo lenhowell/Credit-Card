@@ -104,6 +104,16 @@ prefix,prefix
         XCTAssertEqual(vendorShortNames.dict["2nd entry"], "Number 2")
         XCTAssertEqual(vendorShortNames.dict["3rd entry"], "Number 3")
         XCTAssertEqual(vendorShortNames.dict["prefix"], "prefix")
+    }//end func
+
+    func test_parseCommaDelimitedLine() {
+        var line = ""
+        var result: [String] = []
+        line = "abc, \" def \", \"de,f\" "
+        result = FileIO.parseCommaDelimitedLine(line)
+        XCTAssertEqual(result[0], "abc")
+        XCTAssertEqual(result[1], "def")
+        XCTAssertEqual(result[2], "de;f")
     }
 
 }//end class

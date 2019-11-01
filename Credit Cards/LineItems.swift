@@ -28,32 +28,17 @@ public struct LineItem: Equatable, Hashable {
     init() {
     }
 
-    //MARK:- init - 33-121 = 88-lines
+    //MARK:- init - 34-123 = 89-lines
     //TODO: Allow LineItem.init to throw errors
     // Create a LineItem from a Transaction-File line
     init(fromTransFileLine: String, dictColNums: [String: Int], fileName: String, lineNum: Int, signAmount: Double) {
         let expectedColumnCount = dictColNums.count
 
-        var transaction = fromTransFileLine.trim
-        self.transText = transaction
+        self.transText = fromTransFileLine.trim // TRANSACTION TEXT
 
         // Parse transaction, replacing all "," within quotes with a ";"
-        var inQuote = false
-        var tranArray = Array(fromTransFileLine)     // Create an Array of Individual characters in current transaction.
+        let columns = FileIO.parseCommaDelimitedLine(fromTransFileLine)
 
-        for (i,char) in tranArray.enumerated() {
-            if char == "\"" {
-                inQuote = !inQuote      // Flip the switch indicating a quote was found.
-            }
-            if inQuote && char == "," {
-                tranArray[i] = ";"      // Comma within a quoted string found, replace with a ";".
-            }
-        }
-        transaction = String(tranArray) //.uppercased()    // Covert the Parsed "Array" Item Back to a string
-
-        transaction = transaction.replacingOccurrences(of: "\"", with: "")
-        transaction = transaction.replacingOccurrences(of: "\r", with: "")
-        let columns = transaction.components(separatedBy: ",").map{$0.trim}  // Isolate columns within this transaction
         let columnCount = columns.count
         if columnCount != expectedColumnCount {
             let msg = "\(columnCount) in transaction; should be \(expectedColumnCount)"
@@ -61,33 +46,33 @@ public struct LineItem: Equatable, Hashable {
         }
 
         // Building the lineitem record
-        if let colNum = dictColNums["TRAN"] {   // TRANACTION DATE
+        if let colNum = dictColNums["TRAN"] {           // TRANSACTION DATE
             if colNum < columnCount {
                 self.tranDate = columns[colNum]
             }
         }
 
-        if let colNum = dictColNums["POST"] {   // POST DATE
+        if let colNum = dictColNums["POST"] {           // POST DATE
             if colNum < columnCount {
                 self.postDate = columns[colNum]
             }
         }
 
-        if let colNum = dictColNums["DESC"] {   // DESCRIPTION
+        if let colNum = dictColNums["DESC"] {           // DESCRIPTION
             if colNum < columnCount {
                 self.desc = columns[colNum].replacingOccurrences(of: "\"", with: "")
                 if self.desc.isEmpty {
-                    print("LineItems #\(#line) - Empty Description\n\(transaction)")
+                    print("LineItems #\(#line) - Empty Description\n\(fromTransFileLine)")
                 }
             }
         }
-        if let colNum = dictColNums["CARD"] {   // CARD NUMBER
+        if let colNum = dictColNums["CARD"] {           // CARD NUMBER
             if colNum < columnCount {
                 self.idNumber = columns[colNum]
             }
         }
 
-        if let colNum = dictColNums["NUMBER"] { // CHECK NUMBER
+        if let colNum = dictColNums["NUMBER"] {         // CHECK NUMBER
             if colNum < columnCount {
                 var num = columns[colNum]
                 num = num.replacingOccurrences(of: "[*#,$]", with: "", options: .regularExpression, range: nil).trim
@@ -101,7 +86,7 @@ public struct LineItem: Equatable, Hashable {
             }
         }
 
-        if let colNum = dictColNums["CATE"] {   // CATEGORY
+        if let colNum = dictColNums["CATE"] {           // CATEGORY
             if colNum < columnCount {
                 let assignedCat =  columns[colNum]
                 let myCat = gDictMyCatAliases[assignedCat] ?? assignedCat
@@ -109,7 +94,7 @@ public struct LineItem: Equatable, Hashable {
             }
         }
         //TODO: Detect & report corrupt $values rather than silently setting to $0
-        if let colNum = dictColNums["AMOU"] {   // AMOUNT
+        if let colNum = dictColNums["AMOU"] {           // AMOUNT
             if colNum < columnCount {
                 let amt = columns[colNum].replacingOccurrences(of: ";", with: "") //"0" is for empty fields
                 let amount = Double(amt) ?? 0
@@ -120,13 +105,13 @@ public struct LineItem: Equatable, Hashable {
                 }
             }
         }
-        if let colNum = dictColNums["CRED"] {   // CREDIT
+        if let colNum = dictColNums["CRED"] {           // CREDIT
             if colNum < columnCount {
                 let amt = columns[colNum].replacingOccurrences(of: ";", with: "")
                 self.credit = abs(Double(amt) ?? 0)
             }
         }
-        if let colNum = dictColNums["DEBI"] {   // DEBIT
+        if let colNum = dictColNums["DEBI"] {           // DEBIT
             if colNum < columnCount {
                 let amt = columns[colNum].replacingOccurrences(of: ";", with: "").trim
                 self.debit = abs(Double(amt) ?? 0)
@@ -134,7 +119,7 @@ public struct LineItem: Equatable, Hashable {
         }
 
         let (cleanName, _) = fileName.splitAtFirst(char: ".")
-        self.auditTrail = "\(cleanName)#\(lineNum)"
+        self.auditTrail = "\(cleanName)#\(lineNum)"     // AUDIT TRAIL
     }//end init
 
     func signature() -> String {

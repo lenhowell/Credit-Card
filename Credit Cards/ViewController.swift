@@ -213,15 +213,6 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
     }
 
-    @IBAction func chkLearningModeClick(_ sender: Any) {
-        gLearnMode = chkLearningMode.state == .on
-        print("learnMode = \(gLearnMode)")
-    }
-    @IBAction func chkUserInputClick(_ sender: Any) {
-        gUserInputMode = chkUserInput.state == .on
-        print("UserInputMode = \(gUserInputMode)")
-    }
-
     @IBAction func btnShowTable(_ sender: Any) {
         let storyBoard = NSStoryboard(name: "Spreadsheet", bundle: nil)
         let tableWindowController = storyBoard.instantiateController(withIdentifier: "SpreadsheetWindowController") as! NSWindowController
@@ -234,6 +225,15 @@ class ViewController: NSViewController, NSWindowDelegate {
             tableWindow.close()
         }//end if let
     }//end func
+
+    @IBAction func chkLearningModeClick(_ sender: Any) {
+        gLearnMode = chkLearningMode.state == .on
+        print("learnMode = \(gLearnMode)")
+    }
+    @IBAction func chkUserInputClick(_ sender: Any) {
+        gUserInputMode = chkUserInput.state == .on
+        print("UserInputMode = \(gUserInputMode)")
+    }
 
 
     // MARK:- IBActions - MenuBar
@@ -307,9 +307,9 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
 
-    //MARK:- Main Program 149-lines
+    //MARK:- Main Program 156-lines
     
-    func main() {   // 302-451 = 149-lines
+    func main() {   // 312-468 = 156-lines
         verifyFolders(gotItem: &gotItem)
         if !gotItem.contains(GotItem.allDirs) {
             let errMsg = makeMissingItemsMsg(got: gotItem)

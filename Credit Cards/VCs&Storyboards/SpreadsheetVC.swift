@@ -193,7 +193,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     // is responsible for instance-vbl "filteredLineItemArray"
     //---- loadTableDictsArray - Select stocks to be displayed & Create tableDicts array. Also fill "Totals" labels.
-    private func loadTableDictsArray(lineItemArray: [LineItem]) {  // 154-182 = 28-lines
+    private func loadTableDictsArray(lineItemArray: [LineItem]) {  // 196-236 = 28-lines
         var sumLine = LineItem()
         tableDicts  = []
         filteredLineItemArray = []

@@ -155,6 +155,32 @@ public struct FileIO {
         return true
     }
 
+    //---- parseCommaDelimitedLine - Parse line, replacing all "," within quotes with a ";"
+    // Caution: removes leading & trailing spaces, even if enclosed in quotes
+    static func parseCommaDelimitedLine(_ line: String) -> [String] {
+
+        var modLine = line
+        if line.contains("\"") {
+            var inQuote = false
+            var charArray = Array(line)     // Create an Array of Individual characters in current transaction.
+
+            for (i,char) in charArray.enumerated() {
+                if char == "\"" {
+                    inQuote = !inQuote      // Flip the switch indicating a quote was found.
+                }
+                if inQuote && char == "," {
+                    charArray[i] = ";"      // Comma within a quoted string found, replace with a ";".
+                }
+            }
+            modLine = String(charArray) //.uppercased()    // Covert the Parsed "Array" Item Back to a string
+        }
+        modLine = modLine.replacingOccurrences(of: "\"", with: "")
+        modLine = modLine.replacingOccurrences(of: "\r", with: "")
+
+        let columns = modLine.components(separatedBy: ",").map{$0.trim}  // Isolate columns within this transaction
+        return columns
+    }//end func parseCommaDelimitedLine
+
 }//end struct FileIO
 
 //---- deleteSupportFile -
@@ -309,7 +335,7 @@ func writeMyCats(url: URL) {
 //MARK:- My Modified Transactions
 
 func loadMyModifiedTrans(myModifiedTranURL: URL) -> [String: CategoryItem]  {
-    //let dictColNums = ["TRAN":0, "DESC":1, "DEBI":2, "CRED":3, "CATE":4]
+    //let dictColNums = ["TRAN":0, "DESC":1, "DEBI":2, "CRED":3, "CATE":4] "NUMBER","POST","CARD","AMOU"
     //let fileName = myModifiedTranURL.lastPathComponent
     var dictTrans = [String: CategoryItem]()
     let contentof = (try? String(contentsOf: myModifiedTranURL)) ?? ""
