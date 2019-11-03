@@ -100,6 +100,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         // Set txtTransationFolder.delegate
         txtTransationFolder.delegate = self         // Allow ViewController to see when txtTransationFolder changes.
 
+        // NSComboBoxDelegate Does not work!
+        cboFiles.hasVerticalScroller = true
+        self.cboFiles.delegate = self
 
         // Get UserDefaults
         if let dir = UserDefaults.standard.string(forKey: UDKey.supportFolder) {    // Support Folder
@@ -214,6 +217,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func btnShowTable(_ sender: Any) {
+        gPassToNextTable = TableParams()
         let storyBoard = NSStoryboard(name: "Spreadsheet", bundle: nil)
         let tableWindowController = storyBoard.instantiateController(withIdentifier: "SpreadsheetWindowController") as! NSWindowController
         if let tableWindow = tableWindowController.window {
@@ -234,7 +238,6 @@ class ViewController: NSViewController, NSWindowDelegate {
         gUserInputMode = chkUserInput.state == .on
         print("UserInputMode = \(gUserInputMode)")
     }
-
 
     // MARK:- IBActions - MenuBar
 
@@ -309,7 +312,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     //MARK:- Main Program 156-lines
     
-    func main() {   // 312-468 = 156-lines
+    func main() {   // 315-471 = 156-lines
         verifyFolders(gotItem: &gotItem)
         if !gotItem.contains(GotItem.allDirs) {
             let errMsg = makeMissingItemsMsg(got: gotItem)
@@ -499,7 +502,8 @@ class ViewController: NSViewController, NSWindowDelegate {
         cboFiles.stringValue = "-all-"
         cboFiles.addItem(withObjectValue: "-all-")
         cboFiles.addItems(withObjectValues: fileNames)
-
+        //NSComboBoxDelegate Does not work!
+        //cboFiles.scrollItemAtIndexToVisible(cboFiles.numberOfItems-1) Does not work
         print("ViewController#\(#line): 🤣cboFiles has \(cboFiles.numberOfItems) items.")
     }//end func loadComboBoxFiles
 
@@ -644,6 +648,8 @@ class ViewController: NSViewController, NSWindowDelegate {
             lblErrMsg.stringValue = errText
             gotItem = gotItem.subtracting(GotItem.fileTransactions)
         }
+        //cboFiles.scrollItemAtIndexToVisible(cboFiles.numberOfItems-1) Does not work
+
     }//end func
 
 }//end class ViewController
@@ -663,3 +669,11 @@ extension ViewController: NSTextFieldDelegate {
     }
 
 }//end extension ViewController: NSTextFieldDelegate
+
+//NSComboBoxDelegate Does not work!
+extension ViewController: NSComboBoxDelegate {
+    func willPopUpNotification(_ obj: Notification) { //NSNotification.Name
+        print("😂 \(obj)")
+    }
+}
+

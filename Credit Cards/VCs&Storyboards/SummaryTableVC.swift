@@ -10,33 +10,39 @@ import Cocoa
 
 //MARK:- enums, structs, & globals
 
-public enum SmColID: CaseIterable {
+public enum SummaryColID {
     static let name     = "Name"
     static let count    = "Count"
+    static let netDebit = "NetDebit"
     static let debit    = "Debit"
     static let credit   = "Credit"
 }
 public enum SummarizeBy {
     case none, groupCategory, subCategory, vendor, cardType, month, year
 }
-public struct SummarizeSort {
+public enum TableCalledBy {
+    case none, main, spreadsheet, summaryTable
+}
+public struct SortDirective {
     var column = ""
     var ascending = false
 }
-public struct PassToSummary {
-    var filtDate1   = "0000-00-00"
-    var filtDate2   = "2999-12-31"
-    var filtDollar1 = "0.0"
-    var filtDollar2 = "9999999"
+public struct TableParams {
+    var filtDate1   = ""
+    var filtDate2   = ""
+    var filtDolStr1 = ""
+    var filtDolStr2 = ""
     var filtCardTyp = ""
     var filtCategor = ""
     var filtVendor  = ""
-    var calledBy    = ""
+    var calledBy    = TableCalledBy.main
+    var summaryDepth = 0
     var summarizeBy = SummarizeBy.none
-    var sortBy      = SummarizeSort(column: "", ascending: true)
+    var sortBy      = SortDirective(column: SpSheetColID.transDate, ascending: true)
 }//end struct
 
-public var gPassToSummary = PassToSummary()     // Pass info from Spreadsheet or SummaryTable to next SummaryTable
+public var gPassToNextTable = TableParams()     // Pass info from Spreadsheet or SummaryTable to next SummaryTable
+public let kMaxDollar = 999_999_999.0
 
 class SummaryTableVC: NSViewController, NSWindowDelegate {
 
@@ -44,20 +50,22 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     let codeFile = "SummaryTableVC"
     var summarizeBy = SummarizeBy.groupCategory
     var tableDicts  = [[String : String]]()    // Array of Dictionaries
+    var totalCount  = 0
     var totalCredit = 0.0
     var totalDebit  = 0.0
-    var iSortBy     = SmColID.debit
+    var iSortBy     = SummaryColID.netDebit
     var iAscending  = false
 
     var filtDate1   = "0000-00-00"
     var filtDate2   = "2999-12-31"
-    var filtDollar1 = 0.0
-    var filtDollar2 = 9999999.0
+    var filtDollarVal1 = 0.0
+    var filtDollarVal2 = kMaxDollar
     var filtCardTyp = ""
     var filtCategor = ""
     var filtVendor  = ""
-    var calledBy    = ""
+    var calledBy    = TableCalledBy.none
 
+    var myTableParams = TableParams()
 
     //MARK:- IBOutlets
 
@@ -81,6 +89,11 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     @IBOutlet var txtDollar1:   NSTextField!
     @IBOutlet var txtDollar2:   NSTextField!
 
+    @IBOutlet var txtCountTotal:  NSTextField!
+    @IBOutlet var txtNetTotal:    NSTextField!
+    @IBOutlet var txtDebitTotal:  NSTextField!
+    @IBOutlet var txtCreditTotal: NSTextField!
+
     //MARK:- Lifecycle funcs
 
     override func viewDidLoad() {
@@ -95,12 +108,12 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         txtCategory.delegate = self // Allow ViewController to see when txtCategory changes.
         txtVendor.delegate   = self // Allow ViewController to see when txtVendor changes.
 
-
         tableView.target = self
         tableView.doubleAction = #selector(tableViewDoubleClick(_:))
         radioGroupCategory.state = .on
         loadTableSortDescriptors()
-        loadStuffFromCaller(summaryData: gPassToSummary)
+        myTableParams = loadStuffFromCaller(tableParams: gPassToNextTable)
+        //FIXME: Both btnFilter & radioCatChange reload table
         btnFilter(self)
         radioCatChange(self)
     }
@@ -167,9 +180,9 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
 
     //MARK:- Regular funcs
 
-    private func loadStuffFromCaller(summaryData: PassToSummary) {
-        print("loadStuffFromCaller", summaryData)
-        switch summaryData.summarizeBy {
+    private func loadStuffFromCaller(tableParams: TableParams) -> TableParams {
+        print("loadStuffFromCaller", tableParams)
+        switch tableParams.summarizeBy {
         case .cardType:
             radioCardType.state = .on
         case .groupCategory:
@@ -185,17 +198,18 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         default:
             break
         }
-        calledBy                = summaryData.calledBy
-        iSortBy                 = summaryData.sortBy.column
-        iAscending              = summaryData.sortBy.ascending
-        txtVendor.stringValue   = summaryData.filtVendor
-        txtCategory.stringValue = summaryData.filtCategor
-        txtCardType.stringValue = summaryData.filtCardTyp
-        txtDate1.stringValue    = summaryData.filtDate1
-        txtDate2.stringValue    = summaryData.filtDate2
-        txtDollar1.stringValue  = summaryData.filtDollar1
-        txtDollar2.stringValue  = summaryData.filtDollar2
+        calledBy                = tableParams.calledBy
+        iSortBy                 = tableParams.sortBy.column
+        iAscending              = tableParams.sortBy.ascending
+        txtVendor.stringValue   = tableParams.filtVendor
+        txtCategory.stringValue = tableParams.filtCategor
+        txtCardType.stringValue = tableParams.filtCardTyp
+        txtDate1.stringValue    = tableParams.filtDate1
+        txtDate2.stringValue    = tableParams.filtDate2
+        txtDollar1.stringValue  = tableParams.filtDolStr1
+        txtDollar2.stringValue  = tableParams.filtDolStr2
         //loadTableDictsArray(lineItemArray: filteredLineItemArray, summarizeBy : summarizeBy)
+        return tableParams
     }
 
     //---- loadTableSortDescriptors - for column-based sort - Modifies tableView, colWidDict
@@ -203,14 +217,14 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         for column in tableView.tableColumns {
             let key = column.identifier.rawValue
             let ascending: Bool
-            ascending = (key == SmColID.name) // ascending for cardType; descending for the rest.
+            ascending = (key == SummaryColID.name) // ascending for cardType; descending for the rest.
             let sortDescriptor  = NSSortDescriptor(key: key,  ascending: ascending)
             column.sortDescriptorPrototype = sortDescriptor
         }
     }//end func
 
     //---- loadTableDictsArray - Select stocks to be displayed & Create tableDicts array. Also fill "Totals" labels.
-    private func loadTableDictsArray(lineItemArray: [LineItem], summarizeBy : SummarizeBy) {  // 213-263 = 50-lines
+    private func loadTableDictsArray(lineItemArray: [LineItem], summarizeBy : SummarizeBy) {  // 227-287 = 50-lines
 
         var filteredLineItemArray = [LineItem]()  // Filtered list of transactions
         for lineItem in lineItemArray {
@@ -230,6 +244,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         tableDicts  = []
 
         // Column Totals
+        totalCount  = 0
         totalCredit = 0
         totalDebit  = 0
 
@@ -251,15 +266,24 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
                 namedDebit  = lineItem.debit
                 oldName     = newName
             }
+            totalCount  += 1
             totalCredit += lineItem.credit
             totalDebit  += lineItem.debit
         }//next
         appendToTableDicts(name: oldName, count: namedCount, credit: namedCredit, debit: namedDebit)
 
-        //tableDicts = tableDicts.sorted(by: { $0[ColID.debit]! > $1[ColID.debit]! })
+        //tableDicts = tableDicts.sorted(by: { $0[SpSheetColID.debit]! > $1[SpSheetColID.debit]! })
         let sortBy = iSortBy
         tableDicts.sort { compareTextNum(lft: $0[sortBy]!, rgt: $1[sortBy]!, ascending: false) }
         tableView.reloadData()
+        txtCountTotal.stringValue   = String(totalCount)
+
+        let currencyFormatter = NumberFormatter()
+        currencyFormatter.usesGroupingSeparator = true
+        currencyFormatter.numberStyle = .currency
+        txtCreditTotal.stringValue  = currencyFormatter.string(from: NSNumber(value: totalCredit)) ?? "??"
+        txtDebitTotal.stringValue   = currencyFormatter.string(from: NSNumber(value: totalDebit)) ?? "??"
+        txtNetTotal.stringValue     = currencyFormatter.string(from: NSNumber(value: totalDebit-totalCredit)) ?? "??"
     }//end func loadTableDictsArray
 
     //**
@@ -313,22 +337,22 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         filtDate2 = getFilterDate(txtField: txtDate2, isMin: false)
 
         if txtDollar1.stringValue.trim.isEmpty {
-            filtDollar1 = 0.0
+            filtDollarVal1 = 0.0
         } else {
-            filtDollar1 = Double(txtDollar1.stringValue) ?? -1
+            filtDollarVal1 = Double(txtDollar1.stringValue) ?? -1
         }
         if txtDollar2.stringValue.trim.isEmpty {
-            filtDollar2 = 99999999.0
+            filtDollarVal2 = kMaxDollar
         } else {
-            filtDollar2 = Double(txtDollar2.stringValue) ?? -1
+            filtDollarVal2 = Double(txtDollar2.stringValue) ?? -1
         }
-        if filtDollar1 < 0 || filtDollar2 < 0 { return false }
+        if filtDollarVal1 < 0 || filtDollarVal2 < 0 { return false }
         return true
     }
 
     private func getFilterDate(txtField: NSTextField, isMin: Bool) -> String {
         var txt = txtField.stringValue.trim
-        if txt.count == 6 && txt[4] == "-" {
+        if txt.count == 6 && txt[4] == "-" {            // Insert leading zero in yyyy-m
             txt = txt.prefix(4) + "-0" + txt.suffix(1)
             txtField.stringValue = txt
         }
@@ -355,20 +379,25 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
 
     }//end func
 
+    //TODO: Move to TableFilter.swift
     //---- applyFilter - Returns true if lineItem meets all the filter criteria
     private func applyFilter(lineItem: LineItem) -> Bool {
-        if lineItem.credit + lineItem.debit < filtDollar1 { return false }
-        if lineItem.credit + lineItem.debit > filtDollar2 { return false }
-        let tranDate = makeYYYYMMDD(dateTxt: lineItem.tranDate)
-        if tranDate < filtDate1 { return false }
-        if tranDate > filtDate2 { return false }
+        if lineItem.credit + lineItem.debit < filtDollarVal1 { return false }
+        if lineItem.credit + lineItem.debit > filtDollarVal2 { return false }
+
+        if !filtDate1.isEmpty {
+            let tranDate = makeYYYYMMDD(dateTxt: lineItem.tranDate)
+            if tranDate < filtDate1 { return false }
+            if tranDate > filtDate2 { return false }
+        }
+
         if !lineItem.descKey.hasPrefix(txtVendor.stringValue.uppercased())          { return false }
         if !lineItem.cardType.hasPrefix(txtCardType.stringValue.uppercased())       { return false }
         if !lineItem.genCat.uppercased().hasPrefix(txtCategory.stringValue.uppercased()) { return false }
         return true
     }
 
-    //---- reloadTableSorted - reloads the table for tableDicts, sorted by ColID
+    //---- reloadTableSorted - reloads the table for tableDicts, sorted by SpSheetColID
     private func reloadTableSorted(sortBy: String, ascending: Bool) {
         tableDicts.sort { compareTextNum(lft: $0[sortBy]!, rgt: $1[sortBy]!, ascending: ascending) }
         tableView.reloadData()
@@ -381,7 +410,8 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         if !name.isEmpty {
             let strCredit = formatCell(credit, formatType: .dollar,  digits: 2)
             let strDebit  = formatCell(debit,  formatType: .dollar,  digits: 2)
-            var dict      = [SmColID.name: name, SmColID.count: String(count), SmColID.debit: strDebit, SmColID.credit: strCredit]
+            let strNetDebit  = formatCell(debit-credit,  formatType: .dollar,  digits: 2)
+            var dict      = [SummaryColID.name: name, SummaryColID.count: String(count), SummaryColID.netDebit: strNetDebit, SummaryColID.debit: strDebit, SummaryColID.credit: strCredit]
             dict["idx"] = String(idx)
             tableDicts.append(dict)
         }
@@ -463,9 +493,11 @@ extension SummaryTableVC: NSTableViewDelegate {
     //viewDidLoad has tableView.target = self
     // & tableView.doubleAction = #selector(tableViewDoubleClick(_:))
     @objc func tableViewDoubleClick(_ sender:AnyObject) {
-        let caller = "SummaryTable"
+        prepareCall()
+    }//end func
+
+    func prepareCall() {
         guard tableView.selectedRow >= 0 else   { return }  // Bail if Bogus row#
-        //if calledBy == caller                   { return }  // Bail if called by self
         let rowDict = tableDicts[tableView.selectedRow]
         let idxStr = rowDict["idx"] ?? ""
         let idx = Int(idxStr) ?? -1
@@ -477,55 +509,81 @@ extension SummaryTableVC: NSTableViewDelegate {
         var filterVendor    = txtVendor.stringValue.trim
         var filterCardType  = txtCardType.stringValue.trim
 
+        // Pick the next summarizeBy & filter based in row clicked
         var summarizeNew = summarizeBy
         var doNothing = true
         switch summarizeBy {
         case .groupCategory:        // .groupCategory   => .subCategory
-            filterCategory  = rowDict[SmColID.name]!
+            filterCategory  = rowDict[SummaryColID.name]!
             summarizeNew = .subCategory
             doNothing = false
         case .subCategory:          // .subCategory     => .vendor
-            filterCategory  = rowDict[SmColID.name]!
+            filterCategory  = rowDict[SummaryColID.name]!
             summarizeNew = .vendor
             doNothing = false
         case .vendor:               //  .vendor         => .subCategory
-            filterVendor  = rowDict[SmColID.name]!
+            filterVendor  = rowDict[SummaryColID.name]!
             summarizeNew = .subCategory
             doNothing = false
         case .cardType:             //  .cardType       => .groupCategory
-            filterCardType  = rowDict[SmColID.name]!
+            filterCardType  = rowDict[SummaryColID.name]!
             summarizeNew = .groupCategory
             doNothing = false
         case .month, .year:         //  .month, year    => .groupCategory
-            filterDate1  = rowDict[SmColID.name]!
-            filterDate2  = rowDict[SmColID.name]!
+            filterDate1  = rowDict[SummaryColID.name]!
+            filterDate2  = rowDict[SummaryColID.name]!
             summarizeNew = .groupCategory
             doNothing = false
         default:
             break
         }
         if doNothing { return }
-        
-        gPassToSummary = PassToSummary(filtDate1: filterDate1,
-                                       filtDate2: filterDate2,
-                                       filtDollar1: txtDollar1.stringValue,
-                                       filtDollar2: txtDollar2.stringValue,
-                                       filtCardTyp: filterCardType,
-                                       filtCategor: filterCategory,
-                                       filtVendor:  filterVendor,
-                                       calledBy: caller,
-                                       summarizeBy: summarizeNew,
-                                       sortBy: SummarizeSort(column: SmColID.debit, ascending: false))
 
+        gPassToNextTable = TableParams(filtDate1: filterDate1,
+                                     filtDate2:   filterDate2,
+                                     filtDolStr1: txtDollar1.stringValue,
+                                     filtDolStr2: txtDollar2.stringValue,
+                                     filtCardTyp: filterCardType,
+                                     filtCategor: filterCategory,
+                                     filtVendor:  filterVendor,
+                                     calledBy:    TableCalledBy.summaryTable,
+                                     summaryDepth: myTableParams.summaryDepth+1,
+                                     summarizeBy: summarizeNew,
+                                     sortBy: SortDirective(column: SummaryColID.netDebit, ascending: false))
+
+        if myTableParams.summaryDepth < 2 {
+            callNextSummary()
+        } else {
+            callSpreadsheet()
+        }
+    }//end func prepareCall
+
+    func callNextSummary() {
         let storyBoard = NSStoryboard(name: "SummaryTable", bundle: nil)
         let summaryWindowController = storyBoard.instantiateController(withIdentifier: "SummaryWindowController") as! NSWindowController
         if let summaryWindow = summaryWindowController.window {
             //let summaryTableVC = storyBoard.instantiateController(withIdentifier: "SummaryTableVC") as! SummaryTableVC
             let application = NSApplication.shared
             _ = application.runModal(for: summaryWindow) // <=================  UserInputVC
-            
+
             summaryWindow.close()                     // Return here from userInputWindow
         }
-    }//end func
+    }//end func callNextSummary
+
+    func callSpreadsheet() {
+        gPassToNextTable.sortBy = SortDirective(column: SpSheetColID.transDate, ascending: true)
+
+        let storyBoard = NSStoryboard(name: "Spreadsheet", bundle: nil)
+        let tableWindowController = storyBoard.instantiateController(withIdentifier: "SpreadsheetWindowController") as! NSWindowController
+        if let tableWindow = tableWindowController.window {
+            //let tableVC = tableWindow.contentViewController as! TableVC
+            //gLineItemArray = lineItemArray
+            let application = NSApplication.shared
+            application.runModal(for: tableWindow)
+
+            tableWindow.close()
+        }//end if let
+
+    }//end func callSpreadsheet
 
 }//end extension

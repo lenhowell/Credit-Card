@@ -165,7 +165,7 @@
                                                                                                 <constraints>
                                                                                                     <constraint firstAttribute="height" constant="17" id="tVr-a2-NvR"/>
                                                                                                 </constraints>
-                                                                                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="zVl-Zd-ymm">
+                                                                                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Cell" id="zVl-Zd-ymm">
                                                                                                     <font key="font" metaFont="system"/>
                                                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -187,7 +187,7 @@
                                                                     </tableView>
                                                                 </subviews>
                                                             </clipView>
-                                                            <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="elK-AI-HLC">
+                                                            <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="0.94736842105263153" horizontal="YES" id="elK-AI-HLC">
                                                                 <rect key="frame" x="1" y="29" width="86" height="15"/>
                                                                 <autoresizingMask key="autoresizingMask"/>
                                                             </scroller>
@@ -503,8 +503,8 @@
                                                             <rect key="frame" x="1" y="1" width="64" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="0h5-qh-1kJ">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="64" height="17"/>
+                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0h5-qh-1kJ">
+                                                                    <rect key="frame" x="0.0" y="0.0" width="54" height="17"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" constant="17" id="0ez-Rn-rta"/>
                                                                     </constraints>
@@ -571,8 +571,8 @@
                                                             <rect key="frame" x="135" y="1" width="10" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="v9C-lV-vdZ">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="10" height="17"/>
+                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="v9C-lV-vdZ">
+                                                                    <rect key="frame" x="0.0" y="0.0" width="54" height="17"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" constant="17" id="5Rn-IK-1QB"/>
                                                                     </constraints>
@@ -913,7 +913,7 @@
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rVy-Ye-28R">
                                 <rect key="frame" x="100" y="6" width="1115" height="16"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="48K-hk-xRw">
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Selected-Row Detail" id="48K-hk-xRw">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -942,6 +942,7 @@
                     <connections>
                         <outlet property="btnClear" destination="u9N-eX-HIQ" id="zB2-mr-A14"/>
                         <outlet property="btnFilter" destination="a3p-DE-SJP" id="jIT-O5-nHv"/>
+                        <outlet property="btnSummary" destination="Gt0-QW-d71" id="ucb-UF-Fbu"/>
                         <outlet property="lblStatus" destination="rVy-Ye-28R" id="QcM-l4-Bw9"/>
                         <outlet property="tableView" destination="0Va-J0-BTQ" id="nJT-ad-k0M"/>
                         <outlet property="tableViewSum" destination="i7W-35-TiY" id="9bg-Se-ufw"/>

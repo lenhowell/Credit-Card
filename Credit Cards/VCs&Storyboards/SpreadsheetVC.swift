@@ -17,14 +17,14 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     var tableSumDict = [String : String]()      // Totals Dictionary
     var totalCredit = 0.0
     var totalDebit  = 0.0
-    var iSortBy     = ColID.cardType
+    var iSortBy     = SpSheetColID.cardType
     var iAscending  = true
     var colWidDict  = [String : CGFloat]()
 
-    var filtDate1   = "2999-12-31"
-    var filtDate2   = "0000-00-00"
-    var filtDollar1 = 9999999.0
-    var filtDollar2 = 0.0
+    var filtDate1   = ""
+    var filtDate2   = ""
+    var filtDollarVal1 = 0.0
+    var filtDollarVal2 = kMaxDollar
     var filtCardTyp = ""
     var filtCategor = ""
     var filtVendor  = ""
@@ -36,6 +36,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     @IBOutlet var tableViewSum: NSTableView!
     @IBOutlet var btnFilter:    NSButton!
     @IBOutlet var btnClear:     NSButton!
+    @IBOutlet var btnSummary:   NSButton!
     @IBOutlet var lblStatus:    NSTextField!
 
     @IBOutlet var txtDate1:     NSTextField!
@@ -65,7 +66,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         txtCategory.delegate = self // Allow ViewController to see when txtCategory changes.
         txtVendor.delegate   = self // Allow ViewController to see when txtVendor changes.
 
-        getMinMax(lineItemArray: gLineItemArray)
+        loadStuffFromCaller(summaryData: gPassToNextTable)
         loadTableDictsArray(lineItemArray: gLineItemArray)
 
         tableView.target = self
@@ -75,7 +76,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         syncColWidths()
 
         btnClear.isEnabled = false
-    }
+    }//end func viewDidLoad
 
     override func viewDidAppear() {
         super.viewDidAppear()
@@ -122,22 +123,22 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func btnSummaries(_ sender: Any) {
-        gPassToSummary = PassToSummary(filtDate1: txtDate1.stringValue,
+        gPassToNextTable = TableParams(filtDate1: txtDate1.stringValue,
                                        filtDate2: txtDate2.stringValue,
-                                       filtDollar1: txtDollar1.stringValue,
-                                       filtDollar2: txtDollar2.stringValue,
+                                       filtDolStr1: txtDollar1.stringValue,
+                                       filtDolStr2: txtDollar2.stringValue,
                                        filtCardTyp: txtCardType.stringValue,
                                        filtCategor: txtCategory.stringValue,
                                        filtVendor: txtVendor.stringValue,
-                                       calledBy: "Spreadsheet",
+                                       calledBy: TableCalledBy.spreadsheet,
                                        summarizeBy: SummarizeBy.groupCategory,
-                                       sortBy: SummarizeSort(column: SmColID.debit, ascending: false))
+                                       sortBy: SortDirective(column: SummaryColID.netDebit, ascending: false))
 
         let storyBoard = NSStoryboard(name: "SummaryTable", bundle: nil)
         let summaryWindowController = storyBoard.instantiateController(withIdentifier: "SummaryWindowController") as! NSWindowController
         if let summaryWindow = summaryWindowController.window {
             //let summaryTableVC = storyBoard.instantiateController(withIdentifier: "SummaryTableVC") as! SummaryTableVC
-            print("btnSummaries", gPassToSummary)
+            print("btnSummaries", gPassToNextTable)
             let application = NSApplication.shared
             _ = application.runModal(for: summaryWindow) // <=================  UserInputVC
 
@@ -153,13 +154,36 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     //MARK:- Regular funcs
 
-    //---- loadTableSortDescriptors - for column-based sort - Modifies tableView, colWidDict
+    private func loadStuffFromCaller(summaryData: TableParams) {
+        print("loadStuffFromCaller", summaryData)
+        //calledBy                = summaryData.calledBy
+        if summaryData.calledBy == .main {
+            btnSummary.isHidden = false
+        } else {
+            btnSummary.isHidden = true
+        }
+        iSortBy                 = summaryData.sortBy.column
+        iAscending              = summaryData.sortBy.ascending
+        txtVendor.stringValue   = summaryData.filtVendor
+        txtCategory.stringValue = summaryData.filtCategor
+        txtCardType.stringValue = summaryData.filtCardTyp
+        txtDate1.stringValue    = summaryData.filtDate1
+        txtDate2.stringValue    = summaryData.filtDate2
+        txtDollar1.stringValue  = summaryData.filtDolStr1
+        txtDollar2.stringValue  = summaryData.filtDolStr2
+
+
+        //loadTableDictsArray(lineItemArray: filteredLineItemArray, summarizeBy : summarizeBy)
+    }
+
+
+    //---- loadTableSortDescriptors - for column-based sort - Modifies tableView, colWidDict: called by viewDidLoad
     internal func loadTableSortDescriptors() {
         colWidDict.removeAll()
         for column in tableView.tableColumns {
             let key = column.identifier.rawValue
             let ascending: Bool
-            ascending = (key == ColID.cardType) // ascending for cardType; descending for the rest.
+            ascending = (key == SpSheetColID.cardType) // ascending for cardType; descending for the rest.
             let sortDescriptor  = NSSortDescriptor(key: key,  ascending: ascending)
             print("⬆️ sortDescriptor key: \(sortDescriptor.key!)   ascending: \(sortDescriptor.ascending)")
             column.sortDescriptorPrototype = sortDescriptor
@@ -167,33 +191,42 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         }
     }//end func
 
-    //---- syncColWidths - Make Summary Column widths = Main Column widths
+    //---- syncColWidths - Make Summary Column widths = Main Column widths: called by viewDidLoad
     private func syncColWidths() {
         for (idx, column) in tableView.tableColumns.enumerated() {
             tableViewSum.tableColumns[idx].width = column.width
         }
     }
 
+    //---- getMinMax - Sets filtDollarX, txtDollarX, filtDateX, txtDateX: called by viewDidLoad
     private func getMinMax(lineItemArray: [LineItem]) {
         for lineItem in lineItemArray {
             let dollar = lineItem.credit + lineItem.debit
 
-            if dollar < filtDollar1 { filtDollar1 = dollar }
-            if dollar > filtDollar2 { filtDollar2 = dollar }
+            if dollar < filtDollarVal1 { filtDollarVal1 = dollar }
+            if dollar > filtDollarVal2 { filtDollarVal2 = dollar }
 
             let date = makeYYYYMMDD(dateTxt: lineItem.tranDate)
             if date < filtDate1 { filtDate1 = date }
             if date > filtDate2 { filtDate2 = date }
         }//next
-        txtDollar1.stringValue = String(format: "%.2f", filtDollar1)
-        txtDollar2.stringValue = String(format: "%.2f", filtDollar2)
+        if filtDollarVal1 > 0.001 {
+            txtDollar1.stringValue = String(format: "%.2f", filtDollarVal1)
+        } else {
+            txtDollar1.stringValue = ""
+        }
+        if filtDollarVal2 < kMaxDollar {
+            txtDollar2.stringValue = String(format: "%.2f", filtDollarVal2)
+        } else {
+            txtDollar2.stringValue = ""
+        }
         txtDate1.stringValue = filtDate1
         txtDate2.stringValue = filtDate2
     }//end func
 
     // is responsible for instance-vbl "filteredLineItemArray"
     //---- loadTableDictsArray - Select stocks to be displayed & Create tableDicts array. Also fill "Totals" labels.
-    private func loadTableDictsArray(lineItemArray: [LineItem]) {  // 196-236 = 28-lines
+    private func loadTableDictsArray(lineItemArray: [LineItem]) {  // 229-269 = 40-lines
         var sumLine = LineItem()
         tableDicts  = []
         filteredLineItemArray = []
@@ -235,7 +268,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     }//end func loadTableDictsArray
 
-    //---- setFilter - Setup the filters based on the tsxtView entries
+    //---- setFilter - Setup the filters based on the textView entries
     private func setFilter() -> Bool {
         filtDate1 = getFilterDate(txtField: txtDate1, isMin: true)
         let date1Count = txtDate1.stringValue.trim.count
@@ -245,16 +278,16 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         filtDate2 = getFilterDate(txtField: txtDate2, isMin: false)
 
         if txtDollar1.stringValue.trim.isEmpty {
-            filtDollar1 = 0.0
+            filtDollarVal1 = 0.0
         } else {
-            filtDollar1 = Double(txtDollar1.stringValue) ?? -1
+            filtDollarVal1 = Double(txtDollar1.stringValue) ?? -1
         }
         if txtDollar2.stringValue.trim.isEmpty {
-            filtDollar2 = 99999999.0
+            filtDollarVal2 = kMaxDollar
         } else {
-            filtDollar2 = Double(txtDollar2.stringValue) ?? -1
+            filtDollarVal2 = Double(txtDollar2.stringValue) ?? -1
         }
-        if filtDollar1 < 0 || filtDollar2 < 0 { return false }
+        if filtDollarVal1 < 0 || filtDollarVal2 < 0 { return false }
         return true
     }
 
@@ -289,11 +322,14 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     //---- applyFilter - Returns true if lineItem meets all the filter criteria
     private func applyFilter(lineItem: LineItem) -> Bool {
-        if lineItem.credit + lineItem.debit < filtDollar1 { return false }
-        if lineItem.credit + lineItem.debit > filtDollar2 { return false }
-        let tranDate = makeYYYYMMDD(dateTxt: lineItem.tranDate)
-        if tranDate < filtDate1 { return false }
-        if tranDate > filtDate2 { return false }
+        if lineItem.credit + lineItem.debit < filtDollarVal1 { return false }
+        if lineItem.credit + lineItem.debit > filtDollarVal2 { return false }
+
+        if !filtDate1.isEmpty {
+            let tranDate = makeYYYYMMDD(dateTxt: lineItem.tranDate)
+            if tranDate < filtDate1 { return false }
+            if tranDate > filtDate2 { return false }
+        }
         if !lineItem.descKey.hasPrefix(txtVendor.stringValue.uppercased())          { return false }
         if !lineItem.cardType.hasPrefix(txtCardType.stringValue.uppercased())       { return false }
         if !lineItem.genCat.uppercased().hasPrefix(txtCategory.stringValue.uppercased()) { return false }
@@ -304,22 +340,22 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     func makeRowDict(lineItem: LineItem, idx: Int = -1) -> [String : String] {
         var dict = [String : String]()
 
-        dict[ColID.cardType]    = lineItem.cardType
-        dict[ColID.transDate]   = makeYYYYMMDD(dateTxt: lineItem.tranDate)
-        dict[ColID.descKey]     = lineItem.descKey
-        dict[ColID.fullDesc]    = lineItem.desc
-        dict[ColID.idNumber]    = lineItem.idNumber
-        dict[ColID.debit]       = formatCell(lineItem.debit,  formatType: .dollar,  digits: 2)
-        dict[ColID.credit]      = formatCell(lineItem.credit, formatType: .dollar,  digits: 2)
-        dict[ColID.category]    = lineItem.genCat
-        dict[ColID.rawCat]      = lineItem.rawCat
-        dict[ColID.catSource]   = lineItem.catSource
-        dict[ColID.file_LineNum] = lineItem.auditTrail
+        dict[SpSheetColID.cardType]    = lineItem.cardType
+        dict[SpSheetColID.transDate]   = makeYYYYMMDD(dateTxt: lineItem.tranDate)
+        dict[SpSheetColID.descKey]     = lineItem.descKey
+        dict[SpSheetColID.fullDesc]    = lineItem.desc
+        dict[SpSheetColID.idNumber]    = lineItem.idNumber
+        dict[SpSheetColID.debit]       = formatCell(lineItem.debit,  formatType: .dollar,  digits: 2)
+        dict[SpSheetColID.credit]      = formatCell(lineItem.credit, formatType: .dollar,  digits: 2)
+        dict[SpSheetColID.category]    = lineItem.genCat
+        dict[SpSheetColID.rawCat]      = lineItem.rawCat
+        dict[SpSheetColID.catSource]   = lineItem.catSource
+        dict[SpSheetColID.file_LineNum] = lineItem.auditTrail
         dict["idx"] = String(idx)
         return dict
     }// end func
 
-    //---- reloadTableSorted - reloads the table for tableDicts, sorting by ColID
+    //---- reloadTableSorted - reloads the table for tableDicts, sorting by SpSheetColID
     private func reloadTableSorted(sortBy: String, ascending: Bool) {
         tableDicts.sort { compareTextNum(lft: $0[sortBy]!, rgt: $1[sortBy]!, ascending: ascending) }
         tableView.reloadData()
@@ -331,7 +367,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 }//end class
 
 //              Name        ID          Width   Col#    Totals
-fileprivate enum ColID: CaseIterable {
+public enum SpSheetColID: CaseIterable {
     static let cardType     = "CardType"            // 60    0      -
     static let idNumber     = "Number"
     static let transDate    = "TransDate"           // --   --
@@ -454,10 +490,10 @@ extension SpreadsheetVC: NSTableViewDelegate {
             }
             let iRow = tableView.selectedRow
             let dict = tableDicts[iRow]
-            var id = dict[ColID.idNumber] ?? ""
+            var id = dict[SpSheetColID.idNumber] ?? ""
             if !id.isEmpty { id = "  #" + id + "  " }
-            let fileAndLine = (dict[ColID.file_LineNum] ?? "").replacingOccurrences(of: "#", with: "line#")
-            lblStatus.stringValue = "\(iRow+1) \(id)   desc:\"\(dict[ColID.fullDesc] ?? "")\"     orig.cat:\"\(dict[ColID.rawCat] ?? "")\"       file:\(fileAndLine)"
+            let fileAndLine = (dict[SpSheetColID.file_LineNum] ?? "").replacingOccurrences(of: "#", with: "line#")
+            lblStatus.stringValue = "\(iRow+1) \(id)   desc:\"\(dict[SpSheetColID.fullDesc] ?? "")\"     orig.cat:\"\(dict[SpSheetColID.rawCat] ?? "")\"       file:\(fileAndLine)"
             //updateCompanyNameLabel()
         }//tableView
     }
