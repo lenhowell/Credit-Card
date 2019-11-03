@@ -408,9 +408,9 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     //---- makeRowDict - Create a dictionary entry for loadTable & appends to tableDicts
     private func appendToTableDicts(name: String, count: Int, credit: Double, debit: Double, idx: Int = -1) {
         if !name.isEmpty {
-            let strCredit = formatCell(credit, formatType: .dollar,  digits: 2)
-            let strDebit  = formatCell(debit,  formatType: .dollar,  digits: 2)
-            let strNetDebit  = formatCell(debit-credit,  formatType: .dollar,  digits: 2)
+            let strCredit    = formatCell(credit, formatType: .dollar,  digits: 2)
+            let strDebit     = formatCell(debit,  formatType: .dollar,  digits: 2)
+            let strNetDebit  = formatCell(debit-credit, formatType: .dollar,  digits: 2, doReplaceZero: false)
             var dict      = [SummaryColID.name: name, SummaryColID.count: String(count), SummaryColID.netDebit: strNetDebit, SummaryColID.debit: strDebit, SummaryColID.credit: strCredit]
             dict["idx"] = String(idx)
             tableDicts.append(dict)

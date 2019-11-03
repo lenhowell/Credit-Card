@@ -42,7 +42,12 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-157 = 145-
         lineItem.desc = items[0]
         known = true                                          //             "BRIGHT HOUSE NETWORKS VISA DEFERRED"
 
-    } else if des.hasPrefix("REINVESTMENT")                 { // "REINVESTMENT LORD ABBETT INTERMED TAX FREE FD A"
+    } else if des.hasPrefix("REINVESTMENT PROGRAM ")        { // "REINVESTMENT PROGRAM LORD ABBETT INTERMED TAX FREE FD A"
+        lineItem.desc = String(des.dropFirst(21))
+        known = true
+
+    } else if des.hasPrefix("REINVESTMENT ")                 { // "REINVESTMENT LORD ABBETT INTERMED TAX FREE FD A"
+        lineItem.desc = String(des.dropFirst(13))
         known = true
 
     } else if des.hasPrefix("PRE-AUTHORIZED WITHDRAWA")     { // "PRE-AUTHORIZED WITHDRAWA UNITEDHEALTHCARE"
@@ -92,13 +97,13 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-157 = 145-
 
     } else if des.hasPrefix("PURCHASE:")                    {   // "PURCHASE: CD BANK WEST SAN FRANCISCO; CA 01.050% DEC XX 2017 WHE"
         known = true
-
+        lineItem.desc = colinSplit.rgt
     } else if des.hasPrefix("SALE:")                        {   // "SALE: LORD ABBETT SHORT DURATION INCOME FD A EXCHANGE SELL FRAC"
         known = true
-
+        lineItem.desc = colinSplit.rgt
     } else if des.hasPrefix("REDEMPTION:")                  {   // "REDEMPTION: CD BANK WEST SAN FRANCISCO; CA 01.050% DEC XX 2017 P"
         known = true
-
+        lineItem.desc = colinSplit.rgt
 
     } else if des.hasPrefix("FOREIGN TAX WITHHOLDING:")     {   // "FOREIGN TAX WITHHOLDING: SASOL LTD  SPONSORED ADR NON-RECLAIMABL"
         known = true
@@ -129,20 +134,15 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-157 = 145-
         known = true
         if !lineItem.desc.hasPrefix("SSA") {
             print("HandleCards#\(#line) \(lineItem.transText)")
-            //
+            // Debug Trap - Non-SSA Direct-Deposit
         }
 
     } else if des.hasPrefix("OVERDRAFT") && des.hasSuffix("LOAN") { // "OVERDRAFT LOAN EXTEND OVERDRAFT LOAN"
         known = true
         lineItem.desc = "OVERDRAFT LOAN"
         lineItem.rawCat = "loans"
-
-//    } else if des.hasPrefix("OVERDRAFT LOAN EXTEND OVERDRAFT LOAN") { // "OVERDRAFT LOAN EXTEND OVERDRAFT LOAN"
-//        known = true
-//
-//    }else if des.hasPrefix("OVERDRAFT REPAYMENT REPAY OVERDRAFT LOAN") { // "OVERDRAFT LOAN EXTEND OVERDRAFT LOAN"
-//        known = true
-
+//    des.hasPrefix("OVERDRAFT LOAN EXTEND OVERDRAFT LOAN") { // "OVERDRAFT LOAN EXTEND OVERDRAFT LOAN"
+//    des.hasPrefix("OVERDRAFT REPAYMENT REPAY OVERDRAFT LOAN") { // "OVERDRAFT LOAN EXTEND OVERDRAFT LOAN"
     }
 
     if !known {

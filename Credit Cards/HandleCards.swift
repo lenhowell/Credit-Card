@@ -20,7 +20,6 @@ var usrCatItemReturned  = CategoryItem()
 var usrFixVendor        = true
 var usrIgnoreVendors    = [String: Int]()
 
-
 //MARK:---- handleCards - 26-92 = 66-lines
 
 func handleCards(fileName: String, cardType: String, cardArray: [String], acct: Account?) -> [LineItem] {
@@ -91,7 +90,6 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
     return lineItemArray
 }//end func handleCards
 
-
 func makeYYYYMMDD(dateTxt: String) -> String {
     var dateStr = ""
     let da = dateTxt
@@ -112,8 +110,8 @@ func makeYYYYMMDD(dateTxt: String) -> String {
     return dateStr
 }
 
-//MARK: makeLineItem 117-223 = 106-lines
-//---- makeLineItem - Uses support files & possible user-input
+//MARK: makeLineItem 106-lines
+//---- makeLineItem - Uses support files & possible user-input 117-223 = 106-lines
 internal func makeLineItem(fromTransFileLine: String,
                            dictColNums: [String: Int],
                            dictVendorShortNames: [String: String],
@@ -334,8 +332,6 @@ internal func findShorterDescKey(_ descKey: String) {
     }//next key,value
 }//end func
 
-//TODO: Prioritize prefered cards
-//TODO: Add Unit Test
 //---- pickTheBestCat - Returns (catItemPrefered, isClearWinner) tuple.
 internal func pickTheBestCat(catItemVendor: CategoryItem, catItemTransa: CategoryItem) -> (catItem: CategoryItem, isStrong: Bool) {
     let weak    = false
