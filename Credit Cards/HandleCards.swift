@@ -20,7 +20,7 @@ var usrCatItemReturned  = CategoryItem()
 var usrFixVendor        = true
 var usrIgnoreVendors    = [String: Int]()
 
-//MARK:---- handleCards - 26-92 = 66-lines
+//MARK:---- handleCards - 25-91 = 66-lines
 
 func handleCards(fileName: String, cardType: String, cardArray: [String], acct: Account?) -> [LineItem] {
     let cardArrayCount = cardArray.count
@@ -90,28 +90,8 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
     return lineItemArray
 }//end func handleCards
 
-func makeYYYYMMDD(dateTxt: String) -> String {
-    var dateStr = ""
-    let da = dateTxt
-    if da.contains("/") {
-        let comps = da.components(separatedBy: "/")
-        var yy = comps[2].trim
-        if yy.count <= 2 { yy = "20" + yy }
-        var mm = comps[0].trim
-        if mm.count < 2 { mm = "0" + mm }
-        var dd = comps[1].trim
-        if dd.count < 2 { dd = "0" + dd }
-        dateStr = "\(yy)-\(mm)-\(dd)"
-    } else if da.contains("-") {
-        dateStr = da
-    } else {
-        //
-    }
-    return dateStr
-}
-
-//MARK: makeLineItem 106-lines
-//---- makeLineItem - Uses support files & possible user-input 117-223 = 106-lines
+//MARK: makeLineItem 104-lines
+//---- makeLineItem - Uses support files & possible user-input 95-199 = 104-lines
 internal func makeLineItem(fromTransFileLine: String,
                            dictColNums: [String: Int],
                            dictVendorShortNames: [String: String],
@@ -121,7 +101,7 @@ internal func makeLineItem(fromTransFileLine: String,
                            lineNum: Int,
                            acct: Account?) -> LineItem {
     // Uses Globals: gLearnMode, gUserInputMode, gDictModifiedTrans, gDictMyCatAliases
-    // Modifies Gloabals: gDictVendorCatLookup, gUniqueCategoryCounts, Stats
+    // Modifies Gloabals: gDictVendorCatLookup, Stats
 
     // If an "Account" record has been read-in for this item, set signAmount & tran accordingly
     var isActivity = false
@@ -172,8 +152,6 @@ internal func makeLineItem(fromTransFileLine: String,
             lineItem.catSource  = catItemPrefered.source
         }
         Stats.successfulLookupCount += 1
-        // print("HandleCards#\(#line) \(lineItem.descKey) \(catItemPrefered.category) isClearWinner=\(isClearWinner)  VendorCat=\(catItemFromVendor.category) TransCat=\(catItemFromTran.category)")
-        gUniqueCategoryCounts[descKey, default: 0] += 1
 
     } else {                   // ------ Here if NOT found in Category-Lookup-by-Vendor Dictionary
         findShorterDescKey(descKey) // Does nothing?
@@ -284,20 +262,33 @@ func showUserInputVendorCatForm(lineItem: LineItem,
 //---- makeDictColNums - Infer which columns have the relevant data based in the Header row. Returns dictColNums
 internal func makeDictColNums(headers: [String]) -> [String: Int] {
     // "Check Number", "Date Written", "Date Cleared", "Payee", "Amount"
+    // ML settled-activity: "Trade Date","Settlement Date" "Description 2"
     var dictColNums = [String: Int]()
     for colNum in 0..<headers.count {
-        let rawKey = headers[colNum].uppercased().trim.replacingOccurrences(of: "\"", with: "")
+        let rawKey = headers[colNum].uppercased().trim.replacingOccurrences(of: "\"", with: "").trim
         let key: String
         if rawKey == "DATE" || rawKey.hasSuffix("WRITTEN") {
             key = "TRAN"                                            // Transaction Date
         } else if rawKey.hasSuffix("CLEARED") {
                 key = "POST"                                        // POSTED Date
+
+        } else if rawKey == "TRADE DATE" {
+                key = "TRAN"                                        // Transaction Date - ML Settled Activity
+        } else if rawKey == "SETTLEMENT DATE" {
+                key = "POST"                                        // POSTED Date - ML Settled Activity
+
         } else if  rawKey == "PAYEE" || (rawKey.hasPrefix("ORIG") && rawKey.hasSuffix("DESCRIPTION")) { // "Original Description"
             key = "DESC"                                            // DESCRIPTION
         } else if (rawKey.hasPrefix("MERCH") && rawKey.hasSuffix("CATEGORY")) {   // "Merchant Category"
             key = "CATE"                                            // CATEGORY
         } else if rawKey.hasSuffix("NUMBER") {
             key = "NUMBER"                                          // CHECK NUMBER
+
+        } else if rawKey == "DESCRIPTION 1" {
+            key = "CATE"                                            // CATEGORY - ML Settled Activity
+        } else if rawKey == "DESCRIPTION 2" {
+            key = "DESC"                                            // CATEGORY - ML Settled Activity
+
         } else if rawKey.contains("NOTE") { 
             key = "MEMO"                                            // MEMO
         } else {

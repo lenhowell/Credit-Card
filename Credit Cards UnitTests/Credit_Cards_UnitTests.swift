@@ -220,15 +220,15 @@ class Credit_Cards_UnitTests: XCTestCase {
         let contentLHDC =
     """
     Trans. Date,Post Date,Description,Amount,Category
-    04/04/2018,04/04/2018,"BONEFISH 7027 BOYNTON BEACHFL00422R",32.56,"Restaurants"
+    04/05/2018,04/06/2018,"BONEFISH 7027 BOYNTON BEACHFL00422R",32.56,"Restaurants"
     04/30/2018,04/30/2018,"PHONE PAYMENT - THANK YOU",-32.56,"Payments and Credits"
     """
         let cardArrayLHDC = contentLHDC.components(separatedBy: "\n")
         gDictVendorShortNames = [String: String]()
         lineItemArray = handleCards(fileName: "fileName", cardType: "cardType", cardArray: cardArrayLHDC, acct: nil)
         XCTAssertEqual(lineItemArray.count, 2)
-        XCTAssertEqual(lineItemArray[0].tranDate, "04/04/2018")
-        XCTAssertEqual(lineItemArray[0].postDate, "04/04/2018")
+        XCTAssertEqual(lineItemArray[0].tranDate, "2018-04-05")
+        XCTAssertEqual(lineItemArray[0].postDate, "2018-04-06")
         XCTAssertEqual(lineItemArray[0].idNumber, "")
         //XCTAssertEqual(lineItemArray[0].desc, "BONEFISH 7027 BOYNTON BEACHFL00422R")
         XCTAssertEqual(lineItemArray[0].debit, 32.56)

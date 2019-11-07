@@ -21,6 +21,7 @@
 		BFECDEE322FDCBCD00F1BF5E /* HandleCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFECDEE222FDCBCD00F1BF5E /* HandleCards.swift */; };
 		CE0A86FC230B4AF500FD1ECD /* MakeDescKeyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0A86FB230B4AF500FD1ECD /* MakeDescKeyTests.swift */; };
 		CE1F7EC823317453004765E7 /* MyCategories.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE1F7EC723317453004765E7 /* MyCategories.txt */; };
+		CE2924902372235A00F410A4 /* TableFilter_UnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE29248F2372235A00F410A4 /* TableFilter_UnitTests.swift */; };
 		CE4A27FD2301BEC500CA5A38 /* Stats.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4A27FC2301BEC500CA5A38 /* Stats.swift */; };
 		CE5B1E022304E03C00337C2F /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5B1E012304E03C00337C2F /* UserDefaults.swift */; };
 		CE6F1AE32352D576008CA720 /* VendorShortNames.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE6F1AE22352D576008CA720 /* VendorShortNames.txt */; };
@@ -88,6 +89,7 @@
 		BFECDEE222FDCBCD00F1BF5E /* HandleCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandleCards.swift; sourceTree = "<group>"; };
 		CE0A86FB230B4AF500FD1ECD /* MakeDescKeyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeDescKeyTests.swift; sourceTree = "<group>"; };
 		CE1F7EC723317453004765E7 /* MyCategories.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MyCategories.txt; sourceTree = "<group>"; };
+		CE29248F2372235A00F410A4 /* TableFilter_UnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableFilter_UnitTests.swift; sourceTree = "<group>"; };
 		CE4A27FC2301BEC500CA5A38 /* Stats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stats.swift; sourceTree = "<group>"; };
 		CE5B1E012304E03C00337C2F /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		CE6F1AE22352D576008CA720 /* VendorShortNames.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = VendorShortNames.txt; sourceTree = "<group>"; };
@@ -231,6 +233,7 @@
 			isa = PBXGroup;
 			children = (
 				CEB84F272308EB20001485C5 /* Credit_Cards_UnitTests.swift */,
+				CE29248F2372235A00F410A4 /* TableFilter_UnitTests.swift */,
 				CE0A86FB230B4AF500FD1ECD /* MakeDescKeyTests.swift */,
 				CEB84F292308EB20001485C5 /* Info.plist */,
 				CE90E6DA235F814900184BEF /* FileIO_UnitTests.swift */,
@@ -453,6 +456,7 @@
 			files = (
 				CE90E6DB235F814900184BEF /* FileIO_UnitTests.swift in Sources */,
 				CE0A86FC230B4AF500FD1ECD /* MakeDescKeyTests.swift in Sources */,
+				CE2924902372235A00F410A4 /* TableFilter_UnitTests.swift in Sources */,
 				CEB84F282308EB20001485C5 /* Credit_Cards_UnitTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -611,14 +615,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 747;
+				CURRENT_PROJECT_VERSION = 757;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.9.8;
+				MARKETING_VERSION = 1.9.9;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -632,14 +636,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 747;
+				CURRENT_PROJECT_VERSION = 757;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.9.8;
+				MARKETING_VERSION = 1.9.9;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

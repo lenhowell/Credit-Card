@@ -137,15 +137,15 @@ public struct FileIO {
     //TODO: Tell user about non-qualified csv's & state rules.
     static func qualifyTransFileName(url: URL) -> Bool {
         let ext = url.pathExtension.lowercased()
-        if ext != "csv"                                     { return false }
+        if ext != "csv"                                     { return false }    // not .csv
         let fullName = url.deletingPathExtension().lastPathComponent
         let tuple = fullName.splitAtFirst(char: " ")
         let name = tuple.lft
         let parts = name.components(separatedBy: "-")
         let partsCount = parts.count
-        if partsCount < 2                                   { return false }
+        if partsCount < 2                                   { return false }    // no "-"
         let card = parts[0]
-        if card.count < 2 || card.count > maxCardTypeLen    { return false }
+        if card.count < 2 || card.count > maxCardTypeLen    { return false }    // card <2 chars
         guard let year = Int(parts[1]) else                 { return false }
         if year < 1980 || year > 2099                       { return false }
         if partsCount >= 3 {

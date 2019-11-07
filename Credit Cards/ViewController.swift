@@ -26,8 +26,6 @@ var gAccounts               = Accounts()
 //TODO: Add Memo to gDictModifiedTrans
 var gDictModifiedTrans      = [String: CategoryItem]()  // (MyModifiedTransactions.txt) Hash for user-modified transactions
 
-
-var gUniqueCategoryCounts   = [String: Int]()           // Hash for Unique Category Counts
 var gMyCategoryHeader       = ""
 var gIsUnitTesting          = false     // Not used
 var gLearnMode              = true      // Used here & HandleCards.swift
@@ -40,7 +38,6 @@ var gMyAccountsURL           = FileManager.default.homeDirectoryForCurrentUser
 var gMyCatsFileURL           = FileManager.default.homeDirectoryForCurrentUser
 var gMyModifiedTransURL      = FileManager.default.homeDirectoryForCurrentUser
 var gVendorCatLookupFileURL  = FileManager.default.homeDirectoryForCurrentUser
-
 
 //MARK:- ViewController
 class ViewController: NSViewController, NSWindowDelegate {
@@ -66,6 +63,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     var outputFileURL           = FileManager.default.homeDirectoryForCurrentUser
     var gotItem: GotItem        = .empty
 
+    //---- GotItem - Bitmap to record what required items are accounted for
     struct GotItem: OptionSet {
         let rawValue: Int
         static let empty        = GotItem(rawValue: 0)
@@ -84,6 +82,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         static let allDirs: GotItem = [.dirSupport, .dirOutput, .dirTrans]
         static let requiredElements: GotItem = [.allDirs, .fileTransactions, .fileMyCategories, .userInitials]
     }
+
     //MARK:- Overrides & Lifecycle
     
     override func viewDidLoad() {
@@ -104,14 +103,14 @@ class ViewController: NSViewController, NSWindowDelegate {
         cboFiles.hasVerticalScroller = true
         self.cboFiles.delegate = self
 
-        // Get UserDefaults
-        if let dir = UserDefaults.standard.string(forKey: UDKey.supportFolder) {    // Support Folder
+        // ------ Get UserDefaults -----
+        if let dir = UserDefaults.standard.string(forKey: UDKey.supportFolder) {        // Support Folder
             pathSupportDir = dir
             if !dir.isEmpty && FileIO.folderExists(atPath: dir, isPartialPath: true) {
                 gotItem = [gotItem, .dirSupport]
             }
         }
-        if let dir = UserDefaults.standard.string(forKey: UDKey.outputFolder) {    // Output Folder
+        if let dir = UserDefaults.standard.string(forKey: UDKey.outputFolder) {         // Output Folder
             pathOutputDir = dir
             if !dir.isEmpty && FileIO.folderExists(atPath: dir, isPartialPath: true) {
                 gotItem = [gotItem, .dirOutput]
@@ -123,19 +122,19 @@ class ViewController: NSViewController, NSWindowDelegate {
                 gotItem = [gotItem, .dirTrans]
             }
         }
-
-        btnSpreadsheet.isEnabled = false
-
-        gLearnMode            = false //UserDefaults.standard.bool(forKey: UDKey.learningMode)
-        gUserInputMode        = false //UserDefaults.standard.bool(forKey: UDKey.userInputMode)
-        chkLearningMode.state = gLearnMode     ? .on : .off
-        chkUserInput.state    = gUserInputMode ? .on : .off
-
-
-        gUserInitials       = UserDefaults.standard.string(forKey: UDKey.userInitials) ?? ""
+        gUserInitials       = UserDefaults.standard.string(forKey: UDKey.userInitials) ?? ""    // Users Initials
         if !gUserInitials.isEmpty {
             gotItem = [gotItem, .userInitials]
         }
+
+        // Disable Spreadsheet button until Transactions are read-in
+        btnSpreadsheet.isEnabled = false
+
+        // Start off with Learn-mode and user-intervension-mode off
+        gLearnMode            = false
+        gUserInputMode        = false
+        chkLearningMode.state = gLearnMode     ? .on : .off
+        chkUserInput.state    = gUserInputMode ? .on : .off
 
         // Get List of Transaction Files
         gotNewTranactionFolder()
@@ -310,9 +309,9 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
 
-    //MARK:- Main Program 156-lines
+    //MARK:- Main Program 151-lines
     
-    func main() {   // 315-471 = 156-lines
+    func main() {   // 314-465 = 151-lines
         verifyFolders(gotItem: &gotItem)
         if !gotItem.contains(GotItem.allDirs) {
             let errMsg = makeMissingItemsMsg(got: gotItem)
@@ -428,11 +427,6 @@ class ViewController: NSViewController, NSWindowDelegate {
             print("\(key.PadRight(40))\(val)")
         }
 
-        let uniqueCategoryCountsSorted = gUniqueCategoryCounts.sorted(by: <)
-        print("\n\(gUniqueCategoryCounts.count) uniqueCategoryCountsSorted by description (vendor)")
-        print (uniqueCategoryCountsSorted)
-        print("\n\(gUniqueCategoryCounts.count) gUniqueCategoryCounts.sorted by count")
-        print (gUniqueCategoryCounts.sorted {$0.value > $1.value})
         if Stats.addedCatCount > 0 || Stats.changedVendrCatCount > 0 {
             if gLearnMode {
                 writeVendorCategoriesToFile(url: gVendorCatLookupFileURL, dictCat: gDictVendorCatLookup)
@@ -624,6 +618,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
     }
 
+    //---- gotNewTranactionFolder - Try to load the Combo-Box with FileNames
     func gotNewTranactionFolder() {
         var errText = ""
         (transactionDirURL, errText)  = FileIO.makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
@@ -631,7 +626,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             btnStart.isEnabled = true
             transFileURLs = FileIO.getTransFileList(transDirURL: transactionDirURL)
             if transFileURLs.count > 0 {
-                gotItem = gotItem.union(GotItem.fileTransactions)
+                gotItem = gotItem.union(GotItem.fileTransactions) // Mark Transaction-Files accounted for
             }
             loadComboBoxFiles(fileURLs: transFileURLs)
             cboFiles.isHidden = false
@@ -646,7 +641,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             cboFiles.isHidden = true
             lblTranFileCount.stringValue = "----"
             lblErrMsg.stringValue = errText
-            gotItem = gotItem.subtracting(GotItem.fileTransactions)
+            gotItem = gotItem.subtracting(GotItem.fileTransactions) // Mark as not there
         }
         //cboFiles.scrollItemAtIndexToVisible(cboFiles.numberOfItems-1) Does not work
 
@@ -654,7 +649,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
 }//end class ViewController
 
-// Allow ViewController to see when a TextField changes.
+// Allow ViewController to see when a TextField changes (includes ComboBox).
 extension ViewController: NSTextFieldDelegate {
 
     //---- controlTextDidChange - Called when a textField (with ViewController as its delegate) changes.

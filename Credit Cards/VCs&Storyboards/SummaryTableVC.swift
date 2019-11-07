@@ -86,8 +86,8 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     @IBOutlet var txtDate2:     NSTextField!
     @IBOutlet var txtVendor:    NSTextField!
     @IBOutlet var txtCategory:  NSTextField!
-    @IBOutlet var txtDollar1:   NSTextField!
-    @IBOutlet var txtDollar2:   NSTextField!
+    //@IBOutlet var txtDollar1:   NSTextField!
+    //@IBOutlet var txtDollar2:   NSTextField!
 
     @IBOutlet var txtCountTotal:  NSTextField!
     @IBOutlet var txtNetTotal:    NSTextField!
@@ -102,8 +102,8 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         // Set txtTransationFolder.delegate
         txtDate1.delegate    = self // Allow ViewController to see when txtDate1 changes.
         txtDate2.delegate    = self // Allow ViewController to see when txtDate2 changes.
-        txtDollar1.delegate  = self // Allow ViewController to see when txtDollar1 changes.
-        txtDollar2.delegate  = self // Allow ViewController to see when txtDollar2 changes.
+        //txtDollar1.delegate  = self // Allow ViewController to see when txtDollar1 changes.
+        //txtDollar2.delegate  = self // Allow ViewController to see when txtDollar2 changes.
         txtCardType.delegate = self // Allow ViewController to see when txtCardType changes.
         txtCategory.delegate = self // Allow ViewController to see when txtCategory changes.
         txtVendor.delegate   = self // Allow ViewController to see when txtVendor changes.
@@ -132,26 +132,27 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
 //MARK:- IBActions
 
     @IBAction func btnFilter(_ sender: Any) {
-        if setFilter() {
+        let errMsg = setFilter()
+        if errMsg.isEmpty {
             btnFilter.keyEquivalent = ""
             loadTableDictsArray(lineItemArray: gLineItemArray, summarizeBy : summarizeBy)
             //tableView.reloadData()
             //tableViewSum.reloadData()
         } else {
-            let msg = "Error in Filter item"
-            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alert, errorMsg: msg)
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alert, errorMsg: errMsg)
         }
     }
 
     @IBAction func btnClear(_ sender: Any) {
         txtDate1.stringValue    = ""
         txtDate2.stringValue    = ""
-        txtDollar1.stringValue  = ""
-        txtDollar2.stringValue  = ""
+        //txtDollar1.stringValue  = ""
+        //txtDollar2.stringValue  = ""
         txtCardType.stringValue = ""
         txtCategory.stringValue = ""
         txtVendor.stringValue   = ""
-        if setFilter() {
+        let errMsg = setFilter()
+        if errMsg.isEmpty {
             loadTableDictsArray(lineItemArray: gLineItemArray, summarizeBy : summarizeBy)
             //tableView.reloadData()
             //tableViewSum.reloadData()
@@ -181,7 +182,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     //MARK:- Regular funcs
 
     private func loadStuffFromCaller(tableParams: TableParams) -> TableParams {
-        print("loadStuffFromCaller", tableParams)
+        print("🙂\(codeFile)#\(#line) loadStuffFromCaller", tableParams)
         switch tableParams.summarizeBy {
         case .cardType:
             radioCardType.state = .on
@@ -206,8 +207,8 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         txtCardType.stringValue = tableParams.filtCardTyp
         txtDate1.stringValue    = tableParams.filtDate1
         txtDate2.stringValue    = tableParams.filtDate2
-        txtDollar1.stringValue  = tableParams.filtDolStr1
-        txtDollar2.stringValue  = tableParams.filtDolStr2
+        //txtDollar1.stringValue  = tableParams.filtDolStr1
+        //txtDollar2.stringValue  = tableParams.filtDolStr2
         //loadTableDictsArray(lineItemArray: filteredLineItemArray, summarizeBy : summarizeBy)
         return tableParams
     }
@@ -224,7 +225,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     }//end func
 
     //---- loadTableDictsArray - Select stocks to be displayed & Create tableDicts array. Also fill "Totals" labels.
-    private func loadTableDictsArray(lineItemArray: [LineItem], summarizeBy : SummarizeBy) {  // 227-287 = 50-lines
+    private func loadTableDictsArray(lineItemArray: [LineItem], summarizeBy : SummarizeBy) {  // 228-289 = 51-lines
 
         var filteredLineItemArray = [LineItem]()  // Filtered list of transactions
         for lineItem in lineItemArray {
@@ -241,6 +242,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         let sortedLineItemArray = filteredLineItemArray.sorted(by: { compareST(lft: $0, rgt: $1, summarizeBy: summarizeBy) })  //**
 
         if sortedLineItemArray.isEmpty { return }
+
         tableDicts  = []
 
         // Column Totals
@@ -299,10 +301,8 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
             return lft.cardType < rgt.cardType
         case .vendor:
             return lft.descKey  < rgt.descKey
-        case .year:
-            return makeYYYYMMDD(dateTxt: lft.tranDate)  < makeYYYYMMDD(dateTxt: rgt.tranDate)
-        case .month:
-            return makeYYYYMMDD(dateTxt: lft.tranDate)  < makeYYYYMMDD(dateTxt: rgt.tranDate)
+        case .year, .month:
+            return lft.tranDate  < rgt.tranDate // makeYYYYMMDD(dateTxt: lft.tranDate)  < makeYYYYMMDD(dateTxt: rgt.tranDate)
         default:
             return false
         }
@@ -319,65 +319,37 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         case .vendor:
             return lineItem.descKey
         case .year:
-            return String(makeYYYYMMDD(dateTxt: lineItem.tranDate).prefix(4))
+            return String(lineItem.tranDate.prefix(4)) // String(makeYYYYMMDD(dateTxt: lineItem.tranDate).prefix(4))
         case .month:
-            return String(makeYYYYMMDD(dateTxt: lineItem.tranDate).prefix(7))
+            return String(lineItem.tranDate.prefix(7)) // String(makeYYYYMMDD(dateTxt: lineItem.tranDate).prefix(7))
         default:
             return "?name?"
         }
     }
 
     //---- setFilter - Setup the filters based on the textView entries
-    private func setFilter() -> Bool {
-        filtDate1 = getFilterDate(txtField: txtDate1, isMin: true)
-        let date1Count = txtDate1.stringValue.trim.count
-        if date1Count >= 4 && date1Count <= 7 && txtDate2.stringValue.trim.isEmpty {
-            txtDate2.stringValue = txtDate1.stringValue.trim
-        }
-        filtDate2 = getFilterDate(txtField: txtDate2, isMin: false)
+    private func setFilter() -> String {
+        let tuple = TableFilter.getDateRange(txtfld1: txtDate1.stringValue, txtfld2: txtDate2.stringValue)
+        var errMsg = ""
+        filtDate1 = tuple.date1
+        filtDate2 = tuple.date2
+        txtDate1.stringValue = tuple.txt1
+        txtDate2.stringValue = tuple.txt2
+        errMsg = tuple.errMsg
 
-        if txtDollar1.stringValue.trim.isEmpty {
-            filtDollarVal1 = 0.0
-        } else {
-            filtDollarVal1 = Double(txtDollar1.stringValue) ?? -1
-        }
-        if txtDollar2.stringValue.trim.isEmpty {
-            filtDollarVal2 = kMaxDollar
-        } else {
-            filtDollarVal2 = Double(txtDollar2.stringValue) ?? -1
-        }
-        if filtDollarVal1 < 0 || filtDollarVal2 < 0 { return false }
-        return true
+//        if txtDollar1.stringValue.trim.isEmpty {                                    // set filtDollarVal1
+//            filtDollarVal1 = 0.0
+//        } else {
+//            filtDollarVal1 = Double(txtDollar1.stringValue) ?? -1
+//        }
+//        if txtDollar2.stringValue.trim.isEmpty {                                    // set filtDollarVal2
+//            filtDollarVal2 = kMaxDollar
+//        } else {
+//            filtDollarVal2 = Double(txtDollar2.stringValue) ?? -1
+//        }
+//        if filtDollarVal1 < 0 || filtDollarVal2 < 0 { return false }
+        return errMsg
     }
-
-    private func getFilterDate(txtField: NSTextField, isMin: Bool) -> String {
-        var txt = txtField.stringValue.trim
-        if txt.count == 6 && txt[4] == "-" {            // Insert leading zero in yyyy-m
-            txt = txt.prefix(4) + "-0" + txt.suffix(1)
-            txtField.stringValue = txt
-        }
-        if isMin {
-            if txt.isEmpty {
-                return "2000-01-01"
-                } else if txt.count == 4 {
-                    txt += "-01-01"
-            } else if txt.count == 7 && txt[4] == "-"  {
-                txt += "-01"
-            }
-
-        } else {
-            if txt.isEmpty {
-                return "2100-12-31"
-            } else if txt.count == 4 {
-                txt += "-12-31"
-            } else if txt.count == 7 && txt[4] == "-"  {
-                txt += "-31"
-            }
-
-        }
-        return makeYYYYMMDD(dateTxt: txt)
-
-    }//end func
 
     //TODO: Move to TableFilter.swift
     //---- applyFilter - Returns true if lineItem meets all the filter criteria
@@ -386,11 +358,10 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         if lineItem.credit + lineItem.debit > filtDollarVal2 { return false }
 
         if !filtDate1.isEmpty {
-            let tranDate = makeYYYYMMDD(dateTxt: lineItem.tranDate)
+            let tranDate = lineItem.tranDate
             if tranDate < filtDate1 { return false }
             if tranDate > filtDate2 { return false }
         }
-
         if !lineItem.descKey.hasPrefix(txtVendor.stringValue.uppercased())          { return false }
         if !lineItem.cardType.hasPrefix(txtCardType.stringValue.uppercased())       { return false }
         if !lineItem.genCat.uppercased().hasPrefix(txtCategory.stringValue.uppercased()) { return false }
@@ -428,12 +399,12 @@ extension SummaryTableVC: NSTextFieldDelegate {
         guard let textView = obj.object as? NSTextField else {
             return
         }
-        //print("\(codeFile)#\(#line) \(textView.stringValue)")
+        //print("🙂\(codeFile)#\(#line) \(textView.stringValue)")
         btnFilter.keyEquivalent = "\r"
         let allEmpty = txtDate1.stringValue.isEmpty &&
         txtDate2.stringValue.isEmpty &&
-        txtDollar1.stringValue.isEmpty &&
-        txtDollar2.stringValue.isEmpty &&
+//        txtDollar1.stringValue.isEmpty &&
+//        txtDollar2.stringValue.isEmpty &&
         txtCardType.stringValue.isEmpty &&
         txtCategory.stringValue.isEmpty &&
         txtVendor.stringValue.isEmpty
@@ -448,7 +419,7 @@ extension SummaryTableVC: NSTableViewDataSource {
 
     //---- numberOfRows -
     func numberOfRows(in tableView: NSTableView) -> Int {
-        print("tableDicts.count = \(tableDicts.count)")
+        print("🙂\(codeFile)#\(#line) tableDicts.count = \(tableDicts.count)")
         return tableDicts.count
     }
 
@@ -501,7 +472,7 @@ extension SummaryTableVC: NSTableViewDelegate {
         let rowDict = tableDicts[tableView.selectedRow]
         let idxStr = rowDict["idx"] ?? ""
         let idx = Int(idxStr) ?? -1
-        print("DoubleClicked on Row # \(tableView.selectedRow).  idx = \(idx)")
+        print("🙂\(codeFile)#\(#line) DoubleClicked on Row # \(tableView.selectedRow).  idx = \(idx)")
 
         var filterDate1     = txtDate1.stringValue.trim
         var filterDate2     = txtDate2.stringValue.trim
@@ -541,8 +512,8 @@ extension SummaryTableVC: NSTableViewDelegate {
 
         gPassToNextTable = TableParams(filtDate1: filterDate1,
                                      filtDate2:   filterDate2,
-                                     filtDolStr1: txtDollar1.stringValue,
-                                     filtDolStr2: txtDollar2.stringValue,
+                                     filtDolStr1: "",                   // txtDollar1.stringValue,
+                                     filtDolStr2: "",                   // txtDollar2.stringValue,
                                      filtCardTyp: filterCardType,
                                      filtCategor: filterCategory,
                                      filtVendor:  filterVendor,

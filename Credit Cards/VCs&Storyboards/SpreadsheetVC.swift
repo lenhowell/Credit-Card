@@ -29,9 +29,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     var filtCategor = ""
     var filtVendor  = ""
 
-
     //MARK:- IBOutlets
-
     @IBOutlet var tableView:    NSTableView!
     @IBOutlet var tableViewSum: NSTableView!
     @IBOutlet var btnFilter:    NSButton!
@@ -95,14 +93,14 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     //MARK:- IBActions
 
     @IBAction func btnFilter(_ sender: Any) {
-        if setFilter() {
+        let errMsg = setFilter()
+        if errMsg.isEmpty {
             btnFilter.keyEquivalent = ""
             loadTableDictsArray(lineItemArray: gLineItemArray)
             reloadTableSorted(sortBy: iSortBy, ascending: iAscending)
-            tableViewSum.reloadData()
+            //tableViewSum.reloadData()
         } else {
-            let msg = "Error in Filter item"
-            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alert, errorMsg: msg)
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alert, errorMsg: errMsg)
         }
     }
 
@@ -114,10 +112,10 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         txtCardType.stringValue = ""
         txtCategory.stringValue = ""
         txtVendor.stringValue   = ""
-        if setFilter() {
+        let errMsg = setFilter()
+        if errMsg.isEmpty {
             loadTableDictsArray(lineItemArray: gLineItemArray)
             reloadTableSorted(sortBy: iSortBy, ascending: iAscending)
-            tableViewSum.reloadData()
             btnClear.isEnabled = false
         }
     }
@@ -152,11 +150,11 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         reloadTableSorted(sortBy: iSortBy, ascending: iAscending)
     }//end func
 
+
     //MARK:- Regular funcs
 
     private func loadStuffFromCaller(summaryData: TableParams) {
-        print("loadStuffFromCaller", summaryData)
-        //calledBy                = summaryData.calledBy
+        print("🙂\(codeFile)#\(#line) loadStuffFromCaller", summaryData)
         if summaryData.calledBy == .main {
             btnSummary.isHidden = false
         } else {
@@ -171,9 +169,6 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         txtDate2.stringValue    = summaryData.filtDate2
         txtDollar1.stringValue  = summaryData.filtDolStr1
         txtDollar2.stringValue  = summaryData.filtDolStr2
-
-
-        //loadTableDictsArray(lineItemArray: filteredLineItemArray, summarizeBy : summarizeBy)
     }
 
 
@@ -198,35 +193,9 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         }
     }
 
-    //---- getMinMax - Sets filtDollarX, txtDollarX, filtDateX, txtDateX: called by viewDidLoad
-    private func getMinMax(lineItemArray: [LineItem]) {
-        for lineItem in lineItemArray {
-            let dollar = lineItem.credit + lineItem.debit
-
-            if dollar < filtDollarVal1 { filtDollarVal1 = dollar }
-            if dollar > filtDollarVal2 { filtDollarVal2 = dollar }
-
-            let date = makeYYYYMMDD(dateTxt: lineItem.tranDate)
-            if date < filtDate1 { filtDate1 = date }
-            if date > filtDate2 { filtDate2 = date }
-        }//next
-        if filtDollarVal1 > 0.001 {
-            txtDollar1.stringValue = String(format: "%.2f", filtDollarVal1)
-        } else {
-            txtDollar1.stringValue = ""
-        }
-        if filtDollarVal2 < kMaxDollar {
-            txtDollar2.stringValue = String(format: "%.2f", filtDollarVal2)
-        } else {
-            txtDollar2.stringValue = ""
-        }
-        txtDate1.stringValue = filtDate1
-        txtDate2.stringValue = filtDate2
-    }//end func
-
     // is responsible for instance-vbl "filteredLineItemArray"
     //---- loadTableDictsArray - Select stocks to be displayed & Create tableDicts array. Also fill "Totals" labels.
-    private func loadTableDictsArray(lineItemArray: [LineItem]) {  // 229-269 = 40-lines
+    private func loadTableDictsArray(lineItemArray: [LineItem]) {  // 198-238 = 40-lines
         var sumLine = LineItem()
         tableDicts  = []
         filteredLineItemArray = []
@@ -269,14 +238,15 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     }//end func loadTableDictsArray
 
     //---- setFilter - Setup the filters based on the textView entries
-    private func setFilter() -> Bool {
-        filtDate1 = getFilterDate(txtField: txtDate1, isMin: true)
-        let date1Count = txtDate1.stringValue.trim.count
-        if date1Count >= 4 && date1Count <= 7 && txtDate2.stringValue.trim.isEmpty {
-            txtDate2.stringValue = txtDate1.stringValue.trim
-        }
-        filtDate2 = getFilterDate(txtField: txtDate2, isMin: false)
-
+    private func setFilter() -> String {
+        let tuple = TableFilter.getDateRange(txtfld1: txtDate1.stringValue, txtfld2: txtDate2.stringValue)
+        var errMsg = ""
+        filtDate1 = tuple.date1
+        filtDate2 = tuple.date2
+        txtDate1.stringValue = tuple.txt1
+        txtDate2.stringValue = tuple.txt2
+        errMsg = tuple.errMsg
+        
         if txtDollar1.stringValue.trim.isEmpty {
             filtDollarVal1 = 0.0
         } else {
@@ -287,38 +257,9 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         } else {
             filtDollarVal2 = Double(txtDollar2.stringValue) ?? -1
         }
-        if filtDollarVal1 < 0 || filtDollarVal2 < 0 { return false }
-        return true
+        if filtDollarVal1 < 0 || filtDollarVal2 < 0 { return "Bad Dollar value in filter" }
+        return errMsg
     }
-
-    private func getFilterDate(txtField: NSTextField, isMin: Bool) -> String {
-        var txt = txtField.stringValue.trim
-        if txt.count == 6 && txt[4] == "-" {
-            txt = txt.prefix(4) + "-0" + txt.suffix(1)
-            txtField.stringValue = txt
-        }
-        if isMin {
-            if txt.isEmpty {
-                return "2000-01-01"
-                } else if txt.count == 4 {
-                    txt += "-01-01"
-            } else if txt.count == 7 && txt[4] == "-"  {
-                txt += "-01"
-            }
-
-        } else {
-            if txt.isEmpty {
-                return "2100-12-31"
-            } else if txt.count == 4 {
-                txt += "-12-31"
-            } else if txt.count == 7 && txt[4] == "-"  {
-                txt += "-31"
-            }
-
-        }
-        return makeYYYYMMDD(dateTxt: txt)
-
-    }//end func
 
     //---- applyFilter - Returns true if lineItem meets all the filter criteria
     private func applyFilter(lineItem: LineItem) -> Bool {
@@ -326,7 +267,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         if lineItem.credit + lineItem.debit > filtDollarVal2 { return false }
 
         if !filtDate1.isEmpty {
-            let tranDate = makeYYYYMMDD(dateTxt: lineItem.tranDate)
+            let tranDate = lineItem.tranDate
             if tranDate < filtDate1 { return false }
             if tranDate > filtDate2 { return false }
         }
@@ -341,7 +282,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         var dict = [String : String]()
 
         dict[SpSheetColID.cardType]    = lineItem.cardType
-        dict[SpSheetColID.transDate]   = makeYYYYMMDD(dateTxt: lineItem.tranDate)
+        dict[SpSheetColID.transDate]   = lineItem.tranDate // makeYYYYMMDD(dateTxt: lineItem.tranDate)
         dict[SpSheetColID.descKey]     = lineItem.descKey
         dict[SpSheetColID.fullDesc]    = lineItem.desc
         dict[SpSheetColID.idNumber]    = lineItem.idNumber
@@ -359,6 +300,14 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     private func reloadTableSorted(sortBy: String, ascending: Bool) {
         tableDicts.sort { compareTextNum(lft: $0[sortBy]!, rgt: $1[sortBy]!, ascending: ascending) }
         tableView.reloadData()
+
+        // Select the 1st row of spreadsheet
+        if tableDicts.isEmpty {
+            lblStatus.stringValue = ""
+        } else {
+            tableView.selectRowIndexes(NSIndexSet(index: 0) as IndexSet, byExtendingSelection: false)
+        }
+
         tableViewSum.reloadData()   // Not always needed
         iSortBy    = sortBy         // Remember Sort order
         iAscending = ascending
@@ -390,7 +339,7 @@ extension SpreadsheetVC: NSTextFieldDelegate {
         guard let textView = obj.object as? NSTextField else {
             return
         }
-        //print("\(codeFile)#\(#line) \(textView.stringValue)")
+        //print("🙂\(codeFile)#\(#line) \(textView.stringValue)")
         btnFilter.keyEquivalent = "\r"
         let allEmpty = txtDate1.stringValue.isEmpty &&
         txtDate2.stringValue.isEmpty &&
@@ -410,7 +359,7 @@ extension SpreadsheetVC: NSTableViewDataSource {
 
     //---- numberOfRows -
     func numberOfRows(in tableView: NSTableView) -> Int {
-        print("tableDicts.count = \(tableDicts.count)")
+        print("🙂\(codeFile)#\(#line) tableDicts.count = \(tableDicts.count)")
         if tableView == self.tableView {
             return tableDicts.count
         }

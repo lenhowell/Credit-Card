@@ -9,7 +9,7 @@
 import Foundation
 
 //MARK:extractTranFromActivity
-func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-157 = 145-lines
+func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-183 = 171-lines
     var lineItem = lineItem
     // TRAN, DESC, CATE, AMOU
     // ????     "1/3/17,  DIVD REINV: PIMCO INCOME FUND CL C AGENT REINV AMOUNT   $343.88,   Securities Trades,   0.00"
@@ -23,6 +23,28 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-157 = 145-
     // DIV      "1/13/17, RPT FGN DIV: MEDTRONIC PLC SHS HOLDING 600.0000 PAY DATE 01/13/2,  Investment Income, 258.00"
     // TRANSFER "1/11/17,Funds Transfer WIRE TRF IN Dxxxxxxx1148 ORG=/xxxx9647 TRUFFLE HO,   Transfers,       65789.00"
     // DEPOSIT  "1/18/17,Direct Deposit SSA  TREAS 310,                                      Transfers,        1458.80"
+
+    /*
+          0              1                  2               3                  4                    5          6        7            8
+     "Trade Date","Settlement Date","Pending/Settled","Account Nickname","Account Registration","Account #","Type","Description 1 ","Description 2","Symbol/CUSIP #","Quantity","Price ($)","Amount ($)"
+          0              1       2               3           4         5                6                   7            8
+     "3/29/2019","3/29/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","DividendAndInterest","Foreign Dividend","BP PLC SPON ADR HOLDING 2069.0000 PAY DATE 03/29/2019","BP","--","--","1,272.44"
+     "3/29/2019","3/29/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","Other","Depository Bank (ADR) Fee","BP PLC SPON ADR PAYDATE 03/29/19 DEPOSITORY BANK SVCE FEE","BP","--","--","(10.35)"
+     "3/29/2019","3/29/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","DividendAndInterest","Dividend","PUB SVC ENTERPRISE GRP HOLDING 800.0000 PAY DATE 03/29/2019","PEG","--","--","376.00"
+     "3/29/2019","3/29/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","DividendAndInterest","Bank Interest","PREFERRED DEPOSIT FROM 02/28 THRU 03/28","99861VDM0","--","--","85.00"
+     "3/28/2019","3/28/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","Other","Depository Bank (ADR) Fee","SASOL LTD SPONSORED ADR DEPOSITORY BANK SVCE FEE","SSL","--","--","(10.00)"
+     "3/28/2019","3/28/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","Other","Foreign Tax Withholding","SASOL LTD SPONSORED ADR PAY DATE 03/28/2019","SSL","--","--","(40.79)"
+     "3/28/2019","3/28/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","FundTransfers","Withdrawal","WELLS FARGO BANK EVE MANBECK FARM ACCOUNT","--","--","--","(4,000.00)"
+     "3/25/2019","3/25/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","Checking","Check 3723","CENTRAL FL FIRSTPLACE 000003723","--","--","--","(85.00)"
+     "3/25/2019","3/25/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","DividendAndInterest","Interest","ADVISORS DISCIPLINED TR 532 TAX EXEMPT MUN PORT INTERMEDIATE SER14 HOLDING 35.0000 PAY DATE 03/25/2019","TEMPI14","--","--","60.55"
+     "3/22/2019","3/22/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","Other","Pre-Authorized Withdrawal","BANK OF AMERICA","--","--","--","(2,169.18)"
+     "3/20/2019","3/20/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","FundReceipts","Direct Deposit","SSA TREAS 310","--","--","--","1,520.60"
+     "3/19/2019","3/19/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","FundReceipts","Direct Deposit","PALAC","--","--","--","8,313.01"
+     "3/19/2019","3/19/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","Checking","Check 3721","BARBARA BAUER 000003721","--","--","--","(10,000.00)"
+     "3/18/2019","3/18/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","Other","Pre-Authorized Withdrawal","DukeEnergy-FL","--","--","--","(21.56)"
+     */
+
+
     var known = false
     var ignore = false
     let des = lineItem.desc.uppercased()
@@ -67,7 +89,11 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-157 = 145-
         if items.count >= 2 {
             lineItem.idNumber = items[1]
             let comps = des.components(separatedBy: " "+items[1]+" ")
-            lineItem.desc = comps[1]
+            if comps.count >= 2 {
+                lineItem.desc = comps[1]
+            } else if items[0] == "CHECK" {
+                lineItem.idNumber = items[1]
+            }
         }
         //print("😀 Check ",fromTransFileLine)                //            "CHECK 3633 CHARLES HOWARD"
         known = true

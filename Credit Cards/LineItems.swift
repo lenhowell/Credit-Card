@@ -28,7 +28,7 @@ public struct LineItem: Equatable, Hashable {
     init() {
     }
 
-    //MARK:- init - 34-123 = 89-lines
+    //MARK:- init - 34-127 = 93-lines
     //TODO: Allow LineItem.init to throw errors
     // Create a LineItem from a Transaction-File line
     init(fromTransFileLine: String, dictColNums: [String: Int], fileName: String, lineNum: Int, signAmount: Double) {
@@ -48,13 +48,13 @@ public struct LineItem: Equatable, Hashable {
         // Building the lineitem record
         if let colNum = dictColNums["TRAN"] {           // TRANSACTION DATE
             if colNum < columnCount {
-                self.tranDate = columns[colNum]
+                self.tranDate = convertToYYYYMMDD(dateTxt: columns[colNum]) // = columns[colNum]
             }
         }
 
         if let colNum = dictColNums["POST"] {           // POST DATE
             if colNum < columnCount {
-                self.postDate = columns[colNum]
+                self.postDate = convertToYYYYMMDD(dateTxt: columns[colNum]) // = columns[colNum]
             }
         }
 
@@ -96,8 +96,12 @@ public struct LineItem: Equatable, Hashable {
         //TODO: Detect & report corrupt $values rather than silently setting to $0
         if let colNum = dictColNums["AMOU"] {           // AMOUNT
             if colNum < columnCount {
-                let amt = columns[colNum].replacingOccurrences(of: ";", with: "") //"0" is for empty fields
+                var amt = columns[colNum].replacingOccurrences(of: ";", with: "") //"0" is for empty fields
+                if amt.hasPrefix("(") && amt.hasSuffix(")") {
+                    amt = "-\(amt.dropFirst().dropLast())"
+                }
                 let amount = Double(amt) ?? 0
+
                 if amount*signAmount < 0 {
                     self.credit = abs(amount)
                 } else {
@@ -122,16 +126,43 @@ public struct LineItem: Equatable, Hashable {
         self.auditTrail = "\(cleanName)#\(lineNum)"     // AUDIT TRAIL
     }//end init
 
+    //---- signature - Unique identifier for detecting Transaction dupes & user-modified versions.
     func signature() -> String {
+        // CardType + Date + ID# + 1st4ofDesc + credit + debit
         //let (cleanName, _) = self.auditTrail.splitAtFirst(char: "#")
         //let useName = cleanName.replacingOccurrences(of: "-", with: "")
-        let dateStr = makeYYYYMMDD(dateTxt: self.tranDate)
+        let dateStr = self.tranDate                                 // convertToYYYYMMDD(dateTxt: self.tranDate)
         let vendr   = self.descKey.prefix(4)
-        let credit  =  String(format: "%.2f", self.credit)
-        let debit   =  String(format: "%.2f", self.debit)
+        let credit  = String(format: "%.2f", self.credit)
+        let debit   = String(format: "%.2f", self.debit)
         let sig = "\(self.cardType)|\(dateStr)|\(self.idNumber)|\(vendr)|\(credit)|\(debit)"
         return sig
     }
+
+    //---- convertToYYYYMMDD - Convert date from Transaction from m/d/y to YYYY-MM-DD or "?"
+    func convertToYYYYMMDD(dateTxt: String) -> String {
+        var dateStr = ""
+        let da = dateTxt
+        if da.contains("/") {
+            let parts = da.components(separatedBy: "/")
+            if parts.count != 3 {
+                return "?"
+            }
+            var yy = parts[2].trim
+            if yy.count <= 2 { yy = "20" + yy }
+            var mm = parts[0].trim
+            if mm.count < 2 { mm = "0" + mm }
+            var dd = parts[1].trim
+            if dd.count < 2 { dd = "0" + dd }
+            dateStr = "\(yy)-\(mm)-\(dd)"
+        } else if da.contains("-") {
+            dateStr = da
+        } else {
+            return "?"
+        }
+        return dateStr
+    }
+
 
     // Equatable - Ignore Category-info & truncate desc & auditTrail
     static public func == (lhs: LineItem, rhs: LineItem) -> Bool {
