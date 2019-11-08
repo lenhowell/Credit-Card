@@ -442,7 +442,12 @@ extension SpreadsheetVC: NSTableViewDelegate {
             var id = dict[SpSheetColID.idNumber] ?? ""
             if !id.isEmpty { id = "  #" + id + "  " }
             let fileAndLine = (dict[SpSheetColID.file_LineNum] ?? "").replacingOccurrences(of: "#", with: "line#")
-            lblStatus.stringValue = "\(iRow+1) \(id)   desc:\"\(dict[SpSheetColID.fullDesc] ?? "")\"     orig.cat:\"\(dict[SpSheetColID.rawCat] ?? "")\"       file:\(fileAndLine)"
+            let descFull = dict[SpSheetColID.fullDesc] ?? ""
+            var descTrunc = descFull.prefix(117)
+            if descTrunc.count < descFull.count {
+                descTrunc += "..."
+            }
+            lblStatus.stringValue = "\"\(descTrunc)\"\n\(id)orig.cat:\"\(dict[SpSheetColID.rawCat] ?? "")\"       file:\(fileAndLine)"
             //updateCompanyNameLabel()
         }//tableView
     }

@@ -420,6 +420,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         }//next fileURL
 
         btnSpreadsheet.isEnabled = true
+        btnStart.keyEquivalent = ""
+        btnSpreadsheet.keyEquivalent = "\r"
+
         outputTranactions(outputFileURL: outputFileURL, lineItemArray: gLineItemArray)
 
         print("\n--- Description-Key algorithms ---")

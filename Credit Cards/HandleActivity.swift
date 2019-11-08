@@ -112,7 +112,7 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-183 = 171-
 //    des.hasPrefix("FOREIGN DIVIDEND:")        { // "FOREIGN DIVIDEND: SASOL LTD  SPONSORED ADR HOLDING 500.0000 PAY"
 //    des.hasPrefix("RPT FGN DIV:")             { // "RPT FGN DIV: MEDTRONIC PLC SHS HOLDING 600.0000 PAY DATE 01/13/2"
 
-    } else if colinSplit.lft.contains("INTEREST")                { // "INTEREST:",
+    } else if !colinSplit.rgt.isEmpty && colinSplit.lft.contains("INTEREST")                { // "INTEREST:",
         known = true
         lineItem.desc = colinSplit.rgt
         lineItem.rawCat = "Income-Interest"

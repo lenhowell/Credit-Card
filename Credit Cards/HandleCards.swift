@@ -35,7 +35,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
     while lineNum < cardArrayCount {
         headerLine = cardArray[lineNum]
         lineNum += 1
-        let components = headerLine.components(separatedBy: ",")
+        let components = FileIO.parseCommaDelimitedLine(headerLine)// headerLine.components(separatedBy: ",")
         if components.count >= 3  {
             headers = components
             break
@@ -117,6 +117,9 @@ internal func makeLineItem(fromTransFileLine: String,
     }
 
     // Use LineItem.init to tranlate the transaction entry to a LineItem.
+    if fromTransFileLine.contains("NEW YORK, NY") {
+        // Debug Trap
+    }
     var lineItem = LineItem(fromTransFileLine: fromTransFileLine, dictColNums: dictColNums, fileName: fileName, lineNum: lineNum, signAmount: signAmount)
 
     // Add descKey & cardType

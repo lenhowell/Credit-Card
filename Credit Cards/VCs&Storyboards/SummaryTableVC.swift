@@ -116,6 +116,9 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         //FIXME: Both btnFilter & radioCatChange reload table
         btnFilter(self)
         radioCatChange(self)
+        // Give Window some color to differentiate it from a Spreadsheet
+        view.wantsLayer = true
+        view.layer?.backgroundColor = NSColor.systemTeal.cgColor
     }
 
     override func viewDidAppear() {
@@ -254,6 +257,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         var namedCredit = 0.0
         var namedDebit  = 0.0
         var oldName = ""
+        //TODO: If 1-Trans or 1 unique vendors & cats, go directly to spreadsheet
         for i in 0..<sortedLineItemArray.count {
             let lineItem = sortedLineItemArray[i]
             let newName = summarizeName(lineItem: lineItem, summarizeBy: summarizeBy) //**
@@ -276,7 +280,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
 
         //tableDicts = tableDicts.sorted(by: { $0[SpSheetColID.debit]! > $1[SpSheetColID.debit]! })
         let sortBy = iSortBy
-        tableDicts.sort { compareTextNum(lft: $0[sortBy]!, rgt: $1[sortBy]!, ascending: false) }
+        tableDicts.sort { compareTextNum(lft: $0[sortBy] ?? "", rgt: $1[sortBy] ?? "", ascending: false) }
         tableView.reloadData()
         txtCountTotal.stringValue   = String(totalCount)
 
@@ -370,7 +374,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
 
     //---- reloadTableSorted - reloads the table for tableDicts, sorted by SpSheetColID
     private func reloadTableSorted(sortBy: String, ascending: Bool) {
-        tableDicts.sort { compareTextNum(lft: $0[sortBy]!, rgt: $1[sortBy]!, ascending: ascending) }
+        tableDicts.sort { compareTextNum(lft: $0[sortBy] ?? "", rgt: $1[sortBy] ?? "", ascending: ascending) }
         tableView.reloadData()
         iSortBy    = sortBy         // Remember Sort order
         iAscending = ascending
@@ -502,7 +506,7 @@ extension SummaryTableVC: NSTableViewDelegate {
             doNothing = false
         case .month, .year:         //  .month, year    => .groupCategory
             filterDate1  = rowDict[SummaryColID.name]!
-            filterDate2  = rowDict[SummaryColID.name]!
+            filterDate2  = ""   //rowDict[SummaryColID.name]!
             summarizeNew = .groupCategory
             doNothing = false
         default:
