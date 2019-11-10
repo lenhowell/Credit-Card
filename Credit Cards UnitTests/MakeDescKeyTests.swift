@@ -361,7 +361,7 @@ class MakeDescKeyTests: XCTestCase {
 
         for (key, value) in C1V {
             result = makeDescKey(from: key, dictVendorShortNames: dictVendorShortNames)
-            XCTAssertEqual(result, String(value.prefix(descKeyLength)))
+            XCTAssertEqual(result, String(value.prefix(Const.descKeyLength)))
         }
 
 

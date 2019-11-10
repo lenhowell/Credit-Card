@@ -24,7 +24,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     var filtDate1   = ""
     var filtDate2   = ""
     var filtDollarVal1 = 0.0
-    var filtDollarVal2 = kMaxDollar
+    var filtDollarVal2 = Const.maxDollar
     var filtCardTyp = ""
     var filtCategor = ""
     var filtVendor  = ""
@@ -79,7 +79,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     override func viewDidAppear() {
         super.viewDidAppear()
-        view.window!.delegate = self
+        view.window?.delegate = self
         reloadTableSorted(sortBy: iSortBy, ascending: iAscending)
     }
 
@@ -135,7 +135,11 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
                                        sortBy: SortDirective(column: SummaryColID.netCredit, ascending: true))
 
         let storyBoard = NSStoryboard(name: "SummaryTable", bundle: nil)
-        let summaryWindowController = storyBoard.instantiateController(withIdentifier: "SummaryWindowController") as! NSWindowController
+        guard let summaryWindowController = storyBoard.instantiateController(withIdentifier: "SummaryWindowController") as? NSWindowController else {
+            let msg = "Unable to open SummaryTable Window"
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
+            return
+        }
         if let summaryWindow = summaryWindowController.window {
             //let summaryTableVC = storyBoard.instantiateController(withIdentifier: "SummaryTableVC") as! SummaryTableVC
             print("btnSummaries", gPassToNextTable)
@@ -255,7 +259,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
             filtDollarVal1 = Double(txtDollar1.stringValue) ?? -1
         }
         if txtDollar2.stringValue.trim.isEmpty {
-            filtDollarVal2 = kMaxDollar
+            filtDollarVal2 = Const.maxDollar
         } else {
             filtDollarVal2 = Double(txtDollar2.stringValue) ?? -1
         }

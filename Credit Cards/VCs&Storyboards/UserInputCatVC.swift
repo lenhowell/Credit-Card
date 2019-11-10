@@ -58,7 +58,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
 
     override func viewDidAppear() {
         super.viewDidAppear()
-        view.window!.delegate = self
+        view.window?.delegate = self
     }
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {

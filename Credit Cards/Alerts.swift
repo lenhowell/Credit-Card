@@ -110,8 +110,8 @@ public class GBox {
         txtInput.font = NSFont.systemFont(ofSize: 16)
         txtInput.stringValue = defaultText
         alert.accessoryView = txtInput
-        //alert.accessoryView?.window!.makeFirstResponder(input)
-        //self.view.window!.makeFirstResponder(input)               //????? How do I make "txtInput" the FirstResponder
+        //alert.accessoryView?.window?.makeFirstResponder(input)
+        //self.view.window?.makeFirstResponder(input)               //????? How do I make "txtInput" the FirstResponder
         //input.becomeFirstResponder()
         let button: NSApplication.ModalResponse = alert.runModal()
         alert.buttons[0].setAccessibilityLabel("InputBox OK")

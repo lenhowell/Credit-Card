@@ -119,7 +119,7 @@ public struct FileIO {
         do {
             let fileURLs = try FileManager.default.contentsOfDirectory(at: transDirURL, includingPropertiesForKeys: [], options:  [.skipsHiddenFiles, .skipsSubdirectoryDescendants])
             let csvURLs = fileURLs.filter{ $0.pathExtension.lowercased() == "csv" }
-            //let transURLs = csvURLs.filter{ $0.lastPathComponent.components(separatedBy: "-")[0].count <= maxCardTypeLen }
+            //let transURLs = csvURLs.filter{ $0.lastPathComponent.components(separatedBy: "-")[0].count <= Const.maxCardTypeLen }
             let transURLs = csvURLs.filter{ qualifyTransFileName(url: $0) }
 
             print("\(transURLs.count) Transaction Files found.")
@@ -145,7 +145,7 @@ public struct FileIO {
         let partsCount = parts.count
         if partsCount < 2                                   { return false }    // no "-"
         let card = parts[0]
-        if card.count < 2 || card.count > maxCardTypeLen    { return false }    // card <2 chars
+        if card.count < 2 || card.count > Const.maxCardTypeLen    { return false }    // card <2 chars
         guard let year = Int(parts[1]) else                 { return false }
         if year < 1980 || year > 2099                       { return false }
         if partsCount >= 3 {
@@ -415,7 +415,7 @@ func writeVendorShortNames(url: URL, dictVendorShortNames: [String: String]) {
     text += "// ShortName (prefix),   Full Description Key\n"
     for (shortName, fullDescKey) in dictVendorShortNames.sorted(by: {$0.key < $1.key}) {
         let shortNameInQuotes = "\"\(shortName)\""
-        text += "\(shortNameInQuotes.PadRight(descKeyLength, truncate: false)), \(fullDescKey)\n"
+        text += "\(shortNameInQuotes.PadRight(Const.descKeyLength, truncate: false)), \(fullDescKey)\n"
     }
     //— writing —
     do {
@@ -483,7 +483,7 @@ public struct VendorShortNames {
         text += "// ShortName (prefix),   Full Description Key\n"
         for (shortName, fullDescKey) in self.dict.sorted(by: {$0.key < $1.key}) {
             let shortNameInQuotes = "\"\(shortName)\""
-            text += "\(shortNameInQuotes.PadRight(descKeyLength, truncate: false)), \(fullDescKey)\n"
+            text += "\(shortNameInQuotes.PadRight(Const.descKeyLength, truncate: false)), \(fullDescKey)\n"
         }
         //— writing —
         do {
@@ -663,7 +663,7 @@ func writeVendorCategoriesToFile(url: URL, dictCat: [String: CategoryItem]) {
 
     FileIO.saveBackupFile(url: url)
 
-    var text = "// Description keys are up to \(descKeyLength) chars long.\n"
+    var text = "// Description keys are up to \(Const.descKeyLength) chars long.\n"
     text += "// Apostrophies are removed, and other extraneous punctuation changed to spaces.\n"
     text += "// Prefix of \"SQ *\" or any other \"???*\" is removed if result > 9 chars.\n"
     text += "// When a double-space is found, the rest is truncated.\n"
@@ -672,7 +672,7 @@ func writeVendorCategoriesToFile(url: URL, dictCat: [String: CategoryItem]) {
     var prevCat = ""
     print("\n Different Descs that start with the same 15-chars")
     for catItem in dictCat.sorted(by: {$0.key < $1.key}) {
-        text += "\(catItem.key.PadRight(descKeyLength)), \(catItem.value.category.PadRight(26)),  \(catItem.value.source)\n"
+        text += "\(catItem.key.PadRight(Const.descKeyLength)), \(catItem.value.category.PadRight(26)),  \(catItem.value.source)\n"
 
         let first10 = String(catItem.key.prefix(15))
         if first10 == prevCat.prefix(15) {
@@ -684,7 +684,7 @@ func writeVendorCategoriesToFile(url: URL, dictCat: [String: CategoryItem]) {
     //— writing —
     do {
         try text.write(to: url, atomically: false, encoding: .utf8)
-        print("\n😀 Successfully wrote \(dictCat.count) items, using \(descKeyLength) keys, to: \(url.path)")
+        print("\n😀 Successfully wrote \(dictCat.count) items, using \(Const.descKeyLength) keys, to: \(url.path)")
     } catch {
         let msg = "Could not write new CategoryLookup file."
         handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: url.lastPathComponent, errorMsg: msg)
@@ -738,15 +738,15 @@ DescKey
  */
 
 
-struct VendoProfile {
+struct VendorProfile {
     var descKey     = ""           // key
     var fullName    = ""
     var isTemplate  = false
     var templateName = ""
     var dateAdded   = Date.distantPast
     var dateModifid = Date.distantPast
-    var AddedBy     = ""
-    var ModifiedBy  = ""
+    var addedBy     = ""
+    var modifiedBy  = ""
     var aliases     = [String]()   // keys  //CompareTypes?
     var category    = ""    // Array of equals?
     var catsFromRaw = [CatFromRawCat]()

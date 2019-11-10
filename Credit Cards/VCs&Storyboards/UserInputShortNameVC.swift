@@ -19,15 +19,15 @@ class UserInputShortNameVC: NSViewController, NSWindowDelegate {
         txtPrefix.delegate = self         // Allow ViewController to see when txtPrefix changes.
         txtFullDescKey.delegate = self    // Allow ViewController to see when txtFullDescKey changes.
 
-        txtPrefix.stringValue   = String(usrVendrShortName.prefix(descKeyLength)).uppercased()
-        txtFullDescKey.stringValue = String(usrVendrLongName.prefix(descKeyLength)).uppercased()
+        txtPrefix.stringValue   = String(usrVendrShortName.prefix(Const.descKeyLength)).uppercased()
+        txtFullDescKey.stringValue = String(usrVendrLongName.prefix(Const.descKeyLength)).uppercased()
         lblPrefixChars.stringValue = "\(txtPrefix.stringValue.count) letters"
         lblFullDescKeyChars.stringValue = "\(txtFullDescKey.stringValue.count) letters"
     }//end func
 
     override func viewDidAppear() {
         super.viewDidAppear()
-        view.window!.delegate = self
+        view.window?.delegate = self
     }
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {
@@ -62,7 +62,7 @@ class UserInputShortNameVC: NSViewController, NSWindowDelegate {
 
     @IBAction func btnOK(_ sender: Any) {
         let prefixCount = txtPrefix.stringValue.count
-        if prefixCount < 4 || prefixCount > descKeyLength {
+        if prefixCount < 4 || prefixCount > Const.descKeyLength {
             let msg = "The common prefix must be between 4 and \(prefixCount) characters"
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .alert, errorMsg: msg)
             return
@@ -92,12 +92,12 @@ extension UserInputShortNameVC: NSTextFieldDelegate {
         guard let textView = obj.object as? NSTextField else {
             return      // Not a TextField
         }
-        let prefixU = String(txtPrefix.stringValue.prefix(descKeyLength)).uppercased()
+        let prefixU = String(txtPrefix.stringValue.prefix(Const.descKeyLength)).uppercased()
         if txtPrefix.stringValue != prefixU {
             txtPrefix.stringValue = prefixU
         }
 
-        let descKey = String(txtFullDescKey.stringValue.prefix(descKeyLength)).uppercased()
+        let descKey = String(txtFullDescKey.stringValue.prefix(Const.descKeyLength)).uppercased()
         if txtFullDescKey.stringValue != descKey {
             txtFullDescKey.stringValue = descKey
         }

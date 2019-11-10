@@ -81,8 +81,14 @@ func showUserInputShortNameForm(shortName: String, longName: String) -> NSApplic
     usrVendrShortName = shortName
     usrVendrLongName = longName
     let storyBoard = NSStoryboard(name: "Main", bundle: nil)
-    let userInputWindowController = storyBoard.instantiateController(withIdentifier: "UserInputShortNameWC") as! NSWindowController
     var returnVal: NSApplication.ModalResponse = .continue
+
+    guard let userInputWindowController = storyBoard.instantiateController(withIdentifier: "UserInputShortNameWC") as? NSWindowController else {
+        let msg = "Unable to open UserInputShortNameWC Window"
+        handleError(codeFile: "VendorShortNames", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
+        return returnVal
+    }
+
     if let userInputWindow = userInputWindowController.window {
         //let userVC = storyBoard.instantiateController(withIdentifier: "UserInput") as! UserInputVC
 

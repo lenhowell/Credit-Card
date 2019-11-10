@@ -42,7 +42,6 @@ public struct TableParams {
 }//end struct
 
 public var gPassToNextTable = TableParams()     // Pass info from Spreadsheet or SummaryTable to next SummaryTable
-public let kMaxDollar = 999_999_999.0
 
 class SummaryTableVC: NSViewController, NSWindowDelegate {
 
@@ -59,7 +58,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     var filtDate1   = "0000-00-00"
     var filtDate2   = "2999-12-31"
     var filtDollarVal1 = 0.0
-    var filtDollarVal2 = kMaxDollar
+    var filtDollarVal2 = Const.maxDollar
     var filtCardTyp = ""
     var filtCategor = ""
     var filtVendor  = ""
@@ -123,7 +122,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
 
     override func viewDidAppear() {
         super.viewDidAppear()
-        view.window!.delegate = self
+        view.window?.delegate = self
     }
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {
@@ -347,7 +346,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
 //            filtDollarVal1 = Double(txtDollar1.stringValue) ?? -1
 //        }
 //        if txtDollar2.stringValue.trim.isEmpty {                                    // set filtDollarVal2
-//            filtDollarVal2 = kMaxDollar
+//            filtDollarVal2 = Const.maxDollar
 //        } else {
 //            filtDollarVal2 = Double(txtDollar2.stringValue) ?? -1
 //        }
@@ -541,7 +540,11 @@ extension SummaryTableVC: NSTableViewDelegate {
 
     func callNextSummary() {
         let storyBoard = NSStoryboard(name: "SummaryTable", bundle: nil)
-        let summaryWindowController = storyBoard.instantiateController(withIdentifier: "SummaryWindowController") as! NSWindowController
+        guard let summaryWindowController = storyBoard.instantiateController(withIdentifier: "SummaryWindowController") as? NSWindowController else {
+            let msg = "Unable to open a new SummaryTable Window"
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
+            return
+        }
         if let summaryWindow = summaryWindowController.window {
             //let summaryTableVC = storyBoard.instantiateController(withIdentifier: "SummaryTableVC") as! SummaryTableVC
             let application = NSApplication.shared
@@ -555,7 +558,11 @@ extension SummaryTableVC: NSTableViewDelegate {
         gPassToNextTable.sortBy = SortDirective(column: SpSheetColID.transDate, ascending: true)
 
         let storyBoard = NSStoryboard(name: "Spreadsheet", bundle: nil)
-        let tableWindowController = storyBoard.instantiateController(withIdentifier: "SpreadsheetWindowController") as! NSWindowController
+        guard let tableWindowController = storyBoard.instantiateController(withIdentifier: "SpreadsheetWindowController") as? NSWindowController else {
+            let msg = "Unable to open a new Spreadsheet Window"
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
+            return
+        }
         if let tableWindow = tableWindowController.window {
             //let tableVC = tableWindow.contentViewController as! TableVC
             //gLineItemArray = lineItemArray

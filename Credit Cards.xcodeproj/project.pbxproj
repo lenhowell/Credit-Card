@@ -26,6 +26,7 @@
 		CE5B1E022304E03C00337C2F /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5B1E012304E03C00337C2F /* UserDefaults.swift */; };
 		CE6F1AE32352D576008CA720 /* VendorShortNames.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE6F1AE22352D576008CA720 /* VendorShortNames.txt */; };
 		CE7548132309DC0600FEDAFB /* DescriptionKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7548122309DC0600FEDAFB /* DescriptionKey.swift */; };
+		CE7E093E2377C3C4004150E6 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7E093D2377C3C4004150E6 /* Globals.swift */; };
 		CE8AEB9423459E6F00337A73 /* SpreadsheetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8AEB9323459E6F00337A73 /* SpreadsheetVC.swift */; };
 		CE90E6DB235F814900184BEF /* FileIO_UnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE90E6DA235F814900184BEF /* FileIO_UnitTests.swift */; };
 		CE90E6DD2368D23400184BEF /* MyAccounts.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE90E6DC2368D23400184BEF /* MyAccounts.txt */; };
@@ -94,6 +95,7 @@
 		CE5B1E012304E03C00337C2F /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		CE6F1AE22352D576008CA720 /* VendorShortNames.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = VendorShortNames.txt; sourceTree = "<group>"; };
 		CE7548122309DC0600FEDAFB /* DescriptionKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionKey.swift; sourceTree = "<group>"; };
+		CE7E093D2377C3C4004150E6 /* Globals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Globals.swift; sourceTree = "<group>"; };
 		CE8AEB9323459E6F00337A73 /* SpreadsheetVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpreadsheetVC.swift; sourceTree = "<group>"; };
 		CE90E6DA235F814900184BEF /* FileIO_UnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileIO_UnitTests.swift; sourceTree = "<group>"; };
 		CE90E6DC2368D23400184BEF /* MyAccounts.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MyAccounts.txt; sourceTree = "<group>"; };
@@ -175,6 +177,7 @@
 				CE6F1AE423561C85008CA720 /* VCs&Storyboards */,
 				CEA62D2F2306232C00160DEB /* Alerts.swift */,
 				BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */,
+				CE7E093D2377C3C4004150E6 /* Globals.swift */,
 				BFECDEE022FDBED400F1BF5E /* FileIO.swift */,
 				BFECDEDE22FDBC2F00F1BF5E /* FreeFuncs.swift */,
 				CE7548122309DC0600FEDAFB /* DescriptionKey.swift */,
@@ -420,6 +423,7 @@
 				CE5B1E022304E03C00337C2F /* UserDefaults.swift in Sources */,
 				CE95CC9B23367191008363B7 /* UserInputShortNameVC.swift in Sources */,
 				BF992C4A22EE56410089DAB8 /* ViewController.swift in Sources */,
+				CE7E093E2377C3C4004150E6 /* Globals.swift in Sources */,
 				BF992C4822EE56410089DAB8 /* AppDelegate.swift in Sources */,
 				BFA770DF22FD10BE00BA15B6 /* ErrorHandler.swift in Sources */,
 				CE90E6DF236DF8F100184BEF /* TableFilter.swift in Sources */,

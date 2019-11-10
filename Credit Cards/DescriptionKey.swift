@@ -9,7 +9,6 @@
 import Foundation
 
 //MARK:- Globals
-let descKeyLength          = 24
 var gDictDescKeyAlgorithm  = [String: Int]()
 
 //MARK:- makeDescKey 17-229 = 212-lines
@@ -216,8 +215,8 @@ public func makeDescKey(from desc: String, dictVendorShortNames: [String: String
     descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "22.Squish double spaces")
 
     // Truncate
-    key2 = String(descKeyLong.prefix(descKeyLength)).trim
-    let descKey = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "23.Truncate to \(descKeyLength) chars")
+    key2 = String(descKeyLong.prefix(Const.descKeyLength)).trim
+    let descKey = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "23.Truncate to \(Const.descKeyLength) chars")
 
     let match2 = findPrefixMatch(name: descKey, dictShortNames: dictVendorShortNames)
     if !match2.fullDescKey.isEmpty {

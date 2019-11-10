@@ -78,7 +78,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
                 gDictTranDupes[signature] = fileName        // mark for dupes check
                 lineItemArray.append(lineItem)              // Add new output Record
             } else {
-                let msg = "Duplicate transaction of one from \(gDictTranDupes[signature]!)"
+                let msg = "Duplicate transaction of one from \(gDictTranDupes[signature] ?? "?")"
                 handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .display, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: msg)
                 Stats.duplicateCount += 1
             }
@@ -218,7 +218,11 @@ func showUserInputVendorCatForm(lineItem: LineItem,
     var catItemToReturn  = CategoryItem(category: lineItem.genCat, source: lineItem.catSource)
 
     let storyBoard = NSStoryboard(name: "Main", bundle: nil)
-    let userInputWindowController = storyBoard.instantiateController(withIdentifier: "UserInputWindowController") as! NSWindowController
+    guard let userInputWindowController = storyBoard.instantiateController(withIdentifier: "UserInputWindowController") as? NSWindowController else {
+        let msg = "Unable to open UserInputWindowController"
+        handleError(codeFile: "HandleCards", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
+        return CategoryItem()
+    }
     if let userInputWindow = userInputWindowController.window {
         //let userVC = storyBoard.instantiateController(withIdentifier: "UserInput") as! UserInputVC
         let application = NSApplication.shared
@@ -369,3 +373,7 @@ internal func pickTheBestCat(catItemVendor: CategoryItem, catItemTransa: Categor
     }    //      "
     return (catItemTransa, weak)
 }
+
+/*
+ Cat => SubCat => Vendor => Spreadsheet
+ */

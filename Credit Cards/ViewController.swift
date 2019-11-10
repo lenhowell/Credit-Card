@@ -10,10 +10,6 @@ import Cocoa
 
 //MARK:- Global Variables
 
-// Global Constants
-let maxCardTypeLen = 10
-
-// Global Variables
 var gUserInitials           = "User"    // (UserInputVC.swift-2) Initials used for "Category Source" when Cat is changes by user.
 var gLineItemArray          = [LineItem]()  // Entire list of transactions - used here & SpreadsheetVC
 var gTransFilename          = ""                // (UserInputVC.swift-viewDidLoad) Current Transaction Filename
@@ -218,7 +214,11 @@ class ViewController: NSViewController, NSWindowDelegate {
     @IBAction func btnShowTable(_ sender: Any) {
         gPassToNextTable = TableParams()
         let storyBoard = NSStoryboard(name: "Spreadsheet", bundle: nil)
-        let tableWindowController = storyBoard.instantiateController(withIdentifier: "SpreadsheetWindowController") as! NSWindowController
+        guard let tableWindowController = storyBoard.instantiateController(withIdentifier: "SpreadsheetWindowController") as? NSWindowController else {
+            let msg = "Error tyying to open Spreadsheet Window"
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
+            return
+        }
         if let tableWindow = tableWindowController.window {
             //let tableVC = tableWindow.contentViewController as! TableVC
             //gLineItemArray = lineItemArray
@@ -410,7 +410,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             let cardArray = fileContents.components(separatedBy: "\n")
             
             // Check which Credit Card Transactions we are currently processing
-            if cardType.count >= 2 &&  cardType.count <= maxCardTypeLen  {
+            if cardType.count >= 2 &&  cardType.count <= Const.maxCardTypeLen  {
                 Stats.transFileNumber = fileNum + 1
                 gLineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray, acct: gAccounts.dict[cardType])
                 chkUserInput.state = gUserInputMode ? .on : .off
@@ -556,7 +556,11 @@ class ViewController: NSViewController, NSWindowDelegate {
         if gDictVendorShortNames.count > 0 {
             gotItem = [gotItem, .fileVendorShortNames]
         } else {
-            let path = Bundle.main.path(forResource: "VendorShortNames", ofType: "txt")!
+            guard let path = Bundle.main.path(forResource: "VendorShortNames", ofType: "txt") else {
+                let msg = "Missing starter file - VendorShortNames.txt"
+                handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
+                return
+            }
             let bundleCatsFileURL = URL(fileURLWithPath: path)
             gDictVendorShortNames = loadVendorShortNames(url: bundleCatsFileURL)
             writeVendorShortNames(url: gVendorShortNamesFileURL, dictVendorShortNames: gDictVendorShortNames)
@@ -574,7 +578,11 @@ class ViewController: NSViewController, NSWindowDelegate {
             gotItem = [gotItem, .fileMyCategories]
 
         } else {
-            let path = Bundle.main.path(forResource: "MyCategories", ofType: "txt")!
+            guard let path = Bundle.main.path(forResource: "MyCategories", ofType: "txt") else {
+                let msg = "Missing starter file - MyCategories.txt"
+                handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
+                return
+            }
             let bundleCatsFileURL = URL(fileURLWithPath: path)
             gDictMyCatAliases = loadMyCats(myCatsFileURL: bundleCatsFileURL)
             writeMyCats(url: gMyCatsFileURL)
@@ -592,7 +600,11 @@ class ViewController: NSViewController, NSWindowDelegate {
             gotItem = [gotItem, .fileMyAccounts]
 
         } else {
-            let path = Bundle.main.path(forResource: "MyAccounts", ofType: "txt")!
+            guard let path = Bundle.main.path(forResource: "MyAccounts", ofType: "txt") else {
+                let msg = "Missing starter file - MyAccounts.txt"
+                handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
+                return
+            }
             let bundleAccountsFileURL = URL(fileURLWithPath: path)
             gAccounts = Accounts(url: bundleAccountsFileURL)
             gAccounts.url = gMyAccountsURL
