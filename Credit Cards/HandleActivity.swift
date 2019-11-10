@@ -58,7 +58,29 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-183 = 171-
         }
         known = true
     }
-    if des.hasSuffix("VISA DEFERRED")                       { //ML DEBITCARD "SXM*SIRIUSXM.COM/ACCT VISA DEFERRED"
+
+    // WIRE TRF  " TRUFFLE HO"
+    if des.hasPrefix("WIRE") {
+        print(des)
+        print(lineItem.desc)
+        let words = des.components(separatedBy: " ")
+        var newDes = ""
+        var count = 0
+        for word in words.reversed() {
+            count += 1
+            if count >= 3 || count >= words.count - 1 {
+                break
+            }
+            if word.range(of: "[^A-Za-z]", options: .regularExpression) == nil {
+                newDes = word + " " + newDes
+            }
+        }
+        newDes = newDes.trim
+        if !newDes.isEmpty {
+            lineItem.desc = newDes
+        }
+        known = true
+    } else if des.hasSuffix("VISA DEFERRED")                       { //ML DEBITCARD "SXM*SIRIUSXM.COM/ACCT VISA DEFERRED"
         lineItem.cardType = "MLVISA"
         let items = des.components(separatedBy: " VISA D")
         lineItem.desc = items[0]

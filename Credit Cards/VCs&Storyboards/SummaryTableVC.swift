@@ -13,7 +13,7 @@ import Cocoa
 public enum SummaryColID {
     static let name     = "Name"
     static let count    = "Count"
-    static let netDebit = "NetDebit"
+    static let netCredit = "NetCredit"
     static let debit    = "Debit"
     static let credit   = "Credit"
 }
@@ -53,8 +53,8 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     var totalCount  = 0
     var totalCredit = 0.0
     var totalDebit  = 0.0
-    var iSortBy     = SummaryColID.netDebit
-    var iAscending  = false
+    var iSortBy     = SummaryColID.netCredit
+    var iAscending  = true
 
     var filtDate1   = "0000-00-00"
     var filtDate2   = "2999-12-31"
@@ -280,13 +280,13 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
 
         //tableDicts = tableDicts.sorted(by: { $0[SpSheetColID.debit]! > $1[SpSheetColID.debit]! })
         let sortBy = iSortBy
-        tableDicts.sort { compareTextNum(lft: $0[sortBy] ?? "", rgt: $1[sortBy] ?? "", ascending: false) }
+        tableDicts.sort { compareTextNum(lft: $0[sortBy] ?? "", rgt: $1[sortBy] ?? "", ascending: iAscending) }
         tableView.reloadData()
         txtCountTotal.stringValue   = String(totalCount)
 
         let currencyFormatter = NumberFormatter()
         currencyFormatter.usesGroupingSeparator = true
-        currencyFormatter.numberStyle = .currency
+        currencyFormatter.numberStyle = .currencyAccounting
         txtCreditTotal.stringValue  = currencyFormatter.string(from: NSNumber(value: totalCredit)) ?? "??"
         txtDebitTotal.stringValue   = currencyFormatter.string(from: NSNumber(value: totalDebit)) ?? "??"
         txtNetTotal.stringValue     = currencyFormatter.string(from: NSNumber(value: totalDebit-totalCredit)) ?? "??"
@@ -385,8 +385,8 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         if !name.isEmpty {
             let strCredit    = formatCell(credit, formatType: .dollar,  digits: 2)
             let strDebit     = formatCell(debit,  formatType: .dollar,  digits: 2)
-            let strNetDebit  = formatCell(debit-credit, formatType: .dollar,  digits: 2, doReplaceZero: false)
-            var dict      = [SummaryColID.name: name, SummaryColID.count: String(count), SummaryColID.netDebit: strNetDebit, SummaryColID.debit: strDebit, SummaryColID.credit: strCredit]
+            let strNetCredit  = formatCell(credit-debit, formatType: .dollar,  digits: 2, doReplaceZero: false)
+            var dict      = [SummaryColID.name: name, SummaryColID.count: String(count), SummaryColID.netCredit: strNetCredit, SummaryColID.debit: strDebit, SummaryColID.credit: strCredit]
             dict["idx"] = String(idx)
             tableDicts.append(dict)
         }
@@ -487,25 +487,30 @@ extension SummaryTableVC: NSTableViewDelegate {
         // Pick the next summarizeBy & filter based in row clicked
         var summarizeNew = summarizeBy
         var doNothing = true
+        guard let filterCat = rowDict[SummaryColID.name] else {
+            let msg = "Double-Click on nil item"
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
+            return
+        }
         switch summarizeBy {
         case .groupCategory:        // .groupCategory   => .subCategory
-            filterCategory  = rowDict[SummaryColID.name]!
+            filterCategory  = filterCat
             summarizeNew = .subCategory
             doNothing = false
         case .subCategory:          // .subCategory     => .vendor
-            filterCategory  = rowDict[SummaryColID.name]!
+            filterCategory  = filterCat
             summarizeNew = .vendor
             doNothing = false
         case .vendor:               //  .vendor         => .subCategory
-            filterVendor  = rowDict[SummaryColID.name]!
+            filterVendor  = filterCat
             summarizeNew = .subCategory
             doNothing = false
         case .cardType:             //  .cardType       => .groupCategory
-            filterCardType  = rowDict[SummaryColID.name]!
+            filterCardType  = filterCat
             summarizeNew = .groupCategory
             doNothing = false
         case .month, .year:         //  .month, year    => .groupCategory
-            filterDate1  = rowDict[SummaryColID.name]!
+            filterDate1  = filterCat
             filterDate2  = ""   //rowDict[SummaryColID.name]!
             summarizeNew = .groupCategory
             doNothing = false
@@ -513,7 +518,8 @@ extension SummaryTableVC: NSTableViewDelegate {
             break
         }
         if doNothing { return }
-
+        
+        let count = Int(rowDict[SummaryColID.count] ?? "0") ?? 0
         gPassToNextTable = TableParams(filtDate1: filterDate1,
                                      filtDate2:   filterDate2,
                                      filtDolStr1: "",                   // txtDollar1.stringValue,
@@ -524,9 +530,9 @@ extension SummaryTableVC: NSTableViewDelegate {
                                      calledBy:    TableCalledBy.summaryTable,
                                      summaryDepth: myTableParams.summaryDepth+1,
                                      summarizeBy: summarizeNew,
-                                     sortBy: SortDirective(column: SummaryColID.netDebit, ascending: false))
+                                     sortBy: SortDirective(column: SummaryColID.netCredit, ascending: true))
 
-        if myTableParams.summaryDepth < 2 {
+        if myTableParams.summaryDepth < 2 && count > 1 {
             callNextSummary()
         } else {
             callSpreadsheet()
@@ -562,3 +568,12 @@ extension SummaryTableVC: NSTableViewDelegate {
     }//end func callSpreadsheet
 
 }//end extension
+
+/*
+ 210   60   1000    Name
+  66   40    100    Count
+ 176  100    250    Net Debit
+ 100   10    200    Debit
+  10    10   200    Credit
+
+ */

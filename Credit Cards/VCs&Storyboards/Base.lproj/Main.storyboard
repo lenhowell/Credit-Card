@@ -351,9 +351,9 @@ DQ
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZKE-KE-nfA">
-                                <rect key="frame" x="491" y="259" width="303" height="16"/>
+                                <rect key="frame" x="370" y="259" width="424" height="16"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="299" id="xUJ-qC-BZR"/>
+                                    <constraint firstAttribute="width" constant="420" id="xUJ-qC-BZR"/>
                                 </constraints>
                                 <textFieldCell key="cell" lineBreakMode="clipping" placeholderString="xxxx Tranaction files" id="XUt-Ta-5bs">
                                     <font key="font" metaFont="system"/>
@@ -362,7 +362,7 @@ DQ
                                 </textFieldCell>
                             </textField>
                             <comboBox verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bRm-TN-6sx">
-                                <rect key="frame" x="493" y="228" width="302" height="25"/>
+                                <rect key="frame" x="372" y="228" width="423" height="25"/>
                                 <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="fileName.csv" drawsBackground="YES" completes="NO" numberOfVisibleItems="7" id="Nqw-uu-5Go">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -655,7 +655,7 @@ Gw
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xZz-c5-B01">
-                                <rect key="frame" x="12" y="269" width="584" height="17"/>
+                                <rect key="frame" x="12" y="269" width="594" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Transaction goes here." id="w0V-O5-Gbk">
                                     <font key="font" usesAppearanceFont="YES"/>
@@ -749,7 +749,7 @@ Gw
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kyJ-32-oZs">
-                                <rect key="frame" x="14" y="294" width="582" height="17"/>
+                                <rect key="frame" x="14" y="294" width="592" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Filename" id="C4L-ZI-biR">
                                     <font key="font" metaFont="system"/>
@@ -808,7 +808,7 @@ Gw
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yke-LT-ZLL">
-                                <rect key="frame" x="12" y="244" width="584" height="17"/>
+                                <rect key="frame" x="12" y="244" width="594" height="17"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Tranaction Description" id="EYc-0H-w3a">
                                     <font key="font" metaFont="system"/>
@@ -915,7 +915,7 @@ Gw
                 </viewController>
                 <customObject id="Px0-g5-byd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="418" y="1468"/>
+            <point key="canvasLocation" x="418" y="1467.5"/>
         </scene>
     </scenes>
 </document>

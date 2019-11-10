@@ -713,3 +713,57 @@ func outputTranactions(outputFileURL: URL, lineItemArray: [LineItem]) {
     }
 
 }//end func outputTranactions
+
+//MARK:- New File Formats
+/*
+VendorProfile - Combined VendorCatagoryLookup & VendorShortNames
+DescKey
+    fullName=xxx
+    isTemplate   = false
+    templateName = ""       //Vendor templates (ServiceStations, Stocks, Wire, etc)
+    DateAdded    = Datexxx
+    DateModify   = Dateyyy
+    Addedby      = initxxx
+    ModifyBy     = initYYY
+    alias        = xxx   // (prefix)
+    ...
+    category     = Categoryxxx    // Array of equals?
+    ...
+    catFrom$     = Categoryxxx, >=$xxx, <=$yyy     //based $Amount being between $Val1 & $Val2
+    ...
+    CatFromRawCat = Categoryxxx, RewCat, =/prefix/contains/suffix   //based on RawCat = xxx
+    ...
+
+
+ */
+
+
+struct VendoProfile {
+    var descKey     = ""           // key
+    var fullName    = ""
+    var isTemplate  = false
+    var templateName = ""
+    var dateAdded   = Date.distantPast
+    var dateModifid = Date.distantPast
+    var AddedBy     = ""
+    var ModifiedBy  = ""
+    var aliases     = [String]()   // keys  //CompareTypes?
+    var category    = ""    // Array of equals?
+    var catsFromRaw = [CatFromRawCat]()
+    var catsFromAmt = [CatFromAmountDebit]()
+}
+enum CompareType {
+    case equal, prefix, contains, suffix
+}
+struct CatFromRawCat {
+    var genCat = ""
+    var rawCat = ""
+    var compareType = CompareType.equal
+}
+struct CatFromAmountDebit {
+    var genCat      = ""
+    var greaterThan = 0.00
+    var lessThan    = 0.00
+}
+
+

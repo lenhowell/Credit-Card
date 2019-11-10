@@ -74,6 +74,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         syncColWidths()
 
         btnClear.isEnabled = false
+        btnSummary.keyEquivalent = "\r"
     }//end func viewDidLoad
 
     override func viewDidAppear() {
@@ -96,6 +97,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         let errMsg = setFilter()
         if errMsg.isEmpty {
             btnFilter.keyEquivalent = ""
+            btnSummary.keyEquivalent = "\r"
             loadTableDictsArray(lineItemArray: gLineItemArray)
             reloadTableSorted(sortBy: iSortBy, ascending: iAscending)
             //tableViewSum.reloadData()
@@ -130,7 +132,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
                                        filtVendor: txtVendor.stringValue,
                                        calledBy: TableCalledBy.spreadsheet,
                                        summarizeBy: SummarizeBy.groupCategory,
-                                       sortBy: SortDirective(column: SummaryColID.netDebit, ascending: false))
+                                       sortBy: SortDirective(column: SummaryColID.netCredit, ascending: true))
 
         let storyBoard = NSStoryboard(name: "SummaryTable", bundle: nil)
         let summaryWindowController = storyBoard.instantiateController(withIdentifier: "SummaryWindowController") as! NSWindowController
@@ -180,7 +182,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
             let ascending: Bool
             ascending = (key == SpSheetColID.cardType) // ascending for cardType; descending for the rest.
             let sortDescriptor  = NSSortDescriptor(key: key,  ascending: ascending)
-            print("⬆️ sortDescriptor key: \(sortDescriptor.key!)   ascending: \(sortDescriptor.ascending)")
+            print("⬆️ sortDescriptor key: \(sortDescriptor.key ?? "?")   ascending: \(sortDescriptor.ascending)")
             column.sortDescriptorPrototype = sortDescriptor
             colWidDict[key] = column.width
         }
@@ -298,7 +300,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     //---- reloadTableSorted - reloads the table for tableDicts, sorting by SpSheetColID
     private func reloadTableSorted(sortBy: String, ascending: Bool) {
-        tableDicts.sort { compareTextNum(lft: $0[sortBy]!, rgt: $1[sortBy]!, ascending: ascending) }
+        tableDicts.sort { compareTextNum(lft: $0[sortBy] ?? "", rgt: $1[sortBy] ?? "", ascending: ascending) }
         tableView.reloadData()
 
         // Select the 1st row of spreadsheet
@@ -340,6 +342,7 @@ extension SpreadsheetVC: NSTextFieldDelegate {
             return
         }
         //print("🙂\(codeFile)#\(#line) \(textView.stringValue)")
+        btnSummary.keyEquivalent = ""
         btnFilter.keyEquivalent = "\r"
         let allEmpty = txtDate1.stringValue.isEmpty &&
         txtDate2.stringValue.isEmpty &&
@@ -373,7 +376,7 @@ extension SpreadsheetVC: NSTableViewDataSource {
     func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
         if tableView == self.tableView {
             guard let sortDescriptor = tableView.sortDescriptors.first else { return }
-            print("⬆️ sortDescriptor key: \(sortDescriptor.key!)   ascending: \(sortDescriptor.ascending)")
+            print("⬆️ sortDescriptor key: \(sortDescriptor.key ?? "?")   ascending: \(sortDescriptor.ascending)")
             reloadTableSorted(sortBy: sortDescriptor.key!, ascending: sortDescriptor.ascending)
         }
     }
@@ -456,11 +459,11 @@ extension SpreadsheetVC: NSTableViewDelegate {
     func tableViewColumnDidMove(_ notification: Notification) {
         if notification.object as? NSTableView == self.tableView {
             print("tableViewColumnDidMove")
-            guard let oldIdx = notification.userInfo!["NSOldColumn"] as? Int else { return }
-            guard let newIdx = notification.userInfo!["NSNewColumn"] as? Int else { return }
+            guard let oldIdx = notification.userInfo?["NSOldColumn"] as? Int else { return }
+            guard let newIdx = notification.userInfo?["NSNewColumn"] as? Int else { return }
             //let column = tableView.tableColumns[newIdx]
             //let title = column.title
-            print("Moved \(tableView.tableColumns[newIdx].title) from pos#\(oldIdx) to pos#\(newIdx)")
+            print("↔️ Moved \(tableView.tableColumns[newIdx].title) from pos#\(oldIdx) to pos#\(newIdx)")
             tableViewSum.moveColumn(oldIdx, toColumn: newIdx)
         }//tableView
     }
@@ -469,7 +472,7 @@ extension SpreadsheetVC: NSTableViewDelegate {
     func tableViewColumnDidResize(_ notification: Notification) {
         //notification.debugDescription
         if notification.object as? NSTableView == self.tableView {
-            let column = notification.userInfo!["NSTableColumn"] as! NSTableColumn
+            guard let column = notification.userInfo?["NSTableColumn"] as? NSTableColumn else { return }
             let id = column.identifier
             let idx = tableView.column(withIdentifier: id)
             //print("↔️ tableViewColumnDidResize Col#\(idx): \(id.rawValue) to a width of \(column.width)")
@@ -503,3 +506,13 @@ extension SpreadsheetVC: NSTableViewDelegate {
     }//end func
 
 }//end extension
+
+/*
+ 74     40  100 Card
+ 76     76  100 Date
+220    100  250 Desc
+ 92     10  120 Debit
+ 92     10  120 Credit
+172    100  200 Category
+ 66     10   80 Source
+ */

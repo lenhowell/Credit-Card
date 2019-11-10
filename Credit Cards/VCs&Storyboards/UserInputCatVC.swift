@@ -31,7 +31,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         let lineItem        = usrLineItem
         let amt             = lineItem.debit - lineItem.credit
         let strDebit        = String(format:"%.2f", amt)
-        let desc            = lineItem.desc.PadRight(40, truncate: true, useEllipsis: true, fillChr: " ")
+        let desc            = lineItem.desc.PadRight(60, truncate: true, useEllipsis: true, fillChr: " ")
         lblLineItem.stringValue      = "\(lineItem.tranDate)  \"\(lineItem.descKey)\"   $\(strDebit)"
         lblDesc.stringValue          = "              \(desc)"
         lblcatFromTran.stringValue   = usrCatItemFromTran.category

@@ -294,6 +294,15 @@ internal func makeDictColNums(headers: [String]) -> [String: Int] {
 
         } else if rawKey.contains("NOTE") { 
             key = "MEMO"                                            // MEMO
+        } else if rawKey.hasPrefix("ACCOUNT ") {
+            switch rawKey.suffix(4) {
+            case "NAME":
+                key = "ACCNAME"
+            case "TION":
+                key = "ACCREG"
+            default:
+                key = "ACCNUM"
+            }
         } else {
             key = String(rawKey.replacingOccurrences(of: "\"", with: "").prefix(4))
             if key != "POST" && key != "DESC" && key != "AMOU" && key != "DEBI" && key != "CRED" && key != "CATE" {
@@ -301,7 +310,11 @@ internal func makeDictColNums(headers: [String]) -> [String: Int] {
                 //
             }
         }
-        dictColNums[key] = colNum
+        if dictColNums[key] == nil {
+            dictColNums[key] = colNum
+        } else {
+            // Here more than 1 rawKey points to same column
+        }
     }//next colNum
 
     return dictColNums
