@@ -144,19 +144,40 @@ In
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf0 \
 
-\f1\b Additional Files: 
+\f1\b Files: 
 \f0\b0 \
 \pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
 \ls6\ilvl0\cf0 {\listtext	
 \f5 \uc0\u10003 
-\f0 	}Recognized Accounts with "Amount"-sign & full Names  & type.\
+\f0 	}
+\f1\b Transaction files
+\f0\b0 			.csv files named Code-YYYY or Code-YYYY-MM or Code-YYYY-MM-NumMonths. Optionally followed by a space and additional text.\
 {\listtext	
 \f5 \uc0\u10003 
-\f0 	}MyModifiedTransactions.txt - User-Modified-Transactions file\
+\f0 	}
+\f1\b MyAccounts.txt
+\f0\b0 			CardCode(2-10chars),  "Amount"-sign, full Name,  & type.\
+{\listtext	
+\f5 \uc0\u10003 
+\f0 	}
+\f2\b\fs22 VendorShortNames.txt 		
+\f0\b0\fs24 List of description-prefixes that point to the same vendor\
+{\listtext	
+\f5 \uc0\u10003 
+\f0 	}
+\f2\b\fs22 VendorCategoryLookup.txt
+\f0\b0\fs24 	Category associated with a given Vendor\
+{\listtext	
+\f5 \uc0\u10003 
+\f0 	}
+\f1\b MyModifiedTransactions.txt	
+\f0\b0 User-Modified-Transactions file\
 \pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
 \ls7\ilvl0\cf0 {\listtext	
 \f5 \uc0\u10003 
-\f0 	}MyCategories.txt	List of Allowed Categories with automatic Category Translations (from CreditCard to UserPreference).\
+\f0 	}
+\f1\b MyCategories.txt
+\f0\b0 			List of Allowed Categories with automatic Category Translations (from CreditCard to UserPreference).\
 \pard\tx560\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf0 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
@@ -282,9 +303,12 @@ In
 \f2\b UserInputCatVC: 
 \f3\b0 Allow editing of 
 \f2\b descKey
-\f3\b0  & 
-\f2\b Memo
 \f3\b0 . \
+{\listtext	\uc0\u9642 	}
+\f2\b UserInputCatVC
+\f3\b0 : Add Vendor (
+\f2\b descKey
+\f3\b0 ) to MyModifiedTransactions.txt\
 {\listtext	\uc0\u9642 	}
 \f2\b UserInputCatVC: 
 \f3\b0 Give informed suggestions based on $, rawDesc, name, etc.\
@@ -299,13 +323,6 @@ In
 \f2\b Filter
 \f3\b0  in 
 \f2\b Title
-\f3\b0 \
-{\listtext	\uc0\u9642 	}
-\f2\b Spreadsheet: 
-\f3\b0 Show 
-\f2\b Memo
-\f3\b0  in 
-\f2\b StatusBar
 \f3\b0 \
 {\listtext	\uc0\u9642 	}
 \f2\b Summary: 
@@ -357,6 +374,23 @@ In
 \cf0 \
 \pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
 \ls20\ilvl0\cf0 {\listtext	\uc0\u10003 	}
+\f2\b Spreadsheet: 
+\f3\b0 Show 
+\f2\b Memo
+\f3\b0  in 
+\f2\b StatusBar
+\f3\b0 \
+{\listtext	\uc0\u10003 	}
+\f2\b UserInputCatVC: 
+\f3\b0 Allow editing of 
+\f2\b Memo
+\f3\b0 . \
+{\listtext	\uc0\u10003 	}
+\f2\b UserInputCatVC
+\f3\b0 : Add a 
+\f2\b Memo
+\f3\b0  (Note) to MyModifiedTransactions.txt\
+{\listtext	\uc0\u10003 	}
 \f2\b Summary: 
 \f3\b0 Teal color to differentiate from Spreadsheet\
 {\listtext	\uc0\u10003 	}
@@ -484,15 +518,9 @@ In
 {\listtext	\uc0\u9642 	}
 \f2\b UserInputCatVC
 \f3\b0 : When Cat from transaction is e.g. "Grocery-?", suggest "Food-Grocery"\
-{\listtext	\uc0\u9642 	}
-\f2\b UserInputCatVC
-\f3\b0 : Add a Memo (Note) & Vendor to MyModifiedTransactions.txt\
 {\listtext	\uc0\u9642 	}When in User-Input mode, allow user to check "...-Other" or other specifics.\
 \pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
 \ls30\ilvl0\cf0 {\listtext	\uc0\u9642 	}
-\f2\b Spreadsheet: 
-\f3\b0 If Table or Summary-button clicked, remove keyEquivalent from Filter \
-{\listtext	\uc0\u9642 	}
 \f2\b Spreadsheet: 
 \f3\b0 Combo-Box for Card-Types\
 {\listtext	\uc0\u9642 	}Place \cf2 \cb3 UserInputCat\cf0 \cb1  & \cf2 \cb3 UserInputShortName\cf0 \cb1  each in their own storyboard.\
@@ -621,7 +649,7 @@ New Files for 2.0:\
 \cf2     ...\cf4 \
 \cf2     catFrom$     = Categoryxxx, >=$xxx, <=$yyy     //based $Amount being between $Val1 & $Val2\cf4 \
 \cf2     ...\cf4 \
-\cf2     CatFromRawCat = Categoryxxx, RewCat, =/prefix/contains/suffix   //based on RawCat = xxx\cf4 \
+\cf2     CatFromRawCat = Categoryxxx, RawCat, =/prefix/contains/suffix   //based on RawCat = xxx\cf4 \
 \cf2     ...\cf4 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 

@@ -60,7 +60,7 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-183 = 171-
     }
 
     // WIRE TRF  " TRUFFLE HO"
-    if des.hasPrefix("WIRE") {
+    if des.hasPrefix("WIRE") || des.contains("WIRE TR") {
         print(des)
         print(lineItem.desc)
         let words = des.components(separatedBy: " ")
@@ -68,12 +68,10 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-183 = 171-
         var count = 0
         for word in words.reversed() {
             count += 1
-            if count >= 3 || count >= words.count - 1 {
+            if count >= 3 || count >= words.count - 1 || word.range(of: "[^A-Za-z]", options: .regularExpression) != nil {
                 break
             }
-            if word.range(of: "[^A-Za-z]", options: .regularExpression) == nil {
-                newDes = word + " " + newDes
-            }
+            newDes = word + " " + newDes
         }
         newDes = newDes.trim
         if !newDes.isEmpty {

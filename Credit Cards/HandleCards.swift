@@ -16,7 +16,7 @@ var usrCatItemFromTran   = CategoryItem()
 var usrCatItemPrefered   = CategoryItem()
 var usrBatchMode         = true
 // Returns from UserInputVendorCatForm
-var usrCatItemReturned  = CategoryItem()
+var usrModTranItemReturned  = ModifiedTransactionItem()
 var usrFixVendor        = true
 var usrIgnoreVendors    = [String: Int]()
 
@@ -133,9 +133,9 @@ internal func makeLineItem(fromTransFileLine: String,
     // Check for Modified Transaction
     let modTranKey = lineItem.signature()
     if let modTrans = gDictModifiedTrans[modTranKey] {
-        //TODO: Add Memo to transaction
-        lineItem.genCat = modTrans.category     // Here if found transaction in MyModifiedTransactions.txt
-        lineItem.catSource = modTrans.source
+        lineItem.genCat = modTrans.catItem.category     // Here if found transaction in MyModifiedTransactions.txt
+        lineItem.catSource = modTrans.catItem.source
+        lineItem.memo = modTrans.memo
         Stats.userModTransUsed += 1
         return lineItem                         // Use User-Modified .genCat & .catSource without looking further
     }
@@ -190,7 +190,7 @@ internal func makeLineItem(fromTransFileLine: String,
             if gUserInputMode && !isClearWinner {
                 _ = showUserInputVendorCatForm(lineItem: lineItem, batchMode: true, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemPrefered)
                 // ...and we're back.
-                catItemPrefered = usrCatItemReturned
+                catItemPrefered = usrModTranItemReturned.catItem
             } else if catItemPrefered.category != catItemFromVendor.category && isClearWinner {
                 gDictVendorCatLookup[descKey] = catItemPrefered  // Do Actual Insert into VendorCategoryLookup
                 Stats.changedVendrCatCount += 1
@@ -209,19 +209,19 @@ func showUserInputVendorCatForm(lineItem: LineItem,
                                 batchMode:          Bool,
                                 catItemFromVendor:  CategoryItem,
                                 catItemFromTran:    CategoryItem,
-                                catItemPrefered:    CategoryItem) -> CategoryItem {
+                                catItemPrefered:    CategoryItem) -> ModifiedTransactionItem {
     usrLineItem = lineItem
     usrBatchMode         = batchMode
     usrCatItemFromVendor = catItemFromVendor
     usrCatItemFromTran   = catItemFromTran
     usrCatItemPrefered   = catItemPrefered
-    var catItemToReturn  = CategoryItem(category: lineItem.genCat, source: lineItem.catSource)
-
+    let catItemToRet  = CategoryItem(category: lineItem.genCat, source: lineItem.catSource)
+    var modTranItemToReturn  = ModifiedTransactionItem(catItem: catItemToRet, memo: lineItem.memo)
     let storyBoard = NSStoryboard(name: "Main", bundle: nil)
     guard let userInputWindowController = storyBoard.instantiateController(withIdentifier: "UserInputWindowController") as? NSWindowController else {
         let msg = "Unable to open UserInputWindowController"
         handleError(codeFile: "HandleCards", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
-        return CategoryItem()
+        return ModifiedTransactionItem()
     }
     if let userInputWindow = userInputWindowController.window {
         //let userVC = storyBoard.instantiateController(withIdentifier: "UserInput") as! UserInputVC
@@ -235,17 +235,17 @@ func showUserInputVendorCatForm(lineItem: LineItem,
 
         case .OK:                                   // .OK - Make changes requested by user
             if usrFixVendor {                       // Fix VendorCategoryLookup value
-                gDictVendorCatLookup[lineItem.descKey] = usrCatItemReturned
+                gDictVendorCatLookup[lineItem.descKey] = usrModTranItemReturned.catItem
                 Stats.changedVendrCatCount += 1
                 if !batchMode {
                     writeVendorCategoriesToFile(url: gVendorCatLookupFileURL, dictCat: gDictVendorCatLookup)
                 }
             } else {                                // New category for this transaction only.
                 let transKey = lineItem.signature()
-                gDictModifiedTrans[transKey] = usrCatItemReturned
+                gDictModifiedTrans[transKey] = usrModTranItemReturned
                 writeModTransTofile(url: gMyModifiedTransURL, dictModTrans: gDictModifiedTrans)
             }
-            catItemToReturn = usrCatItemReturned
+            modTranItemToReturn = usrModTranItemReturned
 
         case .cancel:                               // .cancel - Do nothing
             break
@@ -261,8 +261,8 @@ func showUserInputVendorCatForm(lineItem: LineItem,
         let msg = "Could not open User-Input window."
         handleError(codeFile: "HandleCards", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
     }//end if let
-    return catItemToReturn
-}//end func
+    return modTranItemToReturn
+}//end func showUserInputVendorCatForm
 
 //MARK: makeDictColNums
 
@@ -317,7 +317,7 @@ internal func makeDictColNums(headers: [String]) -> [String: Int] {
         if dictColNums[key] == nil {
             dictColNums[key] = colNum
         } else {
-            // Here more than 1 rawKey points to same column
+            // Here when more than 1 rawKey points to same column
         }
     }//next colNum
 

@@ -13,12 +13,12 @@
                     <window key="window" title="Transaction Summary" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="jQc-NG-Z2X">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-                        <rect key="contentRect" x="387" y="207" width="760" height="500"/>
+                        <rect key="contentRect" x="387" y="207" width="774" height="500"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
-                        <value key="minSize" type="size" width="760" height="500"/>
-                        <value key="maxSize" type="size" width="760" height="1200"/>
-                        <value key="minFullScreenContentSize" type="size" width="760" height="500"/>
-                        <value key="maxFullScreenContentSize" type="size" width="760" height="1200"/>
+                        <value key="minSize" type="size" width="774" height="500"/>
+                        <value key="maxSize" type="size" width="774" height="1200"/>
+                        <value key="minFullScreenContentSize" type="size" width="774" height="500"/>
+                        <value key="maxFullScreenContentSize" type="size" width="774" height="1200"/>
                         <connections>
                             <outlet property="delegate" destination="aRR-Af-aKw" id="BHh-vv-zYM"/>
                         </connections>
@@ -445,7 +445,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eyn-e5-nkl">
-                                <rect key="frame" x="386" y="4" width="60" height="21"/>
+                                <rect key="frame" x="372" y="4" width="60" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="am9-xJ-u0V"/>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="mvA-XX-fjy"/>
@@ -457,7 +457,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Iq4-9L-7hm">
-                                <rect key="frame" x="446" y="4" width="104" height="21"/>
+                                <rect key="frame" x="432" y="4" width="104" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="104" id="lny-QB-gdn"/>
                                 </constraints>
@@ -468,7 +468,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="w4R-ye-1zv">
-                                <rect key="frame" x="550" y="4" width="104" height="21"/>
+                                <rect key="frame" x="536" y="4" width="104" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="104" id="EVy-g7-RB6"/>
                                 </constraints>
@@ -479,7 +479,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="152-SD-4VP">
-                                <rect key="frame" x="654" y="4" width="106" height="21"/>
+                                <rect key="frame" x="640" y="4" width="106" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="106" id="1R2-tj-IFC"/>
                                 </constraints>
@@ -491,7 +491,7 @@
                             </textField>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="152-SD-4VP" secondAttribute="trailing" constant="8" id="4i4-Id-abv"/>
+                            <constraint firstAttribute="trailing" secondItem="152-SD-4VP" secondAttribute="trailing" constant="22" id="4i4-Id-abv"/>
                             <constraint firstItem="Iq4-9L-7hm" firstAttribute="top" secondItem="eyn-e5-nkl" secondAttribute="top" id="7yD-i8-irO"/>
                             <constraint firstItem="152-SD-4VP" firstAttribute="bottom" secondItem="eyn-e5-nkl" secondAttribute="bottom" id="AiN-O8-gwg"/>
                             <constraint firstItem="w4R-ye-1zv" firstAttribute="top" secondItem="eyn-e5-nkl" secondAttribute="top" id="Exz-4V-blZ"/>

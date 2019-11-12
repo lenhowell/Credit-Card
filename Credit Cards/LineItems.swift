@@ -20,7 +20,7 @@ public struct LineItem: Equatable, Hashable {
     var credit   = 0.0      // Credit (Credit-Card payments, refunds, etc.)
     var rawCat   = ""       // Category from Tansaction
     var genCat   = ""       // Generated Category
-    var catSource = ""      // Source of Generated Category (including "$" for "LOCKED")
+    var catSource = ""      // Source of Generated Category (including "$" for "LOCKED", "*" for Modified)
     var transText = ""      // Original Transaction Line from file
     var memo      = ""
     var auditTrail = ""     // Original FileName, Line#
@@ -122,8 +122,7 @@ public struct LineItem: Equatable, Hashable {
             }
         }
 
-        let (cleanName, _) = fileName.splitAtFirst(char: ".")
-        self.auditTrail = "\(cleanName)#\(lineNum)"     // AUDIT TRAIL
+        self.auditTrail = "\(fileName)#\(lineNum)"     // AUDIT TRAIL
     }//end init
 
     //---- signature - Unique identifier for detecting Transaction dupes & user-modified versions.

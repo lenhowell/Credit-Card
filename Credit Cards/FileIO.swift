@@ -14,6 +14,11 @@ public struct CategoryItem: Equatable {
     var source      = ""  // Source of Category (including "$" for "LOCKED", "*" for ModTrans )
 }
 
+// Used by MyModifiedTransactions
+public struct ModifiedTransactionItem: Equatable {
+    var catItem = CategoryItem()
+    var memo    = ""
+}
 //MARK:- FileIO struct
 
 public struct FileIO {
@@ -334,10 +339,10 @@ func writeMyCats(url: URL) {
 
 //MARK:- My Modified Transactions
 
-func loadMyModifiedTrans(myModifiedTranURL: URL) -> [String: CategoryItem]  {
+func loadMyModifiedTrans(myModifiedTranURL: URL) -> [String: ModifiedTransactionItem]  {
     //let dictColNums = ["TRAN":0, "DESC":1, "DEBI":2, "CRED":3, "CATE":4] "NUMBER","POST","CARD","AMOU"
     //let fileName = myModifiedTranURL.lastPathComponent
-    var dictTrans = [String: CategoryItem]()
+    var dictTrans = [String: ModifiedTransactionItem]()
     let contentof = (try? String(contentsOf: myModifiedTranURL)) ?? ""
     let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
     var lineNum = 0
@@ -354,23 +359,25 @@ func loadMyModifiedTrans(myModifiedTranURL: URL) -> [String: CategoryItem]  {
         let genCat      = comps[0]
         let catSource   = comps[1]
         let key         = comps[2]
-        //TODO: Add Memo to dictTrans
+        var memo = ""
+        if comps.count > 3 {
+            memo = comps[3]
+        }
         let catItem = CategoryItem(category: genCat, source: catSource)
-        dictTrans[key] = catItem
+        dictTrans[key] = ModifiedTransactionItem(catItem: catItem, memo: memo)
     }//next line
 
     return dictTrans
 }//end func loadMyModifiedTrans
 
 //TODO: writeModTransTofile - only write if changed
-func writeModTransTofile(url: URL, dictModTrans: [String: CategoryItem]) {
+func writeModTransTofile(url: URL, dictModTrans: [String: ModifiedTransactionItem]) {
     FileIO.saveBackupFile(url: url)
     var text = "// Machine-generated file\n"
     text += "//Category     <tab> Source <tab> (Type|Date|Num|Credit|Debit)\n"
-    for (key, catItem) in dictModTrans.sorted(by: {$0.key < $1.key}) {
-        //TODO: Add Memo to dictModTrans
-        let cat = catItem.category.PadRight(20)
-        text += cat + "\t" + catItem.source + "\t" + key + "\n"
+    for (key, modTranItem) in dictModTrans.sorted(by: {$0.key < $1.key}) {
+        let cat = modTranItem.catItem.category.PadRight(20)
+        text += "\(cat)\t\(modTranItem.catItem.source)\t\(key)\t\(modTranItem.memo)\n"
     }
     //— writing —
     do {

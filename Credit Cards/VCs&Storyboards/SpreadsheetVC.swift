@@ -445,16 +445,22 @@ extension SpreadsheetVC: NSTableViewDelegate {
                 return
             }
             let iRow = tableView.selectedRow
-            let dict = tableDicts[iRow]
-            var id = dict[SpSheetColID.idNumber] ?? ""
+            let rowDict = tableDicts[iRow]
+
+            let idxStr = rowDict["idx"] ?? ""
+            let idx = Int(idxStr) ?? -1
+            //print("Selected Row # \(tableView.selectedRow).  idx = \(idx)")
+            let lineItem = gLineItemArray[idx]
+
+            var id = rowDict[SpSheetColID.idNumber] ?? ""
             if !id.isEmpty { id = "  #" + id + "  " }
-            let fileAndLine = (dict[SpSheetColID.file_LineNum] ?? "").replacingOccurrences(of: "#", with: "line#")
-            let descFull = dict[SpSheetColID.fullDesc] ?? ""
+            let fileAndLine = "[\"" + (rowDict[SpSheetColID.file_LineNum] ?? "").replacingOccurrences(of: "#", with: "\" line#") + "]"
+            let descFull = rowDict[SpSheetColID.fullDesc] ?? ""
             var descTrunc = descFull.prefix(117)
             if descTrunc.count < descFull.count {
                 descTrunc += "..."
             }
-            lblStatus.stringValue = "\"\(descTrunc)\"\n\(id)orig.cat:\"\(dict[SpSheetColID.rawCat] ?? "")\"       file:\(fileAndLine)"
+            lblStatus.stringValue = "\"\(descTrunc)\"\n\(id)orig.cat:\"\(rowDict[SpSheetColID.rawCat] ?? "")\"       file:\(fileAndLine)\n\(lineItem.memo)"
             //updateCompanyNameLabel()
         }//tableView
     }
@@ -499,11 +505,12 @@ extension SpreadsheetVC: NSTableViewDelegate {
         let catItemFromVendor = CategoryItem(category: lineItem.genCat, source: lineItem.catSource)
         let catItemFromTran   = CategoryItem(category: lineItem.rawCat, source: lineItem.catSource)
 
-        let catItem = showUserInputVendorCatForm(lineItem: lineItem, batchMode: false, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemFromVendor)
+        let modTranItem = showUserInputVendorCatForm(lineItem: lineItem, batchMode: false, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemFromVendor)
         // ...and we're back.
 
-        gLineItemArray[idx].genCat    = catItem.category
-        gLineItemArray[idx].catSource = catItem.source
+        gLineItemArray[idx].genCat    = modTranItem.catItem.category
+        gLineItemArray[idx].catSource = modTranItem.catItem.source
+        gLineItemArray[idx].memo      = modTranItem.memo
 
         loadTableDictsArray(lineItemArray: gLineItemArray)
         reloadTableSorted(sortBy: iSortBy, ascending: iAscending)

@@ -32,11 +32,13 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         let amt             = lineItem.debit - lineItem.credit
         let strDebit        = String(format:"%.2f", amt)
         let desc            = lineItem.desc.PadRight(60, truncate: true, useEllipsis: true, fillChr: " ")
-        lblLineItem.stringValue      = "\(lineItem.tranDate)  \"\(lineItem.descKey)\"   $\(strDebit)"
-        lblDesc.stringValue          = "              \(desc)"
+        lblLineItem.stringValue = "\(lineItem.tranDate)  \"\(lineItem.descKey)\"   $\(strDebit)"
+        lblDesc.stringValue     = "              \(desc)"
+        txtMemo.stringValue     = lineItem.memo
         lblcatFromTran.stringValue   = usrCatItemFromTran.category
         lblcatFromVendor.stringValue = usrCatItemFromVendor.category
         lblcatPrefered.stringValue   = usrCatItemPrefered.category
+
         if usrBatchMode {
             lblProcessed.stringValue = "\(Stats.lineItemNumber) of \(Stats.lineItemCount),   file \(Stats.transFileNumber) of \(Stats.transFileCount)"
             radioFileVendor.state    = .on   // Default to setting VendorCat in batch mode
@@ -73,6 +75,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
     @IBOutlet var lblFile:          NSTextField!
     @IBOutlet var lblLineItem:      NSTextField!
     @IBOutlet var lblDesc:          NSTextField!
+    @IBOutlet var txtMemo:          NSTextField!
     @IBOutlet var lblcatFromTran:   NSTextField!
     @IBOutlet var lblcatPrefered:   NSTextField!
     @IBOutlet var lblcatFromVendor: NSTextField!
@@ -106,7 +109,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func cboCatsChange(_ sender: Any) {
-        print("(codeFile)#\(#line) cboCatsChange \(cboCats.stringValue)")
+        print("\(codeFile)#\(#line) cboCatsChange \(cboCats.stringValue)")
         catItemCurrent.category = cboCats.stringValue
         catItemCurrent.source = gUserInitials
         updateAfterCatChange(newCatItem: catItemCurrent)
@@ -177,15 +180,15 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
             return
         }
         usrFixVendor = (radioFileVendor.state == .on)
-        usrCatItemReturned = catItemCurrent
+        usrModTranItemReturned = ModifiedTransactionItem(catItem: catItemCurrent, memo: txtMemo.stringValue.trim)
         if radioFileVendor.state == .on {
             if chkLockIn.state == .on {
-                usrCatItemReturned.source = "$" + gUserInitials
+                usrModTranItemReturned.catItem.source = "$" + gUserInitials
             }
         } else {
-            usrCatItemReturned.source = "*" + gUserInitials
+            usrModTranItemReturned.catItem.source = "*" + gUserInitials
         }
-        print("(codeFile)#\(#line) return \(usrCatItemReturned.category) \(usrCatItemReturned.source)")
+        print("\(codeFile)#\(#line) return \(usrModTranItemReturned.catItem.category) \(usrModTranItemReturned.catItem.source)")
         NSApplication.shared.stopModal(withCode: .OK)
     }//end func
 
@@ -214,9 +217,11 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         if radioFileTransac.state == .on {
             chkLockIn.isHidden = true
             chkQuestionMark.isHidden = true
+            txtMemo.isHidden = false
         } else {
             chkLockIn.isHidden = false
             chkQuestionMark.isHidden = false
+            txtMemo.isHidden = true
         }
     }//end func
 

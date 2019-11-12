@@ -19,8 +19,7 @@ var gDictMyCatAliasArray    = [String: [String]]()      // Synonyms for each cat
 var gDictVendorCatLookup    = [String: CategoryItem]()  // (HandleCards.swift-3) Hash for Category Lookup (CategoryLookup.txt)
 var gDictTranDupes          = [String: String]()        // (handleCards) Hash for finding duplicate transactions
 var gAccounts               = Accounts()
-//TODO: Add Memo to gDictModifiedTrans
-var gDictModifiedTrans      = [String: CategoryItem]()  // (MyModifiedTransactions.txt) Hash for user-modified transactions
+var gDictModifiedTrans      = [String: ModifiedTransactionItem]()  // (MyModifiedTransactions.txt) Hash for user-modified transactions
 
 var gMyCategoryHeader       = ""
 var gIsUnitTesting          = false     // Not used
