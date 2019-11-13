@@ -110,7 +110,7 @@ prefix,prefix
         var line = ""
         var result: [String] = []
         line = "abc, \" def \", \"de,f\" "
-        result = FileIO.parseCommaDelimitedLine(line)
+        result = FileIO.parseDelimitedLine(line, csvTsv: .csv)
         XCTAssertEqual(result[0], "abc")
         XCTAssertEqual(result[1], "def")
         XCTAssertEqual(result[2], "de;f")

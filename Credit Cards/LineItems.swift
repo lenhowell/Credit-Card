@@ -28,16 +28,19 @@ public struct LineItem: Equatable, Hashable {
     init() {
     }
 
-    //MARK:- init - 34-127 = 93-lines
+    //MARK:- init - 34-129 = 95-lines
     //TODO: Allow LineItem.init to throw errors
     // Create a LineItem from a Transaction-File line
     init(fromTransFileLine: String, dictColNums: [String: Int], fileName: String, lineNum: Int, signAmount: Double) {
         let expectedColumnCount = dictColNums.count
 
         self.transText = fromTransFileLine.trim // TRANSACTION TEXT
-
+        var csvTsv = FileIO.CsvTsv.tsv
+        if fileName.lowercased().hasSuffix(".csv") {
+            csvTsv = .csv
+        }
         // Parse transaction, replacing all "," within quotes with a ";"
-        let columns = FileIO.parseCommaDelimitedLine(fromTransFileLine)
+        let columns = FileIO.parseDelimitedLine(fromTransFileLine, csvTsv: csvTsv)
 
         let columnCount = columns.count
         if columnCount != expectedColumnCount {
@@ -90,7 +93,10 @@ public struct LineItem: Equatable, Hashable {
             if colNum < columnCount {
                 let assignedCat =  columns[colNum]
                 let myCat = gDictMyCatAliases[assignedCat] ?? assignedCat
-                self.rawCat = myCat
+                //self.rawCat = myCat
+                self.rawCat = assignedCat //%%%%%%%
+                self.genCat = myCat
+
             }
         }
         //TODO: Detect & report corrupt $values rather than silently setting to $0

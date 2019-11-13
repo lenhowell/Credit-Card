@@ -210,7 +210,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
     }
 
-    @IBAction func btnShowTable(_ sender: Any) {
+    @IBAction func btnSpreadsheet(_ sender: Any) {
         gPassToNextTable = TableParams()
         let storyBoard = NSStoryboard(name: "Spreadsheet", bundle: nil)
         guard let tableWindowController = storyBoard.instantiateController(withIdentifier: "SpreadsheetWindowController") as? NSWindowController else {
@@ -219,8 +219,6 @@ class ViewController: NSViewController, NSWindowDelegate {
             return
         }
         if let tableWindow = tableWindowController.window {
-            //let tableVC = tableWindow.contentViewController as! TableVC
-            //gLineItemArray = lineItemArray
             let application = NSApplication.shared
             application.runModal(for: tableWindow)
 
@@ -308,9 +306,9 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
 
-    //MARK:- Main Program 151-lines
+    //MARK:- Main Program 155-lines
     
-    func main() {   // 314-465 = 151-lines
+    func main() {   // 311-466 = 155-lines
         verifyFolders(gotItem: &gotItem)
         if !gotItem.contains(GotItem.allDirs) {
             let errMsg = makeMissingItemsMsg(got: gotItem)
@@ -375,13 +373,13 @@ class ViewController: NSViewController, NSWindowDelegate {
         if shown == "-all-" {
             filesToProcessURLs = transFileURLs
         } else {
-            let nameWithExt = shown + ".csv"
+            let nameWithExt = shown
             let fileURL = transactionDirURL.appendingPathComponent(nameWithExt)
             filesToProcessURLs = [fileURL]
         }
         Stats.transFileCount = filesToProcessURLs.count
         if Stats.transFileCount == 0 {
-            let msg = "No files in the form of Card-2018-12.csv found,\nwhere Card is 2-8 characters."
+            let msg = "No files in the form of Card-2018-12 found,\nwhere Card is 2-8 characters.\nand the extension is .csv, .tsv, or .dnl"
             GBox.alert(msg)
             return
         }
@@ -434,7 +432,6 @@ class ViewController: NSViewController, NSWindowDelegate {
                 writeVendorCategoriesToFile(url: gVendorCatLookupFileURL, dictCat: gDictVendorCatLookup)
             }
         }
-        writeModTransTofile(url: gMyModifiedTransURL, dictModTrans: gDictModifiedTrans)
 
         var statString = ""
 
@@ -454,8 +451,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         statString += "\n(a)\(String(Stats.duplicateCount).rightJust(5)       ) were duplicates.                  ←"
         statString += "\n(b)\(String(Stats.successfulLookupCount).rightJust(5)) were found in Category File.      ←"
         statString += "\n(c)\(String(Stats.addedCatCount).rightJust(5)        ) were inserted into Category File. ←"
-        statString += "\n(d)\(String(Stats.changedVendrCatCount).rightJust(5)      ) were changed in Category File.    ←"
-        statString += "\n(e)\(String(Stats.descWithNoCat).rightJust(5)        ) still with no Category assigned.  ←"
+        statString += "\n(d)\(String(Stats.changedVendrCatCount).rightJust(5) ) were changed in Category File.    ←"
+        statString += "\n(e)\(String(Stats.userModTransUsed).rightJust(5)     ) were found in ModifiedTrans File. ←"
+        statString += "\n(f)\(String(Stats.descWithNoCat).rightJust(5)        ) still with no Category assigned.  ←"
         lblResults.stringValue = statString
         
         let endTime   = CFAbsoluteTimeGetCurrent()
@@ -493,7 +491,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     
     //------ loadComboBoxFiles - Read Trk filenames and load ComboBoxFiles with Recent, Not-done, & Outdated files
     private func loadComboBoxFiles(fileURLs: [URL]) {          // 555-637 = 82 lines
-        let fileNames = fileURLs.map { $0.deletingPathExtension().lastPathComponent }
+        let fileNames = fileURLs.map { $0.lastPathComponent }
         cboFiles.removeAllItems()
         cboFiles.stringValue = "-all-"
         cboFiles.addItem(withObjectValue: "-all-")

@@ -9,7 +9,7 @@
 import Foundation
 
 //MARK:extractTranFromActivity
-func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-183 = 171-lines
+func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-202 = 190-lines
     var lineItem = lineItem
     // TRAN, DESC, CATE, AMOU
     // ????     "1/3/17,  DIVD REINV: PIMCO INCOME FUND CL C AGENT REINV AMOUNT   $343.88,   Securities Trades,   0.00"
@@ -54,15 +54,14 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-183 = 171-
         if lineItem.debit == 0.0 && lineItem.credit == 0.0 {
             ignore = true
         } else {
-            print("😡 Ignore with $ ",lineItem.transText)
+            print("😡 HandleActivity#\(#line) Ignore with $ ",lineItem.transText)
         }
         known = true
     }
 
     // WIRE TRF  " TRUFFLE HO"
     if des.hasPrefix("WIRE") || des.contains("WIRE TR") {
-        print(des)
-        print(lineItem.desc)
+        print("HandleActivity#\(#line) Wire Transfer = \(lineItem.desc)")
         let words = des.components(separatedBy: " ")
         var newDes = ""
         var count = 0

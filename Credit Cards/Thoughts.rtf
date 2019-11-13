@@ -55,7 +55,10 @@ User is not warned of missing MyAccounts.txt or missing entry for Transaction fi
 In Spreadsheet, Sums often do not line-up after column resize.\
 If user changes Vendor-Category from spreadsheet, Transaction files must be re-read to fully implement.\
 If user changes Vendor-Category to a "cat-?", Transaction-file category will override it.\
-If user edits MyCategories.txt, changes must be made to VendorCategryLookop.txt \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 MyModifiedTransactions.txt cannot differentiate between 2 identical transactions. \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 If user edits MyCategories.txt, changes must be made to VendorCategryLookop.txt \
 \pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
 
 \f2\b\fs22 \cf0 UserInputCat
@@ -151,7 +154,7 @@ In
 \f5 \uc0\u10003 
 \f0 	}
 \f1\b Transaction files
-\f0\b0 			.csv files named Code-YYYY or Code-YYYY-MM or Code-YYYY-MM-NumMonths. Optionally followed by a space and additional text.\
+\f0\b0 			.csv, tsv files named Code-YYYY or Code-YYYY-MM or Code-YYYY-MM-NumMonths. Optionally followed by a space and additional text.\
 {\listtext	
 \f5 \uc0\u10003 
 \f0 	}
@@ -497,7 +500,7 @@ In
 \f3\fs22 \cf0 {\listtext	\uc0\u9642 	}Provide an automated 
 \f2\b "Setup"
 \f3\b0  (see below))\
-{\listtext	\uc0\u9642 	}\cf2 \cb3 TODO: Warn user about non-qualified csv's & show rules.\cf0 \cb1 \
+{\listtext	\uc0\u9642 	}\cf2 \cb3 TODO: Warn user about non-qualified filenames & show rules.\cf0 \cb1 \
 \pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
 \ls27\ilvl0\cf0 {\listtext	\uc0\u9642 	}
 \f2\b Suppress "Submit" button
@@ -606,7 +609,7 @@ In
 \f1\b Setup (1st time)
 \f0\b0 \
 \pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
-\ls35\ilvl0\cf0 {\listtext	1.	}Download transactions from Credit-Card providers as "CardID-YYYY-MM-MM.csv" files- e.g. "Cap1V-2018-01-12.csv"\
+\ls35\ilvl0\cf0 {\listtext	1.	}Download transactions from Credit-Card providers as "CardID-YYYY-MM-num.csv" files- e.g. "Cap1V-2018-01-12.csv"\
 {\listtext	2.	}Gather as many different transaction files as you can in a single 
 \f1\b Transaction-Folder
 \f0\b0 .\

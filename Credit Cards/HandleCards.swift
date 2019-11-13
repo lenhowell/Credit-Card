@@ -20,7 +20,7 @@ var usrModTranItemReturned  = ModifiedTransactionItem()
 var usrFixVendor        = true
 var usrIgnoreVendors    = [String: Int]()
 
-//MARK:---- handleCards - 25-91 = 66-lines
+//MARK:---- handleCards - 25-95 = 70-lines
 
 func handleCards(fileName: String, cardType: String, cardArray: [String], acct: Account?) -> [LineItem] {
     let cardArrayCount = cardArray.count
@@ -35,9 +35,13 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
     while lineNum < cardArrayCount {
         headerLine = cardArray[lineNum]
         lineNum += 1
-        let components = FileIO.parseCommaDelimitedLine(headerLine)// headerLine.components(separatedBy: ",")
-        if components.count >= 3  {
-            headers = components
+        var csvTsv = FileIO.CsvTsv.tsv
+        if fileName.lowercased().hasSuffix(".csv") {
+            csvTsv = .csv
+        }
+        let comps = FileIO.parseDelimitedLine(headerLine, csvTsv: csvTsv)// headerLine.components(separatedBy: ",")
+        if comps.count >= 3 && comps[0].count > 2  && comps[0].count < 20   && comps[1].count > 2  {
+            headers = comps
             break
         }
     }
@@ -91,7 +95,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
 }//end func handleCards
 
 //MARK: makeLineItem 104-lines
-//---- makeLineItem - Uses support files & possible user-input 95-199 = 104-lines
+//---- makeLineItem - Uses support files & possible user-input 99-203 = 104-lines
 internal func makeLineItem(fromTransFileLine: String,
                            dictColNums: [String: Int],
                            dictVendorShortNames: [String: String],
@@ -117,9 +121,6 @@ internal func makeLineItem(fromTransFileLine: String,
     }
 
     // Use LineItem.init to tranlate the transaction entry to a LineItem.
-    if fromTransFileLine.contains("NEW YORK, NY") {
-        // Debug Trap
-    }
     var lineItem = LineItem(fromTransFileLine: fromTransFileLine, dictColNums: dictColNums, fileName: fileName, lineNum: lineNum, signAmount: signAmount)
 
     // Add descKey & cardType

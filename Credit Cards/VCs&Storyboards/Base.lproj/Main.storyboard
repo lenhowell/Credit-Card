@@ -241,7 +241,7 @@
         <scene sceneID="R2V-B0-nI4">
             <objects>
                 <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
-                    <window key="window" title="Read Credit Card csv downloads" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
+                    <window key="window" title="Read Credit Card Transactions" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="455" y="216" width="800" height="600"/>
@@ -276,9 +276,9 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="749" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ud1-Xt-qfO">
-                                <rect key="frame" x="8" y="403" width="784" height="160"/>
+                                <rect key="frame" x="8" y="393" width="784" height="170"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="160" id="TTx-cp-D3g"/>
+                                    <constraint firstAttribute="height" constant="170" id="TTx-cp-D3g"/>
                                 </constraints>
                                 <textFieldCell key="cell" lineBreakMode="clipping" selectable="YES" borderStyle="border" alignment="center" title="-" id="mVW-Ja-dVe">
                                     <font key="font" size="13" name="Courier"/>
@@ -363,7 +363,7 @@ DQ
                             </textField>
                             <comboBox verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bRm-TN-6sx">
                                 <rect key="frame" x="372" y="228" width="423" height="25"/>
-                                <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="fileName.csv" drawsBackground="YES" completes="NO" numberOfVisibleItems="7" id="Nqw-uu-5Go">
+                                <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="fileName" drawsBackground="YES" completes="NO" numberOfVisibleItems="7" id="Nqw-uu-5Go">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -424,7 +424,7 @@ DQ
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="btnShowTable:" target="XfG-lQ-9wD" id="0wJ-pM-NTr"/>
+                                    <action selector="btnSpreadsheet:" target="XfG-lQ-9wD" id="0wJ-pM-NTr"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -455,7 +455,7 @@ DQ
                             <constraint firstItem="ZKE-KE-nfA" firstAttribute="trailing" secondItem="LY4-Bk-jrA" secondAttribute="trailing" id="aXa-xU-9gS"/>
                             <constraint firstItem="ZKE-KE-nfA" firstAttribute="leading" secondItem="bRm-TN-6sx" secondAttribute="leading" id="bHc-I2-bC0"/>
                             <constraint firstAttribute="trailing" secondItem="ud1-Xt-qfO" secondAttribute="trailing" constant="8" id="bff-M1-v27"/>
-                            <constraint firstItem="MPH-cH-q8h" firstAttribute="top" secondItem="ud1-Xt-qfO" secondAttribute="bottom" constant="35" id="eOW-Ef-uTT"/>
+                            <constraint firstItem="MPH-cH-q8h" firstAttribute="top" secondItem="ud1-Xt-qfO" secondAttribute="bottom" constant="25" id="eOW-Ef-uTT"/>
                             <constraint firstAttribute="trailing" secondItem="d8k-DQ-haq" secondAttribute="trailing" constant="8" id="fDD-rg-WFj"/>
                             <constraint firstItem="TDc-PY-HdN" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="8" id="fsP-lV-86O"/>
                             <constraint firstItem="d8k-DQ-haq" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="8" id="guo-fK-DL0"/>

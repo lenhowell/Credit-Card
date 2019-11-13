@@ -227,7 +227,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     }//end func
 
     //---- loadTableDictsArray - Select stocks to be displayed & Create tableDicts array. Also fill "Totals" labels.
-    private func loadTableDictsArray(lineItemArray: [LineItem], summarizeBy : SummarizeBy) {  // 228-289 = 51-lines
+    private func loadTableDictsArray(lineItemArray: [LineItem], summarizeBy : SummarizeBy) {  // 230-292 = 52-lines
 
         var filteredLineItemArray = [LineItem]()  // Filtered list of transactions
         for lineItem in lineItemArray {

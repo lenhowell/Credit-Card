@@ -11,7 +11,7 @@ import Foundation
 //MARK:- Globals
 var gDictDescKeyAlgorithm  = [String: Int]()
 
-//MARK:- makeDescKey 17-229 = 212-lines
+//MARK:- makeDescKey 16-228 = 212-lines
 //---- makeDescKey - Make a CategoryLookup key from the transaction "Description"
 public func makeDescKey(from desc: String, dictVendorShortNames: [String: String], fileName: String = "") -> String {
     var descKeyLong = desc.trim
@@ -239,19 +239,19 @@ internal func stripTrailingNumber(_ keyIn: String, fileName: String = "") -> Str
     // Replace [(spc)+(2 or more digits)+(word boundry)] with spc
     key2 = key.replacingOccurrences(of:  #" \d\d+\b"#, with: " ", options: .regularExpression, range: nil).trim
     if key2 != key {    // "PILOT 00337", "SUPER 8", "STAR SHOWER 2", "DTGC 1", "JETBLUE     2"
-        print("🔹 1 ",fileName, key, "=>" , key2)   // CIRCLE B 10 => CIRCLE B (# was too short)
+        //print("🔹 1 ",fileName, key, "=>" , key2)   // CIRCLE B 10 => CIRCLE B (# was too short)
         return key2.trim
     }
 
     if key.contains(" ") {      // has a space
         let indexSp = key.lastIndex(of: " ") ?? key.startIndex
         key2 = String(key[..<indexSp])  // String(key.prefix(upTo: indexSp))
-        print("🔹 2 ",fileName, "\(key)  =>  \"\(key2)\"")
+        //print("🔹 2 ",fileName, "\(key)  =>  \"\(key2)\"")
         key = key2          // MCDONALDS F13620 => MCDONALDS  VIOC AE0034 => VIOC    (# starts with letters)
     } else {                // no space
         let indexLet = key.lastIndex(where: {!$0.isNumber}) ?? key.index(before: key.endIndex) // optional
         key2 = String(key[...indexLet])                                 // "AE1B"
-        print("🔹 3 ",fileName, "\(key)  =>  \"\(key2)\"")
+        //print("🔹 3 ",fileName, "\(key)  =>  \"\(key2)\"")
         key = key2                  // STP&SHPFUEL0663 => STP&SHPFUEL (no space between name & #)
     }
     return key.trim

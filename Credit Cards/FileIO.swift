@@ -123,9 +123,7 @@ public struct FileIO {
         print("\nFileIO.getTransFileList#\(#line)")
         do {
             let fileURLs = try FileManager.default.contentsOfDirectory(at: transDirURL, includingPropertiesForKeys: [], options:  [.skipsHiddenFiles, .skipsSubdirectoryDescendants])
-            let csvURLs = fileURLs.filter{ $0.pathExtension.lowercased() == "csv" }
-            //let transURLs = csvURLs.filter{ $0.lastPathComponent.components(separatedBy: "-")[0].count <= Const.maxCardTypeLen }
-            let transURLs = csvURLs.filter{ qualifyTransFileName(url: $0) }
+            let transURLs = fileURLs.filter{ qualifyTransFileName(url: $0) }
 
             print("\(transURLs.count) Transaction Files found.")
             for url in transURLs {
@@ -139,10 +137,10 @@ public struct FileIO {
         return []
     }//end func
 
-    //TODO: Tell user about non-qualified csv's & state rules.
+    //TODO: Tell user about non-qualified filenames & show rules.
     static func qualifyTransFileName(url: URL) -> Bool {
         let ext = url.pathExtension.lowercased()
-        if ext != "csv"                                     { return false }    // not .csv
+        if ext != "csv" && ext != "tsv" && ext != "dnl"     { return false }    // not .csv,.tsv,.dnl
         let fullName = url.deletingPathExtension().lastPathComponent
         let tuple = fullName.splitAtFirst(char: " ")
         let name = tuple.lft
@@ -160,9 +158,16 @@ public struct FileIO {
         return true
     }
 
-    //---- parseCommaDelimitedLine - Parse line, replacing all "," within quotes with a ";"
+    public enum CsvTsv {
+        case csv, tsv
+    }
+    //---- parseDelimitedLine - Parse line, replacing all "," within quotes with a ";"
     // Caution: removes leading & trailing spaces, even if enclosed in quotes
-    static func parseCommaDelimitedLine(_ line: String) -> [String] {
+    static func parseDelimitedLine(_ line: String, csvTsv: CsvTsv) -> [String] {
+        if csvTsv == .tsv {
+            let columns = line.components(separatedBy: "\t").map{$0.trim}  // Isolate columns within this transaction
+            return columns
+        }
 
         var modLine = line
         if line.contains("\"") {
@@ -184,7 +189,7 @@ public struct FileIO {
 
         let columns = modLine.components(separatedBy: ",").map{$0.trim}  // Isolate columns within this transaction
         return columns
-    }//end func parseCommaDelimitedLine
+    }//end func parseDelimitedLine
 
 }//end struct FileIO
 
