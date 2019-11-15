@@ -56,13 +56,15 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         loadComboBoxCats()
         catItemCurrent      = usrCatItemPrefered
         updateAfterCatChange(newCatItem: catItemCurrent)
+        cboCats.delegate = self as? NSComboBoxDelegate
     }
 
     override func viewDidAppear() {
         super.viewDidAppear()
-        view.window?.delegate = self
+        view.window?.delegate = self    // needed for windowShouldClose
     }
 
+    //---- windowShouldClose - requires NSWindowDelegate
     func windowShouldClose(_ sender: NSWindow) -> Bool {
         print("✅(codeFile)#\(#line) windowShouldClose")
         let application = NSApplication.shared
@@ -249,5 +251,24 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         //print("🤣(codeFile)#\(#line) cboCats has \(cboCats.numberOfItems) items.")
     }//end func loadComboBoxFiles
 
-
 }//end class
+
+//MARK: NSTextFieldDelegate, NSComboBoxDelegate
+// Allow UserInputCatViewController to see when a TextField or ComboBox changes.
+extension UserInputCatVC: NSTextFieldDelegate, NSComboBoxDelegate {
+
+    //---- controlTextDidChange - Called when a textField (with ViewController as its delegate) changes.
+    func controlTextDidChange(_ obj: Notification) {
+        guard let cbo = obj.object as? NSComboBox else {
+            return      // Not a ComboBox
+        }
+        chkQuestionMark.state = cboCats.stringValue.hasSuffix("?") ? .on : .off
+        cbo.removeAllItems()
+        let cboStr = cbo.stringValue.lowercased()
+        //let smallList = gMyCatNames.filter{$0.lowercased().hasPrefix(cboStr)}
+        //print(gMyCatNames.count, smallList.count)
+        cboCats.addItems(withObjectValues: gMyCatNames.filter{$0.lowercased().contains(cboStr)})
+
+    }//end func
+
+}//end extension ViewController: NSTextFieldDelegate

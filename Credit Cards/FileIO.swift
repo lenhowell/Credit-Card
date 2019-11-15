@@ -411,7 +411,8 @@ func loadVendorShortNames(url: URL) -> [String: String]  {
         // Create an Array of line components the seperator being a ","
         let vendorShortNameArray = line.components(separatedBy: ",")
         if vendorShortNameArray.count < 2 {
-            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: url.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "expected a comma")
+            let msg = "expected a comma at line# \(lineNum)\n\(line)"
+            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: url.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: msg)
             continue
         }
         let shortName = vendorShortNameArray[0].trim.removeEnclosingQuotes()
@@ -458,7 +459,8 @@ public struct VendorShortNames {
             // Create an Array of line components the seperator being a ","
             let vendorShortNameArray = line.components(separatedBy: ",")
             if vendorShortNameArray.count < 2 {
-                //handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: url.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "expected a comma")
+                let msg = "expected a comma at line# \(lineNum)\n\(line)"
+                handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: url?.lastPathComponent ?? "?", dataLineNum: lineNum, lineText: line, errorMsg: msg)
                 continue
             }
             let shortName = vendorShortNameArray[0].trim.removeEnclosingQuotes()
@@ -656,7 +658,8 @@ func loadVendorCategories(url: URL) -> [String: CategoryItem]  {
         // Create an Array of line components the seperator being a ","
         let categoryArray = line.components(separatedBy: ",")
         if categoryArray.count != 3 {
-            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .display, fileName: url.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: "Expected 2 commas per line")
+            let msg = "Expected 2 commas per line at line# \(lineNum)\n\(line)"
+            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .display, fileName: url.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: msg)
             continue
         }
         let descKey  = categoryArray[0].trimmingCharacters(in: .whitespaces)  // make-DescKey(from: categoryArray[0])

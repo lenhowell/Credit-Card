@@ -432,6 +432,7 @@ class ViewController: NSViewController, NSWindowDelegate {
                 writeVendorCategoriesToFile(url: gVendorCatLookupFileURL, dictCat: gDictVendorCatLookup)
             }
         }
+        //writeModTransTofile(url: gMyModifiedTransURL, dictModTrans: gDictModifiedTrans)
 
         var statString = ""
 
@@ -655,6 +656,8 @@ class ViewController: NSViewController, NSWindowDelegate {
             lblErrMsg.stringValue = errText
             gotItem = gotItem.subtracting(GotItem.fileTransactions) // Mark as not there
         }
+        btnSpreadsheet.keyEquivalent = ""
+        btnStart.keyEquivalent = "\r"
         //cboFiles.scrollItemAtIndexToVisible(cboFiles.numberOfItems-1) Does not work
 
     }//end func

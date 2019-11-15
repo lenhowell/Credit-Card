@@ -56,7 +56,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
     let hasCatHeader: Bool
     if dictColNums["CATE"] == nil {
         hasCatHeader = false
-        let msg = "No \"Catagory\" in Headers"
+        let msg = "No \"Category\" in Headers"
         handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .display, fileName: fileName, dataLineNum: lineNum, lineText: headerLine, errorMsg: msg)
     } else {
         hasCatHeader = true
@@ -168,6 +168,12 @@ internal func makeLineItem(fromTransFileLine: String,
             catFromTran = catTran
             isClearWinner = !catFromTran.hasSuffix("?") // if no "?", we have a winner
         } else {
+            if lineItem.rawCat.isEmpty {
+                lineItem.rawCat = "Unknown"
+                if lineItem.genCat.isEmpty {
+                    lineItem.genCat = "Unknown"
+                }
+            }
             print("HandleCards#\(#line): Unknown Category: \"\(lineItem.rawCat)\" from \(descKey) (line#\(lineNum) in \(fileName))")
             isClearWinner = false
         }
@@ -289,9 +295,13 @@ internal func makeDictColNums(headers: [String]) -> [String: Int] {
             key = "DESC"                                            // DESCRIPTION
         } else if (rawKey.hasPrefix("MERCH") && rawKey.hasSuffix("CATEGORY")) {   // "Merchant Category"
             key = "CATE"                                            // CATEGORY
+            } else if rawKey == "CHK#" {
+                key = "NUMBER"                                      // CHECK NUMBER
         } else if rawKey.hasSuffix("NUMBER") {
             key = "NUMBER"                                          // CHECK NUMBER
 
+        } else if rawKey == "CATAGORY" {
+            key = "CATE"                                            // CATEGORY - 2006
         } else if rawKey == "DESCRIPTION 1" {
             key = "CATE"                                            // CATEGORY - ML Settled Activity
         } else if rawKey == "DESCRIPTION 2" {

@@ -91,7 +91,8 @@ public struct LineItem: Equatable, Hashable {
 
         if let colNum = dictColNums["CATE"] {           // CATEGORY
             if colNum < columnCount {
-                let assignedCat =  columns[colNum]
+                var assignedCat =  columns[colNum]
+                if assignedCat.trim.isEmpty { assignedCat = "Unknown" }
                 let myCat = gDictMyCatAliases[assignedCat] ?? assignedCat
                 //self.rawCat = myCat
                 self.rawCat = assignedCat //%%%%%%%

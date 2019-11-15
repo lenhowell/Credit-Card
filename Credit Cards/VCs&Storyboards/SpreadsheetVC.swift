@@ -269,8 +269,8 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     //---- applyFilter - Returns true if lineItem meets all the filter criteria
     private func applyFilter(lineItem: LineItem) -> Bool {
-        if lineItem.credit + lineItem.debit < filtDollarVal1 { return false }
-        if lineItem.credit + lineItem.debit > filtDollarVal2 { return false }
+        if abs(lineItem.credit) + abs(lineItem.debit) < filtDollarVal1 { return false }
+        if abs(lineItem.credit) + abs(lineItem.debit) > filtDollarVal2 { return false }
 
         if !filtDate1.isEmpty {
             let tranDate = lineItem.tranDate
