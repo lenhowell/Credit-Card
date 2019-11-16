@@ -294,7 +294,7 @@ func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
         gMyCatNames.append(myCat)
 
         for myCatAliasRaw in myCatsArray {
-            let myCatAlias = myCatAliasRaw.trim.removeEnclosingQuotes()
+            let myCatAlias = myCatAliasRaw.trim.removeEnclosingQuotes().uppercased()
 
             if myCatAlias.count >= 3 {
                 if myCatAlias != myCat {
@@ -411,7 +411,7 @@ func loadVendorShortNames(url: URL) -> [String: String]  {
         // Create an Array of line components the seperator being a ","
         let vendorShortNameArray = line.components(separatedBy: ",")
         if vendorShortNameArray.count < 2 {
-            let msg = "expected a comma at line# \(lineNum)\n\(line)"
+            let msg = "expected a comma in \(url.lastPathComponent) line# \(lineNum)\n\(line)"
             handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: url.lastPathComponent, dataLineNum: lineNum, lineText: line, errorMsg: msg)
             continue
         }
@@ -447,7 +447,7 @@ public struct VendorShortNames {
     var dict     = [String: String]()        // Hash for VendorShortNames Lookup
     var url: URL?
 
-    init(lines: [String]) {
+    init(lines: [String], silentMode: Bool = false) {
         var lineNum = 0
         for line in lines {
             lineNum += 1
@@ -459,8 +459,10 @@ public struct VendorShortNames {
             // Create an Array of line components the seperator being a ","
             let vendorShortNameArray = line.components(separatedBy: ",")
             if vendorShortNameArray.count < 2 {
-                let msg = "expected a comma at line# \(lineNum)\n\(line)"
-                handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: url?.lastPathComponent ?? "?", dataLineNum: lineNum, lineText: line, errorMsg: msg)
+                var action: ErrAction = .alertAndDisplay
+                if silentMode { action = .display }
+                let msg = "expected a comma in \(filename) line# \(lineNum)\n\(line)"
+                handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: action, fileName: url?.lastPathComponent ?? "?", dataLineNum: lineNum, lineText: line, errorMsg: msg)
                 continue
             }
             let shortName = vendorShortNameArray[0].trim.removeEnclosingQuotes()
@@ -469,15 +471,15 @@ public struct VendorShortNames {
         }
     }//end init
 
-    init(content: String) {
+    init(content: String, silentMode: Bool = false) {
         let lines = content.components(separatedBy: "\n") // Create var lines containing Entry for each line.
-        self.init(lines: lines)
+        self.init(lines: lines, silentMode: silentMode)
     }
 
-    init(url: URL) {
+    init(url: URL, silentMode: Bool = false) {
         //TODO: If url is not a file, append default filename
         let content = (try? String(contentsOf: url)) ?? ""
-        self.init(content: content)
+        self.init(content: content, silentMode: silentMode)
         self.url = url
         self.filename = url.lastPathComponent
     }//end init

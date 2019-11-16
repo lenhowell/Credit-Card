@@ -145,7 +145,7 @@ internal func makeLineItem(fromTransFileLine: String,
     var catItemFromVendor = CategoryItem()
     var catItemPrefered   = CategoryItem()
     var isClearWinner     = false
-    var catFromTran       = gDictMyCatAliases[lineItem.rawCat] ?? lineItem.rawCat + "-?"
+    var catFromTran       = gDictMyCatAliases[lineItem.rawCat.uppercased()] ?? lineItem.rawCat + "-?"
     var catItemFromTran   = CategoryItem(category: catFromTran, source: cardType)
 
     if let catVend = gDictVendorCatLookup[descKey] {
@@ -164,15 +164,15 @@ internal func makeLineItem(fromTransFileLine: String,
         // If Transaction-Line has a Category, put it in the Vendor file.
         if catFromTran.count < 3 { catFromTran = "" }
 
-        if let catTran = gDictMyCatAliases[catFromTran] {
+        if let catTran = gDictMyCatAliases[catFromTran.uppercased()] {
             catFromTran = catTran
             isClearWinner = !catFromTran.hasSuffix("?") // if no "?", we have a winner
         } else {
             if lineItem.rawCat.isEmpty {
                 lineItem.rawCat = "Unknown"
-                if lineItem.genCat.isEmpty {
-                    lineItem.genCat = "Unknown"
-                }
+//                if lineItem.genCat.isEmpty {
+//                    lineItem.genCat = "Unknown-?"
+//                }
             }
             print("HandleCards#\(#line): Unknown Category: \"\(lineItem.rawCat)\" from \(descKey) (line#\(lineNum) in \(fileName))")
             isClearWinner = false

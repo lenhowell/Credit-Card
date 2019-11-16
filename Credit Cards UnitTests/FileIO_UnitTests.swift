@@ -98,7 +98,7 @@ Missing comma
 3rd entry ,            "Number 3"
 prefix,prefix
 """
-        let vendorShortNames = VendorShortNames(content: content)
+        let vendorShortNames = VendorShortNames(content: content, silentMode: true)
         XCTAssertEqual(vendorShortNames.dict.count, 4)
         XCTAssertEqual(vendorShortNames.dict["If desc has this prefix"], "DescKey")
         XCTAssertEqual(vendorShortNames.dict["2nd entry"], "Number 2")

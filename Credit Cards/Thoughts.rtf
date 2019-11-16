@@ -52,13 +52,15 @@ Bugs:\
 \pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
 \ls1\ilvl0
 \f0\b0 \cf0 {\listtext	\uc0\u8226 	}User is not warned of missing MyAccounts.txt or missing entry for Transaction file.\
-{\listtext	\uc0\u8226 	}In Spreadsheet, Sums often do not line-up after column resize.\
-{\listtext	\uc0\u8226 	}In Spreadsheet, Date-column is sometimes not wide enough.\
+{\listtext	\uc0\u8226 	}
+\f1\b Spreadsheet:
+\f0\b0  Sums often do not line-up after column resize.\
 {\listtext	\uc0\u8226 	}If user changes Vendor-Category from spreadsheet, Transaction files must be re-submitted to fully implement.\
 {\listtext	\uc0\u8226 	}If user changes Vendor-Category to a category with a "?", Transaction-file category will override it.\
 {\listtext	\uc0\u8226 	}MyModifiedTransactions.txt cannot differentiate between 2 identical transactions. \
 {\listtext	\uc0\u8226 	}If user edits MyCategories.txt (rename a category), changes must be made to VendorCategoryLookop.txt\
 {\listtext	\uc0\u8226 	}If user changes an existing ShortName, the old one is not overridden or deleted.\
+{\listtext	\uc0\u8226 	}"Unknown", "Unknown?", "Unknown-?", "Checks-?" ambiguity.\
 \pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
 \ls1\ilvl0
 \f2\b\fs22 \cf0 {\listtext	\uc0\u8226 	}UserInputCat
@@ -275,18 +277,17 @@ In
 \f3\b0  & 
 \f2\b VendorShortNames.txt
 \f3\b0  & 
-\f2\b MyModifiedTransactions.txt
-\f3\b0 \
+\f2\b MyModifiedTransactions.txt\
+\ls18\ilvl0
+\f3\b0 {\listtext	\uc0\u9642 	}Allow user to
+\f2\b  split
+\f0\b0\fs24  a transaction into multiple categories.
+\f3\fs22 \
 {\listtext	\uc0\u9642 	}
 \f2\b "Find Shorts"
 \f3\b0  should apply fix to 
 \f2\b VendorCatLookup.txt
 \f3\b0  also.\
-{\listtext	\uc0\u9642 	}Allow .
-\f2\b tsv
-\f3\b0  (aka .
-\f2\b dnl
-\f3\b0 ) files in addition to .csv files\
 {\listtext	\uc0\u9642 	}Combine filter logic for Spreadsheet & SummaryTable with 
 \f2\b TableFilter 
 \f6\i\b0 struct
@@ -357,6 +358,12 @@ In
 \f2\b\fs22 Summary: 
 \f1\fs24 Show-Transactions
 \f0\b0  button  when Vendor is selected or selected-row  has less than 20 transactions.\
+{\listtext	
+\f5 \uc0\u9642 
+\f0 	}
+\f2\b\fs22 Summary: 
+\f1\fs24 Save-to-Scratchpad
+\f0\b0  button.\
 \pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
 \ls18\ilvl0
 \f3\fs22 \cf0 {\listtext	\uc0\u9642 	}
@@ -376,7 +383,21 @@ In
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 \cf0 \
 \pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
-\ls21\ilvl0\cf0 {\listtext	\uc0\u10003 	}
+\ls21\ilvl0\cf0 {\listtext	\uc0\u10003 	}Allow .
+\f2\b tsv
+\f3\b0  (aka .
+\f2\b dnl
+\f3\b0 ) files in addition to .csv files\
+\pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
+\ls21\ilvl0
+\f0\fs24 \cf0 {\listtext	
+\f5 \uc0\u10003 
+\f0 	}
+\f1\b Spreadsheet:
+\f0\b0  Disable horizontal scrollbar in totals.\
+\pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
+\ls21\ilvl0
+\f3\fs22 \cf0 {\listtext	\uc0\u10003 	}
 \f2\b Spreadsheet: 
 \f3\b0 Show 
 \f2\b Memo
@@ -543,7 +564,16 @@ In
 \f2\b UserInputCat
 \f3\b0 : Show Check-Number on UserInputCat form.\
 {\listtext	\uc0\u10003 	}Remove check boxes from User-Defaults; LearnMode & UserInputMode are now always off at startup.\
-{\listtext	\uc0\u10003 	}
+\pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
+\ls32\ilvl0
+\f0\fs24 \cf0 {\listtext	
+\f5 \uc0\u10003 
+\f0 	}
+\f1\b Spreadsheet:
+\f0\b0    Widen Date-column.\
+\pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
+\ls32\ilvl0
+\f3\fs22 \cf0 {\listtext	\uc0\u10003 	}
 \f2\b Spreadsheet: 
 \f3\b0 Fixed-width font for numbers\
 {\listtext	\uc0\u10003 	}
@@ -653,7 +683,11 @@ New Files for 2.0:\
 \cf2     catFrom$     = Categoryxxx, >=$xxx, <=$yyy     //based $Amount being between $Val1 & $Val2\cf4 \
 \cf2     ...\cf4 \
 \cf2     CatFromRawCat = Categoryxxx, RawCat, =/prefix/contains/suffix   //based on RawCat = xxx\cf4 \
-\cf2     ...\cf4 \
+\cf2     ...\
+\
+\
+Accounts - Add non-standard column headers + special algorithms.\
+\cf4 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 
 \f0\fs24 \cf0 \cb1 --------------------------------------------------------------\

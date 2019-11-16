@@ -93,12 +93,14 @@ public struct LineItem: Equatable, Hashable {
             if colNum < columnCount {
                 var assignedCat =  columns[colNum]
                 if assignedCat.trim.isEmpty { assignedCat = "Unknown" }
-                let myCat = gDictMyCatAliases[assignedCat] ?? assignedCat
+                let myCat = gDictMyCatAliases[assignedCat.uppercased()] ?? ""
                 //self.rawCat = myCat
                 self.rawCat = assignedCat //%%%%%%%
                 self.genCat = myCat
 
             }
+        } else {
+            self.rawCat = "Unknown"
         }
         //TODO: Detect & report corrupt $values rather than silently setting to $0
         if let colNum = dictColNums["AMOU"] {           // AMOUNT

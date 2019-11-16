@@ -174,13 +174,14 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         //      gDictMyCatAliasArray: [String: [String]] catName: aliasArray
         // Must call writeMyCats()
         let newCat = cboCats.stringValue.trim
-        if gDictMyCatAliases[newCat] == nil {
+        if gDictMyCatAliases[newCat.uppercased()] == nil {
             let response = GBox.alert("\(cboCats.stringValue) is not recognized.\nDo you want to add it to the list?", style: .yesNo)
             if response == .yes {
                addCategory(newCat)
             }
             return
         }
+        catItemCurrent.category = newCat
         usrFixVendor = (radioFileVendor.state == .on)
         usrModTranItemReturned = ModifiedTransactionItem(catItem: catItemCurrent, memo: txtMemo.stringValue.trim)
         if radioFileVendor.state == .on {
