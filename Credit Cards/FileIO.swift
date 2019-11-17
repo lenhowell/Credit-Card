@@ -256,7 +256,8 @@ public struct FileAttributes: Equatable {
 
 
 //MARK:- My Catagories
-
+// Modifies gMyCatNames, gDictMyCatAliasArray
+// Returns gDictMyCatAliases
 func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
     gMyCatNames = []
     gDictMyCatAliasArray = [String: [String]]()
@@ -289,18 +290,18 @@ func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
 
         // Create an Array of line components the seperator being a ","
         let myCatsArray = line.components(separatedBy: ",")
-        let myCat = myCatsArray[0].trim.removeEnclosingQuotes()
-        var aliases = [String]()
+        let myCat       = myCatsArray[0].trim.removeEnclosingQuotes()
+        var aliases     = [String]()
         gMyCatNames.append(myCat)
 
         for myCatAliasRaw in myCatsArray {
-            let myCatAlias = myCatAliasRaw.trim.removeEnclosingQuotes().uppercased()
+            let myCatAlias = myCatAliasRaw.trim.removeEnclosingQuotes()
 
             if myCatAlias.count >= 3 {
                 if myCatAlias != myCat {
                     aliases.append(myCatAlias)
                 }
-                dictMyCats[myCatAlias] = myCat
+                dictMyCats[myCatAlias.uppercased()] = myCat
             }
         }
         gDictMyCatAliasArray[myCat] = aliases
@@ -309,7 +310,7 @@ func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
     return dictMyCats
 }//end func loadMyCats
 
-//---- writeMyCats - 
+//---- writeMyCats - uses Global gDictMyCatAliasArray
 func writeMyCats(url: URL) {
     FileIO.saveBackupFile(url: url)
 
@@ -322,7 +323,7 @@ func writeMyCats(url: URL) {
         }
         prevCat = cat
         text += cat
-        var spaceCount = 22 - cat.count
+        var spaceCount = max(24 - cat.count, 0)
         for alias in array {
             text += "," + String(repeating: " ", count: spaceCount) + alias
             spaceCount = 4

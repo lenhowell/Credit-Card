@@ -291,7 +291,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         dict[SpSheetColID.transDate]   = lineItem.tranDate // makeYYYYMMDD(dateTxt: lineItem.tranDate)
         dict[SpSheetColID.descKey]     = lineItem.descKey
         dict[SpSheetColID.fullDesc]    = lineItem.desc
-        dict[SpSheetColID.idNumber]    = lineItem.idNumber
+        dict[SpSheetColID.ChkNumber]   = lineItem.idNumber
         dict[SpSheetColID.debit]       = formatCell(lineItem.debit,  formatType: .dollar,  digits: 2)
         dict[SpSheetColID.credit]      = formatCell(lineItem.credit, formatType: .dollar,  digits: 2)
         dict[SpSheetColID.category]    = lineItem.genCat
@@ -324,7 +324,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 //              Name        ID          Width   Col#    Totals
 public enum SpSheetColID: CaseIterable {
     static let cardType     = "CardType"            // 60    0      -
-    static let idNumber     = "Number"
+    static let ChkNumber    = "ChkNumber"
     static let transDate    = "TransDate"           // --   --
     static let descKey      = "DescKey"             // 60    1
     static let fullDesc     = "Full Description"    // 70    2
@@ -452,7 +452,7 @@ extension SpreadsheetVC: NSTableViewDelegate {
             //print("Selected Row # \(tableView.selectedRow).  idx = \(idx)")
             let lineItem = gLineItemArray[idx]
 
-            var id = rowDict[SpSheetColID.idNumber] ?? ""
+            var id = rowDict[SpSheetColID.ChkNumber] ?? ""
             if !id.isEmpty { id = "  #" + id + "  " }
             let fileAndLine = "[\"" + (rowDict[SpSheetColID.file_LineNum] ?? "").replacingOccurrences(of: "#", with: "\" line#") + "]"
             let descFull = rowDict[SpSheetColID.fullDesc] ?? ""

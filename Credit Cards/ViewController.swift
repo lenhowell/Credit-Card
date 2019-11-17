@@ -561,7 +561,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             }
             let bundleCatsFileURL = URL(fileURLWithPath: path)
             gDictVendorShortNames = loadVendorShortNames(url: bundleCatsFileURL)
-            writeVendorShortNames(url: gVendorShortNamesFileURL, dictVendorShortNames: gDictVendorShortNames)
+            writeVendorShortNames(url: gVendorShortNamesFileURL, dictVendorShortNames: gDictVendorShortNames) // Save Starter file
             let msg = "A starter \"VendorShortNames.txt\" was placed in your support-files folder"
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, errorMsg: msg)
         }
@@ -583,7 +583,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             }
             let bundleCatsFileURL = URL(fileURLWithPath: path)
             gDictMyCatAliases = loadMyCats(myCatsFileURL: bundleCatsFileURL)
-            writeMyCats(url: gMyCatsFileURL)
+            writeMyCats(url: gMyCatsFileURL)    // Save Starter file
             let msg = "A starter \"MyCategories.txt\" was placed in your support-files folder"
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, errorMsg: msg)
         }
@@ -606,7 +606,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             let bundleAccountsFileURL = URL(fileURLWithPath: path)
             gAccounts = Accounts(url: bundleAccountsFileURL)
             gAccounts.url = gMyAccountsURL
-            gAccounts.writeToFile() //= //writeMyCats(url: gMyCatsFileURL)
+            gAccounts.writeToFile() //= writeMyCats(url: gMyCatsFileURL)    // Save Starter file
             let msg = "A starter \"MyAccounts.txt\" was placed in your support-files folder"
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, errorMsg: msg)
         }

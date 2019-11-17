@@ -230,7 +230,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
 
     //---- addCategory - Add a new user-input category to MyCategories
     func addCategory(_ newCat: String) {
-        gDictMyCatAliases[newCat] = newCat
+        gDictMyCatAliases[newCat.uppercased()] = newCat
         gDictMyCatAliasArray[newCat] = []
         gMyCatNames.append(newCat)
         gMyCatNames.sort()
