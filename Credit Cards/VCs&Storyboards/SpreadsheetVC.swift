@@ -291,7 +291,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         dict[SpSheetColID.transDate]   = lineItem.tranDate // makeYYYYMMDD(dateTxt: lineItem.tranDate)
         dict[SpSheetColID.descKey]     = lineItem.descKey
         dict[SpSheetColID.fullDesc]    = lineItem.desc
-        dict[SpSheetColID.ChkNumber]   = lineItem.idNumber
+        dict[SpSheetColID.ChkNumber]   = lineItem.chkNumber
         dict[SpSheetColID.debit]       = formatCell(lineItem.debit,  formatType: .dollar,  digits: 2)
         dict[SpSheetColID.credit]      = formatCell(lineItem.credit, formatType: .dollar,  digits: 2)
         dict[SpSheetColID.category]    = lineItem.genCat
@@ -461,7 +461,6 @@ extension SpreadsheetVC: NSTableViewDelegate {
                 descTrunc += "..."
             }
             lblStatus.stringValue = "\"\(descTrunc)\"\n\(id)orig.cat:\"\(rowDict[SpSheetColID.rawCat] ?? "")\"       file:\(fileAndLine)\n\(lineItem.memo)"
-            //updateCompanyNameLabel()
         }//tableView
     }
 

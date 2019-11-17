@@ -27,7 +27,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         chkLockIn.state       = .off
         chkQuestionMark.state = .off
 
-        lblFile.stringValue = gTransFilename + "    " + usrLineItem.idNumber
+        lblFile.stringValue = gTransFilename + "    " + usrLineItem.chkNumber
         let lineItem        = usrLineItem
         let amt             = lineItem.debit - lineItem.credit
         let strDebit        = String(format:"%.2f", amt)

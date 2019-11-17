@@ -94,8 +94,8 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
     return lineItemArray
 }//end func handleCards
 
-//MARK: makeLineItem 104-lines
-//---- makeLineItem - Uses support files & possible user-input 99-203 = 104-lines
+//MARK: makeLineItem 110-lines
+//---- makeLineItem - Uses support files & possible user-input 99-209 = 110-lines
 internal func makeLineItem(fromTransFileLine: String,
                            dictColNums: [String: Int],
                            dictVendorShortNames: [String: String],

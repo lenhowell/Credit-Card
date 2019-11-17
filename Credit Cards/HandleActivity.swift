@@ -9,7 +9,7 @@
 import Foundation
 
 //MARK:extractTranFromActivity
-func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-202 = 190-lines
+func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-lines
     var lineItem = lineItem
     // TRAN, DESC, CATE, AMOU
     // ????     "1/3/17,  DIVD REINV: PIMCO INCOME FUND CL C AGENT REINV AMOUNT   $343.88,   Securities Trades,   0.00"
@@ -43,7 +43,6 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-202 = 190-
      "3/19/2019","3/19/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","Checking","Check 3721","BARBARA BAUER 000003721","--","--","--","(10,000.00)"
      "3/18/2019","3/18/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","Other","Pre-Authorized Withdrawal","DukeEnergy-FL","--","--","--","(21.56)"
      */
-
 
     var known = false
     var ignore = false
@@ -106,12 +105,12 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-202 = 190-
         lineItem.cardType = "CHECKML"
         let items = des.components(separatedBy: " ")
         if items.count >= 2 {
-            lineItem.idNumber = items[1]
+            lineItem.chkNumber = items[1]
             let comps = des.components(separatedBy: " "+items[1]+" ")
             if comps.count >= 2 {
                 lineItem.desc = comps[1]
             } else if items[0] == "CHECK" {
-                lineItem.idNumber = items[1]
+                lineItem.chkNumber = items[1]
             }
         }
         //print("😀 Check ",fromTransFileLine)                //            "CHECK 3633 CHARLES HOWARD"

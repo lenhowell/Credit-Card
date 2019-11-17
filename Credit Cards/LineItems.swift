@@ -10,25 +10,25 @@ import Foundation
 
 //FIXIT: tranDate should be of type Date, for comparing
 public struct LineItem: Equatable, Hashable {
-    var cardType = ""       // Identifies the Credit-Card account
-    var tranDate = ""       // Transaction-Date String
-    var postDate = ""       // Post-Date String
-    var idNumber = ""       // Card Number (last 4) or Check Number
-    var descKey  = ""       // Generated Key for this desc. (vendor)
-    var desc     = ""       // Description (Vendor)
-    var debit    = 0.0      // Debit (payments to vendors, etc.)
-    var credit   = 0.0      // Credit (Credit-Card payments, refunds, etc.)
-    var rawCat   = ""       // Category from Tansaction
-    var genCat   = ""       // Generated Category
-    var catSource = ""      // Source of Generated Category (including "$" for "LOCKED", "*" for Modified)
-    var transText = ""      // Original Transaction Line from file
-    var memo      = ""
-    var auditTrail = ""     // Original FileName, Line#
+    var cardType    = ""    // Identifies the Credit-Card account
+    var tranDate    = ""    // Transaction-Date String
+    var postDate    = ""    // Post-Date String
+    var chkNumber   = ""    // Check Number
+    var descKey     = ""    // Generated Key for this desc. (vendor)
+    var desc        = ""    // Description (Vendor)
+    var debit       = 0.0   // Debit (payments to vendors, etc.)
+    var credit      = 0.0   // Credit (Credit-Card payments, refunds, etc.)
+    var rawCat      = ""    // Category from Tansaction
+    var genCat      = ""    // Generated Category
+    var catSource   = ""    // Source of Generated Category (including "$" for "LOCKED", "*" for Modified)
+    var transText   = ""    // Original Transaction Line from file
+    var memo        = ""    // Check Memo or Note added when modified
+    var auditTrail  = ""    // Original FileName, Line#
 
     init() {
     }
 
-    //MARK:- init - 34-129 = 95-lines
+    //MARK:- init - 34-135 = 101-lines
     //TODO: Allow LineItem.init to throw errors
     // Create a LineItem from a Transaction-File line
     init(fromTransFileLine: String, dictColNums: [String: Int], fileName: String, lineNum: Int, signAmount: Double) {
@@ -71,7 +71,7 @@ public struct LineItem: Equatable, Hashable {
         }
         if let colNum = dictColNums["CARD"] {           // CARD NUMBER
             if colNum < columnCount {
-                self.idNumber = columns[colNum]
+                //self.chkNumber = columns[colNum]
             }
         }
 
@@ -85,7 +85,7 @@ public struct LineItem: Equatable, Hashable {
                 } else {
                     //num = num
                 }
-                self.idNumber = num
+                self.chkNumber = num
             }
         }
 
@@ -143,7 +143,7 @@ public struct LineItem: Equatable, Hashable {
         let vendr   = self.descKey.prefix(4)
         let credit  = String(format: "%.2f", self.credit)
         let debit   = String(format: "%.2f", self.debit)
-        let sig = "\(self.cardType)|\(dateStr)|\(self.idNumber)|\(vendr)|\(credit)|\(debit)"
+        let sig = "\(self.cardType)|\(dateStr)|\(self.chkNumber)|\(vendr)|\(credit)|\(debit)"
         return sig
     }
 
@@ -176,7 +176,7 @@ public struct LineItem: Equatable, Hashable {
     static public func == (lhs: LineItem, rhs: LineItem) -> Bool {
         return lhs.cardType == rhs.cardType &&
             lhs.tranDate    == rhs.tranDate &&
-            lhs.idNumber    == rhs.idNumber &&
+            lhs.chkNumber    == rhs.chkNumber &&
             lhs.desc.prefix(8) == rhs.desc.prefix(8)  &&
             lhs.debit       == rhs.debit &&
             lhs.credit      == rhs.credit
@@ -186,7 +186,7 @@ public struct LineItem: Equatable, Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(cardType)
         hasher.combine(tranDate)
-        hasher.combine(idNumber)
+        hasher.combine(chkNumber)
         hasher.combine(desc.prefix(8))
         hasher.combine(debit)
         hasher.combine(credit)
