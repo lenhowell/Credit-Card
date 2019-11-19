@@ -21,7 +21,8 @@ struct Stats {
     static var duplicateCount        = 0    // Duplicate Transactions
     static var lineItemNumber        = 0
     static var lineItemCount         = 0
-
+    static var firstDate             = "9999-99-99"
+    static var lastDate              = "0000-00-00"
 
     static func clearAll() {
         transFileCount          = 0
@@ -36,5 +37,7 @@ struct Stats {
         duplicateCount          = 0
         lineItemNumber          = 0
         lineItemCount           = 0
+        firstDate               = "9999-99-99"
+        lastDate                = "0000-00-00"
     }
 }

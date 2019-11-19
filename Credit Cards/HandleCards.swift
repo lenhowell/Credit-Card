@@ -40,7 +40,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
             csvTsv = .csv
         }
         let comps = FileIO.parseDelimitedLine(headerLine, csvTsv: csvTsv)// headerLine.components(separatedBy: ",")
-        if comps.count >= 3 && comps[0].count > 2  && comps[0].count < 20   && comps[1].count > 2  {
+        if comps.count >= 3 && comps[0].count > 2  && comps[0].count < 30   && comps[1].count > 2  {
             headers = comps
             break
         }
@@ -81,6 +81,11 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
             if gDictTranDupes[signature] == nil || gDictTranDupes[signature] == fileName {
                 gDictTranDupes[signature] = fileName        // mark for dupes check
                 lineItemArray.append(lineItem)              // Add new output Record
+                if Stats.firstDate > lineItem.tranDate { Stats.firstDate = lineItem.tranDate }
+                if Stats.lastDate  < lineItem.tranDate { Stats.lastDate  = lineItem.tranDate }
+                if lineItem.genCat.hasPrefix("Uncat") {
+                    // debug trap
+                }
             } else {
                 let msg = "Duplicate transaction of one from \(gDictTranDupes[signature] ?? "?")"
                 handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .display, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: msg)
@@ -170,6 +175,7 @@ internal func makeLineItem(fromTransFileLine: String,
         } else {
             if lineItem.rawCat.isEmpty {
                 lineItem.rawCat = "Unknown"
+                lineItem.genCat = ""
 //                if lineItem.genCat.isEmpty {
 //                    lineItem.genCat = "Unknown-?"
 //                }

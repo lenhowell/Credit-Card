@@ -46,8 +46,46 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
 
     var known = false
     var ignore = false
+
+    var cat = ""
+    var skip = 0
+    if lineItem.rawCat == "Unknown" {
+        let words = lineItem.desc.components(separatedBy: " ")
+        if words[0].range(of: #"[a-z]"#, options: .regularExpression) != nil {
+            cat = words[0]
+            skip = 1
+            if words[1].range(of: #"[a-z]"#, options: .regularExpression) != nil {
+                cat = cat + " " + words[1]
+                skip = 2
+            }
+            var descWords = words.dropFirst(skip)
+            if words[0] .hasPrefix("Check") {
+                if let lastWord = words.last {
+                    descWords = descWords.dropLast()
+                    lineItem.chkNumber = lastWord
+                }
+            } else {
+
+                if cat.hasPrefix("Deferred") {
+                    print("😈😈 HandleActivity#\(#line) \(cat)")
+                    cat = String(cat.dropFirst(8).trim)
+                    print("😈😈😈 HandleActivity#\(#line) \(cat)")
+                }
+                if !cat.isEmpty {
+                    lineItem.rawCat = cat
+                }
+            }
+            lineItem.desc = descWords.joined(separator: " ")
+        }
+    print("😈 HandleActivity#\(#line) \(cat)")
+    }// Unknown rawCat
+
+
     let des = lineItem.desc.uppercased()
     let colinSplit = des.splitAtFirst(char: ":")
+    if lineItem.tranDate == "?" {
+        lineItem.tranDate = lineItem.postDate
+    }
 
     if des.hasPrefix("DIVD REINV") || des.hasPrefix("EXCHANGE:") || des.hasPrefix("REINVESTMENT SHARE")  {
         if lineItem.debit == 0.0 && lineItem.credit == 0.0 {
@@ -190,11 +228,11 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
     }
 
     if !known {
-        print("😡 Unknown: ", des, "   ", lineItem.debit, lineItem.credit)
+        print("😡 HandleActivity#\(#line) Unknown: \"\(des)\"  ", lineItem.debit, lineItem.credit)
         //
     }
     if !ignore && lineItem.debit == 0.0 && lineItem.credit == 0.0 {
-        print("😡 Zero Amount: ",lineItem.transText)
+        print("😡 HandleActivity#\(#line) Zero Amount: ",lineItem.transText)
         //
     }
     return lineItem

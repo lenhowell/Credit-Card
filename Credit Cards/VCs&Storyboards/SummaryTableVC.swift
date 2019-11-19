@@ -289,6 +289,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         txtCreditTotal.stringValue  = currencyFormatter.string(from: NSNumber(value: totalCredit)) ?? "??"
         txtDebitTotal.stringValue   = currencyFormatter.string(from: NSNumber(value: totalDebit)) ?? "??"
         txtNetTotal.stringValue     = currencyFormatter.string(from: NSNumber(value: totalDebit-totalCredit)) ?? "??"
+        sendSummaryToClipBoard(tableDicts: tableDicts)
     }//end func loadTableDictsArray
 
     //**

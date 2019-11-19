@@ -272,4 +272,17 @@ extension UserInputCatVC: NSTextFieldDelegate, NSComboBoxDelegate {
 
     }//end func
 
-}//end extension ViewController: NSTextFieldDelegate
+    // Case-Insensitive auto-complete
+    func comboBox(_ comboBox: NSComboBox, completedString partialString: String) -> String? {
+        if comboBox == cboCats {
+            for idx in 0..<gMyCatNames.count {
+                let testItem = gMyCatNames[idx] as String
+                if (testItem.commonPrefix(with: partialString, options: .caseInsensitive).count) == partialString.count {
+                    return testItem
+                }
+            }
+        }
+        return ""
+    }
+
+}//end extension ViewController: NSTextFieldDelegate, NSComboBoxDelegate
