@@ -489,6 +489,17 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="F6v-pm-I0v">
+                                <rect key="frame" x="144" y="-3" width="155" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="Show Transactions" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="T2e-Eo-1ur">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="btnShowTransactionsClick:" target="igT-kg-E2n" id="hvv-8d-cjh"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="152-SD-4VP" secondAttribute="trailing" constant="22" id="4i4-Id-abv"/>
@@ -511,6 +522,7 @@
                     <connections>
                         <outlet property="btnClear" destination="Pba-Hz-bnq" id="x7i-rJ-Rj6"/>
                         <outlet property="btnFilter" destination="aTI-o1-VqV" id="w2n-SQ-KP0"/>
+                        <outlet property="btnShowTransactions" destination="F6v-pm-I0v" id="VhK-qy-nex"/>
                         <outlet property="radioCardType" destination="bjc-VF-vgn" id="ZD8-7p-gYH"/>
                         <outlet property="radioGroupCategory" destination="EAW-oI-TAj" id="y1d-68-iSP"/>
                         <outlet property="radioMonth" destination="EoS-g6-ZJY" id="P5K-Qy-Bg7"/>

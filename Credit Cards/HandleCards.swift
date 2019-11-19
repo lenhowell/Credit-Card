@@ -84,11 +84,13 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
                 if Stats.firstDate > lineItem.tranDate { Stats.firstDate = lineItem.tranDate }
                 if Stats.lastDate  < lineItem.tranDate { Stats.lastDate  = lineItem.tranDate }
                 if lineItem.genCat.hasPrefix("Uncat") {
+                    let msg = "Got Uncategorized genCat"
+                    handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .display, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: msg)
                     // debug trap
                 }
             } else {
                 let msg = "Duplicate transaction of one from \(gDictTranDupes[signature] ?? "?")"
-                handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .display, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: msg)
+                handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataError, action: .display, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: msg)
                 Stats.duplicateCount += 1
             }
         } else {
@@ -334,6 +336,8 @@ internal func makeDictColNums(headers: [String]) -> [String: Int] {
         if dictColNums[key] == nil {
             dictColNums[key] = colNum
         } else {
+            let msg = "Got Duplicate Columns for \(key)"
+            handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .display, errorMsg: msg)
             // Here when more than 1 rawKey points to same column
         }
     }//next colNum

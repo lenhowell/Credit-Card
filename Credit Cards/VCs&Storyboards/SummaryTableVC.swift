@@ -65,6 +65,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     var calledBy    = TableCalledBy.none
 
     var myTableParams = TableParams()
+    var selectedRowCount = 0
 
     //MARK:- IBOutlets
 
@@ -92,6 +93,8 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     @IBOutlet var txtNetTotal:    NSTextField!
     @IBOutlet var txtDebitTotal:  NSTextField!
     @IBOutlet var txtCreditTotal: NSTextField!
+
+    @IBOutlet var btnShowTransactions: NSButton!
 
     //MARK:- Lifecycle funcs
 
@@ -160,6 +163,35 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
             //tableViewSum.reloadData()
             btnClear.isEnabled = false
         }
+    }
+
+    @IBAction func btnShowTransactionsClick(_ sender: Any) {
+
+        if tableView.selectedRow >= 0 {
+            //print("tableView.selectedRow = \(tableView.selectedRow)")
+            prepareCall(calledByBtn: true)
+            return
+        }
+
+
+        let filterDate1     = txtDate1.stringValue.trim
+        let filterDate2     = txtDate2.stringValue.trim
+        let filterCategory  = txtCategory.stringValue.trim
+        let filterVendor    = txtVendor.stringValue.trim
+        let filterCardType  = txtCardType.stringValue.trim
+
+        gPassToNextTable = TableParams(filtDate1: filterDate1,
+                                     filtDate2:   filterDate2,
+                                     filtDolStr1: "",                   // txtDollar1.stringValue,
+                                     filtDolStr2: "",                   // txtDollar2.stringValue,
+                                     filtCardTyp: filterCardType,
+                                     filtCategor: filterCategory,
+                                     filtVendor:  filterVendor,
+                                     calledBy:    TableCalledBy.summaryTable,
+                                     summaryDepth: myTableParams.summaryDepth+1,
+                                     summarizeBy: summarizeBy,
+                                     sortBy: SortDirective(column: SummaryColID.netCredit, ascending: true))
+        callSpreadsheet()
     }
 
     @IBAction func radioCatChange(_ sender: Any) {
@@ -282,6 +314,11 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         tableDicts.sort { compareTextNum(lft: $0[sortBy] ?? "", rgt: $1[sortBy] ?? "", ascending: iAscending) }
         tableView.reloadData()
         txtCountTotal.stringValue   = String(totalCount)
+
+        if tableView.selectedRow >= 0 {
+            print("tableView.selectedRow = \(tableView.selectedRow)")
+        }
+        btnShowTransactions.isEnabled = (totalCount < 10)
 
         let currencyFormatter = NumberFormatter()
         currencyFormatter.usesGroupingSeparator = true
@@ -464,14 +501,30 @@ extension SummaryTableVC: NSTableViewDelegate {
         return nil
     }//end func
 
+    //---- tableViewSelectionDidChange -  When user selects a row, show data in status bar
+    func tableViewSelectionDidChange(_ notification: Notification){
+        btnShowTransactions.isEnabled = (totalCount < 10)
+        if tableView == self.tableView {
+            let iRow = tableView.selectedRow
+            if iRow < 0 || iRow >= tableDicts.count                 { return }
+            let rowDict = tableDicts[iRow]
+            guard let countTxt = rowDict[SummaryColID.count] else   { return }
+            guard let count = Int(countTxt) else                    { return }
+            if count > 0 && count < 20 {
+                 btnShowTransactions.isEnabled = true
+            }
+        }//tableView
+    }//end func
+
+
     //---- tableViewDoubleClick - Detected doubleClick: showUserInputVendorCatForm
     //viewDidLoad has tableView.target = self
     // & tableView.doubleAction = #selector(tableViewDoubleClick(_:))
     @objc func tableViewDoubleClick(_ sender:AnyObject) {
-        prepareCall()
+        prepareCall(calledByBtn: false)
     }//end func
 
-    func prepareCall() {
+    func prepareCall(calledByBtn: Bool) {
         guard tableView.selectedRow >= 0 else   { return }  // Bail if Bogus row#
         let rowDict = tableDicts[tableView.selectedRow]
         let idxStr = rowDict["idx"] ?? ""
@@ -532,7 +585,7 @@ extension SummaryTableVC: NSTableViewDelegate {
                                      summarizeBy: summarizeNew,
                                      sortBy: SortDirective(column: SummaryColID.netCredit, ascending: true))
 
-        if myTableParams.summaryDepth < 2 && count > 1 {
+        if (myTableParams.summaryDepth < 2 && count > 1) && !calledByBtn {
             callNextSummary()
         } else {
             callSpreadsheet()
