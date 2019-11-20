@@ -126,6 +126,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     override func viewDidAppear() {
         super.viewDidAppear()
         view.window?.delegate = self
+        setTitle()
     }
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {
@@ -172,7 +173,6 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
             prepareCall(calledByBtn: true)
             return
         }
-
 
         let filterDate1     = txtDate1.stringValue.trim
         let filterDate2     = txtDate2.stringValue.trim
@@ -270,9 +270,8 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
             }
         }//next
 
-        //TODO: Change Summary Title based on filter
-        //self.view.window?.title = "Change title here!!!"
-
+        setTitle()
+        
         let sortedLineItemArray = filteredLineItemArray.sorted(by: { compareST(lft: $0, rgt: $1, summarizeBy: summarizeBy) })  //**
 
         if sortedLineItemArray.isEmpty { return }
@@ -390,6 +389,35 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
 //        }
 //        if filtDollarVal1 < 0 || filtDollarVal2 < 0 { return false }
         return errMsg
+    }
+
+    func setTitle() {
+        let title = "Transaction Summary "
+        var addon = ""
+        var filtCount = 0
+        if !txtDate1.stringValue.isEmpty {
+            filtCount += 1
+            addon = "only \(txtDate1.stringValue)"
+            if !txtDate2.stringValue.isEmpty {
+                addon += " to \(txtDate2.stringValue)"
+            }
+        }
+        if !txtVendor.stringValue.trim.isEmpty {
+            filtCount += 1
+            addon = "only Vendor prefix \"\(txtVendor.stringValue.trim)\""
+        }
+        if !txtCardType.stringValue.trim.isEmpty {
+            filtCount += 1
+            addon = "only Acct-Type prefix \"\(txtCardType.stringValue.trim)\""
+        }
+        if !txtCategory.stringValue.trim.isEmpty {
+            filtCount += 1
+            addon = "only Category prefix \"\(txtCategory.stringValue.trim)\""
+        }
+        if filtCount > 1 { addon = "Multiple filters" }
+        if addon.isEmpty { addon = " \(Stats.firstDate) to \(Stats.lastDate)" }
+
+        self.view.window?.title = title + addon
     }
 
     //TODO: Move to TableFilter.swift
