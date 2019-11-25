@@ -50,6 +50,7 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
     var cat = ""
     var skip = 0
     if lineItem.rawCat == "Unknown" {
+        let oldDesc = lineItem.desc
         let words = lineItem.desc.components(separatedBy: " ")
         if words[0].range(of: #"[a-z]"#, options: .regularExpression) != nil {
             cat = words[0]
@@ -61,15 +62,13 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
             var descWords = words.dropFirst(skip)
             if words[0] .hasPrefix("Check") {
                 if let lastWord = words.last {
-                    descWords = descWords.dropLast()
+                    descWords = descWords.dropLast()    // "Check3519 STEVE BRYAN 3519" -> "STEVE BRYAN"
                     lineItem.chkNumber = lastWord
                 }
             } else {
 
                 if cat.hasPrefix("Deferred") {
-                    print("😈😈 HandleActivity#\(#line) \(cat)")
                     cat = String(cat.dropFirst(8).trim)
-                    print("😈😈😈 HandleActivity#\(#line) \(cat)")
                 }
                 if !cat.isEmpty {
                     lineItem.rawCat = cat
@@ -77,7 +76,8 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
             }
             lineItem.desc = descWords.joined(separator: " ")
         }
-    print("😈 HandleActivity#\(#line) \(cat)")
+        print("😈😈 HandleActivity#\(#line) desc: \"\(oldDesc)\" -> \"\(lineItem.desc)\"")
+        print("😈 HandleActivity#\(#line) rawCat: \"Unknown\" -> \"\(lineItem.rawCat)\"")
     }// Unknown rawCat
 
 
@@ -158,7 +158,7 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
         lineItem.rawCat = "Gift"
         known = true                                          //            "WITHDRAWAL WELLS FARGO BANK"
 
-    } else if colinSplit.lft.contains("DIV")                { // "CDIV:", "DIVIDEND:", "LIQUIDATING DIVIDEND:", "FOREIGN DIVIDEND:"
+    } else if !colinSplit.rgt.isEmpty && colinSplit.lft.contains("DIV") { // "CDIV:", "DIVIDEND:", "LIQUIDATING DIVIDEND:", "FOREIGN DIVIDEND:"
         known = true
         lineItem.desc = colinSplit.rgt
         lineItem.rawCat = "Income-Dividend"
@@ -219,7 +219,7 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
             // Debug Trap - Non-SSA Direct-Deposit
         }
 
-    } else if des.hasPrefix("OVERDRAFT") && des.hasSuffix("LOAN") { // "OVERDRAFT LOAN EXTEND OVERDRAFT LOAN"
+    } else if des.contains("OVERDRAFT") && des.hasSuffix("LOAN") { // "OVERDRAFT LOAN EXTEND OVERDRAFT LOAN"
         known = true
         lineItem.desc = "OVERDRAFT LOAN"
         lineItem.rawCat = "loans"

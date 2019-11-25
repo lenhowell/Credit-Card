@@ -22,9 +22,9 @@ var usrIgnoreVendors    = [String: Int]()
 
 //MARK:---- handleCards - 25-95 = 70-lines
 
-func handleCards(fileName: String, cardType: String, cardArray: [String], acct: Account?) -> [LineItem] {
+func handleCards(fileName: String, cardType: String, cardArray: [String], acct: Account?) {
     let cardArrayCount = cardArray.count
-    var lineItemArray = [LineItem]()                // Create Array variable(lineItemArray) Type lineItem.
+    //var lineItemArray = [LineItem]()                // Create Array variable(lineItemArray) Type lineItem.
     var lineNum = 0
 
     //MARK: Read Header
@@ -48,7 +48,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
 
     if headers.isEmpty {
         handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataError, action: .alertAndDisplay,  fileName: fileName, dataLineNum: lineNum, lineText: "", errorMsg: "Headers not found.")
-        return lineItemArray
+        return
     }
 
     let dictColNums = makeDictColNums(headers: headers)
@@ -76,30 +76,94 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
         let lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: gDictVendorShortNames, cardType: cardType, hasCatHeader: hasCatHeader, fileName: fileName, lineNum: lineNum, acct: acct)
 
         if !lineItem.desc.isEmpty || !lineItem.postDate.isEmpty || lineItem.debit != 0  || lineItem.credit != 0 {
-            // Check for duplicate from another file
-            let signature = lineItem.signature()
-            if gDictTranDupes[signature] == nil || gDictTranDupes[signature] == fileName {
-                gDictTranDupes[signature] = fileName        // mark for dupes check
-                lineItemArray.append(lineItem)              // Add new output Record
+
+            // Check for Duplicate of a Check-Number
+            let chkNum = lineItem.chkNumber.trim
+            if !chkNum.isEmpty {                        // This is a Numbered Check
+                let dateFromTran = lineItem.tranDate
+                var dateUsed = dateFromTran
+                if let idxFromDupe = gDictCheckDupes[chkNum] {
+                    // IS a Dupe
+                    dateUsed = gotaDupe(lineItem: lineItem, idxFromDupe: idxFromDupe, fileName: fileName, lineNum: lineNum)
+
+                } else {    // NOT a Dupe
+                    gDictCheckDupes[chkNum] = gLineItemArray.count  // Record its position in array for Dupe check
+                    gLineItemArray.append(lineItem)                 // Add new output Record
+                }
+                if Stats.firstDate > dateUsed { Stats.firstDate = dateUsed }
+                if Stats.lastDate  < dateUsed { Stats.lastDate  = dateUsed }
+                continue
+            }
+
+            // Check for Duplicate from another file
+            let signature1 = lineItem.signature()                   // Signature using TranDate
+            let signature2 = lineItem.signature(usePostDate: true)  // Signature using PostDate
+            var matchOpt = gDictTranDupes[signature1]
+            if matchOpt == nil { matchOpt = gDictTranDupes[signature2] }
+            if lineItem.desc.hasPrefix("TIV") && lineItem.credit >= 600 {
+                // Debug Trap
+            }
+            if matchOpt == nil || matchOpt!.1 == fileName {
+                // NOT a Dupe
+                let tuple = (gLineItemArray.count, fileName)
+                gDictTranDupes[signature1] = tuple        // mark for dupes check using TranDate
+                gDictTranDupes[signature2] = tuple        // mark for dupes check using PostDate
+
+                gLineItemArray.append(lineItem)              // Add new output Record
                 if Stats.firstDate > lineItem.tranDate { Stats.firstDate = lineItem.tranDate }
                 if Stats.lastDate  < lineItem.tranDate { Stats.lastDate  = lineItem.tranDate }
+
                 if lineItem.genCat.hasPrefix("Uncat") {
                     let msg = "Got Uncategorized genCat"
                     handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataWarning, action: .display, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: msg)
                     // debug trap
                 }
-            } else {
-                let msg = "Duplicate transaction of one from \(gDictTranDupes[signature] ?? "?")"
-                handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataError, action: .display, fileName: fileName, dataLineNum: lineNum, lineText: tran, errorMsg: msg)
-                Stats.duplicateCount += 1
+            } else {    // IS a Dupe
+                if let match = matchOpt {
+                    let idxFromDupe = match.0
+                    _ = gotaDupe(lineItem: lineItem, idxFromDupe: idxFromDupe, fileName: fileName, lineNum: lineNum)
+                }
             }
         } else {
             // debug trap - empty line
         }
     }//end line-by-line loop
 
-    return lineItemArray
+    return
 }//end func handleCards
+
+// Returns the TrasactionDate to use for min-max
+internal func gotaDupe(lineItem: LineItem, idxFromDupe: Int, fileName: String, lineNum: Int) -> String {
+    // IS a Dupe
+    let lineItemFromDupe = gLineItemArray[idxFromDupe]
+    let dateFromDupe = lineItemFromDupe.tranDate
+    let dateFromTran = lineItem.tranDate
+    var dateUsed     = dateFromTran
+    let chkNum = lineItem.chkNumber
+    let msg: String
+    if chkNum.isEmpty {
+        msg = "Duplicate transaction of one from \(lineItemFromDupe.auditTrail)"
+    } else {
+        msg = "Duplicate chkNumber \(chkNum) with dates of \(dateFromTran) & \(dateFromDupe) "
+    }
+    handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataError, action: .display, fileName: fileName, dataLineNum: lineNum, lineText: lineItem.transText, errorMsg: msg)
+    if lineItem.descKey != lineItemFromDupe.descKey ||  lineItem.genCat != lineItemFromDupe.genCat {
+        print("\(lineItem.descKey) != \(lineItemFromDupe.descKey) ||  \(lineItem.genCat) != \(lineItemFromDupe.genCat)")
+        if lineItemFromDupe.genCat == "Unknown" && lineItem.genCat != "Unknown" {
+            gLineItemArray[idxFromDupe].genCat = lineItem.genCat
+            gLineItemArray[idxFromDupe].descKey = lineItem.descKey
+        } else {
+            //
+        }
+    }
+    if dateFromTran < dateFromDupe {
+        gLineItemArray[idxFromDupe].tranDate = dateFromTran // Use older tranDate (newer one is probably a postDate)
+    } else {
+        dateUsed = dateFromDupe
+    }
+    Stats.duplicateCount += 1
+    return dateUsed
+}
 
 //MARK: makeLineItem 110-lines
 //---- makeLineItem - Uses support files & possible user-input 99-209 = 110-lines

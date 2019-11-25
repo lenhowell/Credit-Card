@@ -77,21 +77,30 @@ public struct LineItem: Equatable, Hashable {
 
         if let colNum = dictColNums["NUMBER"] {         // CHECK NUMBER
             if colNum < columnCount {
-                var num = columns[colNum]
-                num = num.replacingOccurrences(of: "[*#,$]", with: "", options: .regularExpression, range: nil).trim
-                num = String(num.suffix(6))
-                if num == "0" || num == "00" || (num.prefix(3) == "000" && num.suffix(3) == "000") {
-                    num = ""
-                } else {
-                    //num = num
+                var numStr = columns[colNum]
+                numStr = numStr.replacingOccurrences(of: "[*#,$]", with: "", options: .regularExpression, range: nil).trim
+                if !numStr.isEmpty {
+                    if let num = Int(numStr) {
+                        if num != 0 { self.chkNumber = "\(num)" }
+                    } else{
+                        //
+                    }
                 }
-                self.chkNumber = num
             }
         }
 
         if let colNum = dictColNums["CATE"] {           // CATEGORY
             if colNum < columnCount {
                 var assignedCat =  columns[colNum]
+                if assignedCat.hasPrefix("Check ") {
+                    let (_, chkNum) = assignedCat.splitAtFirst(char: " ")
+                    if chkNum == "3704" {
+                        print("LineItems #\(#line) - \(assignedCat)\n\(fromTransFileLine)")
+                        //
+                    }
+                    self.chkNumber = chkNum
+                    assignedCat = ""
+                }
                 if assignedCat.trim.isEmpty { assignedCat = "Unknown" }
                 let myCat = gDictMyCatAliases[assignedCat.uppercased()] ?? ""
                 //self.rawCat = myCat
@@ -135,15 +144,23 @@ public struct LineItem: Equatable, Hashable {
     }//end init
 
     //---- signature - Unique identifier for detecting Transaction dupes & user-modified versions.
-    func signature() -> String {
+    func signature(usePostDate: Bool = false) -> String {
         // CardType + Date + ID# + 1st4ofDesc + credit + debit
         //let (cleanName, _) = self.auditTrail.splitAtFirst(char: "#")
         //let useName = cleanName.replacingOccurrences(of: "-", with: "")
-        let dateStr = self.tranDate                                 // convertToYYYYMMDD(dateTxt: self.tranDate)
+        var dateStr = self.tranDate
+        if usePostDate { dateStr = self.postDate }
+
         let vendr   = self.descKey.prefix(4)
         let credit  = String(format: "%.2f", self.credit)
         let debit   = String(format: "%.2f", self.debit)
-        let sig = "\(self.cardType)|\(dateStr)|\(self.chkNumber)|\(vendr)|\(credit)|\(debit)"
+        let chkNum = self.chkNumber.trim
+        var sig = ""
+        if chkNum.isEmpty {
+            sig = "\(dateStr)|\(vendr)|\(credit)|\(debit)"
+        } else {
+            sig = "\(chkNum)|\(vendr)|\(credit)|\(debit)"
+        }
         return sig
     }
 

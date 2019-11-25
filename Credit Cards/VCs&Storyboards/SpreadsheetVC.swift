@@ -495,6 +495,7 @@ extension SpreadsheetVC: NSTableViewDelegate {
     @objc func tableViewDoubleClick(_ sender:AnyObject) {
         // 1
         guard tableView.selectedRow >= 0 else { return }
+        let selectedRow = tableView.selectedRow
         let rowDict = tableDicts[tableView.selectedRow]
         let idxStr = rowDict["idx"] ?? ""
         let idx = Int(idxStr) ?? -1
@@ -513,6 +514,7 @@ extension SpreadsheetVC: NSTableViewDelegate {
 
         loadTableDictsArray(lineItemArray: gLineItemArray)
         reloadTableSorted(sortBy: iSortBy, ascending: iAscending)
+        tableView.selectRowIndexes(NSIndexSet(index: selectedRow) as IndexSet, byExtendingSelection: false)
     }//end func
 
 }//end extension

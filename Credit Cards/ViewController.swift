@@ -17,7 +17,8 @@ var gMyCatNames             = [String]()            // (loadMyCats, UserInputVC.
 var gDictMyCatAliases       = [String: String]()        // (LineItems.init, etc) Hash of Category Synonyms
 var gDictMyCatAliasArray    = [String: [String]]()      // Synonyms for each cat name
 var gDictVendorCatLookup    = [String: CategoryItem]()  // (HandleCards.swift-3) Hash for Category Lookup (CategoryLookup.txt)
-var gDictTranDupes          = [String: String]()        // (handleCards) Hash for finding duplicate transactions
+var gDictTranDupes          = [String: (Int, String)]() // (handleCards) Hash for finding duplicate transactions
+var gDictCheckDupes         = [String: Int]()           // (handleCards) Hash for finding duplicate checkNumbers
 var gAccounts               = Accounts()
 var gDictModifiedTrans      = [String: ModifiedTransactionItem]()  // (MyModifiedTransactions.txt) Hash for user-modified transactions
 
@@ -361,6 +362,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         var fileContents    = ""                        // Where All Transactions in a File go
         gDictTranDupes = [:]
+        gDictCheckDupes = [:]
         lblErrMsg.stringValue = ""
         
         if !FileManager.default.fileExists(atPath: transactionDirURL.path) {
@@ -409,7 +411,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             // Check which Credit Card Transactions we are currently processing
             if cardType.count >= 2 &&  cardType.count <= Const.maxCardTypeLen  {
                 Stats.transFileNumber = fileNum + 1
-                gLineItemArray += handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray, acct: gAccounts.dict[cardType])
+                handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray, acct: gAccounts.dict[cardType])
                 chkUserInput.state = gUserInputMode ? .on : .off
             } else {
                 //Stats.junkFileCount += 1

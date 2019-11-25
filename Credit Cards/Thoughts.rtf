@@ -52,13 +52,17 @@ Bugs:\
 \pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
 \ls1\ilvl0
 \f0\b0 \cf0 {\listtext	\uc0\u8226 	}User is not warned of missing MyAccounts.txt or missing entry for Transaction file.\
-{\listtext	\uc0\u8226 	}
-\f1\b Spreadsheet:
-\f0\b0  Sums often do not line-up after column resize.\
 {\listtext	\uc0\u8226 	}If user changes Vendor-Category from spreadsheet, Transaction files must be re-submitted to fully implement.\
+{\listtext	\uc0\u8226 	}Duplicates are still problematic when CreditCard & Activity files have different dates.\
 {\listtext	\uc0\u8226 	}If user changes Vendor-Category to a category with a "?", Transaction-file category will override it.\
 {\listtext	\uc0\u8226 	}MyModifiedTransactions.txt cannot differentiate between 2 identical transactions. \
-{\listtext	\uc0\u8226 	}If user edits MyCategories.txt (rename a category), changes must be made to VendorCategoryLookop.txt\
+{\listtext	\uc0\u8226 	}If user edits 
+\f1\b MyCategories.txt
+\f0\b0  (rename a category), changes must be made to 
+\f1\b VendorCategoryLookop.txt
+\f0\b0  & 
+\f1\b MyModifiedTransactions.txt
+\f0\b0 \
 {\listtext	\uc0\u8226 	}If user changes an existing ShortName, the old one is not overridden or deleted.\
 {\listtext	\uc0\u8226 	}"Unknown", "Unknown?", "Unknown-?", "Checks-?","Uncategorized" ambiguity.\
 \pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
@@ -171,31 +175,58 @@ In
 \f5 \uc0\u10003 
 \f0 	}
 \f2\b\fs22 VendorShortNames.txt 		
-\f0\b0\fs24 List of description-prefixes that point to the same vendor\
+\f0\b0\fs24 List of description-prefixes that point to the same 
+\f1\b Vendor
+\f0\b0 \
 {\listtext	
 \f5 \uc0\u10003 
 \f0 	}
 \f2\b\fs22 VendorCategoryLookup.txt
-\f0\b0\fs24 	Category associated with a given Vendor\
+\f0\b0\fs24 	
+\f1\b Category
+\f0\b0  associated with a given 
+\f1\b Vendor
+\f0\b0 \
 {\listtext	
 \f5 \uc0\u10003 
 \f0 	}
 \f1\b MyModifiedTransactions.txt	
-\f0\b0 User-Modified-Transactions file\
+\f0\b0 User-Modified-Transactions file with revised 
+\f1\b Category
+\f0\b0 .\
 \pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
 \ls8\ilvl0\cf0 {\listtext	
 \f5 \uc0\u10003 
 \f0 	}
 \f1\b MyCategories.txt
-\f0\b0 			List of Allowed Categories with automatic Category Translations (from CreditCard to UserPreference).\
+\f0\b0 			List of Allowed 
+\f1\b Categories
+\f0\b0  with automatic Category Translations (from CreditCard to UserPreference).\
 \pard\tx560\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf0 \
+\
+
+\f1\b Workflow:
+\f0\b0 \
+\pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
+\ls9\ilvl0\cf0 {\listtext	
+\f5 \uc0\u9642 
+\f0 	}Allow user to go directly to Summary (no Spreadsheet)\
+{\listtext	
+\f5 \uc0\u9642 
+\f0 	}Summaries overwrite each other rather than chaining.\
+{\listtext	
+\f5 \uc0\u9642 
+\f0 	}Allow multiple Transaction files to be selected from dropdown list.\
+\pard\tx560\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \f1\b \cf0 Possible User Inputs (CheckBoxes, etc.)
 \f0\b0 \
 \pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
-\ls9\ilvl0\cf0 {\listtext	
+\ls10\ilvl0\cf0 {\listtext	
 \f5 \uc0\u9642 
 \f0 	}
 \f1\b Back-button
@@ -210,7 +241,7 @@ In
 \f1\b Spreadsheet
 \f0\b0  form.\
 \pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
-\ls10\ilvl0\cf0 {\listtext	
+\ls11\ilvl0\cf0 {\listtext	
 \f5 \uc0\u9642 
 \f0 	}
 \f1\b Back-button
@@ -218,21 +249,13 @@ In
 \f1\b SummaryTable
 \f0\b0  form.\
 \pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
-\ls11\ilvl0\cf0 {\listtext	
-\f5 \uc0\u9642 
-\f0 	}
-\f1\b Show-Transactions
-\f0\b0  button on 
-\f1\b SummaryTable
-\f0\b0  form if Vendor is selected or selected-row  has less than 20 transactions.\
-\pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
 \ls12\ilvl0\cf0 {\listtext	
 \f5 \uc0\u9642 
 \f0 	}
 \f1\b Edit-Transaction
 \f0\b0  button on 
 \f1\b Spreadsheet
-\f0\b0  form if a row is selected.\
+\f0\b0  form if a row is selected (same as dbl-click).\
 \pard\tx560\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf0 \
 \pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
@@ -286,7 +309,8 @@ In
 \ls18\ilvl0
 \f3\b0 {\listtext	\uc0\u9642 	}Allow user to
 \f2\b  split
-\f0\b0\fs24  a transaction into multiple categories.
+\f1\fs24  a transaction
+\f0\b0  into multiple categories.
 \f3\fs22 \
 {\listtext	\uc0\u9642 	}
 \f2\b "Find Shorts"
@@ -324,6 +348,9 @@ In
 {\listtext	\uc0\u9642 	}
 \f2\b UserInputCatVC: 
 \f3\b0 Give informed suggestions based on $, rawDesc, name, etc.\
+{\listtext	\uc0\u9642 	}
+\f2\b UserInputCatVC: 
+\f3\b0 Give complete details of original Transaction & Modified Transaction.\
 {\listtext	\uc0\u9642 	}
 \f2\b Spreadsheet: 
 \f3\b0 Show ValueError, DateError, ModifiedTransaction in 
@@ -383,9 +410,16 @@ In
 \f3 	}Flag transaction as possible fraud, based on category & $-amount.\
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 \cf0 \
-\pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
+\pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
 \ls21\ilvl0
 \f0\fs24 \cf0 {\listtext	
+\f5 \uc0\u10003 
+\f0 	}When returning from 
+\f2\b\fs22 UserInputCat, Spreadsheet 
+\f3\b0 selection is now restored.
+\f0\fs24 \
+\pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
+\ls21\ilvl0\cf0 {\listtext	
 \f5 \uc0\u10003 
 \f0 	}
 \f2\b\fs22 Summary: 
