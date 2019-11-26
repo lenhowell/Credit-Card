@@ -70,6 +70,14 @@ class Credit_Cards_UnitTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
+    func  testDateDif() {
+        var result = 0
+        result = dateDif(dateStr1: "2013-01-31", dateStr2: "2013-02-01")
+        XCTAssertEqual(result, 1)
+        result = dateDif(dateStr1: "2014-01-01", dateStr2: "2013-12-31")
+        XCTAssertEqual(result, -1)
+    }
+
     func testDateExtensions() {
         let date = Date.distantFuture
         let dc = date.getComponents()

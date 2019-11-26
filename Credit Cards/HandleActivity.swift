@@ -42,6 +42,21 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
      "3/19/2019","3/19/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","FundReceipts","Direct Deposit","PALAC","--","--","--","8,313.01"
      "3/19/2019","3/19/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","Checking","Check 3721","BARBARA BAUER 000003721","--","--","--","(10,000.00)"
      "3/18/2019","3/18/2019","Settled","GEORGE'S CMA PLUS","CMAM","812-43946","Other","Pre-Authorized Withdrawal","DukeEnergy-FL","--","--","--","(21.56)"
+
+     MLCMA-2013 Activity
+     "expand/collapse column header" ," Trade Date " ," Settlement Date " ," Type" ," Description" ," Symbol/  CUSIP  " ," Quantity" ," Price ($) " ," Amount ($)" ," "
+     ""     ,"" ,"12/18/2013" ,"" ,"DDS SSA  TREAS 310"                                    ,""      ,"" ,"" ,  "1,494.40" ,""
+     "show" ,"" ,"12/16/2013" ,"" ,"Dividend DUKE ENERGY CORP NEW HOLDING 200.00..."       ,"DUK"   ,"" ,"" ,    "156.00" ,""
+     ""     ,"" ,"12/16/2013" ,"" ,"Pre Authdebit ProgressEngyFl"                          ,""      ,"" ,"" ,   "(18.75)" ,""
+     ""     ,"" ,"12/13/2013" ,"" ,"Check3474 ORLANDO APOPKA A 3474"                       ,""      ,"" ,"" ,  "(285.00)" ,""
+     ""     ,"" ,"12/13/2013" ,"" ,"Funds Transfer TR TO ML   81217K22"                    ,""      ,"" ,"" ,"(4,400.00)" ,""
+     "show" ,"" ,"12/12/2013" ,"" ,"Lg Tm Cap Gain PIMCO INCOME FUND CL C PAY DATE 12/..." ,"PONCX" ,"" ,"" ,   "100.50"  ,""
+     ""     ,"" ,"12/12/2013" ,"" ,"Reinvestment PIMCO INCOME FUND CL C"                   ,"PONCX" ,"" ,"" ,  "(100.50)" ,""
+     "show" ,"" ,"12/12/2013" ,"" ,"Sh Tm Cap Gain PIMCO INCOME FUND CL C PAY DATE 12/..." ,"PONCX" ,"" ,"" ,    "15.36"  ,""
+     "show" ,"" ,"12/27/2013" ,"" ,"Divd Reinv DAF S AND P 500 TRUST 2 PRINCIPAL Q..."     ,"ESP002","735" ,"" ,"0.00" ,""
+     "show" ,"11/26/2013" ,"12/26/2013" ,"" ,"Deferred CINEMARK THEATRES 284 ORLANDO FL En..." ,"" ,"" ,"" ,"(10.25)" ,""
+     "show" ,"11/30/2013" ,"12/26/2013" ,"" ,"Deferred TEXAS ROADHOUSE 2285 OCOEE FL Resta..." ,"" ,"" ,"" ,"(15.00)" ,""
+
      */
 
     var known = false
@@ -76,8 +91,8 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
             }
             lineItem.desc = descWords.joined(separator: " ")
         }
-        print("😈😈 HandleActivity#\(#line) desc: \"\(oldDesc)\" -> \"\(lineItem.desc)\"")
-        print("😈 HandleActivity#\(#line) rawCat: \"Unknown\" -> \"\(lineItem.rawCat)\"")
+        //print("😈😈 HandleActivity#\(#line) desc: \"\(oldDesc)\" -> \"\(lineItem.desc)\"")
+        //print("😈 HandleActivity#\(#line) rawCat: \"Unknown\" -> \"\(lineItem.rawCat)\"")
     }// Unknown rawCat
 
 

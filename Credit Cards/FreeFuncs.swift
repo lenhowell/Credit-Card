@@ -109,6 +109,23 @@ public func compareTextNum(lft: String, rgt: String, ascending: Bool) -> Bool {
     return false
 }
 
+func dateDif(dateStr1: String, dateStr2: String) -> Int {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd"
+    let date1 = dateFormatter.date(from: dateStr1) ?? Date.distantPast
+    let date2 = dateFormatter.date(from: dateStr2) ?? Date.distantPast
+    let interval = date2.timeIntervalSince(date1)
+    let dblDiff = Double(interval) / (3600*24)
+    let diff: Int
+    if dblDiff >= 0 {
+        diff = Int(dblDiff + 0.001)
+    } else {
+        diff = Int(dblDiff - 0.001)
+    }
+    return diff
+}
+
+
 //---- sortStr - returns a string that is sortable, either numerically or case-insensitive.
 public func sortStr(_ str: String) -> String {
     var txt = str

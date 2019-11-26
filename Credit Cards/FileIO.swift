@@ -382,7 +382,7 @@ func writeModTransTofile(url: URL, dictModTrans: [String: ModifiedTransactionIte
     var text = "// Machine-generated file\n"
     text += "//Category     <tab> Source <tab> (Type|Date|Num|Credit|Debit)\n"
     for (key, modTranItem) in dictModTrans.sorted(by: {$0.key < $1.key}) {
-        let cat = modTranItem.catItem.category.PadRight(20)
+        let cat = modTranItem.catItem.category.PadRight(24, truncate: false)
         text += "\(cat)\t\(modTranItem.catItem.source)\t\(key)\t\(modTranItem.memo)\n"
     }
     //— writing —

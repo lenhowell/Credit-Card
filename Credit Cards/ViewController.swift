@@ -19,6 +19,7 @@ var gDictMyCatAliasArray    = [String: [String]]()      // Synonyms for each cat
 var gDictVendorCatLookup    = [String: CategoryItem]()  // (HandleCards.swift-3) Hash for Category Lookup (CategoryLookup.txt)
 var gDictTranDupes          = [String: (Int, String)]() // (handleCards) Hash for finding duplicate transactions
 var gDictCheckDupes         = [String: Int]()           // (handleCards) Hash for finding duplicate checkNumbers
+var gDictCreditDupes        = [String: String]()        // (handleCards) Hash for finding duplicate Visa Credits (inconsistant dates)
 var gAccounts               = Accounts()
 var gDictModifiedTrans      = [String: ModifiedTransactionItem]()  // (MyModifiedTransactions.txt) Hash for user-modified transactions
 
@@ -124,7 +125,8 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
 
         // Disable Spreadsheet button until Transactions are read-in
-        btnSpreadsheet.isEnabled = false
+        setButtons(btnDefault: .start, needsRecalc: true, transFolderOK: true)
+        //btnSpreadsheet.isEnabled = false
 
         // Start off with Learn-mode and user-intervension-mode off
         gLearnMode            = false
@@ -190,8 +192,9 @@ class ViewController: NSViewController, NSWindowDelegate {
     @IBOutlet weak var lblRunTime:  NSTextField!
     @IBOutlet var lblTranFileCount: NSTextField!
 
-    @IBOutlet weak var btnSpreadsheet:  NSButton!
     @IBOutlet weak var btnStart:        NSButton!
+    @IBOutlet weak var btnSpreadsheet:  NSButton!
+    @IBOutlet weak var btnSummary:      NSButton!
     @IBOutlet var chkLearningMode:      NSButton!
     @IBOutlet var chkUserInput:         NSButton!
     
@@ -226,6 +229,10 @@ class ViewController: NSViewController, NSWindowDelegate {
             tableWindow.close()
         }//end if let
     }//end func
+
+    @IBAction func btnSummaryClick(_ sender: Any) {
+        handleError(codeFile: codeFile, codeLineNum: #line, type: .codeWarning, action: .alert, errorMsg: "This Button not yet implemented.")
+    }
 
     @IBAction func chkLearningModeClick(_ sender: Any) {
         gLearnMode = chkLearningMode.state == .on
@@ -361,8 +368,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         Stats.origVendrCatCount = gDictVendorCatLookup.count
 
         var fileContents    = ""                        // Where All Transactions in a File go
-        gDictTranDupes = [:]
-        gDictCheckDupes = [:]
+        gDictTranDupes      = [:]
+        gDictCheckDupes     = [:]
+        gDictCreditDupes    = [:]
         lblErrMsg.stringValue = ""
         
         if !FileManager.default.fileExists(atPath: transactionDirURL.path) {
@@ -418,9 +426,10 @@ class ViewController: NSViewController, NSWindowDelegate {
             }
         }//next fileURL
 
-        btnSpreadsheet.isEnabled = true
-        btnStart.keyEquivalent = ""
-        btnSpreadsheet.keyEquivalent = "\r"
+        setButtons(btnDefault: .spreadsheet, needsRecalc: false, transFolderOK: true)
+//        btnSpreadsheet.isEnabled = true
+//        btnStart.keyEquivalent = ""
+//        btnSpreadsheet.keyEquivalent = "\r"
 
         outputTranactions(outputFileURL: outputFileURL, lineItemArray: gLineItemArray)
 
@@ -468,6 +477,40 @@ class ViewController: NSViewController, NSWindowDelegate {
     }// End of func main
 
     //MARK: Support funcs
+
+    enum Button { case start,spreadsheet,summary }
+    private func setButtons(btnDefault: Button, needsRecalc: Bool, transFolderOK: Bool) {
+
+        btnStart.keyEquivalent       = ""
+        btnSpreadsheet.keyEquivalent = ""
+        btnSummary.keyEquivalent     = ""
+
+        if !transFolderOK {
+            btnStart.isEnabled       = false
+            btnSpreadsheet.isEnabled = false
+            btnSummary.isEnabled     = false
+            return
+        }
+        btnStart.isEnabled           = true
+
+        if needsRecalc {
+            btnStart.keyEquivalent   = "\r"
+            btnSpreadsheet.isEnabled = false
+            btnSummary.isEnabled     = false
+            return
+        }
+        btnSpreadsheet.isEnabled     = true
+        btnSummary.isEnabled         = true
+
+        switch btnDefault {
+        case .spreadsheet:
+            btnSpreadsheet.keyEquivalent = "\r"
+        case .summary:
+            btnSummary.keyEquivalent     = "\r"
+        default:
+            btnStart.keyEquivalent       = "\r"
+        }
+    }
 
     private func makeMissingItemsMsg(got: GotItem ) -> String {
         if got.contains(GotItem.requiredElements) { return "" }
@@ -638,7 +681,8 @@ class ViewController: NSViewController, NSWindowDelegate {
         var errText = ""
         (transactionDirURL, errText)  = FileIO.makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
         if errText.isEmpty {             // Transaction Folder Exists
-            btnStart.isEnabled = true
+            setButtons(btnDefault: .start, needsRecalc: true, transFolderOK: true)
+            //btnStart.isEnabled = true
             transFileURLs = FileIO.getTransFileList(transDirURL: transactionDirURL)
             if transFileURLs.count > 0 {
                 gotItem = gotItem.union(GotItem.fileTransactions) // Mark Transaction-Files accounted for
@@ -650,7 +694,8 @@ class ViewController: NSViewController, NSWindowDelegate {
             print("Trans Folder set to: \"\(pathTransactionDir)\"")
 
         } else {                        // Error getting Transaction Folder
-            btnStart.isEnabled = false
+            setButtons(btnDefault: .start, needsRecalc: true, transFolderOK: false)
+            //btnStart.isEnabled = false
             transFileURLs = []
             loadComboBoxFiles(fileURLs: transFileURLs)
             cboFiles.isHidden = true
@@ -658,8 +703,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             lblErrMsg.stringValue = errText
             gotItem = gotItem.subtracting(GotItem.fileTransactions) // Mark as not there
         }
-        btnSpreadsheet.keyEquivalent = ""
-        btnStart.keyEquivalent = "\r"
+        //setButtons(btnDefault: .start, needsRecalc: true, transFolderOK: true)
         //cboFiles.scrollItemAtIndexToVisible(cboFiles.numberOfItems-1) Does not work
 
     }//end func
@@ -667,25 +711,44 @@ class ViewController: NSViewController, NSWindowDelegate {
 }//end class ViewController
 
 // Allow ViewController to see when a TextField changes (includes ComboBox).
-extension ViewController: NSTextFieldDelegate {
+extension ViewController: NSTextFieldDelegate, NSComboBoxDelegate {
 
     //---- controlTextDidChange - Called when a textField (with ViewController as its delegate) changes.
     func controlTextDidChange(_ obj: Notification) {
-        guard let textView = obj.object as? NSTextField else {
-            return
+        if let textView = obj.object as? NSTextField {
+            if pathTransactionDir != txtTransationFolder.stringValue {
+                pathTransactionDir = txtTransationFolder.stringValue
+                gotNewTranactionFolder()
+            }
         }
-        if pathTransactionDir != txtTransationFolder.stringValue {
-            pathTransactionDir = txtTransationFolder.stringValue
-            gotNewTranactionFolder()
+        // This only works if user types
+        if let _ = obj.object as? NSComboBox {
+            setButtons(btnDefault: .start, needsRecalc: true, transFolderOK: true)
+            print("🔷 \(codeFile)#\(#line) comboBox Text Did Change")
         }
+    }
+
+    func comboBoxSelectionDidChange(_ obj: Notification) { //NSNotification.Name
+        setButtons(btnDefault: .start, needsRecalc: true, transFolderOK: true)
+        print("🔷 \(codeFile)#\(#line) comboBox Selection Did Change")
+    }
+    func comboBoxWillPopUp(_ obj: Notification) { //NSNotification.Name
+        print("🔷 \(codeFile)#\(#line) comboBox Will PopUp")
     }
 
 }//end extension ViewController: NSTextFieldDelegate
 
-//NSComboBoxDelegate Does not work!
-extension ViewController: NSComboBoxDelegate {
-    func willPopUpNotification(_ obj: Notification) { //NSNotification.Name
-        print("😂 \(obj)")
-    }
-}
+// NSComboBoxDelegate
+//extension ViewController: NSComboBoxDelegate {
+//    func controlTextDidChange(_ obj: Notification) {
+//        guard let cbo = obj.object as? NSComboBox else {
+//            return
+//        }
+//
+//    }
+//    // Does not work!
+//    func willPopUpNotification(_ obj: Notification) { //NSNotification.Name
+//        print("😂 \(obj)")
+//    }
+//}
 

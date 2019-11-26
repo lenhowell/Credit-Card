@@ -427,6 +427,17 @@ DQ
                                     <action selector="btnSpreadsheet:" target="XfG-lQ-9wD" id="0wJ-pM-NTr"/>
                                 </connections>
                             </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FHK-6S-ee3">
+                                <rect key="frame" x="111" y="564" width="98" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="Summary" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="qWO-HC-IuM">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="btnSummaryClick:" target="XfG-lQ-9wD" id="0b4-s0-qzf"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="vvR-Af-aLC" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="8" id="0pd-kR-dYo"/>
@@ -471,6 +482,7 @@ DQ
                     <connections>
                         <outlet property="btnSpreadsheet" destination="vWS-7S-9w2" id="7Md-0R-KP2"/>
                         <outlet property="btnStart" destination="D0v-vZ-h7M" id="pu9-yt-ERf"/>
+                        <outlet property="btnSummary" destination="FHK-6S-ee3" id="Emd-ZF-nbx"/>
                         <outlet property="cboFiles" destination="bRm-TN-6sx" id="4AR-IO-NWm"/>
                         <outlet property="chkLearningMode" destination="GY1-RP-4M3" id="a1w-C9-IbY"/>
                         <outlet property="chkUserInput" destination="2vy-a1-kio" id="Y5j-9I-izQ"/>

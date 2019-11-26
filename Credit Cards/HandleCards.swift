@@ -100,9 +100,24 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
             let signature2 = lineItem.signature(usePostDate: true)  // Signature using PostDate
             var matchOpt = gDictTranDupes[signature1]
             if matchOpt == nil { matchOpt = gDictTranDupes[signature2] }
-            if lineItem.desc.hasPrefix("TIV") && lineItem.credit >= 600 {
-                // Debug Trap
+
+            if lineItem.rawCat.uppercased().contains("CREDIT") && lineItem.credit > 0 {
+                print("\(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat)")
+                let vendr   = lineItem.descKey.prefix(4)
+                let credit  = String(format: "%.2f", lineItem.credit)
+                let signature = vendr + "|" + credit
+                if let dateFromDupe = gDictCreditDupes[signature] {
+                    let daysDif = dateDif(dateStr1: lineItem.tranDate, dateStr2: dateFromDupe)
+                    if abs(daysDif) <= 4 {
+                        print("HandleCards#\(#line) \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat)")
+                    }
+                } else {
+                    gDictCreditDupes[signature] = lineItem.tranDate
+                    gLineItemArray.append(lineItem)              // Add new output Record
+                }
+                continue
             }
+
             if matchOpt == nil || matchOpt!.1 == fileName {
                 // NOT a Dupe
                 let tuple = (gLineItemArray.count, fileName)
