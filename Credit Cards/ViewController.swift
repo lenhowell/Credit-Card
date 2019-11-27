@@ -18,6 +18,8 @@ var gDictMyCatAliases       = [String: String]()        // (LineItems.init, etc)
 var gDictMyCatAliasArray    = [String: [String]]()      // Synonyms for each cat name
 var gDictVendorCatLookup    = [String: CategoryItem]()  // (HandleCards.swift-3) Hash for Category Lookup (CategoryLookup.txt)
 var gDictTranDupes          = [String: (Int, String)]() // (handleCards) Hash for finding duplicate transactions
+var gDictNoVendrDupes       = [String: (Int, String)]()
+var gDictNoDateDupes        = [String: (Int, String)]()
 var gDictCheckDupes         = [String: Int]()           // (handleCards) Hash for finding duplicate checkNumbers
 var gDictCreditDupes        = [String: String]()        // (handleCards) Hash for finding duplicate Visa Credits (inconsistant dates)
 var gAccounts               = Accounts()
@@ -74,9 +76,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         static let fileMyModifiedTrans  = GotItem(rawValue: 1 << 6)
         static let fileMyAccounts       = GotItem(rawValue: 1 << 7)
 
-        static let userInitials = GotItem(rawValue: 1 << 9)
+        static let userInitials         = GotItem(rawValue: 1 << 9)
 
-        static let allDirs: GotItem = [.dirSupport, .dirOutput, .dirTrans]
+        static let allDirs: GotItem     = [.dirSupport, .dirOutput, .dirTrans]
         static let requiredElements: GotItem = [.allDirs, .fileTransactions, .fileMyCategories, .userInitials]
     }
 
@@ -231,7 +233,26 @@ class ViewController: NSViewController, NSWindowDelegate {
     }//end func
 
     @IBAction func btnSummaryClick(_ sender: Any) {
-        handleError(codeFile: codeFile, codeLineNum: #line, type: .codeWarning, action: .alert, errorMsg: "This Button not yet implemented.")
+        //handleError(codeFile: codeFile, codeLineNum: #line, type: .codeWarning, action: .alert, errorMsg: "This Button not yet implemented.")
+        gPassToNextTable = TableParams()
+        gPassToNextTable.calledBy = TableCalledBy.main
+        gPassToNextTable.summarizeBy = SummarizeBy.groupCategory
+        gPassToNextTable.sortBy = SortDirective(column: SummaryColID.netCredit, ascending: true)
+
+        let storyBoard = NSStoryboard(name: "SummaryTable", bundle: nil)
+        guard let summaryWindowController = storyBoard.instantiateController(withIdentifier: "SummaryWindowController") as? NSWindowController else {
+            let msg = "Unable to open SummaryTable Window"
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
+            return
+        }
+        if let summaryWindow = summaryWindowController.window {
+            //let summaryTableVC = storyBoard.instantiateController(withIdentifier: "SummaryTableVC") as! SummaryTableVC
+            print("btnSummaries", gPassToNextTable)
+            let application = NSApplication.shared
+            _ = application.runModal(for: summaryWindow) // <=================  UserInputVC
+
+            summaryWindow.close()                     // Return here from userInputWindow
+        }
     }
 
     @IBAction func chkLearningModeClick(_ sender: Any) {
@@ -371,6 +392,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         gDictTranDupes      = [:]
         gDictCheckDupes     = [:]
         gDictCreditDupes    = [:]
+        gDictNoVendrDupes   = [:]
+        gDictNoDateDupes    = [:]
+
         lblErrMsg.stringValue = ""
         
         if !FileManager.default.fileExists(atPath: transactionDirURL.path) {

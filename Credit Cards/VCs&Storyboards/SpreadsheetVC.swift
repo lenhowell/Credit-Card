@@ -416,7 +416,7 @@ extension SpreadsheetVC: NSTableViewDelegate {
             }
         }//tableView
 
-        // Summary (Totals) table
+        // tableViewSum (Totals at bottom)
         if tableView == self.tableViewSum {
             guard let colID = tableColumn?.identifier.rawValue else {
                 print("⛔️ \(codeFile)#\(#line) Table Column nil")

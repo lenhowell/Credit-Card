@@ -136,6 +136,16 @@ public func sortStr(_ str: String) -> String {
     return txt.uppercased()
 }
 
+//---- textToDbl - returns an optional Double from "(12,345.6)" or "15%" or "-$123", etc.
+public func textToDbl(_ str: String) -> Double? {
+    var txt = str
+    txt = txt.replacingOccurrences(of: "$", with: "")
+    txt = txt.replacingOccurrences(of: "%", with: "")
+    txt = txt.replacingOccurrences(of: ",", with: "").trim
+    if txt.hasPrefix("(") && txt.hasSuffix(")") { txt = "-" + String(txt.dropFirst().dropLast()) }
+    return Double(txt)
+}
+
 
 //MARK:- Date Extensions
 

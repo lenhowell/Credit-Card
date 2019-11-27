@@ -24,7 +24,7 @@ public struct LineItem: Equatable, Hashable {
     var transText   = ""    // Original Transaction Line from file
     var memo        = ""    // Check Memo or Note added when modified
     var auditTrail  = ""    // Original FileName, Line#
-
+    let codeFile = "LineItems"
     init() {
     }
 
@@ -111,14 +111,21 @@ public struct LineItem: Equatable, Hashable {
         } else {
             self.rawCat = "Unknown"
         }
-        //TODO: Detect & report corrupt $values rather than silently setting to $0
+
         if let colNum = dictColNums["AMOU"] {           // AMOUNT
             if colNum < columnCount {
-                var amt = columns[colNum].replacingOccurrences(of: ";", with: "") //"0" is for empty fields
-                if amt.hasPrefix("(") && amt.hasSuffix(")") {
-                    amt = "-\(amt.dropFirst().dropLast())"
+                var amtStr = columns[colNum].replacingOccurrences(of: ";", with: "") //"0" is for empty fields
+                if amtStr.hasPrefix("(") && amtStr.hasSuffix(")") {
+                    amtStr = "-\(amtStr.dropFirst().dropLast())"
                 }
-                let amount = Double(amt) ?? 0
+
+                var amount = 0.0
+                if let amt = textToDbl(amtStr) {
+                    amount = amt
+                } else {
+                    let msg = "Bad value for Amount \"\(amtStr)\""
+                    handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: msg)
+                }
 
                 if amount*signAmount < 0 {
                     self.credit = abs(amount)
@@ -144,7 +151,7 @@ public struct LineItem: Equatable, Hashable {
     }//end init
 
     //---- signature - Unique identifier for detecting Transaction dupes & user-modified versions.
-    func signature(usePostDate: Bool = false) -> String {
+    func signature(usePostDate: Bool = false, ignoreVendr: Bool = false, ignoreDate: Bool = false) -> String {
         // CardType + Date + ID# + 1st4ofDesc + credit + debit
         //let (cleanName, _) = self.auditTrail.splitAtFirst(char: "#")
         //let useName = cleanName.replacingOccurrences(of: "-", with: "")
@@ -157,7 +164,13 @@ public struct LineItem: Equatable, Hashable {
         let chkNum = self.chkNumber.trim
         var sig = ""
         if chkNum.isEmpty {
-            sig = "\(dateStr)|\(vendr)|\(credit)|\(debit)"
+            if ignoreVendr {
+                sig = "\(dateStr)|\(credit)|\(debit)"
+            } else if ignoreDate {
+                sig = "\(vendr)|\(credit)|\(debit)"
+            } else {
+                sig = "\(dateStr)|\(vendr)|\(credit)|\(debit)"
+            }
         } else {
             sig = "\(chkNum)|\(vendr)|\(credit)|\(debit)"
         }

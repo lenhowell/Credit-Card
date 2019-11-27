@@ -78,6 +78,22 @@ class Credit_Cards_UnitTests: XCTestCase {
         XCTAssertEqual(result, -1)
     }
 
+    func test_sortStr() {
+        var result = ""
+        result = sortStr("123.4")
+        XCTAssertEqual(result, "123.4")
+    }
+
+    func test_textToDbl() {
+        var result = 0.0
+        result = textToDbl("123.4")!
+        XCTAssertEqual(result, 123.4)
+        result = textToDbl("-12.34")!
+        XCTAssertEqual(result, -12.34)
+        result = textToDbl("(1,234)")!
+        XCTAssertEqual(result, -1234)
+    }
+
     func testDateExtensions() {
         let date = Date.distantFuture
         let dc = date.getComponents()
@@ -87,6 +103,8 @@ class Credit_Cards_UnitTests: XCTestCase {
         let str = date.toString("yyyy-MM-dd HH-mm-ss")
         XCTAssertEqual(str, "4000-12-31 19-00-00")
     }
+
+//MARK: HandleCards
 
     func testMakeLineItemAndDictColNums() {
         let dictVendorShortNames = [String: String]()
@@ -230,19 +248,24 @@ class Credit_Cards_UnitTests: XCTestCase {
     """
     Trans. Date,Post Date,Description,Amount,Category
     04/05/2018,04/06/2018,"BONEFISH 7027 BOYNTON BEACHFL00422R",32.56,"Restaurants"
-    04/30/2018,04/30/2018,"PHONE PAYMENT - THANK YOU",-32.56,"Payments and Credits"
+    04/20/2018,04/21/2018,"NEGATIVE",-32.56,"Payments and Credits"
+    04/28/2018,04/29/2018,"NEGATIVE - ACCOUNTING",(42.56),"Payments and Credits"
     """
         let cardArrayLHDC = contentLHDC.components(separatedBy: "\n")
         gDictVendorShortNames = [String: String]()
         gLineItemArray = []
         handleCards(fileName: "fileName.csv", cardType: "cardType", cardArray: cardArrayLHDC, acct: nil)
-        XCTAssertEqual(gLineItemArray.count, 2)
+        XCTAssertEqual(gLineItemArray.count, 3)
         XCTAssertEqual(gLineItemArray[0].tranDate, "2018-04-05")
         XCTAssertEqual(gLineItemArray[0].postDate, "2018-04-06")
         XCTAssertEqual(gLineItemArray[0].chkNumber, "")
         //XCTAssertEqual(gLineItemArray[0].desc, "BONEFISH 7027 BOYNTON BEACHFL00422R")
         XCTAssertEqual(gLineItemArray[0].debit, 32.56)
         XCTAssertEqual(gLineItemArray[0].credit, 0.00)
+        XCTAssertEqual(gLineItemArray[1].debit, 0.0)
+        XCTAssertEqual(gLineItemArray[1].credit, 32.56)
+        XCTAssertEqual(gLineItemArray[2].debit, 0.0)
+        XCTAssertEqual(gLineItemArray[2].credit, 42.56)
         //XCTAssertEqual(gLineItemArray[0].rawCat, "Food-Restaurant") //Note: Depends on MyCategories.txt
 
 

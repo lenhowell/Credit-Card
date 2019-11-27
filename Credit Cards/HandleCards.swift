@@ -65,7 +65,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
     //MARK: Read Transactions
 
     while lineNum < cardArrayCount {
-        let tran = cardArray[lineNum].trim
+        let tran = cardArray[lineNum]
         lineNum += 1
         if tran.trim.count < 16 { continue }    // Blank line or ",,,,,,,,,,,"
 
@@ -79,7 +79,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
 
             // Check for Duplicate of a Check-Number
             let chkNum = lineItem.chkNumber.trim
-            if !chkNum.isEmpty {                        // This is a Numbered Check
+            if !chkNum.isEmpty {                        // This IS a Numbered Check
                 let dateFromTran = lineItem.tranDate
                 var dateUsed = dateFromTran
                 if let idxFromDupe = gDictCheckDupes[chkNum] {
@@ -92,15 +92,18 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
                 }
                 if Stats.firstDate > dateUsed { Stats.firstDate = dateUsed }
                 if Stats.lastDate  < dateUsed { Stats.lastDate  = dateUsed }
-                continue
+                continue        // We're done here
             }
 
             // Check for Duplicate from another file
             let signature1 = lineItem.signature()                   // Signature using TranDate
             let signature2 = lineItem.signature(usePostDate: true)  // Signature using PostDate
+            let signatureNoVendr = lineItem.signature(ignoreVendr: true)
+            let signatureNoDate  = lineItem.signature(ignoreDate: true)
             var matchOpt = gDictTranDupes[signature1]
             if matchOpt == nil { matchOpt = gDictTranDupes[signature2] }
 
+            // Special handling for Credits that might have differing dates
             if lineItem.rawCat.uppercased().contains("CREDIT") && lineItem.credit > 0 {
                 print("\(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat)")
                 let vendr   = lineItem.descKey.prefix(4)
@@ -115,7 +118,35 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
                     gDictCreditDupes[signature] = lineItem.tranDate
                     gLineItemArray.append(lineItem)              // Add new output Record
                 }
-                continue
+                continue    // Done with this transaction
+            }
+
+            // See if Match for Dates & $ only
+            if matchOpt == nil {
+                if let tuple = gDictNoVendrDupes[signatureNoVendr] {
+                    let idx  = tuple.0
+                    let file = tuple.1
+                    print("HandleCards#\(#line) 🔹 \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat) - Dupe in \(file)")
+                    print("HandleCards#\(#line)     descKey \"\(lineItem.descKey)\" vs \"\(gLineItemArray[idx].descKey)\" both $\(lineItem.debit), $\(lineItem.credit)")
+                    if lineItem.descKey.prefix(3) == gLineItemArray[idx].descKey.prefix(3) {
+                        matchOpt = tuple
+                    } else {
+                        //
+                    }
+                }
+            }
+
+            // See if Match for Vendr & approx dates (+/-4)
+            if matchOpt == nil {
+                if let tuple = gDictNoDateDupes[signatureNoDate] {
+                    let daysDif = dateDif(dateStr1: lineItem.tranDate, dateStr2: gLineItemArray[tuple.0].tranDate)
+                    if abs(daysDif) <= 4 {
+                        let file = tuple.1
+                        print("HandleCards#\(#line) 🔹 \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat) - Dupe in \(file)")
+                        print("HandleCards#\(#line)     descKey \"\(lineItem.descKey)\" \(lineItem.tranDate) vs \"\(gLineItemArray[tuple.0].descKey)\" \(gLineItemArray[tuple.0].tranDate) both $\(lineItem.debit), $\(lineItem.credit)")
+                        //matchOpt = tuple
+                    }
+                }
             }
 
             if matchOpt == nil || matchOpt!.1 == fileName {
@@ -123,6 +154,10 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
                 let tuple = (gLineItemArray.count, fileName)
                 gDictTranDupes[signature1] = tuple        // mark for dupes check using TranDate
                 gDictTranDupes[signature2] = tuple        // mark for dupes check using PostDate
+                if lineItem.debit != 0.0 || lineItem.credit != 0.0 {
+                    gDictNoVendrDupes[signatureNoVendr] = tuple
+                    gDictNoDateDupes[signatureNoDate] = tuple
+                }
 
                 gLineItemArray.append(lineItem)              // Add new output Record
                 if Stats.firstDate > lineItem.tranDate { Stats.firstDate = lineItem.tranDate }
@@ -151,21 +186,23 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
 internal func gotaDupe(lineItem: LineItem, idxFromDupe: Int, fileName: String, lineNum: Int) -> String {
     // IS a Dupe
     let lineItemFromDupe = gLineItemArray[idxFromDupe]
-    let dateFromDupe = lineItemFromDupe.tranDate
-    let dateFromTran = lineItem.tranDate
-    var dateUsed     = dateFromTran
-    let chkNum = lineItem.chkNumber
+    let dateFromDupe     = lineItemFromDupe.tranDate
+    let dateFromTran     = lineItem.tranDate
+    let chkNum           = lineItem.chkNumber
+    var dateUsed = dateFromTran
     let msg: String
     if chkNum.isEmpty {
         msg = "Duplicate transaction of one from \(lineItemFromDupe.auditTrail)"
     } else {
         msg = "Duplicate chkNumber \(chkNum) with dates of \(dateFromTran) & \(dateFromDupe) "
     }
-    handleError(codeFile: "HandleCards", codeLineNum: #line, type: .dataError, action: .display, fileName: fileName, dataLineNum: lineNum, lineText: lineItem.transText, errorMsg: msg)
+    // fileName: fileName, dataLineNum: lineNum, lineText: lineItem.transText,
+    print("HandleCards#\(#line): \(msg)")
+    gLineItemArray[idxFromDupe].cardType = gLineItemArray[idxFromDupe].cardType + "*"
     if lineItem.descKey != lineItemFromDupe.descKey ||  lineItem.genCat != lineItemFromDupe.genCat {
-        print("\(lineItem.descKey) != \(lineItemFromDupe.descKey) ||  \(lineItem.genCat) != \(lineItemFromDupe.genCat)")
+        print("HandleCards#\(#line): \(lineItem.descKey) != \(lineItemFromDupe.descKey) ||  \(lineItem.genCat) != \(lineItemFromDupe.genCat)")
         if lineItemFromDupe.genCat == "Unknown" && lineItem.genCat != "Unknown" {
-            gLineItemArray[idxFromDupe].genCat = lineItem.genCat
+            gLineItemArray[idxFromDupe].genCat  = lineItem.genCat
             gLineItemArray[idxFromDupe].descKey = lineItem.descKey
         } else {
             //
@@ -407,7 +444,7 @@ internal func makeDictColNums(headers: [String]) -> [String: Int] {
             }
         } else {
             key = String(rawKey.replacingOccurrences(of: "\"", with: "").prefix(4))
-            if key != "POST" && key != "DESC" && key != "AMOU" && key != "DEBI" && key != "CRED" && key != "CATE" {
+            if key != "TRAN" && key != "POST" && key != "DESC" && key != "AMOU" && key != "DEBI" && key != "CRED" && key != "CATE" {
                 print("HandleCards#\(#line) unknown column type: \(rawKey)")
                 //
             }

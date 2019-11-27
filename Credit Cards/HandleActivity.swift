@@ -62,39 +62,42 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
     var known = false
     var ignore = false
 
-    var cat = ""
-    var skip = 0
     if lineItem.rawCat == "Unknown" {
         let oldDesc = lineItem.desc
-        let words = lineItem.desc.components(separatedBy: " ")
-        if words[0].range(of: #"[a-z]"#, options: .regularExpression) != nil {
-            cat = words[0]
-            skip = 1
-            if words[1].range(of: #"[a-z]"#, options: .regularExpression) != nil {
-                cat = cat + " " + words[1]
-                skip = 2
-            }
-            var descWords = words.dropFirst(skip)
-            if words[0] .hasPrefix("Check") {
-                if let lastWord = words.last {
-                    descWords = descWords.dropLast()    // "Check3519 STEVE BRYAN 3519" -> "STEVE BRYAN"
-                    lineItem.chkNumber = lastWord
-                }
-            } else {
 
-                if cat.hasPrefix("Deferred") {
-                    cat = String(cat.dropFirst(8).trim)
+        if oldDesc.hasPrefix("Check") {
+            let words = lineItem.desc.components(separatedBy: " ")
+            if let lastWord = words.last {
+                let descWords = words.dropFirst().dropLast()   // "Check3519 STEVE BRYAN 3519" -> "STEVE BRYAN"
+                lineItem.desc = descWords.joined(separator: " ")
+                lineItem.chkNumber = lastWord
+            }
+
+        } else if oldDesc.hasPrefix("Deferred") {
+            lineItem.desc = String(oldDesc.dropFirst(8).trim)
+        } else {
+            var cat = ""
+            var skip = 0
+
+            let words = lineItem.desc.components(separatedBy: " ")
+
+            if words[0].range(of: #"[a-z]"#, options: .regularExpression) != nil {
+                cat = words[0]
+                skip = 1
+                if words[1].range(of: #"[a-z]"#, options: .regularExpression) != nil {
+                    cat = cat + " " + words[1]
+                    skip = 2
                 }
+                let descWords = words.dropFirst(skip)
                 if !cat.isEmpty {
                     lineItem.rawCat = cat
                 }
+                lineItem.desc = descWords.joined(separator: " ")
             }
-            lineItem.desc = descWords.joined(separator: " ")
+            //print("😈😈 HandleActivity#\(#line) desc: \"\(oldDesc)\" -> \"\(lineItem.desc)\"")
+            //print("😈 HandleActivity#\(#line) rawCat: \"Unknown\" -> \"\(lineItem.rawCat)\"")
         }
-        //print("😈😈 HandleActivity#\(#line) desc: \"\(oldDesc)\" -> \"\(lineItem.desc)\"")
-        //print("😈 HandleActivity#\(#line) rawCat: \"Unknown\" -> \"\(lineItem.rawCat)\"")
     }// Unknown rawCat
-
 
     let des = lineItem.desc.uppercased()
     let colinSplit = des.splitAtFirst(char: ":")
