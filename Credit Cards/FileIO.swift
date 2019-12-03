@@ -191,6 +191,36 @@ public struct FileIO {
         return columns
     }//end func parseDelimitedLine
 
+    //---- convertToYYYYMMDD - Convert date from Transaction from m/d/y to YYYY-MM-DD or "?"
+    static func convertToYYYYMMDD(dateTxt: String) -> String {
+        var dateStr = ""
+        let da = dateTxt
+        if da.contains("/") {
+            let parts = da.components(separatedBy: "/")
+            if parts.count != 3 {
+                return "?"
+            }
+            var yy = parts[2].trim
+            if yy.count <= 2 {
+                if yy < "80" {
+                    yy = "20" + yy
+                } else {
+                    yy = "19" + yy
+                }
+            }
+                var mm = parts[0].trim
+            if mm.count < 2 { mm = "0" + mm }
+            var dd = parts[1].trim
+            if dd.count < 2 { dd = "0" + dd }
+            dateStr = "\(yy)-\(mm)-\(dd)"
+        } else if da.contains("-") {
+            dateStr = da
+        } else {
+            return "?"
+        }
+        return dateStr
+    }
+
 }//end struct FileIO
 
 //---- deleteSupportFile -
@@ -346,7 +376,7 @@ func writeMyCats(url: URL) {
 //MARK:- My Modified Transactions
 
 func loadMyModifiedTrans(myModifiedTranURL: URL) -> [String: ModifiedTransactionItem]  {
-    //let dictColNums = ["TRAN":0, "DESC":1, "DEBI":2, "CRED":3, "CATE":4] "NUMBER","POST","CARD","AMOU"
+    //let dictColNums = ["TRAN":0, "DESC":1, "DEBI":2, "CRED":3, "CATE":4] "NUMBER","POST","CARD","AMOU","MEMO"
     //let fileName = myModifiedTranURL.lastPathComponent
     var dictTrans = [String: ModifiedTransactionItem]()
     let contentof = (try? String(contentsOf: myModifiedTranURL)) ?? ""
@@ -518,7 +548,7 @@ public struct VendorShortNames {
 
 public struct Account {
     public enum AmountDefault: String {case debit,credit }
-    public enum AcctType: String { case creditCard, debitCard, check, activity }
+    public enum AcctType: String { case creditCard, debitCard, check, activity, deposit }
 
     public var code = ""
     public var name = ""
@@ -526,9 +556,10 @@ public struct Account {
     public var amount: AmountDefault = .debit
     public var lineForFile: String {
         return "\(code.PadRight(10)), \(amount.rawValue.PadRight(10)), \(type.rawValue.PadRight(11)), \"\(name)\""
-        //SAMPLE    , Debit     , CreditCard , "Sample Credit Card"
     }
+}//end struct Account
 
+extension Account{
     init?(fromCsvLine line: String) {
         // Create an Array of line components the seperator being a ","
         let items = line.components(separatedBy: ",")
@@ -563,7 +594,7 @@ public struct Account {
         let strName = items[3].trim.removeEnclosingQuotes()
         name = strName
     }
-}
+}//end extension Account
 
 
 public struct Accounts {
@@ -732,7 +763,109 @@ func outputTranactions(outputFileURL: URL, lineItemArray: [LineItem]) {
 
 }//end func outputTranactions
 
-//MARK:- New File Formats
+//MARK:- Read Deposits
+func readDeposits() {
+    var acct = Account(code: "DEPOS", name: "Deposit", type: .deposit, amount: .credit)
+    var pathURL = gTransactionFolderURL
+    let last = pathURL.lastPathComponent
+    if let yr = Int(last.prefix(4)) {
+        if yr > 1980 && yr < 2100 {
+            pathURL = pathURL.deletingLastPathComponent()
+        }
+    }
+    let fileURL = pathURL.appendingPathComponent("DEPOSITcsv.csv")
+    let content = (try? String(contentsOf: fileURL)) ?? ""
+    if content.isEmpty {
+        let msg = "\(fileURL.path) does not exist."
+        handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataWarning, action: .alert, fileName: "DEPOSIT.csv", dataLineNum: 0, lineText: "", errorMsg: msg)
+        return
+    }
+    let lines = content.components(separatedBy: "\n").map {$0.trim}
+    let headers = lines[0].components(separatedBy: ",")
+    let dictColNums = makeDictColNums(headers: headers)
+
+    var calcSum = 0.0
+    var postDate = ""
+    var got1 = false
+    var errorCount = 0
+    var checkCount = 0
+    var depositCount = 0
+    for (idx, line) in lines.enumerated() {
+        if line.hasPrefix(",,,,") {
+            continue                            // Blank line
+        }
+
+        let items = FileIO.parseDelimitedLine(line, csvTsv: .csv)
+        if items[0].hasSuffix("Missing") {
+            continue
+        }
+
+        let chkDate = FileIO.convertToYYYYMMDD(dateTxt: items[1])
+        if line.hasPrefix("Deposit") {          // "Deposit mm/dd/yy" or "Deposit, mm/dd/yy"
+            if items[0] == "Deposit" && chkDate != "?" {
+                postDate = chkDate
+            } else {
+                let tuple = items[0].splitAtFirst(char: " ")
+                postDate = FileIO.convertToYYYYMMDD(dateTxt: tuple.1)
+            }
+            if postDate == "?" {
+                print("FileIO#\(#line) 😡 Deposit.csv line \(idx+1) Bad Date: \"\(items[1])\",  \(line)")//(idx+1,desc,chkDate,credit)
+                //
+            }
+            calcSum = 0.0
+            got1 = true
+            continue
+        }
+
+        if !got1 { continue }                       // Waiting for 1st Deposit
+
+
+        let valStr = items[3]
+        let optVal = textToDbl(valStr)
+        if items[0].isEmpty && !valStr.isEmpty {        // Total $
+            depositCount += 1
+            if let total = optVal {
+                if abs(calcSum - total) > 0.004 {
+                    print("FileIO#\(#line) ⛔️  Deposit.csv line \(idx+1)  \(calcSum) != \(total)")
+                    errorCount += 1
+                }
+            } else {
+                print("FileIO#\(#line) 😡 Deposit.csv line \(idx+1) \(valStr)")//(idx+1,desc,chkDate,credit)
+                errorCount += 1
+            }
+            continue
+        }
+
+        //print("FileIO#\(#line)  Deposit.csv line \(idx+1)  \(items)")
+        let desc = items[0]
+        if chkDate == "?" {
+            print("FileIO#\(#line) 😡 Deposit.csv line \(idx+1) Bad Date: \"\(items[1])\",  \(line)")//(idx+1,desc,chkDate,credit)
+            errorCount += 1
+        }
+        if let credit = optVal {
+            //print("FileIO#\(#line) 🤪 Deposit.csv line \(idx+1) \(desc) \(chkDate) \(credit)")//(idx+1,desc,chkDate,credit)
+            var lineItem = makeLineItem(fromTransFileLine: line, dictColNums: dictColNums, dictVendorShortNames: gDictVendorShortNames, cardType: "Deposit", hasCatHeader: true, fileName: "DepositCsv.csv", lineNum: idx+1, acct: acct)
+            lineItem.postDate = postDate
+
+            calcSum += credit
+            checkCount += 1
+            //let lineItem = LineItem(tranDate: chkDate, postDate: postDate, desc: desc, debit: 0, credit: credit)
+        } else {
+            print("FileIO#\(#line) 😡 Deposit.csv line \(idx+1) \(desc) \(chkDate) \(valStr)")//(idx+1,desc,chkDate,credit)
+            errorCount += 1
+        }
+    }//next line
+
+    if errorCount == 0 {
+        print("FileIO#\(#line) 🤪 Deposit.csv sucessfully read \(lines.count) lines, \(checkCount) checks, \(depositCount) deposits")
+    } else {
+        print("FileIO#\(#line) 😡 Deposit.csv read \(lines.count) lines, \(depositCount) deposits with \(errorCount) errors.")
+    }
+}//end func readDeposits
+
+
+
+//MARK:- File Formats 2.0
 /*
 VendorProfile - Combined VendorCatagoryLookup & VendorShortNames
 DescKey
@@ -755,20 +888,20 @@ DescKey
 
  */
 
-
+// Vendor Profile 2.0
 struct VendorProfile {
-    var descKey     = ""           // key
-    var fullName    = ""
-    var isTemplate  = false
+    var descKey      = ""           // key
+    var fullName     = ""
+    var isTemplate   = false
     var templateName = ""
-    var dateAdded   = Date.distantPast
-    var dateModifid = Date.distantPast
-    var addedBy     = ""
-    var modifiedBy  = ""
-    var aliases     = [String]()   // keys  //CompareTypes?
-    var category    = ""    // Array of equals?
-    var catsFromRaw = [CatFromRawCat]()
-    var catsFromAmt = [CatFromAmountDebit]()
+    var dateAdded    = Date.distantPast
+    var dateModified = Date.distantPast
+    var addedBy      = ""
+    var modifiedBy   = ""
+    var aliases      = [String]()   // keys  //CompareTypes?
+    var category     = ""    // Array of equals?
+    var catsFromRaw  = [CatFromRawCat]()
+    var catsFromAmt  = [CatFromAmountDebit]()
 }
 enum CompareType {
     case equal, prefix, contains, suffix
@@ -785,3 +918,19 @@ struct CatFromAmountDebit {
 }
 
 
+// Modified Transaction 2.0
+struct ModifiedTransaction {
+    var originalText    = ""
+    var newDescKey      = ""
+    var newTransDate    = ""
+    var newPostDate     = ""
+    var splitCategory   = [CategorySplit]()
+    var dateAdded       = Date.distantPast
+    var dateModified    = Date.distantPast
+    var addedBy         = ""
+    var modifiedBy      = ""
+}
+struct CategorySplit {
+    var category     = ""
+    var AmountCredit = 0.0
+}

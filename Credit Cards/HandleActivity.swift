@@ -62,7 +62,7 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
     var known = false
     var ignore = false
 
-    if lineItem.rawCat == "Unknown" {
+    if lineItem.rawCat == Const.unknown {
         let oldDesc = lineItem.desc
 
         if oldDesc.hasPrefix("Check") {

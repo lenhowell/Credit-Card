@@ -18,17 +18,67 @@ public struct LineItem: Equatable, Hashable {
     var desc        = ""    // Description (Vendor)
     var debit       = 0.0   // Debit (payments to vendors, etc.)
     var credit      = 0.0   // Credit (Credit-Card payments, refunds, etc.)
-    var rawCat      = ""    // Category from Tansaction
+    var rawCat      = ""    // Category from Transaction
     var genCat      = ""    // Generated Category
     var catSource   = ""    // Source of Generated Category (including "$" for "LOCKED", "*" for Modified)
     var transText   = ""    // Original Transaction Line from file
     var memo        = ""    // Check Memo or Note added when modified
     var auditTrail  = ""    // Original FileName, Line#
-    let codeFile = "LineItems"
-    init() {
+    static let codeFile = "LineItems"
+
+    //---- signature - Unique identifier for detecting Transaction dupes & user-modified versions.
+    func signature(usePostDate: Bool = false, ignoreVendr: Bool = false, ignoreDate: Bool = false) -> String {
+        // CardType + Date + ID# + 1st4ofDesc + credit + debit
+        //let (cleanName, _) = self.auditTrail.splitAtFirst(char: "#")
+        //let useName = cleanName.replacingOccurrences(of: "-", with: "")
+        var dateStr = self.tranDate
+        if usePostDate { dateStr = self.postDate }
+
+        let vendr   = self.descKey.prefix(4)
+        let credit  = String(format: "%.2f", self.credit)
+        let debit   = String(format: "%.2f", self.debit)
+        let chkNum = self.chkNumber.trim
+        var sig = ""
+        if chkNum.isEmpty {
+            if ignoreVendr {
+                sig = "\(dateStr)|\(credit)|\(debit)"
+            } else if ignoreDate {
+                sig = "\(vendr)|\(credit)|\(debit)"
+            } else {
+                sig = "\(dateStr)|\(vendr)|\(credit)|\(debit)"
+            }
+        } else {
+            sig = "\(chkNum)|\(vendr)|\(credit)|\(debit)"
+        }
+        return sig
     }
 
-    //MARK:- init - 34-135 = 101-lines
+
+    // Equatable - Ignore Category-info & truncate desc
+    static public func == (lhs: LineItem, rhs: LineItem) -> Bool {
+        return lhs.cardType == rhs.cardType &&
+            lhs.tranDate    == rhs.tranDate &&
+            lhs.chkNumber    == rhs.chkNumber &&
+            lhs.desc.prefix(8) == rhs.desc.prefix(8)  &&
+            lhs.debit       == rhs.debit &&
+            lhs.credit      == rhs.credit
+    }
+
+    // Hashable - Ignore Category-info & truncate desc
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(cardType)
+        hasher.combine(tranDate)
+        hasher.combine(chkNumber)
+        hasher.combine(desc.prefix(8))
+        hasher.combine(debit)
+        hasher.combine(credit)
+    }
+
+}//end struct LineItem
+
+extension LineItem {
+
+    //MARK:- init - 34-151 = 117-lines
     //TODO: Allow LineItem.init to throw errors
     // Create a LineItem from a Transaction-File line
     init(fromTransFileLine: String, dictColNums: [String: Int], fileName: String, lineNum: Int, signAmount: Double) {
@@ -51,13 +101,13 @@ public struct LineItem: Equatable, Hashable {
         // Building the lineitem record
         if let colNum = dictColNums["TRAN"] {           // TRANSACTION DATE
             if colNum < columnCount {
-                self.tranDate = convertToYYYYMMDD(dateTxt: columns[colNum]) // = columns[colNum]
+                self.tranDate = FileIO.convertToYYYYMMDD(dateTxt: columns[colNum]) // = columns[colNum]
             }
         }
 
         if let colNum = dictColNums["POST"] {           // POST DATE
             if colNum < columnCount {
-                self.postDate = convertToYYYYMMDD(dateTxt: columns[colNum]) // = columns[colNum]
+                self.postDate = FileIO.convertToYYYYMMDD(dateTxt: columns[colNum]) // = columns[colNum]
             }
         }
 
@@ -72,6 +122,12 @@ public struct LineItem: Equatable, Hashable {
         if let colNum = dictColNums["CARD"] {           // CARD NUMBER
             if colNum < columnCount {
                 //self.chkNumber = columns[colNum]
+            }
+        }
+
+        if let colNum = dictColNums["MEMO"] {           // MEMO
+            if colNum < columnCount {
+                self.memo = columns[colNum]
             }
         }
 
@@ -101,7 +157,7 @@ public struct LineItem: Equatable, Hashable {
                     self.chkNumber = chkNum
                     assignedCat = ""
                 }
-                if assignedCat.trim.isEmpty { assignedCat = "Unknown" }
+                if assignedCat.trim.isEmpty { assignedCat = Const.unknown }
                 let myCat = gDictMyCatAliases[assignedCat.uppercased()] ?? ""
                 //self.rawCat = myCat
                 self.rawCat = assignedCat //%%%%%%%
@@ -109,7 +165,7 @@ public struct LineItem: Equatable, Hashable {
 
             }
         } else {
-            self.rawCat = "Unknown"
+            self.rawCat = Const.unknown
         }
 
         if let colNum = dictColNums["AMOU"] {           // AMOUNT
@@ -124,7 +180,7 @@ public struct LineItem: Equatable, Hashable {
                     amount = amt
                 } else {
                     let msg = "Bad value for Amount \"\(amtStr)\""
-                    handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: msg)
+                    handleError(codeFile: LineItem.codeFile, codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: msg)
                 }
 
                 if amount*signAmount < 0 {
@@ -150,76 +206,19 @@ public struct LineItem: Equatable, Hashable {
         self.auditTrail = "\(fileName)#\(lineNum)"     // AUDIT TRAIL
     }//end init
 
-    //---- signature - Unique identifier for detecting Transaction dupes & user-modified versions.
-    func signature(usePostDate: Bool = false, ignoreVendr: Bool = false, ignoreDate: Bool = false) -> String {
-        // CardType + Date + ID# + 1st4ofDesc + credit + debit
-        //let (cleanName, _) = self.auditTrail.splitAtFirst(char: "#")
-        //let useName = cleanName.replacingOccurrences(of: "-", with: "")
-        var dateStr = self.tranDate
-        if usePostDate { dateStr = self.postDate }
 
-        let vendr   = self.descKey.prefix(4)
-        let credit  = String(format: "%.2f", self.credit)
-        let debit   = String(format: "%.2f", self.debit)
-        let chkNum = self.chkNumber.trim
-        var sig = ""
-        if chkNum.isEmpty {
-            if ignoreVendr {
-                sig = "\(dateStr)|\(credit)|\(debit)"
-            } else if ignoreDate {
-                sig = "\(vendr)|\(credit)|\(debit)"
-            } else {
-                sig = "\(dateStr)|\(vendr)|\(credit)|\(debit)"
-            }
+    init(type: String, tranDate: String, postDate: String, desc: String, amount: Double, memo: String, auditTrail: String) {
+        cardType        = type
+        self.tranDate   = FileIO.convertToYYYYMMDD(dateTxt: tranDate)   // TRANSACTION DATE
+        self.postDate   = FileIO.convertToYYYYMMDD(dateTxt: postDate)   // POST DATE
+        self.desc       = desc                                          // DESC
+        if amount > 0.0 {
+            self.credit = amount                                        // CREDIT
         } else {
-            sig = "\(chkNum)|\(vendr)|\(credit)|\(debit)"
+            self.debit  = amount                                        // DEBIT
         }
-        return sig
+        self.memo       = memo                                          // MEMO
+        self.auditTrail = auditTrail                                    // AUDIT TRAIL
     }
 
-    //---- convertToYYYYMMDD - Convert date from Transaction from m/d/y to YYYY-MM-DD or "?"
-    func convertToYYYYMMDD(dateTxt: String) -> String {
-        var dateStr = ""
-        let da = dateTxt
-        if da.contains("/") {
-            let parts = da.components(separatedBy: "/")
-            if parts.count != 3 {
-                return "?"
-            }
-            var yy = parts[2].trim
-            if yy.count <= 2 { yy = "20" + yy }
-            var mm = parts[0].trim
-            if mm.count < 2 { mm = "0" + mm }
-            var dd = parts[1].trim
-            if dd.count < 2 { dd = "0" + dd }
-            dateStr = "\(yy)-\(mm)-\(dd)"
-        } else if da.contains("-") {
-            dateStr = da
-        } else {
-            return "?"
-        }
-        return dateStr
-    }
-
-
-    // Equatable - Ignore Category-info & truncate desc & auditTrail
-    static public func == (lhs: LineItem, rhs: LineItem) -> Bool {
-        return lhs.cardType == rhs.cardType &&
-            lhs.tranDate    == rhs.tranDate &&
-            lhs.chkNumber    == rhs.chkNumber &&
-            lhs.desc.prefix(8) == rhs.desc.prefix(8)  &&
-            lhs.debit       == rhs.debit &&
-            lhs.credit      == rhs.credit
-    }
-
-    // Hashable - Ignore Category-info & truncate desc & auditTrail
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(cardType)
-        hasher.combine(tranDate)
-        hasher.combine(chkNumber)
-        hasher.combine(desc.prefix(8))
-        hasher.combine(debit)
-        hasher.combine(credit)
-    }
-
-}//end struct LineItem
+}//end extension

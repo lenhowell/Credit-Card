@@ -82,10 +82,12 @@ class FileIO__UnitTests: XCTestCase {
     }//end func
 
     func test_makeFileURL() {
-        var url = FileManager.default.homeDirectoryForCurrentUser
+        let urlHome = FileManager.default.homeDirectoryForCurrentUser
+        var url = urlHome
         var msg = ""
         (url, msg) = FileIO.makeFileURL(pathFileDir: "xxx", fileName: "xxx")
         XCTAssertEqual(msg, "Folder \"/Users/georgebauer/xxx\" does NOT exist!")
+        
     }
 
     func test_VendorShortNames() {
@@ -106,7 +108,7 @@ prefix,prefix
         XCTAssertEqual(vendorShortNames.dict["prefix"], "prefix")
     }//end func
 
-    func test_parseCommaDelimitedLine() {
+    func test_parseDelimitedLine() {
         var line = ""
         var result: [String] = []
         line = "abc, \" def \", \"de,f\" "
@@ -114,6 +116,10 @@ prefix,prefix
         XCTAssertEqual(result[0], "abc")
         XCTAssertEqual(result[1], "def")
         XCTAssertEqual(result[2], "de;f")
+        line = "a,bc\td;ef\r"
+        result = FileIO.parseDelimitedLine(line, csvTsv: .tsv)
+        XCTAssertEqual(result[0], "a,bc")
+        XCTAssertEqual(result[1], "d;ef")
     }
 
 }//end class

@@ -37,6 +37,7 @@ var gMyAccountsURL           = FileManager.default.homeDirectoryForCurrentUser
 var gMyCatsFileURL           = FileManager.default.homeDirectoryForCurrentUser
 var gMyModifiedTransURL      = FileManager.default.homeDirectoryForCurrentUser
 var gVendorCatLookupFileURL  = FileManager.default.homeDirectoryForCurrentUser
+var gTransactionFolderURL    = FileManager.default.homeDirectoryForCurrentUser
 
 //MARK:- ViewController
 class ViewController: NSViewController, NSWindowDelegate {
@@ -54,11 +55,10 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     // Variables
     var transFileURLs           = [URL]()
-    var pathTransactionDir      = "Downloads/Credit Card Trans"
-    var pathSupportDir          = "Desktop/CreditCard/xxx"
-    var pathOutputDir           = "Desktop/CreditCard"
+    var pathTransactionFolder   = "Downloads/Credit Card Trans"
+    var pathSupportFolder       = "Desktop/CreditCard/xxx"
+    var pathOutputFolder        = "Desktop/CreditCard"
 
-    var transactionDirURL       = FileManager.default.homeDirectoryForCurrentUser
     var outputFileURL           = FileManager.default.homeDirectoryForCurrentUser
     var gotItem: GotItem        = .empty
 
@@ -103,25 +103,25 @@ class ViewController: NSViewController, NSWindowDelegate {
         self.cboFiles.delegate = self
 
         // ------ Get UserDefaults -----
-        if let dir = UserDefaults.standard.string(forKey: UDKey.supportFolder) {        // Support Folder
-            pathSupportDir = dir
-            if !dir.isEmpty && FileIO.folderExists(atPath: dir, isPartialPath: true) {
+        if let folder = UserDefaults.standard.string(forKey: UDKey.supportFolder) {     // Support Folder
+            pathSupportFolder = folder
+            if !folder.isEmpty && FileIO.folderExists(atPath: folder, isPartialPath: true) {
                 gotItem = [gotItem, .dirSupport]
             }
         }
-        if let dir = UserDefaults.standard.string(forKey: UDKey.outputFolder) {         // Output Folder
-            pathOutputDir = dir
-            if !dir.isEmpty && FileIO.folderExists(atPath: dir, isPartialPath: true) {
+        if let folder = UserDefaults.standard.string(forKey: UDKey.outputFolder) {      // Output Folder
+            pathOutputFolder = folder
+            if !folder.isEmpty && FileIO.folderExists(atPath: folder, isPartialPath: true) {
                 gotItem = [gotItem, .dirOutput]
             }
         }
-        if let dir = UserDefaults.standard.string(forKey: UDKey.transactionFolder) {    // Transactions Folder
-            pathTransactionDir = dir
-            if !dir.isEmpty && FileIO.folderExists(atPath: dir, isPartialPath: true) {
+        if let folder = UserDefaults.standard.string(forKey: UDKey.transactionFolder) { // Transactions Folder
+            pathTransactionFolder = folder
+            if !folder.isEmpty && FileIO.folderExists(atPath: folder, isPartialPath: true) {
                 gotItem = [gotItem, .dirTrans]
             }
         }
-        gUserInitials       = UserDefaults.standard.string(forKey: UDKey.userInitials) ?? ""    // Users Initials
+        gUserInitials = UserDefaults.standard.string(forKey: UDKey.userInitials) ?? ""  // Users Initials
         if !gUserInitials.isEmpty {
             gotItem = [gotItem, .userInitials]
         }
@@ -140,9 +140,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         gotNewTranactionFolder()
 
         // Read Support files ("CategoryLookup.txt", "VendorShortNames.txt", "MyCategories.txt")
-        txtOutputFolder.stringValue     = pathOutputDir
-        txtSupportFolder.stringValue    = pathSupportDir
-        txtTransationFolder.stringValue = pathTransactionDir
+        txtOutputFolder.stringValue     = pathOutputFolder
+        txtSupportFolder.stringValue    = pathSupportFolder
+        txtTransationFolder.stringValue = pathTransactionFolder
         verifyFolders(gotItem: &gotItem)
         if gotItem.contains(GotItem.dirSupport) {
             readSupportFiles()
@@ -334,7 +334,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         } while !isValid
     }
 
-
+    @IBAction func mnuReadDeposits(_ sender: Any) {
+        readDeposits()
+    }
     //MARK:- Main Program 155-lines
     
     func main() {   // 311-466 = 155-lines
@@ -350,21 +352,21 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         var errTxt = ""
 
-        pathTransactionDir = txtTransationFolder.stringValue
-        (transactionDirURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
+        pathTransactionFolder = txtTransationFolder.stringValue
+        (gTransactionFolderURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathTransactionFolder, fileName: "")
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Transaction" + errTxt)
             return
         }
 
-        (outputFileURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathOutputDir, fileName: myFileNameOut)
+        (outputFileURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathOutputFolder, fileName: myFileNameOut)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Output" + errTxt)
             return
         }
 
-        pathOutputDir  = txtOutputFolder.stringValue
-        pathSupportDir = txtSupportFolder.stringValue
+        pathOutputFolder  = txtOutputFolder.stringValue
+        pathSupportFolder = txtSupportFolder.stringValue
 
         readSupportFiles()
         verifyFolders(gotItem: &gotItem)
@@ -375,9 +377,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
 
         // Save UserDefaults
-        UserDefaults.standard.set(pathTransactionDir, forKey: UDKey.transactionFolder)
-        UserDefaults.standard.set(pathSupportDir,     forKey: UDKey.supportFolder)
-        UserDefaults.standard.set(pathOutputDir,      forKey: UDKey.outputFolder)
+        UserDefaults.standard.set(pathTransactionFolder, forKey: UDKey.transactionFolder)
+        UserDefaults.standard.set(pathSupportFolder,     forKey: UDKey.supportFolder)
+        UserDefaults.standard.set(pathOutputFolder,      forKey: UDKey.outputFolder)
         UserDefaults.standard.set(gUserInitials,      forKey: UDKey.userInitials)
         UserDefaults.standard.set(gUserInputMode,     forKey: UDKey.userInputMode)
         UserDefaults.standard.set(gLearnMode,         forKey: UDKey.learningMode)
@@ -397,9 +399,9 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         lblErrMsg.stringValue = ""
         
-        if !FileManager.default.fileExists(atPath: transactionDirURL.path) {
+        if !FileManager.default.fileExists(atPath: gTransactionFolderURL.path) {
             let msg = "Folder does not exist"
-            handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay,  fileName: transactionDirURL.path, dataLineNum: 0, lineText: "", errorMsg: msg)
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay,  fileName: gTransactionFolderURL.path, dataLineNum: 0, lineText: "", errorMsg: msg)
         }
 
         let filesToProcessURLs: [URL]
@@ -408,7 +410,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             filesToProcessURLs = transFileURLs
         } else {
             let nameWithExt = shown
-            let fileURL = transactionDirURL.appendingPathComponent(nameWithExt)
+            let fileURL = gTransactionFolderURL.appendingPathComponent(nameWithExt)
             filesToProcessURLs = [fileURL]
         }
         Stats.transFileCount = filesToProcessURLs.count
@@ -478,7 +480,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             let shortTransFilePath = FileIO.removeUserFromPath(filesToProcessURLs[0].path)
             statString += "\(Stats.transFileCount) File named \"\(shortTransFilePath)/\" Processed."
         } else {
-            let shortTransFilePath = FileIO.removeUserFromPath(transactionDirURL.path)
+            let shortTransFilePath = FileIO.removeUserFromPath(gTransactionFolderURL.path)
             statString += "\(Stats.transFileCount) Files from \"\(shortTransFilePath)/\" Processed."
         }
 
@@ -582,7 +584,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         } else {
             gotItem = gotItem.union(GotItem.dirSupport)
         }
-        pathSupportDir = supportPath
+        pathSupportFolder = supportPath
 
         let outputPath = txtOutputFolder.stringValue.trim
         if outputPath.isEmpty || !FileIO.folderExists(atPath: outputPath, isPartialPath: true) {
@@ -591,7 +593,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             } else {
                 gotItem = gotItem.union(GotItem.dirOutput)
             }
-        pathOutputDir  = outputPath
+        pathOutputFolder  = outputPath
 
         let transPath = txtTransationFolder.stringValue.trim
         if transPath.isEmpty || !FileIO.folderExists(atPath: transPath, isPartialPath: true) {
@@ -600,14 +602,14 @@ class ViewController: NSViewController, NSWindowDelegate {
         } else {
             gotItem = gotItem.union(GotItem.dirTrans)
         }
-        pathTransactionDir = transPath
+        pathTransactionFolder = transPath
     }
 
     func readSupportFiles() {
         var errTxt = ""
 
         // --------- "CategoryLookup.txt" -----------
-        (gVendorCatLookupFileURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportDir, fileName: vendorCatLookupFilename)
+        (gVendorCatLookupFileURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportFolder, fileName: vendorCatLookupFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "Category" + errTxt)
         }
@@ -615,7 +617,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         Stats.origVendrCatCount = gDictVendorCatLookup.count
 
         // -------- "VendorShortNames.txt" ----------
-        (gVendorShortNamesFileURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportDir, fileName: vendorShortNameFilename)
+        (gVendorShortNamesFileURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportFolder, fileName: vendorShortNameFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "VendorShortNames " + errTxt)
         }
@@ -636,7 +638,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
 
         // ---------- "MyCategories.txt" ------------
-        (gMyCatsFileURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportDir, fileName: myCatsFilename)
+        (gMyCatsFileURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportFolder, fileName: myCatsFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories " + errTxt)
         }
@@ -658,7 +660,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
 
         // ---------- "MyAccounts.txt" ------------
-        (gMyAccountsURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportDir, fileName: Accounts.filename)
+        (gMyAccountsURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportFolder, fileName: Accounts.filename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories " + errTxt)
         }
@@ -682,7 +684,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
 
         // -------- "MyModifiedTransactions" ----------
-        (gMyModifiedTransURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportDir, fileName: myModifiedTranFilename)
+        (gMyModifiedTransURL, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportFolder, fileName: myModifiedTranFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyModifiedTransactions " + errTxt)
         }
@@ -703,11 +705,11 @@ class ViewController: NSViewController, NSWindowDelegate {
     //---- gotNewTranactionFolder - Try to load the Combo-Box with FileNames
     func gotNewTranactionFolder() {
         var errText = ""
-        (transactionDirURL, errText)  = FileIO.makeFileURL(pathFileDir: pathTransactionDir, fileName: "")
+        (gTransactionFolderURL, errText)  = FileIO.makeFileURL(pathFileDir: pathTransactionFolder, fileName: "")
         if errText.isEmpty {             // Transaction Folder Exists
             setButtons(btnDefault: .start, needsRecalc: true, transFolderOK: true)
             //btnStart.isEnabled = true
-            transFileURLs = FileIO.getTransFileList(transDirURL: transactionDirURL)
+            transFileURLs = FileIO.getTransFileList(transDirURL: gTransactionFolderURL)
             if transFileURLs.count > 0 {
                 gotItem = gotItem.union(GotItem.fileTransactions) // Mark Transaction-Files accounted for
             }
@@ -715,7 +717,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             cboFiles.isHidden = false
             lblTranFileCount.stringValue = "\(transFileURLs.count) Transaction \("file".pluralize(transFileURLs.count))"
             lblErrMsg.stringValue = ""
-            print("Trans Folder set to: \"\(pathTransactionDir)\"")
+            print("Trans Folder set to: \"\(pathTransactionFolder)\"")
 
         } else {                        // Error getting Transaction Folder
             setButtons(btnDefault: .start, needsRecalc: true, transFolderOK: false)
@@ -740,8 +742,8 @@ extension ViewController: NSTextFieldDelegate, NSComboBoxDelegate {
     //---- controlTextDidChange - Called when a textField (with ViewController as its delegate) changes.
     func controlTextDidChange(_ obj: Notification) {
         if let textView = obj.object as? NSTextField {
-            if pathTransactionDir != txtTransationFolder.stringValue {
-                pathTransactionDir = txtTransationFolder.stringValue
+            if pathTransactionFolder != txtTransationFolder.stringValue {
+                pathTransactionFolder = txtTransationFolder.stringValue
                 gotNewTranactionFolder()
             }
         }

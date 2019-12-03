@@ -20,7 +20,7 @@ var usrModTranItemReturned  = ModifiedTransactionItem()
 var usrFixVendor        = true
 var usrIgnoreVendors    = [String: Int]()
 
-//MARK:---- handleCards - 25-95 = 70-lines
+//MARK:---- handleCards - 25-187 = 162-lines
 
 func handleCards(fileName: String, cardType: String, cardArray: [String], acct: Account?) {
     let cardArrayCount = cardArray.count
@@ -126,24 +126,28 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
                 if let tuple = gDictNoVendrDupes[signatureNoVendr] {
                     let idx  = tuple.0
                     let file = tuple.1
-                    print("HandleCards#\(#line) 🔹 \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat) - Dupe in \(file)")
-                    print("HandleCards#\(#line)     descKey \"\(lineItem.descKey)\" vs \"\(gLineItemArray[idx].descKey)\" both $\(lineItem.debit), $\(lineItem.credit)")
-                    if lineItem.descKey.prefix(3) == gLineItemArray[idx].descKey.prefix(3) {
-                        matchOpt = tuple
-                    } else {
-                        //
+                    if file != fileName {
+                        print("HandleCards#\(#line) 🔹 \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat) - Dupe in \(file)")
+                        print("HandleCards#\(#line)     descKey \"\(lineItem.descKey)\" vs \"\(gLineItemArray[idx].descKey)\" both $\(lineItem.debit), $\(lineItem.credit) on \(lineItem.tranDate)")
+                        if lineItem.descKey.prefix(3) == gLineItemArray[idx].descKey.prefix(3) {
+                            matchOpt = tuple
+                        } else {
+                            //
+                        }
                     }
                 }
             }
 
-            // See if Match for Vendr & approx dates (+/-4)
+            // See if Match for Vendr & approx dates (+/-2)
             if matchOpt == nil {
                 if let tuple = gDictNoDateDupes[signatureNoDate] {
-                    let daysDif = dateDif(dateStr1: lineItem.tranDate, dateStr2: gLineItemArray[tuple.0].tranDate)
-                    if abs(daysDif) <= 4 {
-                        let file = tuple.1
-                        print("HandleCards#\(#line) 🔹 \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat) - Dupe in \(file)")
-                        print("HandleCards#\(#line)     descKey \"\(lineItem.descKey)\" \(lineItem.tranDate) vs \"\(gLineItemArray[tuple.0].descKey)\" \(gLineItemArray[tuple.0].tranDate) both $\(lineItem.debit), $\(lineItem.credit)")
+                    let date1 = lineItem.tranDate
+                    let date2 = gLineItemArray[tuple.0].tranDate
+                    let daysDif = dateDif(dateStr1: date1, dateStr2: date2)
+                    let file = tuple.1
+                    if abs(daysDif) <= 2 && file != fileName {
+                        print("HandleCards#\(#line) 🔹 \(date1) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat) - Dupe in \(file)")
+                        print("HandleCards#\(#line)     Close dates \"\(lineItem.descKey)\" \(date1) vs \"\(gLineItemArray[tuple.0].descKey)\" \(date2) both $\(lineItem.debit), $\(lineItem.credit)")
                         //matchOpt = tuple
                     }
                 }
@@ -201,7 +205,7 @@ internal func gotaDupe(lineItem: LineItem, idxFromDupe: Int, fileName: String, l
     gLineItemArray[idxFromDupe].cardType = gLineItemArray[idxFromDupe].cardType + "*"
     if lineItem.descKey != lineItemFromDupe.descKey ||  lineItem.genCat != lineItemFromDupe.genCat {
         print("HandleCards#\(#line): \(lineItem.descKey) != \(lineItemFromDupe.descKey) ||  \(lineItem.genCat) != \(lineItemFromDupe.genCat)")
-        if lineItemFromDupe.genCat == "Unknown" && lineItem.genCat != "Unknown" {
+        if lineItemFromDupe.genCat == Const.unknown && lineItem.genCat != Const.unknown {
             gLineItemArray[idxFromDupe].genCat  = lineItem.genCat
             gLineItemArray[idxFromDupe].descKey = lineItem.descKey
         } else {
@@ -218,7 +222,7 @@ internal func gotaDupe(lineItem: LineItem, idxFromDupe: Int, fileName: String, l
 }
 
 //MARK: makeLineItem 110-lines
-//---- makeLineItem - Uses support files & possible user-input 99-209 = 110-lines
+//---- makeLineItem - Uses support files & possible user-input 225-335 = 110-lines
 internal func makeLineItem(fromTransFileLine: String,
                            dictColNums: [String: Int],
                            dictVendorShortNames: [String: String],
@@ -292,11 +296,8 @@ internal func makeLineItem(fromTransFileLine: String,
             isClearWinner = !catFromTran.hasSuffix("?") // if no "?", we have a winner
         } else {
             if lineItem.rawCat.isEmpty {
-                lineItem.rawCat = "Unknown"
+                lineItem.rawCat = Const.unknown
                 lineItem.genCat = ""
-//                if lineItem.genCat.isEmpty {
-//                    lineItem.genCat = "Unknown-?"
-//                }
             }
             print("HandleCards#\(#line): Unknown Category: \"\(lineItem.rawCat)\" from \(descKey) (line#\(lineNum) in \(fileName))")
             isClearWinner = false
@@ -312,6 +313,7 @@ internal func makeLineItem(fromTransFileLine: String,
         }
         // print("Category that was inserted = Key==> \(key) Value ==> \(self.rawCat) Source ==> \(source)")
     }//end if NOT found in Category-Lookup-by-Vendor Dictionary
+
 
     // if we're not ignoring this vendor
     if usrIgnoreVendors[lineItem.descKey] == nil {
@@ -398,7 +400,7 @@ func showUserInputVendorCatForm(lineItem: LineItem,
 //MARK: makeDictColNums
 
 //---- makeDictColNums - Infer which columns have the relevant data based in the Header row. Returns dictColNums
-internal func makeDictColNums(headers: [String]) -> [String: Int] {
+public func makeDictColNums(headers: [String]) -> [String: Int] {
     // "Check Number", "Date Written", "Date Cleared", "Payee", "Amount"
     // ML settled-activity: "Trade Date","Settlement Date" "Description 2"
     var dictColNums = [String: Int]()
@@ -444,7 +446,7 @@ internal func makeDictColNums(headers: [String]) -> [String: Int] {
             }
         } else {
             key = String(rawKey.replacingOccurrences(of: "\"", with: "").prefix(4))
-            if key != "TRAN" && key != "POST" && key != "DESC" && key != "AMOU" && key != "DEBI" && key != "CRED" && key != "CATE" {
+            if key != "TRAN" && key != "POST" && key != "DESC" && key != "AMOU" && key != "DEBI" && key != "CRED" && key != "CATE" && key != "MEMO" {
                 print("HandleCards#\(#line) unknown column type: \(rawKey)")
                 //
             }

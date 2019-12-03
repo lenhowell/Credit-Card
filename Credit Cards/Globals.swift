@@ -13,8 +13,5 @@ public struct Const {
     static let maxCardTypeLen = 10
     static let descKeyLength  = 24
     static let maxDollar = 999_999_999.0
-
-
-
-
+    static let unknown = "Unknown"
 }
