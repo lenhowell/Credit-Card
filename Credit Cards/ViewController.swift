@@ -33,11 +33,11 @@ var gUserInputMode          = true      // Used here & HandleCards.swift
 var gDictVendorShortNames   = [String: String]()        // (VendorShortNames.txt) Hash for VendorShortNames Lookup
 var gVendorShortNamesFileURL = FileManager.default.homeDirectoryForCurrentUser
 
-var gMyAccountsURL           = FileManager.default.homeDirectoryForCurrentUser
-var gMyCatsFileURL           = FileManager.default.homeDirectoryForCurrentUser
-var gMyModifiedTransURL      = FileManager.default.homeDirectoryForCurrentUser
-var gVendorCatLookupFileURL  = FileManager.default.homeDirectoryForCurrentUser
-var gTransactionFolderURL    = FileManager.default.homeDirectoryForCurrentUser
+var gMyAccountsURL          = FileManager.default.homeDirectoryForCurrentUser
+var gMyCatsFileURL          = FileManager.default.homeDirectoryForCurrentUser
+var gMyModifiedTransURL     = FileManager.default.homeDirectoryForCurrentUser
+var gVendorCatLookupFileURL = FileManager.default.homeDirectoryForCurrentUser
+var gTransactionFolderURL   = FileManager.default.homeDirectoryForCurrentUser
 
 //MARK:- ViewController
 class ViewController: NSViewController, NSWindowDelegate {
@@ -199,7 +199,11 @@ class ViewController: NSViewController, NSWindowDelegate {
     @IBOutlet weak var btnSummary:      NSButton!
     @IBOutlet var chkLearningMode:      NSButton!
     @IBOutlet var chkUserInput:         NSButton!
-    
+    @IBOutlet var chkDeposit:           NSButton!
+
+    @IBOutlet var radioActivityNormal:  NSButton!
+    @IBOutlet var radioActivityOnly:   NSButton!
+    @IBOutlet var radioActivityNot: NSButton!
     @IBOutlet var cboFiles:     NSComboBox!
 
     //MARK:- @IBActions
@@ -262,6 +266,14 @@ class ViewController: NSViewController, NSWindowDelegate {
     @IBAction func chkUserInputClick(_ sender: Any) {
         gUserInputMode = chkUserInput.state == .on
         print("UserInputMode = \(gUserInputMode)")
+    }
+
+    @IBAction func chkDepositsClick(_ sender: Any) {
+
+    }
+
+@IBAction func radioActivity(_ sender: Any) {
+
     }
 
     // MARK:- IBActions - MenuBar
@@ -334,8 +346,8 @@ class ViewController: NSViewController, NSWindowDelegate {
         } while !isValid
     }
 
-    @IBAction func mnuReadDeposits(_ sender: Any) {
-        readDeposits()
+    @IBAction func mnuReadAmazon(_ sender: Any) {
+        readAmazon()
     }
     //MARK:- Main Program 155-lines
     
@@ -452,10 +464,11 @@ class ViewController: NSViewController, NSWindowDelegate {
             }
         }//next fileURL
 
+        if chkDeposit.state == .on {
+            readDeposits()
+        }
+
         setButtons(btnDefault: .spreadsheet, needsRecalc: false, transFolderOK: true)
-//        btnSpreadsheet.isEnabled = true
-//        btnStart.keyEquivalent = ""
-//        btnSpreadsheet.keyEquivalent = "\r"
 
         outputTranactions(outputFileURL: outputFileURL, lineItemArray: gLineItemArray)
 

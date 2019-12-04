@@ -122,4 +122,21 @@ prefix,prefix
         XCTAssertEqual(result[1], "d;ef")
     }
 
+    func test_optimizeDatesForDeposits() {
+        var firstDate = "2006-11-01"
+        var lastDate  = "2007-12-07"
+        (firstDate, lastDate) = optimizeDatesForDeposits(firstDate: firstDate, lastDate: lastDate)
+        XCTAssertEqual(firstDate, "2007-01-01")
+        XCTAssertEqual(lastDate,  "2007-12-31")
+        (firstDate, lastDate) = optimizeDatesForDeposits(firstDate: "2001-11-01", lastDate: "2007-12-05")
+        XCTAssertEqual(firstDate, "2002-01-01")
+        XCTAssertEqual(lastDate,  "2007-12-31")
+        (firstDate, lastDate) = optimizeDatesForDeposits(firstDate: "2007-02-04", lastDate: "2007-02-05")
+        XCTAssertEqual(firstDate, "2007-02-01")
+        XCTAssertEqual(lastDate,  "2007-02-31")
+        (firstDate, lastDate) = optimizeDatesForDeposits(firstDate: "1999-12-04", lastDate: "2000-02-05")
+        XCTAssertEqual(firstDate, "1999-12-01")
+        XCTAssertEqual(lastDate,  "2000-02-31")
+    }
+
 }//end class

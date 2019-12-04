@@ -668,7 +668,7 @@ public struct Accounts {
             let msg = "Could not write new MyModifiesTransactions file."
             handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: url.lastPathComponent, errorMsg: msg)
         }
-    }//end method
+    }//end method writeToFile
 
 }//end struct Accounts
 
@@ -765,14 +765,8 @@ func outputTranactions(outputFileURL: URL, lineItemArray: [LineItem]) {
 
 //MARK:- Read Deposits
 func readDeposits() {
-    var acct = Account(code: "DEPOS", name: "Deposit", type: .deposit, amount: .credit)
-    var pathURL = gTransactionFolderURL
-    let last = pathURL.lastPathComponent
-    if let yr = Int(last.prefix(4)) {
-        if yr > 1980 && yr < 2100 {
-            pathURL = pathURL.deletingLastPathComponent()
-        }
-    }
+    // Find the Deposit file
+    let pathURL = getPossibleParentFolder(myURL: gTransactionFolderURL)
     let fileURL = pathURL.appendingPathComponent("DEPOSITcsv.csv")
     let content = (try? String(contentsOf: fileURL)) ?? ""
     if content.isEmpty {
@@ -780,9 +774,16 @@ func readDeposits() {
         handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataWarning, action: .alert, fileName: "DEPOSIT.csv", dataLineNum: 0, lineText: "", errorMsg: msg)
         return
     }
+
     let lines = content.components(separatedBy: "\n").map {$0.trim}
     let headers = lines[0].components(separatedBy: ",")
     let dictColNums = makeDictColNums(headers: headers)
+    var acct = Account(code: "DEPOS", name: "DEPOSIT", type: .deposit, amount: .credit)
+    var firstDate   = Stats.firstDate
+    var lastDate    = Stats.lastDate
+
+    // Optimize Dates for calandar years
+    (firstDate, lastDate) = optimizeDatesForDeposits(firstDate: firstDate, lastDate: lastDate)
 
     var calcSum = 0.0
     var postDate = ""
@@ -795,6 +796,7 @@ func readDeposits() {
             continue                            // Blank line
         }
 
+        // Ignore
         let items = FileIO.parseDelimitedLine(line, csvTsv: .csv)
         if items[0].hasSuffix("Missing") {
             continue
@@ -822,6 +824,8 @@ func readDeposits() {
 
         let valStr = items[3]
         let optVal = textToDbl(valStr)
+
+        // "Total" line
         if items[0].isEmpty && !valStr.isEmpty {        // Total $
             depositCount += 1
             if let total = optVal {
@@ -842,15 +846,22 @@ func readDeposits() {
             print("FileIO#\(#line) 😡 Deposit.csv line \(idx+1) Bad Date: \"\(items[1])\",  \(line)")//(idx+1,desc,chkDate,credit)
             errorCount += 1
         }
+        if chkDate == "2008-08-08" {
+            //
+        }
         if let credit = optVal {
+            // ------ Here to record this Deposit LineItem ------
             //print("FileIO#\(#line) 🤪 Deposit.csv line \(idx+1) \(desc) \(chkDate) \(credit)")//(idx+1,desc,chkDate,credit)
-            var lineItem = makeLineItem(fromTransFileLine: line, dictColNums: dictColNums, dictVendorShortNames: gDictVendorShortNames, cardType: "Deposit", hasCatHeader: true, fileName: "DepositCsv.csv", lineNum: idx+1, acct: acct)
+            var lineItem = makeLineItem(fromTransFileLine: line, dictColNums: dictColNums, dictVendorShortNames: gDictVendorShortNames, cardType: "DEPOSIT", hasCatHeader: true, fileName: "DepositCsv.csv", lineNum: idx+1, acct: acct)
             lineItem.postDate = postDate
 
+            if lineItem.tranDate >= firstDate && lineItem.tranDate <= lastDate {
+                gLineItemArray.append(lineItem)
+            }
             calcSum += credit
             checkCount += 1
-            //let lineItem = LineItem(tranDate: chkDate, postDate: postDate, desc: desc, debit: 0, credit: credit)
-        } else {
+
+        } else {    // Bad $-Value
             print("FileIO#\(#line) 😡 Deposit.csv line \(idx+1) \(desc) \(chkDate) \(valStr)")//(idx+1,desc,chkDate,credit)
             errorCount += 1
         }
@@ -863,7 +874,270 @@ func readDeposits() {
     }
 }//end func readDeposits
 
+internal func optimizeDatesForDeposits(firstDate: String, lastDate: String) -> (String, String) {
+    // Optimize Dates for calandar years
+    var firstDate = firstDate
+    var lastDate = lastDate
+    let ymd1  = firstDate.components(separatedBy: "-")
+    let ymd2  = lastDate.components(separatedBy: "-")
+    let mo1 = ymd1[1]
+    let mo2 = ymd2[1]
+    let yr1 = Int(ymd1[0]) ?? 0
+    let yr2 = Int(ymd2[0]) ?? 0
+    if (yr1 == yr2) && mo1 == "01" && mo2 == "12" {
+        firstDate = "\(yr2)-01-01"
+        lastDate  = "\(yr2)-12-31"
+    } else if (yr2-yr1 > 0) && (mo2 == "12" && (mo1 == "11" || mo1 == "12")) {
+        firstDate = "\(yr1+1)-01-01"
+        lastDate  = "\(yr2)-12-31"
+    } else {
+        firstDate = "\(yr1)-\(mo1)-01"
+    }
+    lastDate = "\(yr2)-\(mo2)-31"
+    return (firstDate, lastDate)
 
+}
+
+// If calling Folder name is a 4-digit year (1980-2099) return parent. Else return same.
+func getPossibleParentFolder(myURL: URL) -> URL {
+    var pathURL = myURL
+    let last = pathURL.lastPathComponent
+    if let yr = Int(last.prefix(4)) {
+        if yr >= 1980 && yr < 2100 {
+            pathURL = pathURL.deletingLastPathComponent()   // use parent folder
+        }
+    }
+    return pathURL
+}
+
+//MARK:- ReadAmazon
+// TODO: Fix returns, crosscheck files/year count.
+func readAmazon() {
+    enum Expect: String { case none, ordersYear, year,
+        orderPlaced, date, totalTitle, total$, shipToTitle, shipTo, orderNumber,
+        itemName, item$
+    }
+
+
+    // Find the Amazon Orders file
+    let pathURL = getPossibleParentFolder(myURL: gTransactionFolderURL)
+    let fileURL = pathURL.appendingPathComponent("Amazon Orders.txt")
+    let content = (try? String(contentsOf: fileURL)) ?? ""
+    if content.isEmpty {
+        let msg = "\(fileURL.path) does not exist."
+        handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataWarning, action: .alert, fileName: "DEPOSIT.csv", dataLineNum: 0, lineText: "", errorMsg: msg)
+        return
+    }
+    let ignores = ["Buy it again","View your","Get product","Share gift","Write a product",
+                   "Archive order","Return","Order D","Ask Product", "Problem with or", "===="]
+    /*
+     Buy it again
+     View your item
+     Get product support
+     Share gift receipt
+     Write a product review
+     Archive order
+
+     Return window closed on Jun 19, 2011
+     Return and product support eligibility
+     Return eligibility
+
+     Order Details   Invoice
+      2
+
+
+      Product question? Ask Seller
+
+     */
+    let lines = content.components(separatedBy: "\n").map {$0.trim}
+    print("FileIO#\(#line) read \(lines.count) lines from Amazon Orders.txt")
+
+    var errorCount      = 0
+    var orderCount      = 0
+    var orderCountTotal = 0
+    var itemCountTotal  = 0
+    var orderCountExpected = 0
+    var yearExpected    = 0
+    var expect          = Expect.ordersYear
+    var orderDate       = ""
+    var itemName        = ""
+
+    func gotNewOrdersInYear(line: String) {
+        yearExpected = 0
+        let words = line.components(separatedBy: " ")
+        orderCountExpected = Int(words[0]) ?? 0
+        orderCount = 0
+        if let yrStr = words.last {
+            let yr = Int(yrStr) ?? 0
+            if yr >= 1980 && yr < 2099 {
+                yearExpected = yr
+                expect = .orderPlaced
+            } else {
+                expect = .year
+            }
+        }
+    }
+
+    func newOrder() {
+        orderCount += 1
+        orderCountTotal += 1
+        itemName = "?"
+        expect = .date
+    }
+
+    for (idx, line) in lines.enumerated(){
+        if line.hasPrefix("EOF-") { break }
+        if idx == 3919 {
+            // Debug Trap
+        }
+        if line.count < 4 { continue }
+        var ignoreMe = false
+        for ignore in ignores {
+            if line.hasPrefix(ignore) {
+                ignoreMe = true
+                break
+            }
+        }
+        if ignoreMe { continue }
+
+        print("FileIO#\(#line) line#\(idx+1): \(line)")
+
+        var abort = false
+        let missing = expect.rawValue
+        if expect != .ordersYear && line.contains("orders placed in" ) {
+            if expect != .itemName { abort = true }
+            expect = .ordersYear
+        }
+        if expect != .itemName && expect != .orderPlaced && line == "ORDER PLACED" {
+            if expect != .itemName { abort = true }
+            expect = .orderPlaced
+        }
+        if expect != .orderNumber && line.hasPrefix("ORDER #") {
+            abort = true
+            expect = .orderPlaced
+        }
+        if abort {
+            errorCount += 1
+            let msg = "Amazon Orders.txt line # \(idx+1)\n\(orderDate) order for:\n\(itemName)\nunexpectedly ended without \(missing)"
+            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "AMAZON", dataLineNum: idx+1, lineText: line, errorMsg: msg)
+        }
+
+        switch expect {
+        case .ordersYear:
+            if line.contains("orders placed") { // Ignore stuff until "## orders placed in"
+                yearExpected = 0
+                let words = line.components(separatedBy: " ")
+                orderCountExpected = Int(words[0]) ?? 0     // Expected Order count
+                orderCount = 0
+                if let yrStr = words.last {
+                    let yr = Int(yrStr) ?? 0
+                    if yr >= 1980 && yr < 2099 {
+                        yearExpected = yr                   // covering what year?
+                        expect = .orderPlaced
+                    } else {
+                        expect = .year                      // Year was missing: get from next line
+                    }
+                }
+            }
+        case .year:
+            let yr = Int(line) ?? 0
+            if yr >= 1980 && yr < 2099 {
+                yearExpected = yr                           // Year from ordersYear
+            } else {
+                yearExpected = 0
+            }
+            expect = .orderPlaced
+
+        case .orderPlaced:
+            if line.hasPrefix("ORDER PLACED") {             // Start of new Order
+                newOrder()
+            }
+
+        case .date:
+            orderDate = line
+            let yr = Int(line.suffix(4)) ?? 0
+            if yr != yearExpected {
+                errorCount += 1
+                let msg = "Order Date not in \(yearExpected)"
+                handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "AMAZON", dataLineNum: idx+1, lineText: line, errorMsg: msg)
+            }
+                expect = .totalTitle
+
+        case .totalTitle:
+            if line != "TOTAL" {
+                errorCount += 1
+                let msg = "Order \"TOTAL\" missing"
+                handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "AMAZON", dataLineNum: idx+1, lineText: line, errorMsg: msg)
+            }
+            expect = .total$
+
+        case .total$:
+            let amount = textToDbl(line)
+            if amount == nil || !line.hasPrefix("$") {
+                errorCount += 1
+                let msg = "Order total $-amount corrupt: \(line)"
+                handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "AMAZON", dataLineNum: idx+1, lineText: line, errorMsg: msg)
+            }
+            expect = .shipToTitle
+
+        case .shipToTitle:
+            expect = .shipTo
+
+        case .shipTo:
+            expect = .orderNumber
+
+        case .orderNumber:
+            expect = .itemName
+
+            //--------- Items ---------
+
+        case .itemName:
+            if line.hasPrefix("ORDER PLACED") {
+                newOrder()
+
+            } else if line.contains("orders placed"){
+                gotNewOrdersInYear(line: line)
+
+            } else {
+                itemCountTotal += 1
+                itemName = line
+                expect = .item$     // Item Name
+            }
+
+        case .item$:
+            if line.hasPrefix("Sold by:") {
+                expect = .item$
+                // Sold By:
+            } else if line.hasPrefix("$") {
+                var amtStr = line
+                if amtStr.contains("\t") {
+                    (amtStr, _) = amtStr.splitAtFirst(char: "\t")
+                    amtStr = amtStr.trim
+                }
+                let amount = textToDbl(amtStr)
+                if amount == nil || !line.hasPrefix("$") {
+                    errorCount += 1
+                    let msg = "Order total $-amount corrupt: \(line)"
+                    handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "AMAZON", dataLineNum: idx+1, lineText: line, errorMsg: msg)
+                }
+                expect = .itemName
+            } else {
+                // Author
+            }
+
+        default:
+            errorCount += 1
+            print("FileIO#\(#line) line#\(idx+1): \(line)")
+        }
+//
+    }//next line
+    if errorCount == 0 {
+        print("FileIO#\(#line) 🤪 Amazon Orders.txt sucessfully read \(lines.count) lines, \(orderCountTotal) orders, \(itemCountTotal) items")
+    } else {
+        print("FileIO#\(#line) 😡 Amazon Orders.txt read \(lines.count) lines, \(orderCountTotal) orders, \(itemCountTotal) items, with \(errorCount) errors.")
+    }
+
+}//end func readAmazon
 
 //MARK:- File Formats 2.0
 /*

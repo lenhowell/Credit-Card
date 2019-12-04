@@ -56,7 +56,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         loadComboBoxCats()
         catItemCurrent      = usrCatItemPrefered
         updateAfterCatChange(newCatItem: catItemCurrent)
-        cboCats.delegate = self as? NSComboBoxDelegate
+        cboCats.delegate = self as NSComboBoxDelegate
     }
 
     override func viewDidAppear() {

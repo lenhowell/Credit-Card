@@ -317,7 +317,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         if tableView.selectedRow >= 0 {
             print("tableView.selectedRow = \(tableView.selectedRow)")
         }
-        btnShowTransactions.isEnabled = (totalCount < 10)
+        btnShowTransactions.isEnabled = (totalCount < 20)
 
         let currencyFormatter = NumberFormatter()
         currencyFormatter.usesGroupingSeparator = true
@@ -531,14 +531,14 @@ extension SummaryTableVC: NSTableViewDelegate {
 
     //---- tableViewSelectionDidChange -  When user selects a row, show data in status bar
     func tableViewSelectionDidChange(_ notification: Notification){
-        btnShowTransactions.isEnabled = (totalCount < 10)
+        btnShowTransactions.isEnabled = (totalCount < 20)
         if tableView == self.tableView {
             let iRow = tableView.selectedRow
             if iRow < 0 || iRow >= tableDicts.count                 { return }
             let rowDict = tableDicts[iRow]
             guard let countTxt = rowDict[SummaryColID.count] else   { return }
             guard let count = Int(countTxt) else                    { return }
-            if count > 0 && count < 20 {
+            if count > 0 && count < 80 {
                  btnShowTransactions.isEnabled = true
             }
         }//tableView
