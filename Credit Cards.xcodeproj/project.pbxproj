@@ -41,6 +41,7 @@
 		CEB315962321607E00D88759 /* UserInputCatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB315942321607E00D88759 /* UserInputCatVC.swift */; };
 		CEB84F282308EB20001485C5 /* Credit_Cards_UnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB84F272308EB20001485C5 /* Credit_Cards_UnitTests.swift */; };
 		CED5662823459C90002DD645 /* Spreadsheet.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CED5662723459C90002DD645 /* Spreadsheet.storyboard */; };
+		CEE86B18239EE04E0062C84F /* UnitTest_Amazon.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE86B17239EE04E0062C84F /* UnitTest_Amazon.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -111,6 +112,7 @@
 		CEB84F272308EB20001485C5 /* Credit_Cards_UnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Credit_Cards_UnitTests.swift; sourceTree = "<group>"; };
 		CEB84F292308EB20001485C5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CED5662723459C90002DD645 /* Spreadsheet.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Spreadsheet.storyboard; sourceTree = "<group>"; };
+		CEE86B17239EE04E0062C84F /* UnitTest_Amazon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitTest_Amazon.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -234,8 +236,9 @@
 			isa = PBXGroup;
 			children = (
 				CEB84F272308EB20001485C5 /* Credit_Cards_UnitTests.swift */,
-				CE29248F2372235A00F410A4 /* TableFilter_UnitTests.swift */,
 				CE0A86FB230B4AF500FD1ECD /* MakeDescKeyTests.swift */,
+				CE29248F2372235A00F410A4 /* TableFilter_UnitTests.swift */,
+				CEE86B17239EE04E0062C84F /* UnitTest_Amazon.swift */,
 				CEB84F292308EB20001485C5 /* Info.plist */,
 				CE90E6DA235F814900184BEF /* FileIO_UnitTests.swift */,
 			);
@@ -460,6 +463,7 @@
 				CE0A86FC230B4AF500FD1ECD /* MakeDescKeyTests.swift in Sources */,
 				CE2924902372235A00F410A4 /* TableFilter_UnitTests.swift in Sources */,
 				CEB84F282308EB20001485C5 /* Credit_Cards_UnitTests.swift in Sources */,
+				CEE86B18239EE04E0062C84F /* UnitTest_Amazon.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -617,14 +621,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 911;
+				CURRENT_PROJECT_VERSION = 920;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.10.6;
+				MARKETING_VERSION = 1.10.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -638,14 +642,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 911;
+				CURRENT_PROJECT_VERSION = 920;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.10.6;
+				MARKETING_VERSION = 1.10.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

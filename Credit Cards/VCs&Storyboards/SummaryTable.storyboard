@@ -489,9 +489,8 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="F6v-pm-I0v">
+                            <button verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="F6v-pm-I0v">
                                 <rect key="frame" x="144" y="-3" width="155" height="32"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="Show Transactions" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="T2e-Eo-1ur">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -512,6 +511,7 @@
                             <constraint firstItem="d5p-tA-fEf" firstAttribute="leading" secondItem="h7a-YN-YVP" secondAttribute="leading" constant="150" id="Ruw-kV-JjT"/>
                             <constraint firstItem="152-SD-4VP" firstAttribute="top" secondItem="eyn-e5-nkl" secondAttribute="top" id="WIL-yp-tuc"/>
                             <constraint firstItem="Iq4-9L-7hm" firstAttribute="leading" secondItem="eyn-e5-nkl" secondAttribute="trailing" id="Zsg-fI-9Kh"/>
+                            <constraint firstItem="eyn-e5-nkl" firstAttribute="bottom" secondItem="F6v-pm-I0v" secondAttribute="bottom" id="a4D-bD-aja"/>
                             <constraint firstAttribute="trailing" secondItem="d5p-tA-fEf" secondAttribute="trailing" constant="8" id="c1x-pv-SZS"/>
                             <constraint firstItem="Iq4-9L-7hm" firstAttribute="bottom" secondItem="eyn-e5-nkl" secondAttribute="bottom" id="lER-IR-o2E"/>
                             <constraint firstItem="152-SD-4VP" firstAttribute="leading" secondItem="w4R-ye-1zv" secondAttribute="trailing" id="lwO-CY-1ib"/>

@@ -24,6 +24,7 @@ var gDictCheckDupes         = [String: Int]()           // (handleCards) Hash fo
 var gDictCreditDupes        = [String: String]()        // (handleCards) Hash for finding duplicate Visa Credits (inconsistant dates)
 var gAccounts               = Accounts()
 var gDictModifiedTrans      = [String: ModifiedTransactionItem]()  // (MyModifiedTransactions.txt) Hash for user-modified transactions
+var gDictAmazonItemsByDate  = [String: [AmazonItem]]()
 
 var gMyCategoryHeader       = ""
 var gIsUnitTesting          = false     // Not used
@@ -347,7 +348,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func mnuReadAmazon(_ sender: Any) {
-        readAmazon()
+        gDictAmazonItemsByDate = readAmazon()
     }
     //MARK:- Main Program 155-lines
     

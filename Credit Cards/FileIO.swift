@@ -764,7 +764,7 @@ func outputTranactions(outputFileURL: URL, lineItemArray: [LineItem]) {
 }//end func outputTranactions
 
 //MARK:- Read Deposits
-func readDeposits() {
+func readDeposits(testData: String = "") {
     // Find the Deposit file
     let pathURL = getPossibleParentFolder(myURL: gTransactionFolderURL)
     let fileURL = pathURL.appendingPathComponent("DEPOSITcsv.csv")
@@ -812,7 +812,7 @@ func readDeposits() {
             }
             if postDate == "?" {
                 print("FileIO#\(#line) 😡 Deposit.csv line \(idx+1) Bad Date: \"\(items[1])\",  \(line)")//(idx+1,desc,chkDate,credit)
-                //
+                errorCount += 1
             }
             calcSum = 0.0
             got1 = true
@@ -847,7 +847,7 @@ func readDeposits() {
             errorCount += 1
         }
         if chkDate == "2008-08-08" {
-            //
+            // Debug Trap
         }
         if let credit = optVal {
             // ------ Here to record this Deposit LineItem ------
@@ -902,6 +902,10 @@ internal func optimizeDatesForDeposits(firstDate: String, lastDate: String) -> (
 func getPossibleParentFolder(myURL: URL) -> URL {
     var pathURL = myURL
     let last = pathURL.lastPathComponent
+    if last == "All" {
+        pathURL = pathURL.deletingLastPathComponent()   // use parent folder
+        return pathURL
+    }
     if let yr = Int(last.prefix(4)) {
         if yr >= 1980 && yr < 2100 {
             pathURL = pathURL.deletingLastPathComponent()   // use parent folder
@@ -911,56 +915,85 @@ func getPossibleParentFolder(myURL: URL) -> URL {
 }
 
 //MARK:- ReadAmazon
+public struct AmazonItem {
+    var orderNumber = ""
+    var orderDate   = ""
+    var order$      = 0.0
+    var orderShipTo = ""
+    var itemQuant   = 1
+    var itemName    = ""
+    var personTitle = ""
+    var personName  = ""
+    var itemSoldBy  = ""
+    var item$       = 0.0
+    var itemSerial  = ""
+    var fileLineNum = 0
+
+    init(orderNumber: String, orderDate: String, order$: Double, orderShipTo: String, fileLineNum: Int) {
+        self.orderNumber = orderNumber
+        self.orderDate   = orderDate
+        self.order$      = order$
+        self.orderShipTo = orderShipTo
+        self.fileLineNum = fileLineNum
+    }
+}
+
 // TODO: Fix returns, crosscheck files/year count.
-func readAmazon() {
+func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
     enum Expect: String { case none, ordersYear, year,
         orderPlaced, date, totalTitle, total$, shipToTitle, shipTo, orderNumber,
-        itemName, item$
+        itemName, item$, itemSerial
     }
-
 
     // Find the Amazon Orders file
-    let pathURL = getPossibleParentFolder(myURL: gTransactionFolderURL)
-    let fileURL = pathURL.appendingPathComponent("Amazon Orders.txt")
-    let content = (try? String(contentsOf: fileURL)) ?? ""
-    if content.isEmpty {
-        let msg = "\(fileURL.path) does not exist."
-        handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataWarning, action: .alert, fileName: "DEPOSIT.csv", dataLineNum: 0, lineText: "", errorMsg: msg)
-        return
+    let fileName: String
+    let content:  String
+    let allowAlert: Bool
+    if testData.isEmpty {
+        fileName = "Amazon Orders.txt"
+        allowAlert = true
+        let pathURL = getPossibleParentFolder(myURL: gTransactionFolderURL)
+        let fileURL = pathURL.appendingPathComponent(fileName)
+        content = (try? String(contentsOf: fileURL)) ?? ""
+        if content.isEmpty {
+            let msg = "\(fileURL.path) does not exist."
+            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataWarning, action: .alert, fileName: fileName, dataLineNum: 0, lineText: "", errorMsg: msg)
+            return [:]
+        }
+    } else {
+        fileName = "TestData"
+        allowAlert = false
+        content  = testData
     }
+
     let ignores = ["Buy it again","View your","Get product","Share gift","Write a product",
-                   "Archive order","Return","Order D","Ask Product", "Problem with or", "===="]
-    /*
-     Buy it again
-     View your item
-     Get product support
-     Share gift receipt
-     Write a product review
-     Archive order
+                   "Archive order","Return","Order D","Ask Product", "Problem with or",
+                   "Replacement ordered", "Your replacement","View ret",
+                   "This is a gift","Condition:" , "===="]
 
-     Return window closed on Jun 19, 2011
-     Return and product support eligibility
-     Return eligibility
-
-     Order Details   Invoice
-      2
-
-
-      Product question? Ask Seller
-
-     */
+    var amazonItemsByDate = [String: [AmazonItem]]()
     let lines = content.components(separatedBy: "\n").map {$0.trim}
-    print("FileIO#\(#line) read \(lines.count) lines from Amazon Orders.txt")
+    let linesCount = lines.count
+    print("\nFileIO#\(#line) read \(linesCount) lines from Amazon Orders.txt")
 
-    var errorCount      = 0
-    var orderCount      = 0
-    var orderCountTotal = 0
-    var itemCountTotal  = 0
-    var orderCountExpected = 0
-    var yearExpected    = 0
-    var expect          = Expect.ordersYear
+    var errorCount          = 0
+    var warningCount        = 0
+    var orderCount          = 0
+    var orderCountTotal     = 0
+    var itemCountTotal      = 0
+    var orderCountExpected  = 0
+    var yearExpected        = 0
+    var expect              = Expect.ordersYear
+
+    var orderNumber     = ""
+    var orderDateRaw    = ""
     var orderDate       = ""
-    var itemName        = ""
+    var order$          = 0.0
+    var orderShipTo     = ""
+
+    var personTitle     = ""
+    var personName      = ""
+
 
     func gotNewOrdersInYear(line: String) {
         yearExpected = 0
@@ -981,13 +1014,24 @@ func readAmazon() {
     func newOrder() {
         orderCount += 1
         orderCountTotal += 1
-        itemName = "?"
+
+        orderNumber     = ""
+        orderDateRaw    = ""
+        orderDate       = ""
+        order$          = 0.0
+        orderShipTo     = ""
+
+        personTitle     = ""
+        personName      = ""
         expect = .date
     }
 
+    var amazonOrder = AmazonItem(orderNumber: "", orderDate: "", order$: 0.0, orderShipTo: "", fileLineNum: 0)
+    var amazonItem  = amazonOrder
+    var orderRemaining$ = 0.0
     for (idx, line) in lines.enumerated(){
         if line.hasPrefix("EOF-") { break }
-        if idx == 3919 {
+        if idx == 3099 {
             // Debug Trap
         }
         if line.count < 4 { continue }
@@ -1000,7 +1044,7 @@ func readAmazon() {
         }
         if ignoreMe { continue }
 
-        print("FileIO#\(#line) line#\(idx+1): \(line)")
+        //print("FileIO#\(#line) line#\(idx+1): \(line)")
 
         var abort = false
         let missing = expect.rawValue
@@ -1012,14 +1056,21 @@ func readAmazon() {
             if expect != .itemName { abort = true }
             expect = .orderPlaced
         }
-        if expect != .orderNumber && line.hasPrefix("ORDER #") {
-            abort = true
-            expect = .orderPlaced
+        if line.hasPrefix("ORDER #") {
+            let tuple = line.splitAtFirst(char: "#")
+            orderNumber = tuple.rgt.trim
+            amazonOrder = AmazonItem(orderNumber: orderNumber, orderDate: orderDate, order$: order$, orderShipTo: orderShipTo, fileLineNum: idx+1)
+            amazonItem  = amazonOrder
+            if expect != .orderNumber {
+                abort = true
+                expect = .orderPlaced
+            }
         }
         if abort {
+            let name = amazonItem.itemName.count <= 1 ? "" : " for:\n\"\(amazonItem.itemName)\""
+            let msg = "\(orderDateRaw) order\(name)\nunexpectedly ended without \(missing)"
+            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: fileName, dataLineNum: idx+1, lineText: line, errorMsg: msg)
             errorCount += 1
-            let msg = "Amazon Orders.txt line # \(idx+1)\n\(orderDate) order for:\n\(itemName)\nunexpectedly ended without \(missing)"
-            handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "AMAZON", dataLineNum: idx+1, lineText: line, errorMsg: msg)
         }
 
         switch expect {
@@ -1054,29 +1105,36 @@ func readAmazon() {
             }
 
         case .date:
-            orderDate = line
+            orderDateRaw = line.trim
+            orderDate = makeDate(orderDateRaw)
             let yr = Int(line.suffix(4)) ?? 0
             if yr != yearExpected {
                 errorCount += 1
-                let msg = "Order Date not in \(yearExpected)"
-                handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "AMAZON", dataLineNum: idx+1, lineText: line, errorMsg: msg)
+                let msg = "AmazonOrders.txt line # \(idx+1)\nOrder Date not in \(yearExpected)\n\(orderDateRaw)"
+                handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "", dataLineNum: 0, lineText: line, errorMsg: msg)
             }
-                expect = .totalTitle
+            order$ = 0
+            orderRemaining$ = 0
+            expect = .totalTitle
 
         case .totalTitle:
             if line != "TOTAL" {
                 errorCount += 1
-                let msg = "Order \"TOTAL\" missing"
-                handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "AMAZON", dataLineNum: idx+1, lineText: line, errorMsg: msg)
+                let msg = "AmazonOrders.txt line # \(idx+1)\nOrder \"TOTAL\" missing\n\(orderDateRaw)"
+                handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "", dataLineNum: 0, lineText: line, errorMsg: msg)
             }
             expect = .total$
 
         case .total$:
-            let amount = textToDbl(line)
-            if amount == nil || !line.hasPrefix("$") {
-                errorCount += 1
-                let msg = "Order total $-amount corrupt: \(line)"
-                handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "AMAZON", dataLineNum: idx+1, lineText: line, errorMsg: msg)
+            if line.hasPrefix("$") {
+                if let amount = textToDbl(line) {
+                    order$ = amount
+                    orderRemaining$ = amount
+                } else {
+                    let msg = "AmazonOrders.txt line # \(idx+1)\nOrder total $-amount corrupt: \(line)\n\(orderDateRaw)"
+                    handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "", dataLineNum: 0, lineText: line, errorMsg: msg)
+                    errorCount += 1
+                }
             }
             expect = .shipToTitle
 
@@ -1084,6 +1142,7 @@ func readAmazon() {
             expect = .shipTo
 
         case .shipTo:
+            orderShipTo = line
             expect = .orderNumber
 
         case .orderNumber:
@@ -1091,38 +1150,103 @@ func readAmazon() {
 
             //--------- Items ---------
 
-        case .itemName:
-            if line.hasPrefix("ORDER PLACED") {
+        case .itemName:                                 // Expecting $amount, got:
+            if line.hasPrefix("ORDER PLACED") {                 // ORDER PLACED
+                let pctOff = abs(orderRemaining$/order$)
+                if (orderRemaining$ > 10.0  || orderRemaining$ < -0.1) && pctOff > 0.07 {
+                    let s = String(format: "%.1f", orderRemaining$/order$*100)//(orderRemaining$/order$*100)
+                    print("⚠️ \(amazonItem.orderDate) Tax & Shipping of $\(String(format: "%.2",orderRemaining$)) on $\(String(format: "%.2",order$)) = \(s)%  line \(amazonItem.fileLineNum)")
+                    warningCount += 1
+                }
                 newOrder()
 
-            } else if line.contains("orders placed"){
+            } else if line.contains("orders placed"){           // Begin a new year
                 gotNewOrdersInYear(line: line)
 
+            } else if line.hasPrefix("See all") {               // See all
+                let s = String(format: "%.1f", orderRemaining$/order$*100)//(orderRemaining$/order$*100)
+                print("⛔️ \(amazonItem.orderDate) Not shown: $\(String(format: "%.2",orderRemaining$)) on $\(String(format: "%.2",order$)) = \(s)%  line \(amazonItem.fileLineNum)")
+                print()
+            } else if line.hasPrefix("Amount Serial") {         // Amount Serial number(s)
+                expect = .itemSerial
+
             } else {
+                amazonItem = amazonOrder
+                amazonItem.itemQuant = 1
+                amazonItem.itemName = line
+                let comps = line.components(separatedBy: " of ")
+                if comps.count >= 2  {
+                    let qStr = comps[0].trim
+                    if qStr.count < 4 {
+                        if let quan = Int(qStr) {
+                            amazonItem.itemQuant = quan
+                            amazonItem.itemName = String(line.dropFirst(comps[0].count + 4))
+                        }
+                    }
+                }
                 itemCountTotal += 1
-                itemName = line
                 expect = .item$     // Item Name
             }
 
-        case .item$:
-            if line.hasPrefix("Sold by:") {
+        case .item$:                                     // Expecting $amount, got:
+            if line.hasPrefix("Sold by:") {                     // Sold by:
+                (_, amazonItem.itemSoldBy) = line.splitAtFirst(char: ":")
+                amazonItem.itemSoldBy = amazonItem.itemSoldBy.trim
                 expect = .item$
-                // Sold By:
-            } else if line.hasPrefix("$") {
+            } else if line.hasPrefix("Lightning Deal") {        // Lightning Deal
+                amazonItem.item$ = orderRemaining$
+                orderRemaining$ = 0
+                expect = .itemName
+            } else if line.hasPrefix("Serial Numbers:") {       // Serial Numbers:
+                if line.count > 15 {
+                    let tuple = line.splitAtFirst(char: ":")
+                    amazonItem.itemSerial = tuple.rgt.trim
+                } else {
+                    expect = .itemSerial
+                }
+
+                //
+            } else if line.hasPrefix("$") {                     // $amount
                 var amtStr = line
                 if amtStr.contains("\t") {
                     (amtStr, _) = amtStr.splitAtFirst(char: "\t")
                     amtStr = amtStr.trim
                 }
-                let amount = textToDbl(amtStr)
-                if amount == nil || !line.hasPrefix("$") {
+                if let amount = textToDbl(amtStr) {
+                    amazonItem.item$ = amount
+                    orderRemaining$ -= amount * Double(amazonItem.itemQuant)
+                } else {
+                    let msg = "Order total $-amount corrupt: \(line)\n\(orderDateRaw) order for:\n\(amazonItem.itemName)\n"
+                    handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "fileName", dataLineNum: idx+1, lineText: line, errorMsg: msg)
                     errorCount += 1
-                    let msg = "Order total $-amount corrupt: \(line)"
-                    handleError(codeFile: "FileIO", codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "AMAZON", dataLineNum: idx+1, lineText: line, errorMsg: msg)
+                }
+                amazonItem.fileLineNum = idx+1
+                if let orderArray =  amazonItemsByDate[amazonItem.orderDate] {
+                    var newOrderArray = orderArray
+                    newOrderArray.append(amazonItem)
+                    amazonItemsByDate[amazonItem.orderDate] = newOrderArray
+                } else {
+                    amazonItemsByDate[amazonItem.orderDate] = [amazonItem]
                 }
                 expect = .itemName
+            } else {                                            // Author
+                if !line.contains("(") {
+                    amazonItem.personTitle = "Author"
+                    amazonItem.personName = line
+                } else {
+                    var s1 = ""
+                    (amazonItem.personName, s1) = line.splitAtFirst(char: "(")
+                    amazonItem.personName = amazonItem.personName.trim
+                    (amazonItem.personTitle, _) = s1.splitAtFirst(char: ")")
+                }
+            }
+
+        case .itemSerial:
+            amazonItem.itemSerial = line.trim
+            if line.hasPrefix("$") {
+                expect = .itemName
             } else {
-                // Author
+                expect = .item$
             }
 
         default:
@@ -1131,13 +1255,56 @@ func readAmazon() {
         }
 //
     }//next line
-    if errorCount == 0 {
-        print("FileIO#\(#line) 🤪 Amazon Orders.txt sucessfully read \(lines.count) lines, \(orderCountTotal) orders, \(itemCountTotal) items")
+    if errorCount + warningCount == 0 {
+        print("FileIO#\(#line) 🤪 Amazon Orders.txt sucessfully read \(linesCount) lines, \(orderCountTotal) orders, \(itemCountTotal) items")
     } else {
-        print("FileIO#\(#line) 😡 Amazon Orders.txt read \(lines.count) lines, \(orderCountTotal) orders, \(itemCountTotal) items, with \(errorCount) errors.")
+        print("FileIO#\(#line) 😡 Amazon Orders.txt read \(linesCount) lines, \(orderCountTotal) orders, \(itemCountTotal) items, with \(warningCount) warnings, \(errorCount) errors.")
     }
-
+    return amazonItemsByDate
 }//end func readAmazon
+
+func makeDate(_ dateStr: String) -> String {
+    // April 24, 2017 => 2017-04-24
+    let comps = dateStr.trim.components(separatedBy: " ")
+    if comps.count != 3 {
+        return "0000-00-00"
+    }
+    let yr = comps[2]
+    var da = String(comps[1].dropLast())
+    if da.count < 2 {
+        da = "0" + da
+    }
+    let mo: String
+    switch comps[0] {
+    case "January":
+        mo = "01"
+    case "February":
+        mo = "02"
+    case "March":
+        mo = "03"
+    case "April":
+        mo = "04"
+    case "May":
+        mo = "05"
+    case "June":
+        mo = "06"
+    case "July":
+        mo = "07"
+    case "August":
+        mo = "08"
+    case "September":
+        mo = "09"
+    case "October":
+        mo = "10"
+    case "November":
+        mo = "11"
+    case "December":
+        mo = "12"
+    default:
+        mo = "00"
+    }
+    return "\(yr)-\(mo)-\(da)"
+}
 
 //MARK:- File Formats 2.0
 /*
@@ -1208,3 +1375,4 @@ struct CategorySplit {
     var category     = ""
     var AmountCredit = 0.0
 }
+
