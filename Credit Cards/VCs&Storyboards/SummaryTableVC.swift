@@ -420,7 +420,6 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         self.view.window?.title = title + addon
     }
 
-    //TODO: Move to TableFilter.swift
     //---- applyFilter - Returns true if lineItem meets all the filter criteria
     private func applyFilter(lineItem: LineItem) -> Bool {
         if lineItem.credit + lineItem.debit < filtDollarVal1 { return false }
@@ -495,8 +494,11 @@ extension SummaryTableVC: NSTableViewDataSource {
     //---- tableView sortDescriptorsDidChange - Column SORT
     func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
         guard let sortDescriptor = tableView.sortDescriptors.first else { return }
-        //print("⬆️\(sortDescriptor.key!) \(sortDescriptor.ascending)")
-        reloadTableSorted(sortBy: sortDescriptor.key!, ascending: sortDescriptor.ascending)
+
+        if let key = sortDescriptor.key {
+            print("⬆️ \(codeFile)#\(#line) sortDescriptor key: \(key)   ascending: \(sortDescriptor.ascending)")
+            reloadTableSorted(sortBy: key, ascending: sortDescriptor.ascending)
+        }
     }
 
 }//end extension

@@ -152,8 +152,9 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
                     }
                 }
             }
-
-            if matchOpt == nil || matchOpt!.1 == fileName {
+            
+            let matchFile = matchOpt?.1 ?? ""
+            if matchOpt == nil || matchFile == fileName {
                 // NOT a Dupe
                 let tuple = (gLineItemArray.count, fileName)
                 gDictTranDupes[signature1] = tuple        // mark for dupes check using TranDate

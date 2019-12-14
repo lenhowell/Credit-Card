@@ -291,7 +291,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         dict[SpSheetColID.transDate]   = lineItem.tranDate // makeYYYYMMDD(dateTxt: lineItem.tranDate)
         dict[SpSheetColID.descKey]     = lineItem.descKey
         dict[SpSheetColID.fullDesc]    = lineItem.desc
-        dict[SpSheetColID.ChkNumber]   = lineItem.chkNumber
+        dict[SpSheetColID.chkNumber]   = lineItem.chkNumber
         dict[SpSheetColID.debit]       = formatCell(lineItem.debit,  formatType: .dollar,  digits: 2)
         dict[SpSheetColID.credit]      = formatCell(lineItem.credit, formatType: .dollar,  digits: 2)
         dict[SpSheetColID.category]    = lineItem.genCat
@@ -324,7 +324,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 //              Name        ID          Width   Col#    Totals
 public enum SpSheetColID: CaseIterable {
     static let cardType     = "CardType"            // 60    0      -
-    static let ChkNumber    = "ChkNumber"
+    static let chkNumber    = "ChkNumber"
     static let transDate    = "TransDate"           // --   --
     static let descKey      = "DescKey"             // 60    1
     static let fullDesc     = "Full Description"    // 70    2
@@ -366,7 +366,7 @@ extension SpreadsheetVC: NSTableViewDataSource {
 
     //---- numberOfRows -
     func numberOfRows(in tableView: NSTableView) -> Int {
-        print("🙂\(codeFile)#\(#line) tableDicts.count = \(tableDicts.count)")
+        //print("🙂\(codeFile)#\(#line) tableDicts.count = \(tableDicts.count)")
         if tableView == self.tableView {
             return tableDicts.count
         }
@@ -380,8 +380,10 @@ extension SpreadsheetVC: NSTableViewDataSource {
     func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
         if tableView == self.tableView {
             guard let sortDescriptor = tableView.sortDescriptors.first else { return }
-            print("⬆️ sortDescriptor key: \(sortDescriptor.key ?? "?")   ascending: \(sortDescriptor.ascending)")
-            reloadTableSorted(sortBy: sortDescriptor.key!, ascending: sortDescriptor.ascending)
+            if let key = sortDescriptor.key {
+                print("⬆️ \(codeFile)#\(#line) sortDescriptor key: \(key)   ascending: \(sortDescriptor.ascending)")
+                reloadTableSorted(sortBy: key, ascending: sortDescriptor.ascending)
+            }
         }
     }
 
@@ -452,7 +454,7 @@ extension SpreadsheetVC: NSTableViewDelegate {
             //print("Selected Row # \(tableView.selectedRow).  idx = \(idx)")
             let lineItem = gLineItemArray[idx]
 
-            var id = rowDict[SpSheetColID.ChkNumber] ?? ""
+            var id = rowDict[SpSheetColID.chkNumber] ?? ""
             if !id.isEmpty { id = "  #" + id + "  " }
             let fileAndLine = "[\"" + (rowDict[SpSheetColID.file_LineNum] ?? "").replacingOccurrences(of: "#", with: "\" line#") + "]"
             let descFull = rowDict[SpSheetColID.fullDesc] ?? ""
