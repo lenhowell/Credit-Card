@@ -5,7 +5,8 @@
 //  Created by George Bauer on 10/11/17.
 //  Copyright © 2017-2019 GeorgeBauer. All rights reserved.
 
-//  Ver 1.8.0  10/12/2019 Add splitAtFirst(char:) to split a String at 1st occurrence of a Character
+//  Ver 1.9.0  05/07/2020 Add splitAtLast(char:) to split a String at last occurrence of a Character
+//      1.8.0  10/12/2019 Add splitAtFirst(char:) to split a String at 1st occurrence of a Character
 //      1.7.4   8/22/2019 Add out-of-range protection for all Int subscripting
 //      1.7.3   7/09/2019 Add removeEnclosingQuotes()
 //      1.7.2   7/04/2019 PadRight now optionally truncates with ellipsis or does not truncate at all.
@@ -344,15 +345,44 @@ extension StringProtocol {
 
     //---- splitAtFirst(char - Split string at 1st occurence of char
     public func splitAtFirst(char: Character) -> (lft: String, rgt: String) {
-        let idx = self.firstIndex(of: char)
-        guard let index1 = idx else {
-            return (String(self), "")
+        if self.isEmpty { return ("", "") }
+        if self.first == char { return ("", String(self.dropFirst())) }
+        let array = self.split(maxSplits: 1, whereSeparator: { $0 == char })
+        let ilft = String(array[0])
+        let irgt: String
+        if array.count > 1 {
+            irgt = String(array[1])
+        } else {
+            irgt = ""
         }
-        let ilft = String(self[self.startIndex..<index1])
-        let irgt = String(self[index(after: index1)..<endIndex])
         return (ilft, irgt)
     }
     
+    //---- splitAtFirst(char - Split string at 1st occurence of char - alternative method
+//    public func splitAtFirst(char: Character) -> (lft: String, rgt: String) {
+//        let idx = self.firstIndex(of: char)
+//        guard let index1 = idx else {
+//            return (String(self), "")
+//        }
+//        let ilft = String(self[self.startIndex..<index1])
+//        let irgt = String(self[index(after: index1)..<endIndex])
+//        return (ilft, irgt)
+//    }
+
+    //---- splitAtLast(char - Split string at last occurence of char
+    public func splitAtLast(char: Character) -> (lft: String, rgt: String) {
+        if self.isEmpty { return ("", "") }
+        if self.last == char { return ( String(self.dropLast()), "") }
+        if !self.contains(char) { return ("", String(self) ) }
+        let array = self.split(whereSeparator: { $0 == char })
+
+        let ilft = String(array.dropLast().joined(separator: String(char)))
+        let x = array.last ?? ""
+        let irgt = String(x)
+        return (ilft, irgt)
+    }
+
+
     //---- pluralize - Pluralize a word (English) ------
     /// Pluralize an English word if count > 0
     /// - Parameter count: Triggers pluralization if > 0

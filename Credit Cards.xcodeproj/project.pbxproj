@@ -20,9 +20,10 @@
 		BFECDEE122FDBED400F1BF5E /* FileIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFECDEE022FDBED400F1BF5E /* FileIO.swift */; };
 		BFECDEE322FDCBCD00F1BF5E /* HandleCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFECDEE222FDCBCD00F1BF5E /* HandleCards.swift */; };
 		CE0A86FC230B4AF500FD1ECD /* MakeDescKeyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0A86FB230B4AF500FD1ECD /* MakeDescKeyTests.swift */; };
+		CE0BBCCD23A6D58E003EA6C3 /* FileDeposits.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0BBCCC23A6D58E003EA6C3 /* FileDeposits.swift */; };
 		CE1F7EC823317453004765E7 /* MyCategories.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE1F7EC723317453004765E7 /* MyCategories.txt */; };
 		CE2924902372235A00F410A4 /* TableFilter_UnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE29248F2372235A00F410A4 /* TableFilter_UnitTests.swift */; };
-		CE35141223A08E9400158000 /* AmazonOrders.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE35141123A08E9400158000 /* AmazonOrders.swift */; };
+		CE35141223A08E9400158000 /* FileAmazonOrders.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE35141123A08E9400158000 /* FileAmazonOrders.swift */; };
 		CE4A27FD2301BEC500CA5A38 /* Stats.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4A27FC2301BEC500CA5A38 /* Stats.swift */; };
 		CE5B1E022304E03C00337C2F /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5B1E012304E03C00337C2F /* UserDefaults.swift */; };
 		CE6F1AE32352D576008CA720 /* VendorShortNames.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE6F1AE22352D576008CA720 /* VendorShortNames.txt */; };
@@ -90,9 +91,10 @@
 		BFECDEE022FDBED400F1BF5E /* FileIO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileIO.swift; sourceTree = "<group>"; };
 		BFECDEE222FDCBCD00F1BF5E /* HandleCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandleCards.swift; sourceTree = "<group>"; };
 		CE0A86FB230B4AF500FD1ECD /* MakeDescKeyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeDescKeyTests.swift; sourceTree = "<group>"; };
+		CE0BBCCC23A6D58E003EA6C3 /* FileDeposits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDeposits.swift; sourceTree = "<group>"; };
 		CE1F7EC723317453004765E7 /* MyCategories.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MyCategories.txt; sourceTree = "<group>"; };
 		CE29248F2372235A00F410A4 /* TableFilter_UnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableFilter_UnitTests.swift; sourceTree = "<group>"; };
-		CE35141123A08E9400158000 /* AmazonOrders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmazonOrders.swift; sourceTree = "<group>"; };
+		CE35141123A08E9400158000 /* FileAmazonOrders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileAmazonOrders.swift; sourceTree = "<group>"; };
 		CE4A27FC2301BEC500CA5A38 /* Stats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stats.swift; sourceTree = "<group>"; };
 		CE5B1E012304E03C00337C2F /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		CE6F1AE22352D576008CA720 /* VendorShortNames.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = VendorShortNames.txt; sourceTree = "<group>"; };
@@ -182,7 +184,8 @@
 				BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */,
 				CE7E093D2377C3C4004150E6 /* Globals.swift */,
 				BFECDEE022FDBED400F1BF5E /* FileIO.swift */,
-				CE35141123A08E9400158000 /* AmazonOrders.swift */,
+				CE35141123A08E9400158000 /* FileAmazonOrders.swift */,
+				CE0BBCCC23A6D58E003EA6C3 /* FileDeposits.swift */,
 				BFECDEDE22FDBC2F00F1BF5E /* FreeFuncs.swift */,
 				CE7548122309DC0600FEDAFB /* DescriptionKey.swift */,
 				BFECDEE222FDCBCD00F1BF5E /* HandleCards.swift */,
@@ -425,7 +428,7 @@
 				CE8AEB9423459E6F00337A73 /* SpreadsheetVC.swift in Sources */,
 				CE95CC9D2336D722008363B7 /* VendorShortNames.swift in Sources */,
 				CE5B1E022304E03C00337C2F /* UserDefaults.swift in Sources */,
-				CE35141223A08E9400158000 /* AmazonOrders.swift in Sources */,
+				CE35141223A08E9400158000 /* FileAmazonOrders.swift in Sources */,
 				CE95CC9B23367191008363B7 /* UserInputShortNameVC.swift in Sources */,
 				BF992C4A22EE56410089DAB8 /* ViewController.swift in Sources */,
 				CE7E093E2377C3C4004150E6 /* Globals.swift in Sources */,
@@ -439,6 +442,7 @@
 				CEA62D302306232C00160DEB /* Alerts.swift in Sources */,
 				CE7548132309DC0600FEDAFB /* DescriptionKey.swift in Sources */,
 				BFECDEE122FDBED400F1BF5E /* FileIO.swift in Sources */,
+				CE0BBCCD23A6D58E003EA6C3 /* FileDeposits.swift in Sources */,
 				CE90E6E1236E80B400184BEF /* HandleActivity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

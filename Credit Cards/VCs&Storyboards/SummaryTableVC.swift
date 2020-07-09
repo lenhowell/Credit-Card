@@ -115,8 +115,8 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         radioGroupCategory.state = .on
         loadTableSortDescriptors()
         myTableParams = loadStuffFromCaller(tableParams: gPassToNextTable)
-        //FIXME: Both btnFilter & radioCatChange reload table
-        btnFilter(self)
+        //FIXME: Both btnFilterClick & radioCatChange reload table
+        _ = applyFilter()
         radioCatChange(self)
         // Give Window some color to differentiate it from a Spreadsheet
         view.wantsLayer = true
@@ -137,19 +137,24 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
 
 //MARK:- IBActions
 
-    @IBAction func btnFilter(_ sender: Any) {
-        let errMsg = setFilter()
+    @IBAction func btnFilterClick(_ sender: Any) {
+        let errMsg = applyFilter()
         if errMsg.isEmpty {
-            btnFilter.keyEquivalent = ""
             loadTableDictsArray(lineItemArray: gLineItemArray, summarizeBy : summarizeBy)
-            //tableView.reloadData()
-            //tableViewSum.reloadData()
-        } else {
-            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alert, errorMsg: errMsg)
         }
     }
 
-    @IBAction func btnClear(_ sender: Any) {
+    func applyFilter() -> String {
+        let errMsg = setFilter()
+        if errMsg.isEmpty {
+            btnFilter.keyEquivalent = ""
+        } else {
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alert, errorMsg: errMsg)
+        }
+        return errMsg
+    }//end func
+
+    @IBAction func btnClearClick(_ sender: Any) {
         txtDate1.stringValue    = ""
         txtDate2.stringValue    = ""
         //txtDollar1.stringValue  = ""
