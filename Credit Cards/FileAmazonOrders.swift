@@ -10,10 +10,10 @@ import Foundation
 
 //MARK:- ReadAmazon
 public struct AmazonItem {
-    var orderNumber = ""
-    var orderDate   = ""
-    var order$      = 0.0
-    var orderShipTo = ""
+    var orderNumber:String
+    var orderDate:  String
+    var order$:     Double
+    var orderShipTo:String
     var itemQuant   = 1
     var itemName    = ""
     var personTitle = ""
@@ -21,7 +21,7 @@ public struct AmazonItem {
     var itemSoldBy  = ""
     var item$       = 0.0
     var itemSerial  = ""
-    var fileLineNum = 0
+    var fileLineNum:Int
     
     init(orderNumber: String, orderDate: String, order$: Double, orderShipTo: String, fileLineNum: Int) {
         self.orderNumber = orderNumber
@@ -30,23 +30,24 @@ public struct AmazonItem {
         self.orderShipTo = orderShipTo
         self.fileLineNum = fileLineNum
     }
-}
+}//end struct AmazonItem
 
 // TODO: Fix returns, crosscheck files/year count.
+//---- readAmazon - 37-366 = 329-lines
 func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
     enum Expect: String { case none, ordersYear, year,
         orderPlaced, date, totalTitle, total$, shipToTitle, shipTo, orderNumber,
         itemName, item$, itemSerial
     }
-    let codeFile = "AmazonOrders"
+    let codeFile = "AmazonOrders"   // for error logging
     // Find the Amazon Orders file
     let fileName: String
     let content:  String
-    let allowAlert: Bool
+    let errAction: ErrAction
     if testData.isEmpty {
         fileName = "Amazon Orders.txt"
-        allowAlert = true
-        let pathURL = FileIO.getPossibleParentFolder(myURL: gTransactionFolderURL)
+        errAction = .alertAndDisplay
+        let pathURL = FileIO.getPossibleParentFolder(myURL: gUrl.transactionFolder)
         let fileURL = pathURL.appendingPathComponent(fileName)
         content = (try? String(contentsOf: fileURL)) ?? ""
         if content.isEmpty {
@@ -56,7 +57,7 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
         }
     } else {
         fileName = "TestData"
-        allowAlert = false
+        errAction = .display
         content  = testData
     }
 
@@ -70,14 +71,14 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
     let linesCount = lines.count
     print("\n\(codeFile)#\(#line) read \(linesCount) lines from Amazon Orders.txt")
 
-    var errorCount          = 0
-    var warningCount        = 0
-    var orderCount          = 0
-    var orderCountTotal     = 0
-    var itemCountTotal      = 0
-    var orderCountExpected  = 0
-    var yearExpected        = 0
-    var expect              = Expect.ordersYear
+    var errorCount      = 0
+    var warningCount    = 0
+    var orderCount      = 0
+    var orderCountTotal = 0
+    var itemCountTotal  = 0
+    var yearExpected    = 0
+    var expect          = Expect.ordersYear
+    var orderCountExpected = 0
 
     var orderNumber     = ""
     var orderDateRaw    = ""
@@ -88,7 +89,7 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
     var personTitle     = ""
     var personName      = ""
 
-
+    // internal to set orderCount, yearExpected, expect, orderCountExpected from line
     func gotNewOrdersInYear(line: String) {
         yearExpected = 0
         let words = line.components(separatedBy: " ")
@@ -103,21 +104,21 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
                 expect = .year
             }
         }
-    }
+    }//end func
 
     func newOrder() {
         orderCount += 1
         orderCountTotal += 1
 
-        orderNumber     = ""
-        orderDateRaw    = ""
-        orderDate       = ""
-        order$          = 0.0
-        orderShipTo     = ""
+        orderNumber  = ""
+        orderDateRaw = ""
+        orderDate    = ""
+        order$       = 0.0
+        orderShipTo  = ""
 
-        personTitle     = ""
-        personName      = ""
-        expect = .date
+        personTitle  = ""
+        personName   = ""
+        expect       = .date
     }
 
     var amazonOrder = AmazonItem(orderNumber: "", orderDate: "", order$: 0.0, orderShipTo: "", fileLineNum: 0)
@@ -163,7 +164,7 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
         if abort {
             let name = amazonItem.itemName.count <= 1 ? "" : " for:\n\"\(amazonItem.itemName)\""
             let msg = "\(orderDateRaw) order\(name)\nunexpectedly ended without \(missing)"
-            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: fileName, dataLineNum: idx+1, lineText: line, errorMsg: msg)
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: errAction, fileName: fileName, dataLineNum: idx+1, lineText: line, errorMsg: msg)
             errorCount += 1
         }
 
@@ -205,7 +206,7 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
             if yr != yearExpected {
                 errorCount += 1
                 let msg = "AmazonOrders.txt line # \(idx+1)\nOrder Date not in \(yearExpected)\n\(orderDateRaw)"
-                handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "", dataLineNum: 0, lineText: line, errorMsg: msg)
+                handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: errAction, fileName: "", dataLineNum: 0, lineText: line, errorMsg: msg)
             }
             order$ = 0
             orderRemaining$ = 0
@@ -215,7 +216,7 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
             if line != "TOTAL" {
                 errorCount += 1
                 let msg = "AmazonOrders.txt line # \(idx+1)\nOrder \"TOTAL\" missing\n\(orderDateRaw)"
-                handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "", dataLineNum: 0, lineText: line, errorMsg: msg)
+                handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: errAction, fileName: "", dataLineNum: 0, lineText: line, errorMsg: msg)
             }
             expect = .total$
 
@@ -226,7 +227,7 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
                     orderRemaining$ = amount
                 } else {
                     let msg = "AmazonOrders.txt line # \(idx+1)\nOrder total $-amount corrupt: \(line)\n\(orderDateRaw)"
-                    handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "", dataLineNum: 0, lineText: line, errorMsg: msg)
+                    handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: errAction, fileName: "", dataLineNum: 0, lineText: line, errorMsg: msg)
                     errorCount += 1
                 }
             }
@@ -319,7 +320,7 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
                     orderRemaining$ -= amount * Double(amazonItem.itemQuant)
                 } else {
                     let msg = "Order total $-amount corrupt: \(line)\n\(orderDateRaw) order for:\n\(amazonItem.itemName)\n"
-                    handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alertAndDisplay, fileName: "fileName", dataLineNum: idx+1, lineText: line, errorMsg: msg)
+                    handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: errAction, fileName: "fileName", dataLineNum: idx+1, lineText: line, errorMsg: msg)
                     errorCount += 1
                 }
                 amazonItem.fileLineNum = idx+1

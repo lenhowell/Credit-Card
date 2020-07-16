@@ -372,12 +372,12 @@ func showUserInputVendorCatForm(lineItem: LineItem,
                 gDictVendorCatLookup[lineItem.descKey] = usrModTranItemReturned.catItem
                 Stats.changedVendrCatCount += 1
                 if !batchMode {
-                    writeVendorCategoriesToFile(url: gVendorCatLookupFileURL, dictCat: gDictVendorCatLookup)
+                    writeVendorCategoriesToFile(url: gUrl.vendorCatLookupFile, dictCat: gDictVendorCatLookup)
                 }
             } else {                                // New category for this transaction only.
                 let transKey = lineItem.signature()
                 gDictModifiedTrans[transKey] = usrModTranItemReturned
-                writeModTransTofile(url: gMyModifiedTransURL, dictModTrans: gDictModifiedTrans)
+                writeModTransTofile(url: gUrl.myModifiedTrans, dictModTrans: gDictModifiedTrans)
             }
             modTranItemToReturn = usrModTranItemReturned
 

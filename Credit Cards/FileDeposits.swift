@@ -11,7 +11,7 @@ import Foundation
 //MARK:- Read Deposits
 func readDeposits(testData: String = "") {
     // Find the Deposit file
-    let pathURL = FileIO.getPossibleParentFolder(myURL: gTransactionFolderURL)
+    let pathURL = FileIO.getPossibleParentFolder(myURL: gUrl.transactionFolder)
     let fileURL = pathURL.appendingPathComponent("DEPOSITcsv.csv")
     let content = (try? String(contentsOf: fileURL)) ?? ""
     if content.isEmpty {
@@ -20,21 +20,21 @@ func readDeposits(testData: String = "") {
         return
     }
 
-    let lines = content.components(separatedBy: "\n").map {$0.trim}
+    let lines   = content.components(separatedBy: "\n").map {$0.trim}
     let headers = lines[0].components(separatedBy: ",")
+    let acct    = Account(code: "DEPOS", name: "DEPOSIT", type: .deposit, amount: .credit)
     let dictColNums = makeDictColNums(headers: headers)
-    var acct = Account(code: "DEPOS", name: "DEPOSIT", type: .deposit, amount: .credit)
     var firstDate   = Stats.firstDate
     var lastDate    = Stats.lastDate
 
     // Optimize Dates for calandar years
     (firstDate, lastDate) = optimizeDatesForDeposits(firstDate: firstDate, lastDate: lastDate)
 
-    var calcSum = 0.0
-    var postDate = ""
-    var got1 = false
-    var errorCount = 0
-    var checkCount = 0
+    var calcSum     = 0.0
+    var postDate    = ""
+    var got1        = false
+    var errorCount  = 0
+    var checkCount  = 0
     var depositCount = 0
     for (idx, line) in lines.enumerated() {
         if line.hasPrefix(",,,,") {

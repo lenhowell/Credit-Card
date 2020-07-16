@@ -10,6 +10,7 @@ import Foundation
 
 //FIXIT: tranDate should be of type Date, for comparing
 public struct LineItem: Equatable, Hashable {
+    static let codeFile = "LineItems"   // for error logging
     var cardType    = ""    // Identifies the Credit-Card account
     var tranDate    = ""    // Transaction-Date String
     var postDate    = ""    // Post-Date String
@@ -24,7 +25,6 @@ public struct LineItem: Equatable, Hashable {
     var transText   = ""    // Original Transaction Line from file
     var memo        = ""    // Check Memo or Note added when modified
     var auditTrail  = ""    // Original FileName, Line#
-    static let codeFile = "LineItems"
 
     //---- signature - Unique identifier for detecting Transaction dupes & user-modified versions.
     func signature(usePostDate: Bool = false, ignoreVendr: Bool = false, ignoreDate: Bool = false) -> String {
@@ -78,7 +78,7 @@ public struct LineItem: Equatable, Hashable {
 
 extension LineItem {
 
-    //MARK:- init - 34-151 = 117-lines
+    //MARK:- init - 84-207 = 123-lines
     //TODO: Allow LineItem.init to throw errors
     // Create a LineItem from a Transaction-File line
     init(fromTransFileLine: String, dictColNums: [String: Int], fileName: String, lineNum: Int, signAmount: Double) {

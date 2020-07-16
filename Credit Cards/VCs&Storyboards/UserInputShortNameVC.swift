@@ -9,7 +9,7 @@
 import Cocoa
 
 class UserInputShortNameVC: NSViewController, NSWindowDelegate {
-    let codeFile = "UserInputShortNameVC"
+    let codeFile = "UserInputShortNameVC"   // for error logging
 
     //MARK:- Overrides & Lifecycle
     override func viewDidLoad() {

@@ -11,7 +11,7 @@ import Cocoa
 class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     //MARK: Instance Variables
-    let codeFile    = "SpreadsheetVC"
+    let codeFile = "SpreadsheetVC"  // for error logging
     var filteredLineItemArray = [LineItem]()  // Filtered list of transactions - used in SummaryTableVC
     var tableDicts  = [[String : String]]()     // Array of Dictionaries
     var tableSumDict = [String : String]()      // Totals Dictionary

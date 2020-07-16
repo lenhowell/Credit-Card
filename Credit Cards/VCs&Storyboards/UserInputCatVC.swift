@@ -12,7 +12,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
 
     //MARK:- Instance Variables
 //    weak var delegate: UserInputVcDelegate?          //delegate <— (2)
-    let codeFile    = "UserInputCatVC"
+    let codeFile = "UserInputCatVC"     // for error logging
     var catItemFromVendor = CategoryItem()
     var catItemFromTran   = CategoryItem()
     var catItemPrefered   = CategoryItem()
@@ -146,7 +146,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         let returnVal = showUserInputShortNameForm(shortName: usrLineItem.desc, longName: usrLineItem.descKey) //$$$
         if returnVal == .OK {           // OK: Add (prefix,descKey) to list
             gDictVendorShortNames[usrVendrPrefix] = usrVendrFullDescKey //move to showUserInputShortNameForm?
-            writeVendorShortNames(url: gVendorShortNamesFileURL, dictVendorShortNames: gDictVendorShortNames)
+            writeVendorShortNames(url: gUrl.vendorShortNamesFile, dictVendorShortNames: gDictVendorShortNames)
         }
     }
 
@@ -235,7 +235,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         gMyCatNames.append(newCat)
         gMyCatNames.sort()
         loadComboBoxCats()
-        writeMyCats(url: gMyCatsFileURL)
+        writeMyCats(url: gUrl.myCatsFile)
     }
 
     // Sets ComboBox-String and chkQuestionMark.state

@@ -57,6 +57,27 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
      "show" ,"11/26/2013" ,"12/26/2013" ,"" ,"Deferred CINEMARK THEATRES 284 ORLANDO FL En..." ,"" ,"" ,"" ,"(10.25)" ,""
      "show" ,"11/30/2013" ,"12/26/2013" ,"" ,"Deferred TEXAS ROADHOUSE 2285 OCOEE FL Resta..." ,"" ,"" ,"" ,"(15.00)" ,""
 
+     MLCMA-2019 ExportData
+     Status,Date,Original Description,Split Type,Category,Currency,Amount,User Description,Memo,Classification,Account Name,Simple Description
+     posted,12/31/2019, Reinvestment Program PIMCO INCOME FUND CL C,,Securities Trades,USD,-389.46, , ,Personal,Merrill Lynch MyMerrill - Investments - CMAM-GEORGE'S CMA PLUS,
+     posted,12/31/2019, Reinvestment Program LORD ABBETT INTERMED TAX FREE FD A,,Securities Trades,USD,-272.34, , ,Personal,Merrill Lynch MyMerrill - Investments - CMAM-GEORGE'S CMA PLUS,
+     posted,12/31/2019, Reinvestment Program LORD ABBETT SHORT DURATION T/F FD CL A,,Securities Trades,USD,-790.22, , ,Personal,Merrill Lynch MyMerrill - Investments - CMAM-GEORGE'S CMA PLUS,
+     posted,12/31/2019, CHECK 3757 FARMERS PRIOR GAS CLUB,,Transfers,USD,-158.00, , ,Personal,Merrill Lynch MyMerrill - Investments - CMAM-GEORGE'S CMA PLUS,
+     posted,12/31/2019, BANK INTEREST: ML BANK DEPOSIT PROGRAM,,Investment Income,USD,"1,054.00", , ,Personal,Merrill Lynch MyMerrill - Investments - CMAM-GEORGE'S CMA PLUS,
+     posted,12/31/2019, BANK INTEREST: ML BANK DEPOSIT PROGRAM FROM 11/29 THRU 12/31,,Investment Income,USD,1.49, , ,Personal,Merrill Lynch MyMerrill - Investments - CMAM-GEORGE'S CMA PLUS,
+     posted,12/31/2019, DIVIDEND: PIMCO INCOME FUND CL C PAY DATE 12/31/2019,,Investment Income,USD,389.46, , ,Personal,Merrill Lynch MyMerrill - Investments - CMAM-GEORGE'S CMA PLUS,
+     posted,12/31/2019, DIVIDEND: LORD ABBETT INTERMED TAX FREE FD A PAY DATE 12/31/2019,,Investment Income,USD,272.34, , ,Personal,Merrill Lynch MyMerrill - Investments - CMAM-GEORGE'S CMA PLUS,
+     posted,12/31/2019, DIVIDEND: LORD ABBETT SHORT DURATION T/F FD CL A PAY DATE 12/31/,,Investment Income,USD,790.22, , ,Personal,Merrill Lynch MyMerrill - Investments - CMAM-GEORGE'S CMA PLUS,
+     posted,12/31/2019, DIVIDEND: PUB SVC ENTERPRISE GRP HOLDING 800.0000 PAY DATE 12/31,,Investment Income,USD,376.00, , ,Personal,Merrill Lynch MyMerrill - Investments - CMAM-GEORGE'S CMA PLUS,
+     posted,12/30/2019, Amazon.com*NQ5ZZ2HU3     Amzn.com/billWA,,General Merchandise,USD,-19.93, , ,Personal,Bank of America - Credit Card - Bank of America Premium Rewards Visa Sig, Amazon
+     posted,12/30/2019, SPECTRUM                 xxx-xxx-7328 FL,,Other Expenses,USD,-237.33, , ,Personal,Bank of America - Credit Card - Bank of America Premium Rewards Visa Sig, Spectrum
+     posted,12/30/2019, Pre-Authorized Withdrawa DukeEnergy-FL GEORGE W BAUER,,Utilities,USD,-195.60, , ,Personal,Merrill Lynch MyMerrill - Investments - CMAM-GEORGE'S CMA PLUS, Duke Energy Corporation
+     posted,12/28/2019, PILOT_x0280              BLOOMSBURY   NJ,,Gasoline/Fuel,USD,-27.01, , ,Personal,Bank of America - Credit Card - Bank of America Premium Rewards Visa Sig, PILOT_x0280 BLOOMSBURY NJ
+     posted,12/28/2019, BLUE MOUNTAIN FMLY RSTR  SHARTLESVILLEPA,,Travel,USD,-35.00, , ,Personal,Bank of America - Credit Card - Bank of America Premium Rewards Visa Sig, Blue Mountain
+     posted,12/28/2019, APPLE.COM/US             xxx-xxx-2775 CA,,Electronics,USD,-99.00, , ,Personal,Bank of America - Credit Card - Bank of America Premium Rewards Visa Sig, Apple
+     posted,12/27/2019, Interest Earned,,Interest,USD,2.74, , ,Personal,Bank of America - Bank - Money Market Savings, Interest Income
+     posted,12/27/2019, Amazon.com*3Y5SL8BO3     Amzn.com/billWA,,General Merchandise,USD,-19.13, , ,Personal,Bank of America - Credit Card - Bank of America Premium Rewards Visa Sig, Amazon
+
      */
 
     var known = false
@@ -246,7 +267,7 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
     }
 
     if !known {
-        print("😡 HandleActivity#\(#line) Unknown: \"\(des)\"  ", lineItem.debit, lineItem.credit)
+        print("😡 HandleActivity#\(#line) Unknown desc: \"\(des)\"  ", lineItem.debit, lineItem.credit)
         //
     }
     if !ignore && lineItem.debit == 0.0 && lineItem.credit == 0.0 {

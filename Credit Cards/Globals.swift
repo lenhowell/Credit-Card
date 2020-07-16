@@ -14,4 +14,14 @@ public struct Const {
     static let descKeyLength  = 24
     static let maxDollar = 999_999_999.0
     static let unknown = "Unknown"
+}//end struct
+
+//not used yet
+public struct Url {
+    var vendorShortNamesFile = FileManager.default.homeDirectoryForCurrentUser
+    var myAccounts           = FileManager.default.homeDirectoryForCurrentUser
+    var myCatsFile           = FileManager.default.homeDirectoryForCurrentUser
+    var myModifiedTrans      = FileManager.default.homeDirectoryForCurrentUser
+    var vendorCatLookupFile  = FileManager.default.homeDirectoryForCurrentUser
+    var transactionFolder    = FileManager.default.homeDirectoryForCurrentUser
 }

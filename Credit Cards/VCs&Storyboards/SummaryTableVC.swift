@@ -46,7 +46,7 @@ public var gPassToNextTable = TableParams()     // Pass info from Spreadsheet or
 class SummaryTableVC: NSViewController, NSWindowDelegate {
 
     //MARK: Instance Variables
-    let codeFile = "SummaryTableVC"
+    let codeFile = "SummaryTableVC"   // for error logging
     var summarizeBy = SummarizeBy.groupCategory
     var tableDicts  = [[String : String]]()    // Array of Dictionaries
     var totalCount  = 0
