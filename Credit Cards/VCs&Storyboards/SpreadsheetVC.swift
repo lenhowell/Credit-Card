@@ -495,24 +495,26 @@ extension SpreadsheetVC: NSTableViewDelegate {
     //viewDidLoad has tableView.target = self
     // & tableView.doubleAction = #selector(tableViewDoubleClick(_:))
     @objc func tableViewDoubleClick(_ sender:AnyObject) {
-        // 1
+        
         guard tableView.selectedRow >= 0 else { return }
+        
         let selectedRow = tableView.selectedRow
         let rowDict = tableDicts[tableView.selectedRow]
         let idxStr = rowDict["idx"] ?? ""
         let idx = Int(idxStr) ?? -1
-        print("DoubleClicked on Row # \(tableView.selectedRow).  idx = \(idx)")
+        print("✅✅ \(codeFile)#\(#line) DoubleClicked on Row # \(tableView.selectedRow).  idx = \(idx)")
         let lineItem = gLineItemArray[idx]
-        print("\(lineItem.tranDate) \(lineItem.descKey) \(lineItem.debit)")
+        print("      \(lineItem.tranDate) \(lineItem.descKey) \(lineItem.debit)")
         let catItemFromVendor = CategoryItem(category: lineItem.genCat, source: lineItem.catSource)
         let catItemFromTran   = CategoryItem(category: lineItem.rawCat, source: lineItem.catSource)
 
         let modTranItem = showUserInputVendorCatForm(lineItem: lineItem, batchMode: false, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemFromVendor)
         // ...and we're back.
 
-        gLineItemArray[idx].genCat    = modTranItem.catItem.category
-        gLineItemArray[idx].catSource = modTranItem.catItem.source
-        gLineItemArray[idx].memo      = modTranItem.memo
+        gLineItemArray[idx].genCat      = modTranItem.catItem.category
+        gLineItemArray[idx].catSource   = modTranItem.catItem.source
+        gLineItemArray[idx].memo        = modTranItem.memo
+        gLineItemArray[idx].modifiedKey = modTranItem.key
 
         loadTableDictsArray(lineItemArray: gLineItemArray)
         reloadTableSorted(sortBy: iSortBy, ascending: iAscending)

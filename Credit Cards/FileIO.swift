@@ -18,6 +18,7 @@ public struct CategoryItem: Equatable {
 public struct ModifiedTransactionItem: Equatable {
     var catItem = CategoryItem()
     var memo    = ""
+    var key     = ""
 }
 //MARK:- FileIO struct
 
@@ -45,11 +46,11 @@ public struct FileIO {
 
         var isDirectory: ObjCBool = false
         if fileManager.fileExists(atPath: dirURL.path, isDirectory: &isDirectory) && isDirectory.boolValue {
-            //print("😀 \(#line) \"\(dirURL.path)\" exists")
+            //print("😀 FileIO#\(#line) \"\(dirURL.path)\" exists")
             let fileURL = dirURL.appendingPathComponent(fileName)
             return (fileURL, "")
         }
-        //print("⛔️ \(#line) \(dirURL.path) does NOT exist!")
+        //print("⛔️ FileIO#\(#line) \(dirURL.path) does NOT exist!")
         return (dirURL, "Folder \"\(dirURL.path)\" does NOT exist!")
     }
 
@@ -82,7 +83,7 @@ public struct FileIO {
                 try fileManager.removeItem(atPath: newPath)
             }
             catch let error as NSError {
-                print("Ooops! Something went wrong: \(error)")
+                print("⛔️ FileIO#\(#line) Ooops! Something went wrong: \(error)")
             }
         }//end if new file already exists
 
@@ -90,7 +91,7 @@ public struct FileIO {
             // Rename oldFile to newFile
             try fileManager.moveItem(atPath: url.path, toPath: newPath)
         } catch {
-            // print("Error: \(error.localizedDescription)")
+            // print("⛔️ FileIO#\(#line) Error: \(error.localizedDescription)")
         }
 
     }//end func saveBackupFile
@@ -120,19 +121,19 @@ public struct FileIO {
     }//end func makeBackupFilePath
 
     static func getTransFileList(transDirURL: URL) -> [URL] {
-        print("\nFileIO.getTransFileList#\(#line)")
+        print("\n😋 FileIO#\(#line) getTransFileList")
         do {
             let fileURLs = try FileManager.default.contentsOfDirectory(at: transDirURL, includingPropertiesForKeys: [], options:  [.skipsHiddenFiles, .skipsSubdirectoryDescendants])
             let transURLs = fileURLs.filter{ qualifyTransFileName(url: $0) }
 
-            print("\(transURLs.count) Transaction Files found.")
+            print("😋 FileIO#\(#line) \(transURLs.count) Transaction Files found.")
             for url in transURLs {
-                print(url.path)
+                print("    ",url.path)
             }
             print()
             return transURLs
         } catch {
-            print(error.localizedDescription)
+            print("FileIO#\(#line) \(error.localizedDescription)")
         }
         return []
     }//end func
@@ -314,8 +315,8 @@ func loadMyCats(myCatsFileURL: URL) -> [String: String]  {
     do {
         contentof = (try String(contentsOf: myCatsFileURL))
     } catch {
-        print(myCatsFileURL.path)
-        print(error.localizedDescription)
+        print("⛔️",myCatsFileURL.path)
+        print("FileIO#\(#line) \(error.localizedDescription)")
         //
     }
     let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
@@ -382,7 +383,7 @@ func writeMyCats(url: URL) {
     //— writing —
     do {
         try text.write(to: url, atomically: false, encoding: .utf8)
-        print("\n😀 Successfully wrote new MyCategories to: \(url.path)")
+        print("\n😀 FileIO#\(#line) Successfully wrote new MyCategories to: \(url.path)")
     } catch {
         let msg = "Could not write new MyCategories file."
         handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: url.lastPathComponent, errorMsg: msg)
@@ -436,7 +437,7 @@ func writeModTransTofile(url: URL, dictModTrans: [String: ModifiedTransactionIte
     //— writing —
     do {
         try text.write(to: url, atomically: false, encoding: .utf8)
-        print("\n😀 Successfully wrote \(dictModTrans.count) transactions to: \(url.path)")
+        print("\n😀 FileIO#\(#line) Successfully wrote \(dictModTrans.count) transactions to: \(url.path)")
     } catch {
         let msg = "Could not write new MyModifiesTransactions file."
         handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: url.lastPathComponent, errorMsg: msg)
@@ -482,7 +483,7 @@ func writeVendorShortNames(url: URL, dictVendorShortNames: [String: String]) {
     //— writing —
     do {
         try text.write(to: url, atomically: false, encoding: .utf8)
-        print("\n😀 Successfully wrote \(dictVendorShortNames.count) transactions to: \(url.path)")
+        print("\n😀 FileIO#\(#line) Successfully wrote \(dictVendorShortNames.count) transactions to: \(url.path)")
     } catch {
         let msg = "Could not write new MyModifiesTransactions file."
         handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: url.lastPathComponent, errorMsg: msg)
@@ -553,7 +554,7 @@ public struct VendorShortNames {
         //— writing —
         do {
             try text.write(to: url, atomically: false, encoding: .utf8)
-            print("\n😀 Successfully wrote \(self.dict.count) transactions to: \(url.path)")
+            print("\n😀 FileIO#\(#line) Successfully wrote \(self.dict.count) transactions to: \(url.path)")
         } catch {
             let msg = "Could not write new MyModifiesTransactions file."
             handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: url.lastPathComponent, errorMsg: msg)
@@ -681,7 +682,7 @@ public struct Accounts {
         //— writing —
         do {
             try text.write(to: url, atomically: false, encoding: .utf8)
-            print("\n😀 Successfully wrote \(self.dict.count) transactions to: \(url.path)")
+            print("\n😀 FileIO#\(#line) Successfully wrote \(self.dict.count) transactions to: \(url.path)")
         } catch {
             let msg = "Could not write new MyModifiesTransactions file."
             handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: url.lastPathComponent, errorMsg: msg)
@@ -720,7 +721,7 @@ func loadVendorCategories(url: URL) -> [String: CategoryItem]  {
         let categoryItem = CategoryItem(category: category, source: source)
         dictCat[descKey] = categoryItem
     }
-    print("\(dictCat.count) Items Read into Category dictionary from: \(url.path)")
+    print("😋 FileIO#\(#line) \(dictCat.count) Items Read into Category dictionary from: \(url.path)")
     return dictCat
 }//end func loadVendorCategories
 
@@ -737,13 +738,13 @@ func writeVendorCategoriesToFile(url: URL, dictCat: [String: CategoryItem]) {
     text += "// When a phone number or \"xxx...\" or other multi-digit number is reached the rest is truncated.\n"
     text += "\n// Description Key        Category              Source\n"
     var prevCat = ""
-    print("\n Different Descs that start with the same 15-chars")
+    print("\n😡 FileIO#\(#line) Different Descs that start with the same 15-chars")
     for catItem in dictCat.sorted(by: {$0.key < $1.key}) {
         text += "\(catItem.key.PadRight(Const.descKeyLength)), \(catItem.value.category.PadRight(26)),  \(catItem.value.source)\n"
 
         let first10 = String(catItem.key.prefix(15))
         if first10 == prevCat.prefix(15) {
-            print("😡 \"\(prevCat)\" (\(prevCat.count)-chars)     \"\(catItem.key)\" (\(catItem.key.count)-chars)")
+            print("😡 FileIO#\(#line) \"\(prevCat)\" (\(prevCat.count)-chars)     \"\(catItem.key)\" (\(catItem.key.count)-chars)")
         }
         prevCat = catItem.key
     }
@@ -751,7 +752,7 @@ func writeVendorCategoriesToFile(url: URL, dictCat: [String: CategoryItem]) {
     //— writing —
     do {
         try text.write(to: url, atomically: false, encoding: .utf8)
-        print("\n😀 Successfully wrote \(dictCat.count) items, using \(Const.descKeyLength) keys, to: \(url.path)")
+        print("\n😀 FileIO#\(#line) Successfully wrote \(dictCat.count) items, using \(Const.descKeyLength) keys, to: \(url.path)")
     } catch {
         let msg = "Could not write new CategoryLookup file."
         handleError(codeFile: "FileIO", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, fileName: url.lastPathComponent, errorMsg: msg)

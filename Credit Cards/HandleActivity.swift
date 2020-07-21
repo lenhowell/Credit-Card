@@ -267,7 +267,7 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
     }
 
     if !known {
-        print("😡 HandleActivity#\(#line) Unknown desc: \"\(des)\"  ", lineItem.debit, lineItem.credit)
+        //print("😡 HandleActivity#\(#line) Unknown desc: \"\(des)\"  ", lineItem.debit, lineItem.credit)
         //
     }
     if !ignore && lineItem.debit == 0.0 && lineItem.credit == 0.0 {

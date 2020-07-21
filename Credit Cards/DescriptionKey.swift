@@ -191,7 +191,7 @@ public func makeDescKey(from desc: String, dictVendorShortNames: [String: String
 
     if !ccPrefix.isEmpty {
         if descKeyLong.count < 9 {
-            print("⚠️ \(ccPrefix) + \"\(descKeyLong)\"   \(descKeyLong.count)")
+            print("⚠️ DescriptionKey#\(#line) \(desc) -> \(ccPrefix) + \(descKeyLong)   \(descKeyLong.count) chars")
             key2 = ccPrefix + " " + descKeyLong
             //"SWA EARLYBRD", "ALG AIR", "HUM HUMANN"
         } else if ccPrefix == "PAYPAL" {

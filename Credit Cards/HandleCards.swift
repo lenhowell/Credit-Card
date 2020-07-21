@@ -81,17 +81,17 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
             let chkNum = lineItem.chkNumber.trim
             if !chkNum.isEmpty {                        // This IS a Numbered Check
                 let dateFromTran = lineItem.tranDate
-                var dateUsed = dateFromTran
+                var dateToUse = dateFromTran
                 if let idxFromDupe = gDictCheckDupes[chkNum] {
                     // IS a Dupe
-                    dateUsed = gotaDupe(lineItem: lineItem, idxFromDupe: idxFromDupe, fileName: fileName, lineNum: lineNum)
+                    dateToUse = gotaDupe(lineItem: lineItem, idxFromDupe: idxFromDupe, fileName: fileName, lineNum: lineNum)
 
                 } else {    // NOT a Dupe
                     gDictCheckDupes[chkNum] = gLineItemArray.count  // Record its position in array for Dupe check
                     gLineItemArray.append(lineItem)                 // Add new output Record
                 }
-                if Stats.firstDate > dateUsed { Stats.firstDate = dateUsed }
-                if Stats.lastDate  < dateUsed { Stats.lastDate  = dateUsed }
+                if Stats.firstDate > dateToUse { Stats.firstDate = dateToUse }
+                if Stats.lastDate  < dateToUse { Stats.lastDate  = dateToUse }
                 continue        // We're done here
             }
 
@@ -194,8 +194,20 @@ internal func gotaDupe(lineItem: LineItem, idxFromDupe: Int, fileName: String, l
     let dateFromDupe     = lineItemFromDupe.tranDate
     let dateFromTran     = lineItem.tranDate
     let chkNum           = lineItem.chkNumber
-    var dateUsed = dateFromTran
+    var dateToUse = dateFromTran
     let msg: String
+    /*
+                Good        Bad
+     postDate   yyyy-mm-dd  ""
+     descKey    Payee       "PAYEE UNRECORDE"
+     desc       Payee       "PAYEE UNRECORDE"
+     rawCat     "Unknown"   "Checks"
+     genCat     MyCategory  "Checks-?"
+     */
+    if lineItemFromDupe.postDate.count < 8 || lineItemFromDupe.desc.contains("UNREC") {
+        gLineItemArray[idxFromDupe] = lineItem  // Replace current lineItem with this one
+    }
+    
     if chkNum.isEmpty {
         msg = "Duplicate transaction of one from \(lineItemFromDupe.auditTrail)"
     } else {
@@ -204,6 +216,7 @@ internal func gotaDupe(lineItem: LineItem, idxFromDupe: Int, fileName: String, l
     // fileName: fileName, dataLineNum: lineNum, lineText: lineItem.transText,
     print("HandleCards#\(#line): \(msg)")
     gLineItemArray[idxFromDupe].cardType = gLineItemArray[idxFromDupe].cardType + "*"
+    
     if lineItem.descKey != lineItemFromDupe.descKey ||  lineItem.genCat != lineItemFromDupe.genCat {
         print("HandleCards#\(#line): \(lineItem.descKey) != \(lineItemFromDupe.descKey) ||  \(lineItem.genCat) != \(lineItemFromDupe.genCat)")
         if lineItemFromDupe.genCat == Const.unknown && lineItem.genCat != Const.unknown {
@@ -216,22 +229,22 @@ internal func gotaDupe(lineItem: LineItem, idxFromDupe: Int, fileName: String, l
     if dateFromTran < dateFromDupe {
         gLineItemArray[idxFromDupe].tranDate = dateFromTran // Use older tranDate (newer one is probably a postDate)
     } else {
-        dateUsed = dateFromDupe
+        dateToUse = dateFromDupe
     }
     Stats.duplicateCount += 1
-    return dateUsed
-}
+    return dateToUse
+}//end func gotaDupe
 
 //MARK: makeLineItem 110-lines
 //---- makeLineItem - Uses support files & possible user-input 225-335 = 110-lines
-internal func makeLineItem(fromTransFileLine: String,
-                           dictColNums: [String: Int],
-                           dictVendorShortNames: [String: String],
-                           cardType: String,
-                           hasCatHeader: Bool,
-                           fileName: String,
-                           lineNum: Int,
-                           acct: Account?) -> LineItem {
+internal func makeLineItem(fromTransFileLine:   String,
+                           dictColNums:         [String: Int],
+                           dictVendorShortNames:[String: String],
+                           cardType:            String,
+                           hasCatHeader:        Bool,
+                           fileName:            String,
+                           lineNum:             Int,
+                           acct:                Account?) -> LineItem {
     // Uses Globals: gLearnMode, gUserInputMode, gDictModifiedTrans, gDictMyCatAliases
     // Modifies Gloabals: gDictVendorCatLookup, Stats
 
@@ -262,9 +275,10 @@ internal func makeLineItem(fromTransFileLine: String,
     // Check for Modified Transaction
     let modTranKey = lineItem.signature()
     if let modTrans = gDictModifiedTrans[modTranKey] {
-        lineItem.genCat = modTrans.catItem.category     // Here if found transaction in MyModifiedTransactions.txt
-        lineItem.catSource = modTrans.catItem.source
-        lineItem.memo = modTrans.memo
+        lineItem.genCat      = modTrans.catItem.category // Found transaction in MyModifiedTransactions.txt
+        lineItem.catSource   = modTrans.catItem.source
+        lineItem.memo        = modTrans.memo
+        lineItem.modifiedKey = modTranKey
         Stats.userModTransUsed += 1
         return lineItem                         // Use User-Modified .genCat & .catSource without looking further
     }
@@ -276,6 +290,10 @@ internal func makeLineItem(fromTransFileLine: String,
     var catFromTran       = gDictMyCatAliases[lineItem.rawCat.uppercased()] ?? lineItem.rawCat + "-?"
     var catItemFromTran   = CategoryItem(category: catFromTran, source: cardType)
 
+    if descKey.contains("WINAN") && lineItem.credit > 38000 {//lineItem.tranDate.contains("20"){
+        //print("")     //Debug Trap
+    }
+    
     if let catVend = gDictVendorCatLookup[descKey] {
         catItemFromVendor = catVend             // ------ Here if Lookup by Vendor was successful
         (catItemPrefered, isClearWinner) = pickTheBestCat(catItemVendor: catItemFromVendor, catItemTransa: catItemFromTran)
@@ -409,46 +427,46 @@ public func makeDictColNums(headers: [String]) -> [String: Int] {
         let rawKey = headers[colNum].uppercased().trim.replacingOccurrences(of: "\"", with: "").trim
         let key: String
         if rawKey == "DATE" || rawKey.hasSuffix("WRITTEN") {
-            key = "TRAN"                                            // Transaction Date
+            key = "TRAN"                                    // TRANsaction Date <- "DATE...WRITTEN"
         } else if rawKey.hasSuffix("CLEARED") {
-                key = "POST"                                        // POSTED Date
+                key = "POST"                                // POSTed Date      <-  "DATE...CLEARED"
 
         } else if rawKey == "TRADE DATE" {
-                key = "TRAN"                                        // Transaction Date - ML Settled Activity
+                key = "TRAN"                                // TRANsaction Date <- "TRADE DATE"     ML Activity
         } else if rawKey == "SETTLEMENT DATE" {
-                key = "POST"                                        // POSTED Date - ML Settled Activity
+                key = "POST"                                // POSTED Date      <- "SETTLEMENT DATE" ML Activity
 
         } else if  rawKey == "PAYEE" || (rawKey.hasPrefix("ORIG") && rawKey.hasSuffix("DESCRIPTION")) { // "Original Description"
-            key = "DESC"                                            // DESCRIPTION
+            key = "DESC"                                    // DESCription      <- "PAYEE" or "ORIG...DESCRIPTION"
         } else if (rawKey.hasPrefix("MERCH") && rawKey.hasSuffix("CATEGORY")) {   // "Merchant Category"
-            key = "CATE"                                            // CATEGORY
-            } else if rawKey == "CHK#" {
-                key = "NUMBER"                                      // CHECK NUMBER
+            key = "CATE"                                    // CATEgory         <- "MERCH...CATEGORY"
+        } else if rawKey == "CHK#" {
+                key = "NUMBER"                              // check NUMBER     <- "CHK#"
         } else if rawKey.hasSuffix("NUMBER") {
-            key = "NUMBER"                                          // CHECK NUMBER
+            key = "NUMBER"                                  // check NUMBER     <- "NUMBER"
 
         } else if rawKey == "CATAGORY" {
-            key = "CATE"                                            // CATEGORY - 2006
+            key = "CATE"                                    // CATEgory         <- "CATEGORY" 2006
         } else if rawKey == "DESCRIPTION 1" {
-            key = "CATE"                                            // CATEGORY - ML Settled Activity
+            key = "CATE"                                    // CATEgory         <- "DESCRIPTION 1" ML Activity
         } else if rawKey == "DESCRIPTION 2" {
-            key = "DESC"                                            // CATEGORY - ML Settled Activity
+            key = "DESC"                                    // CATEgory         <- "DESCRIPTION 2" ML Activity
 
         } else if rawKey.contains("NOTE") { 
-            key = "MEMO"                                            // MEMO
+            key = "MEMO"                                    // MEMO             <- "NOTE"
         } else if rawKey.hasPrefix("ACCOUNT ") {
             switch rawKey.suffix(4) {
             case "NAME":
-                key = "ACCNAME"
+                key = "ACCNAME"                             // ACCNAME          `<- "ACCOUNT ...NAME"
             case "TION":
-                key = "ACCREG"
+                key = "ACCREG"                              // ACCREG           `<- "ACCOUNT ...TION"
             default:
-                key = "ACCNUM"
+                key = "ACCNUM"                              // ACCNUM            `<- "ACCOUNT ..."
             }
         } else {
             key = String(rawKey.replacingOccurrences(of: "\"", with: "").prefix(4))
             if key != "TRAN" && key != "POST" && key != "DESC" && key != "AMOU" && key != "DEBI" && key != "CRED" && key != "CATE" && key != "MEMO" {
-                print("HandleCards#\(#line) unknown column type: \(rawKey)")
+                print("😡 HandleCards#\(#line) unknown column type: \(rawKey)")
                 //
             }
         }
@@ -471,12 +489,12 @@ internal func findShorterDescKey(_ descKey: String) {
         let keyCount = key.count
         if descKeyCount < keyCount && descKeyCount > 3 {
             if key.prefix(descKeyCount) == descKey {
-                print("Found \(descKey) (\(descKey.count)) as subset of \(key) (\(keyCount)) : \(value)")
+                //print("😋 HandleCards#\(#line) Found \(descKey) (\(descKey.count)) as subset of \(key) (\(keyCount)) : \(value)")
                 //
             }
         } else if descKeyCount > keyCount && keyCount > 3 {
             if descKey.prefix(keyCount) == key {
-                print("Found \(descKey) (\(descKey.count)) as superset of \(key) (\(keyCount)) : \(value)")
+                //print("😋 HandleCards#\(#line) Found \(descKey) (\(descKey.count)) as superset of \(key) (\(keyCount)) : \(value)")
                 //
             }
         }

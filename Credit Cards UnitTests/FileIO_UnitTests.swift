@@ -87,7 +87,8 @@ class FileIO__UnitTests: XCTestCase {
         var msg = ""
         (url, msg) = FileIO.makeFileURL(pathFileDir: "xxx", fileName: "xxx")
         XCTAssertEqual(msg, "Folder \"/Users/georgebauer/xxx\" does NOT exist!")
-        
+        XCTAssertEqual(url.path, "/Users/georgebauer/xxx")
+
     }
 
     func test_VendorShortNames() {

@@ -56,7 +56,7 @@ func readDeposits(testData: String = "") {
                 postDate = FileIO.convertToYYYYMMDD(dateTxt: tuple.1)
             }
             if postDate == "?" {
-                print("FileIO#\(#line) 😡 Deposit.csv line \(idx+1) Bad Date: \"\(items[1])\",  \(line)")//(idx+1,desc,chkDate,credit)
+                print("😡 FileDeposits#\(#line) Deposit.csv line \(idx+1) Bad Date: \"\(items[1])\",  \(line)")//(idx+1,desc,chkDate,credit)
                 errorCount += 1
             }
             calcSum = 0.0
@@ -75,47 +75,50 @@ func readDeposits(testData: String = "") {
             depositCount += 1
             if let total = optVal {
                 if abs(calcSum - total) > 0.004 {
-                    print("FileIO#\(#line) ⛔️  Deposit.csv line \(idx+1)  \(calcSum) != \(total)")
+                    print("⛔️ FileDeposits#\(#line) Deposit.csv line \(idx+1)  \(calcSum) != \(total)")
                     errorCount += 1
                 }
             } else {
-                print("FileIO#\(#line) 😡 Deposit.csv line \(idx+1) \(valStr)")//(idx+1,desc,chkDate,credit)
+                print("😡 FileDeposits#\(#line) Deposit.csv line \(idx+1) \(valStr)")//(idx+1,desc,chkDate,credit)
                 errorCount += 1
             }
             continue
         }
 
-        //print("FileIO#\(#line)  Deposit.csv line \(idx+1)  \(items)")
+        //print("FileDeposits#\(#line)  Deposit.csv line \(idx+1)  \(items)")
         let desc = items[0]
-        if chkDate == "?" {
-            print("FileIO#\(#line) 😡 Deposit.csv line \(idx+1) Bad Date: \"\(items[1])\",  \(line)")//(idx+1,desc,chkDate,credit)
-            errorCount += 1
-        }
         if chkDate == "2008-08-08" {
             // Debug Trap
         }
         if let credit = optVal {
             // ------ Here to record this Deposit LineItem ------
-            //print("FileIO#\(#line) 🤪 Deposit.csv line \(idx+1) \(desc) \(chkDate) \(credit)")//(idx+1,desc,chkDate,credit)
+            //print("🤪 FileDeposits#\(#line) Deposit.csv line \(idx+1) \(desc) \(chkDate) \(credit)")//(idx+1,desc,chkDate,credit)
+            if chkDate == "?" && credit != 0 {
+                print("😡 FileDeposits#\(#line) Deposit.csv line \(idx+1) Bad Date: \"\(items[1])\",  \(line)")//(idx+1,desc,chkDate,credit)
+                errorCount += 1
+            }
             var lineItem = makeLineItem(fromTransFileLine: line, dictColNums: dictColNums, dictVendorShortNames: gDictVendorShortNames, cardType: "DEPOSIT", hasCatHeader: true, fileName: "DepositCsv.csv", lineNum: idx+1, acct: acct)
             lineItem.postDate = postDate
 
             if lineItem.tranDate >= firstDate && lineItem.tranDate <= lastDate {
                 gLineItemArray.append(lineItem)
+                if lineItem.descKey.contains("WINAN") {
+                    //print("")     //Debug Trap
+                }
             }
             calcSum += credit
             checkCount += 1
 
         } else {    // Bad $-Value
-            print("FileIO#\(#line) 😡 Deposit.csv line \(idx+1) \(desc) \(chkDate) \(valStr)")//(idx+1,desc,chkDate,credit)
+            print("😡 FileDeposits#\(#line) Bad $-Amount: Deposit.csv line \(idx+1) \(desc) \(chkDate) \(valStr)")//(idx+1,desc,chkDate,credit)
             errorCount += 1
         }
     }//next line
 
     if errorCount == 0 {
-        print("FileIO#\(#line) 🤪 Deposit.csv sucessfully read \(lines.count) lines, \(checkCount) checks, \(depositCount) deposits")
+        print("🤪 FileDeposits#\(#line) Deposit.csv sucessfully read \(lines.count) lines, \(checkCount) checks, \(depositCount) deposits")
     } else {
-        print("FileIO#\(#line) 😡 Deposit.csv read \(lines.count) lines, \(depositCount) deposits with \(errorCount) errors.")
+        print("😡 FileDeposits#\(#line) Deposit.csv read \(lines.count) lines, \(depositCount) deposits with \(errorCount) errors.")
     }
 }//end func readDeposits
 

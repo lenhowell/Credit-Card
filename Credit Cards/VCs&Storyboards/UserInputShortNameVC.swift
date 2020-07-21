@@ -63,7 +63,10 @@ class UserInputShortNameVC: NSViewController, NSWindowDelegate {
     @IBAction func btnOK(_ sender: Any) {
         let prefixCount = txtPrefix.stringValue.count
         if prefixCount < 4 || prefixCount > Const.descKeyLength {
-            let msg = "The common prefix must be between 4 and \(prefixCount) characters"
+            var msg = "The common prefix must be between 4 and \(prefixCount) characters"
+            if prefixCount < 4 {
+                msg = "The common prefix must be at least 4 letters"
+            }
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .alert, errorMsg: msg)
             return
         }

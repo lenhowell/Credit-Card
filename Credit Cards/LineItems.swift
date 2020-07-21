@@ -25,6 +25,7 @@ public struct LineItem: Equatable, Hashable {
     var transText   = ""    // Original Transaction Line from file
     var memo        = ""    // Check Memo or Note added when modified
     var auditTrail  = ""    // Original FileName, Line#
+    var modifiedKey = ""    // Key to gDictModifiedTrans entry
 
     //---- signature - Unique identifier for detecting Transaction dupes & user-modified versions.
     func signature(usePostDate: Bool = false, ignoreVendr: Bool = false, ignoreDate: Bool = false) -> String {

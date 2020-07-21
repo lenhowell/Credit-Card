@@ -1,5 +1,5 @@
 //
-//  AmazonOrders.swift
+//  FileAmazonOrders.swift
 //  Credit Cards
 //
 //  Created by George Bauer on 12/10/19.
@@ -33,7 +33,7 @@ public struct AmazonItem {
 }//end struct AmazonItem
 
 // TODO: Fix returns, crosscheck files/year count.
-//---- readAmazon - 37-366 = 329-lines
+//---- readAmazon - Returns dict [DateStr:AmazonItem] 37-366 = 329-lines
 func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
     enum Expect: String { case none, ordersYear, year,
         orderPlaced, date, totalTitle, total$, shipToTitle, shipTo, orderNumber,
@@ -255,9 +255,9 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
                     let o$  = String(format: "%.2f",sum)
                     let pct = String(format: "%.1f", pctOff*100)
                     if orderRemaining$ > 0 {
-                        print("⚠️ \(amazonItem.orderDate) Tax & Shipping of $\(r$) on $\(o$) = \(pct)%  line \(amazonItem.fileLineNum)")
+                        print("⚠️ FileAmazonOrders#\(#line) \(amazonItem.orderDate) Tax & Shipping of $\(r$) on $\(o$) = \(pct)%  line \(amazonItem.fileLineNum)")
                     } else {
-                        print("⚠️ \(amazonItem.orderDate) Hidden Discount of at least $\(r$) on $\(o$) = \(pct)%  line \(amazonItem.fileLineNum)")
+                        print("⚠️ FileAmazonOrders#\(#line) \(amazonItem.orderDate) Hidden Discount of at least $\(r$) on $\(o$) = \(pct)%  line \(amazonItem.fileLineNum)")
                     }
                     warningCount += 1
                 }

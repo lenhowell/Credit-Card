@@ -249,7 +249,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
         if let summaryWindow = summaryWindowController.window {
             //let summaryTableVC = storyBoard.instantiateController(withIdentifier: "SummaryTableVC") as! SummaryTableVC
-            print("btnSummaries", gPassToNextTable)
+            print("😋 \(codeFile)#\(#line) btnSummaries", gPassToNextTable)
             let application = NSApplication.shared
             _ = application.runModal(for: summaryWindow) // <=================  UserInputVC
 
@@ -259,11 +259,11 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     @IBAction func chkLearningModeClick(_ sender: Any) {
         gLearnMode = chkLearningMode.state == .on
-        print("learnMode = \(gLearnMode)")
+        print("😋 \(codeFile)#\(#line) learnMode = \(gLearnMode)")
     }
     @IBAction func chkUserInputClick(_ sender: Any) {
         gUserInputMode = chkUserInput.state == .on
-        print("UserInputMode = \(gUserInputMode)")
+        print("😋 \(codeFile)#\(#line) UserInputMode = \(gUserInputMode)")
     }
 
     @IBAction func chkDepositsClick(_ sender: Any) {
@@ -470,9 +470,9 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         outputTranactions(outputFileURL: outputFileURL, lineItemArray: gLineItemArray)
 
-        print("\n--- Description-Key algorithms ---")
+        print("\n😋 --- Description-Key algorithms ---")
         for (key, val) in gDictDescKeyAlgorithm.sorted(by: <) {
-            print("\(key.PadRight(40))\(val)")
+            print("  \(key.PadRight(40))\(val)")
         }
 
         if Stats.addedCatCount > 0 || Stats.changedVendrCatCount > 0 {
@@ -581,7 +581,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         cboFiles.addItems(withObjectValues: fileNames)
         //NSComboBoxDelegate Does not work!
         //cboFiles.scrollItemAtIndexToVisible(cboFiles.numberOfItems-1) Does not work
-        print("ViewController#\(#line): 🤣cboFiles has \(cboFiles.numberOfItems) items.")
+        print("🤣 \(codeFile)#\(#line): cboFiles has \(cboFiles.numberOfItems) items.")
     }//end func loadComboBoxFiles
 
 
@@ -590,7 +590,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         let supportPath = txtSupportFolder.stringValue.trim
         if supportPath.isEmpty || !FileIO.folderExists(atPath: supportPath, isPartialPath: true) {
-            print("ViewController#\(#line): Support folder: \"\(txtSupportFolder.stringValue)\" doesn't exist.")
+            print("🤣 \(codeFile)#\(#line): Support folder: \"\(txtSupportFolder.stringValue)\" doesn't exist.")
             gotItem = gotItem.subtracting(GotItem.dirSupport)
         } else {
             gotItem = gotItem.union(GotItem.dirSupport)
@@ -599,7 +599,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         let outputPath = txtOutputFolder.stringValue.trim
         if outputPath.isEmpty || !FileIO.folderExists(atPath: outputPath, isPartialPath: true) {
-            print("ViewController#\(#line): Output folder: \"\(txtOutputFolder.stringValue)\" doesn't exist.")
+            print("😡  \(codeFile)#\(#line): Output folder: \"\(txtOutputFolder.stringValue)\" doesn't exist.")
             gotItem = gotItem.subtracting(GotItem.dirOutput)
             } else {
                 gotItem = gotItem.union(GotItem.dirOutput)
@@ -608,7 +608,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         let transPath = txtTransationFolder.stringValue.trim
         if transPath.isEmpty || !FileIO.folderExists(atPath: transPath, isPartialPath: true) {
-            print("ViewController#\(#line): Output folder: \"\(txtTransationFolder.stringValue)\" doesn't exist.")
+            print("😡  \(codeFile)#\(#line): Output folder: \"\(txtTransationFolder.stringValue)\" doesn't exist.")
             gotItem = gotItem.subtracting(GotItem.dirTrans)
         } else {
             gotItem = gotItem.union(GotItem.dirTrans)
@@ -727,7 +727,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             cboFiles.isHidden = false
             lblTranFileCount.stringValue = "\(transFileURLs.count) Transaction \("file".pluralize(transFileURLs.count))"
             lblErrMsg.stringValue = ""
-            print("Trans Folder set to: \"\(pathTransactionFolder)\"")
+            print("😋 \(codeFile)#\(#line) Trans Folder set to: \"\(pathTransactionFolder)\"")
 
         } else {                        // Error getting Transaction Folder
             setButtons(btnDefault: .start, needsRecalc: true, transFolderOK: false) // btnStart.isEnabled = false etc

@@ -44,6 +44,9 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
             radioFileVendor.state    = .on   // Default to setting VendorCat in batch mode
         } else {
             lblProcessed.stringValue = ""
+            if !usrLineItem.modifiedKey.isEmpty{
+                lblProcessed.stringValue = "This is a user-modidified transaction"
+            }
             radioFileTransac.state   = .on   // Default to modifying Transaction otherwise
         }
         configureUI()
@@ -139,11 +142,21 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func radioFileChange(_ sender: Any) {
+        if radioFileVendor.state == .on {
+            if !usrLineItem.modifiedKey.isEmpty {
+                let msg = "This is a modified transaction.\nIt will not be affected by Vendor category\nProceed anyway?"
+                let response = GBox.alert(msg, style: .okCancel)
+                if response == .cancel {
+                    radioFileTransac.state = .on
+                }
+
+            }
+        }
         configureUI()
     }
 
     @IBAction func btnAddShortName(_ sender: Any) {
-        let returnVal = showUserInputShortNameForm(shortName: usrLineItem.desc, longName: usrLineItem.descKey) //$$$
+        let returnVal = showUserInputShortNameForm(shortName: usrLineItem.desc.trim, longName: usrLineItem.descKey) //$$$
         if returnVal == .OK {           // OK: Add (prefix,descKey) to list
             gDictVendorShortNames[usrVendrPrefix] = usrVendrFullDescKey //move to showUserInputShortNameForm?
             writeVendorShortNames(url: gUrl.vendorShortNamesFile, dictVendorShortNames: gDictVendorShortNames)
@@ -153,7 +166,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
     @IBAction func btnAddCategory(_ sender: Any) {
         let newCat = cboCats.stringValue.trim
         if gDictMyCatAliases[newCat] == nil {
-            let response = GBox.alert("\(cboCats.stringValue) is not recognized.\nDo you want to add it to the list?", style: .yesNo)
+            let response = GBox.alert("Add \(cboCats.stringValue) to category list?", style: .yesNo)
             if response == .yes {
                addCategory(newCat)
             }
@@ -183,12 +196,21 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         }
         catItemCurrent.category = newCat
         usrFixVendor = (radioFileVendor.state == .on)
-        usrModTranItemReturned = ModifiedTransactionItem(catItem: catItemCurrent, memo: txtMemo.stringValue.trim)
-        if radioFileVendor.state == .on {
-            if chkLockIn.state == .on {
+        if usrFixVendor && (!usrLineItem.modifiedKey.isEmpty) {
+            let msg = "This is a modified transaction.\nIt will not be affected by Vendor category\nProceed anyway?"
+            let response = GBox.alert(msg, style: .okCancel)
+            if response == .cancel { return }
+        }
+        var modKey = ""
+        if !usrFixVendor {
+            modKey = usrLineItem.signature()
+        }
+        usrModTranItemReturned = ModifiedTransactionItem(catItem: catItemCurrent, memo: txtMemo.stringValue.trim, key: modKey)
+        if radioFileVendor.state == .on {       // Change vendor cat
+            if chkLockIn.state == .on { //LockIn
                 usrModTranItemReturned.catItem.source = "$" + gUserInitials
             }
-        } else {
+        } else {                                // Modify this transaction
             usrModTranItemReturned.catItem.source = "*" + gUserInitials
         }
         print("\(codeFile)#\(#line) return \(usrModTranItemReturned.catItem.category) \(usrModTranItemReturned.catItem.source)")
