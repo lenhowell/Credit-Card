@@ -144,6 +144,27 @@ public func textToDbl(_ str: String) -> Double? {
     return Double(txt)
 }
 
+public func MsgBox(_ str: String) {
+    print("MsgBox: ", str)
+    DispatchQueue.main.async {
+        let alert = NSAlert()
+        alert.informativeText = str
+        alert.runModal()
+    }
+    return
+}
+
+public func MsgBox(text: String, title: String) {
+    print("MsgBox: ", text)
+    DispatchQueue.main.async {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = text
+        alert.runModal()
+    }
+    return
+}
+
 
 //MARK:- Date Extensions
 

@@ -11,8 +11,6 @@ import Cocoa
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-
-
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
     }
@@ -21,6 +19,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Insert code here to tear down your application
     }
 
+    @IBAction func mnuHelpAbout_Click(_ sender: Any) {              // Handles mnuHelpAbout.Click
+        MsgBox(text: "Credit Cards Version \(gAppVersion)\nBuild \(gAppBuild)\nTransaction files are in:\n\"Download/Credit Card Tran\"\nSupport files are in:\n\"Desktop/CreditCard\"",title: "About Credit Cards")//, "About Garmitrk")
+    }
+    
+    @IBAction func mnuHelpShowHelp(_ sender: Any) {
+        MsgBox(text: "Transaction files are in:\n\"Download/Credit Card Tran\"\nSupport files are in:\n\"Desktop/CreditCard\"\nSupport files are:\nMyAccounts.txt\nMyCatagories.txt\nMyModifiedTransactions.txt\nVendorCategoryLookup.txt\nVendorShortNames.txt", title: "Help")
+    }
 
 }
+
 

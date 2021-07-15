@@ -8,6 +8,9 @@
 
 import Foundation
 
+public let gAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
+public let gAppBuild   = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion")            as? String ?? "0"
+
 public struct Const {
     // Global Constants
     static let maxCardTypeLen = 10
@@ -25,3 +28,4 @@ public struct Url {
     var vendorCatLookupFile  = FileManager.default.homeDirectoryForCurrentUser
     var transactionFolder    = FileManager.default.homeDirectoryForCurrentUser
 }
+

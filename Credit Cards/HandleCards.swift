@@ -91,10 +91,17 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
                     gLineItemArray.append(lineItem)                 // Add new output Record
                 }
                 if Stats.firstDate > dateToUse { Stats.firstDate = dateToUse }
-                if Stats.lastDate  < dateToUse { Stats.lastDate  = dateToUse }
+        	        if Stats.lastDate  < dateToUse { Stats.lastDate  = dateToUse }
                 continue        // We're done here
             }
 
+            if lineItem.desc == "CHECK" {
+                // If we have an unmarked check (no # or payee) in CMA Transaction file,
+                // ignore it and hope it's picked up in CheckML-20xx file. ????
+                print("HandleCards#\(#line) ⛔️Unrecorded check \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.debit) \(lineItem.rawCat)")
+                continue
+            }
+            
             // Check for Duplicate from another file
             let signature1 = lineItem.signature()                   // Signature using TranDate
             let signature2 = lineItem.signature(usePostDate: true)  // Signature using PostDate

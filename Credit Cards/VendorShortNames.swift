@@ -9,6 +9,7 @@
 import Cocoa
 
 //MARK:- Globals for UserInputs
+//TODO: Change to use segue & eliminate globals
 // Parameters for UserInputs
 var usrVendrShortName = ""
 var usrVendrLongName = ""
@@ -22,7 +23,7 @@ func findTruncatedDescs(vendorNameDescs: [String]) -> Bool {
     // Sort by length - longest to shortest
     let vendorCatLookupSortedByLength = vendorNameDescs.sorted(by: {$0.count > $1.count})
     guard let minLen = vendorCatLookupSortedByLength.last?.count else {
-        print("\nFreeFuncs#\(#line) findTruncatedDescs:  No vendorNameDescs found.")
+        print("\n😡 VendorShortNames#\(#line): No vendorNameDescs found.")
         return false      // empty
     }
 
@@ -41,7 +42,7 @@ func findTruncatedDescs(vendorNameDescs: [String]) -> Bool {
 
                 if match.fullDescKey.isEmpty {
                     if (shortLen > 9 || truncLong.hasPrefix(" ")) {
-                        //print("Possible dupe \"\(descShort)\"(\(shortLen)) is part of \"\(descLong)\"(\(longLen))")
+                        //print("😡 VendorShortNames#\(#line): Possible dupe \"\(descShort)\"(\(shortLen)) is part of \"\(descLong)\"(\(longLen))")
                         let returnVal = showUserInputShortNameForm(shortName: descShort, longName: descLong)
                         if returnVal == .OK {           // OK: Add (prefix,descKey) to list
                             gDictVendorShortNames[usrVendrPrefix] = usrVendrFullDescKey //move to showUserInputShortNameForm?
@@ -53,22 +54,22 @@ func findTruncatedDescs(vendorNameDescs: [String]) -> Bool {
                             return false
                         }
                     } else {
-                        print("Too short for a dupe \(descShort) (\(shortLen)) is part of \(descLong) (\(longLen))")
+                        print("😡 VendorShortNames#\(#line): Too short for a dupe \(descShort) (\(shortLen)) is part of \(descLong) (\(longLen))")
 
                     }
                 } else {
-                    print("\(descShort) already in file as \(match.fullDescKey)")
+                    print("😡 VendorShortNames#\(#line): \(descShort) already in file as \(match.fullDescKey)")
                     //
                 }
 
             } else  if descLong.prefix(9) == descShort.prefix(9) {
-                print("Not a dupe, but same at 9 \"\(descShort)\"(\(shortLen)) is part of \"\(descLong)\"(\(longLen))")
+                print("😡 VendorShortNames#\(#line): Not a dupe, but same at 9 \"\(descShort)\"(\(shortLen)) is part of \"\(descLong)\"(\(longLen))")
                 //
             }
 
         }//next i
     }//next desc
-    print("\nFreeFuncs#\(#line) findTruncatedDescs: gDictVendorShortNames.count = \(gDictVendorShortNames.count) ")
+    print("\n😋 VendorShortNames#\(#line) gDictVendorShortNames.count = \(gDictVendorShortNames.count) ")
     for (key,val) in gDictVendorShortNames.sorted(by: <) {
         print("\(val.PadRight(23, truncate: false)) <==    \(key)")
     }
@@ -77,6 +78,7 @@ func findTruncatedDescs(vendorNameDescs: [String]) -> Bool {
 
 //MARK:- Show Input-ShortName Form
 //---- showUserInputShortNameForm - Present UserInputShortName Window Controller
+//TODO: Change to use segue & eliminate globals
 func showUserInputShortNameForm(shortName: String, longName: String) -> NSApplication.ModalResponse {
     usrVendrShortName = shortName
     usrVendrLongName = longName
@@ -97,7 +99,7 @@ func showUserInputShortNameForm(shortName: String, longName: String) -> NSApplic
 
         userInputWindow.close()                     // Return here from userInputWindow
     } else {
-        handleError(codeFile: "FreeFuncs", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: "Could not open User-Input-ShortName window.")
+        handleError(codeFile: "VendorShortNames", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: "Could not open User-Input-ShortName window.")
     }//end if let
     return returnVal
 }//end func

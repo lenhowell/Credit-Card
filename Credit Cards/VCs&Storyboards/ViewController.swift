@@ -347,6 +347,16 @@ class ViewController: NSViewController, NSWindowDelegate {
     @IBAction func mnuReadAmazon(_ sender: Any) {
         gDictAmazonItemsByDate = readAmazon()
     }
+    
+    @IBAction func mnuHelpSearchForHelpOn_Click(_ sender: Any) {    // Handles mnuHelpSearchForHelpOn.Click
+        MsgBox("Unable to display Help Contents. There is no Help associated with this project.")
+    }
+
+    @IBAction func mnuHelpContents_Click(_ sender: Any) {           // Handles mnuHelpContents.Click
+        MsgBox("Unable to display Help Contents. There is no Help associated with this project.")
+    }
+
+
     //MARK:- Main Program 155-lines
     
     func main() {   // 311-466 = 155-lines
