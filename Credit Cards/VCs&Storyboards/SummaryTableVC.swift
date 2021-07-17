@@ -292,7 +292,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         var namedCredit = 0.0
         var namedDebit  = 0.0
         var oldName = ""
-        //TODO: If 1-Trans or 1 unique vendors & cats, go directly to spreadsheet
+        //TODO: SummaryTableVC.swift If 1-Trans or 1 unique vendors & cats, go directly to spreadsheet
         for i in 0..<sortedLineItemArray.count {
             let lineItem = sortedLineItemArray[i]
             let newName = summarizeName(lineItem: lineItem, summarizeBy: summarizeBy) //**
@@ -469,9 +469,7 @@ extension SummaryTableVC: NSTextFieldDelegate {
 
     //---- controlTextDidChange - Called when a textField (with SpreadsheetVC as its delegate) changes.
     func controlTextDidChange(_ obj: Notification) {
-        guard let textView = obj.object as? NSTextField else {
-            return
-        }
+        guard let _ = obj.object as? NSTextField else { return } // Not a TextFiled
         //print("🙂\(codeFile)#\(#line) \(textView.stringValue)")
         btnFilter.keyEquivalent = "\r"
         let allEmpty = txtDate1.stringValue.isEmpty &&

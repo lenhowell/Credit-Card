@@ -23,7 +23,7 @@ func readDeposits(testData: String = "") {
     let lines   = content.components(separatedBy: "\n").map {$0.trim}
     let headers = lines[0].components(separatedBy: ",")
     let acct    = Account(code: "DEPOS", name: "DEPOSIT", type: .deposit, amount: .credit)
-    let dictColNums = makeDictColNums(headers: headers)
+    let dictColNums = makeDictColNums(file: "DEPOSITcsv", headers: headers)
     var firstDate   = Stats.firstDate
     var lastDate    = Stats.lastDate
 

@@ -8,6 +8,20 @@
 
 import Cocoa
 
+//TODO:
+// SummaryTableVC:  If 1-Trans or 1 unique vendors & cats, go directly to spreadsheet
+// ErrorHandler:    Append Error message to Error-Log File
+// FileIO:          Tell user about non-qualified filenames & show rules.
+// FileIO:          If url is not a file, append default filename 1
+// FileIO:          If url is not a file, append default filename 2
+// FileAmazonOrders: Fix returns, crosscheck files/year count.
+// DescriptionKey:  Eliminate use of firstIntIndexOf()
+// LineItems:       Allow LineItem.init to throw errors
+// VendorShortNames: Change to use segue & eliminate globals 1
+// VendorShortNames: Change to use segue & eliminate globals 2
+// TableFilter:     Handle filtering as an object
+// Credit_Cards_UnitTests: The following Unit-Tests need assertions
+
 //MARK:- Global Variables
 
 var gUserInitials           = "User"    //  UD (UserInputVC) Initials used for "Category Source" when Cat changed by user.
@@ -761,7 +775,7 @@ extension ViewController: NSTextFieldDelegate, NSComboBoxDelegate {
 
     //---- controlTextDidChange - Called when a textField (with ViewController as its delegate) changes.
     func controlTextDidChange(_ obj: Notification) {
-        if let textView = obj.object as? NSTextField {
+        if let _ = obj.object as? NSTextField {
             if pathTransactionFolder != txtTransationFolder.stringValue {
                 pathTransactionFolder = txtTransationFolder.stringValue
                 gotNewTranactionFolder()

@@ -24,7 +24,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     @IBAction func mnuHelpShowHelp(_ sender: Any) {
-        MsgBox(text: "Transaction files are in:\n\"Download/Credit Card Tran\"\nSupport files are in:\n\"Desktop/CreditCard\"\nSupport files are:\nMyAccounts.txt\nMyCatagories.txt\nMyModifiedTransactions.txt\nVendorCategoryLookup.txt\nVendorShortNames.txt", title: "Help")
+        MsgBox(text: "Transaction files are in:\n\"Download/Credit Card Tran/...\"\nCARDTYPE-20xx...\nAmazon Orders.txt\nDEPOSITcsv.csv\n\nSupport files are in:\n\"Desktop/CreditCard\"\nMyAccounts.txt\nMyCatagories.txt\nMyModifiedTransactions.txt\nVendorCategoryLookup.txt\nVendorShortNames.txt", title: "Help")
     }
 
 }

@@ -527,7 +527,7 @@ public struct VendorShortNames {
     }
 
     init(url: URL, silentMode: Bool = false) {
-        //TODO: If url is not a file, append default filename
+        //TODO: If url is not a file, append default filename 1
         let content = (try? String(contentsOf: url)) ?? ""
         self.init(content: content, silentMode: silentMode)
         self.url = url
@@ -650,7 +650,7 @@ public struct Accounts {
     }
 
     init(url: URL) {
-        //TODO: If url is not a file, append default filename
+        //TODO: If url is not a file, append default filename 2
         let content = (try? String(contentsOf: url)) ?? ""
         self.init(content: content)
         self.url = url

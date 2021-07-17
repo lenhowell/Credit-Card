@@ -51,7 +51,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
         return
     }
 
-    let dictColNums = makeDictColNums(headers: headers)
+    let dictColNums = makeDictColNums(file: fileName, headers: headers)
 
     let hasCatHeader: Bool
     if dictColNums["CATE"] == nil {
@@ -98,7 +98,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
             if lineItem.desc == "CHECK" {
                 // If we have an unmarked check (no # or payee) in CMA Transaction file,
                 // ignore it and hope it's picked up in CheckML-20xx file. ????
-                print("HandleCards#\(#line) ⛔️Unrecorded check \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.debit) \(lineItem.rawCat)")
+                print("HandleCards#\(#line) ⛔️[\(fileName)] Unrecorded check \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.debit) \(lineItem.rawCat)")
                 continue
             }
             
@@ -216,16 +216,16 @@ internal func gotaDupe(lineItem: LineItem, idxFromDupe: Int, fileName: String, l
     }
     
     if chkNum.isEmpty {
-        msg = "Duplicate transaction of one from \(lineItemFromDupe.auditTrail)"
+        msg = "Duplicate transaction (\(lineItem.descKey) $\(lineItem.debit)) of one from \(lineItemFromDupe.auditTrail)"
     } else {
         msg = "Duplicate chkNumber \(chkNum) with dates of \(dateFromTran) & \(dateFromDupe) "
     }
     // fileName: fileName, dataLineNum: lineNum, lineText: lineItem.transText,
-    print("HandleCards#\(#line): \(msg)")
+    print("HandleCards#\(#line):[\(fileName)] \(msg)")
     gLineItemArray[idxFromDupe].cardType = gLineItemArray[idxFromDupe].cardType + "*"
     
     if lineItem.descKey != lineItemFromDupe.descKey ||  lineItem.genCat != lineItemFromDupe.genCat {
-        print("HandleCards#\(#line): \(lineItem.descKey) != \(lineItemFromDupe.descKey) ||  \(lineItem.genCat) != \(lineItemFromDupe.genCat)")
+        print("HandleCards#\(#line)[\(fileName)] \(lineItem.descKey) != \(lineItemFromDupe.descKey) ||  \(lineItem.genCat) != \(lineItemFromDupe.genCat)")
         if lineItemFromDupe.genCat == Const.unknown && lineItem.genCat != Const.unknown {
             gLineItemArray[idxFromDupe].genCat  = lineItem.genCat
             gLineItemArray[idxFromDupe].descKey = lineItem.descKey
@@ -426,7 +426,7 @@ func showUserInputVendorCatForm(lineItem: LineItem,
 //MARK: makeDictColNums
 
 //---- makeDictColNums - Infer which columns have the relevant data based in the Header row. Returns dictColNums
-public func makeDictColNums(headers: [String]) -> [String: Int] {
+public func makeDictColNums(file: String, headers: [String]) -> [String: Int] {
     // "Check Number", "Date Written", "Date Cleared", "Payee", "Amount"
     // ML settled-activity: "Trade Date","Settlement Date" "Description 2"
     var dictColNums = [String: Int]()
@@ -473,7 +473,7 @@ public func makeDictColNums(headers: [String]) -> [String: Int] {
         } else {
             key = String(rawKey.replacingOccurrences(of: "\"", with: "").prefix(4))
             if key != "TRAN" && key != "POST" && key != "DESC" && key != "AMOU" && key != "DEBI" && key != "CRED" && key != "CATE" && key != "MEMO" {
-                print("😡 HandleCards#\(#line) unknown column type: \(rawKey)")
+                print("😡 HandleCards#\(#line)[\(file)] unknown column type: \(rawKey)")
                 //
             }
         }

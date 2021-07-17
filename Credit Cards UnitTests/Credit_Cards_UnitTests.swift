@@ -114,7 +114,7 @@ class Credit_Cards_UnitTests: XCTestCase {
 
         headerLine = "Transaction Date,Posted Date,Card No.,Description,Category,Debit,Credit"
         headers = headerLine.components(separatedBy: ",")
-        dictColNums = makeDictColNums(headers: headers)
+        dictColNums = makeDictColNums(file: "testMakeLineItemAndDictColNums", headers: headers)
         XCTAssertEqual(dictColNums["TRAN"], 0)
         XCTAssertEqual(dictColNums["DESC"], 3)
         XCTAssertEqual(dictColNums["CATE"], 4)

@@ -254,7 +254,7 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
         lineItem.rawCat = "Income"
         known = true
         if !lineItem.desc.hasPrefix("SSA") {
-            print("HandleCards#\(#line) \(lineItem.transText)")
+            print("❓HandleActivity#\(#line) Non-SSA Direct Deposit on \(lineItem.tranDate) from \(lineItem.desc) for $\(lineItem.credit)")
             // Debug Trap - Non-SSA Direct-Deposit
         }
 

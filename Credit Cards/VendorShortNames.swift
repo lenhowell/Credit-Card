@@ -9,7 +9,7 @@
 import Cocoa
 
 //MARK:- Globals for UserInputs
-//TODO: Change to use segue & eliminate globals
+//TODO: Change to use segue & eliminate globals 1
 // Parameters for UserInputs
 var usrVendrShortName = ""
 var usrVendrLongName = ""
@@ -78,7 +78,7 @@ func findTruncatedDescs(vendorNameDescs: [String]) -> Bool {
 
 //MARK:- Show Input-ShortName Form
 //---- showUserInputShortNameForm - Present UserInputShortName Window Controller
-//TODO: Change to use segue & eliminate globals
+//TODO: Change to use segue & eliminate globals 2
 func showUserInputShortNameForm(shortName: String, longName: String) -> NSApplication.ModalResponse {
     usrVendrShortName = shortName
     usrVendrLongName = longName

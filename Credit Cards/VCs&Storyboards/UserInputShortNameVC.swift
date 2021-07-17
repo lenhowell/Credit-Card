@@ -92,9 +92,8 @@ extension UserInputShortNameVC: NSTextFieldDelegate {
 
     //---- controlTextDidChange - Called when a textField (with ViewController as its delegate) changes.
     func controlTextDidChange(_ obj: Notification) {
-        guard let textView = obj.object as? NSTextField else {
-            return      // Not a TextField
-        }
+        guard let _ = obj.object as? NSTextField else { return }     // Not a TextField
+        
         let prefixU = String(txtPrefix.stringValue.prefix(Const.descKeyLength)).uppercased()
         if txtPrefix.stringValue != prefixU {
             txtPrefix.stringValue = prefixU

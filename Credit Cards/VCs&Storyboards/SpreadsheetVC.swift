@@ -71,7 +71,6 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         tableView.doubleAction = #selector(tableViewDoubleClick(_:))
 
         loadTableSortDescriptors()
-        syncColWidths()
 
         btnClear.isEnabled = false
         btnSummary.keyEquivalent = "\r"
@@ -81,6 +80,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         super.viewDidAppear()
         view.window?.delegate = self
         reloadTableSorted(sortBy: iSortBy, ascending: iAscending)
+        syncColWidths()
     }
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {
@@ -196,6 +196,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     private func syncColWidths() {
         for (idx, column) in tableView.tableColumns.enumerated() {
             tableViewSum.tableColumns[idx].width = column.width
+            print("Set Column \(idx) \(column.title) to width of \(column.width)")
         }
     }
 
@@ -342,9 +343,7 @@ extension SpreadsheetVC: NSTextFieldDelegate {
 
     //---- controlTextDidChange - Called when a textField (with SpreadsheetVC as its delegate) changes.
     func controlTextDidChange(_ obj: Notification) {
-        guard let textView = obj.object as? NSTextField else {
-            return
-        }
+        guard let _ = obj.object as? NSTextField else { return }    // Not a TextField
         //print("🙂\(codeFile)#\(#line) \(textView.stringValue)")
         btnSummary.keyEquivalent = ""
         btnFilter.keyEquivalent = "\r"
@@ -486,10 +485,10 @@ extension SpreadsheetVC: NSTableViewDelegate {
             guard let column = notification.userInfo?["NSTableColumn"] as? NSTableColumn else { return }
             let id = column.identifier
             let idx = tableView.column(withIdentifier: id)
-            //print("↔️ tableViewColumnDidResize Col#\(idx): \(id.rawValue) to a width of \(column.width)")
+            print("↔️ tableViewColumnDidResize Col#\(idx): \(id.rawValue) to a width of \(column.width)")
             tableViewSum.tableColumns[idx].width = column.width
-        }//tableView
-    }
+        }//is a tableView
+    }//end func
 
     //---- tableViewDoubleClick - Detected doubleClick: showUserInputVendorCatForm
     //viewDidLoad has tableView.target = self
