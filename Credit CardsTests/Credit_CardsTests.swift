@@ -2,8 +2,8 @@
 //  Credit_CardsTests.swift
 //  Credit CardsTests
 //
-//  Created by Lenard Howell on 7/28/19.
-//  Copyright © 2019 Lenard Howell. All rights reserved.
+//  Created by George Bauer on 7/28/19.
+//  Copyright © 2019 George Bauer. All rights reserved.
 //
 
 // THIS FILE NO LONGER WORKS!  USE Credit_Card_UnitTests INSTEAD.

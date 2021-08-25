@@ -2,8 +2,8 @@
 //  Credit_CardsUITests.swift
 //  Credit CardsUITests
 //
-//  Created by Lenard Howell on 7/28/19.
-//  Copyright © 2019 Lenard Howell. All rights reserved.
+//  Created by George Bauer on 7/28/19.
+//  Copyright © 2019-2021 George Bauer. All rights reserved.
 //
 
 import XCTest

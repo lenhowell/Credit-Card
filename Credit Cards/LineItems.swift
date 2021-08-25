@@ -2,8 +2,8 @@
 //  LineItems.swift
 //  Credit Cards
 //
-//  Created by Lenard Howell on 7/29/19.
-//  Copyright © 2019 Lenard Howell. All rights reserved.
+//  Created by George Bauer on 7/29/19.
+//  Copyright © 2019-2021 George Bauer. All rights reserved.
 //
 
 import Foundation

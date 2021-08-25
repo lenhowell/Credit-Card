@@ -3,7 +3,7 @@
 //  Credit Cards
 //
 //  Created by George Bauer on 12/10/19.
-//  Copyright © 2019 Lenard Howell. All rights reserved.
+//  Copyright © 2019-2021 George Bauer. All rights reserved.
 //
 
 import Foundation
@@ -407,4 +407,4 @@ func makeDate(_ dateStr: String) -> String {
         mo = "00"
     }
     return "\(yr)-\(mo)-\(da)"
-}
+}//end func makeDate
