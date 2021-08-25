@@ -3,7 +3,7 @@
 //  Credit Cards
 //
 //  Created by George Bauer on 8/9/19.
-//  Copyright © 2019 George Bauer. All rights reserved.
+//  Copyright © 2019-2021 George Bauer. All rights reserved.
 //
 
 import Cocoa    // Cocoa is needed to recognize NSPasteboard
@@ -144,26 +144,6 @@ public func textToDbl(_ str: String) -> Double? {
     return Double(txt)
 }
 
-public func MsgBox(_ str: String) {
-    print("MsgBox: ", str)
-    DispatchQueue.main.async {
-        let alert = NSAlert()
-        alert.informativeText = str
-        alert.runModal()
-    }
-    return
-}
-
-public func MsgBox(text: String, title: String) {
-    print("MsgBox: ", text)
-    DispatchQueue.main.async {
-        let alert = NSAlert()
-        alert.messageText = title
-        alert.informativeText = text
-        alert.runModal()
-    }
-    return
-}
 
 
 //MARK:- Date Extensions

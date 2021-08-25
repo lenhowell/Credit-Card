@@ -3,7 +3,7 @@
 //  Credit Cards
 //
 //  Created by George Bauer on 9/21/19.
-//  Copyright © 2019 Lenard Howell. All rights reserved.
+//  Copyright © 2019-2021 George Bauer. All rights reserved.
 //
 
 import Cocoa
@@ -71,7 +71,7 @@ class UserInputShortNameVC: NSViewController, NSWindowDelegate {
             return
         }
 
-        let descKey = makeDescKey(from: txtFullDescKey.stringValue, dictVendorShortNames: [:], fileName: "")
+        let descKey = DescriptionKey.makeDescKey(from: txtFullDescKey.stringValue, dictVendorShortNames: [:], fileName: "")
         if txtFullDescKey.stringValue != descKey {
             let msg = "\(txtFullDescKey.stringValue) is not acceptable.\nSubstituting \(descKey)."
             txtFullDescKey.stringValue = descKey

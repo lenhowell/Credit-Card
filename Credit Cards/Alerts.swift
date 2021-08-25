@@ -3,7 +3,7 @@
 //  AnalyseSwiftCode
 //
 //  Created by George Bauer on 6/12/19.
-//  Copyright © 2019 George Bauer. All rights reserved.
+//  Copyright © 2019-2021 George Bauer. All rights reserved.
 //
 
 import Cocoa
@@ -33,7 +33,7 @@ public class GBox {
             alert.runModal()
         //}
         return
-    }
+    }//end func alert(:,title:)
 
     // string, style -> result
     static public func alert(_ str: String, style: AlertStyle) -> AlertResult {
@@ -58,9 +58,8 @@ public class GBox {
             }
             return .no
         }
-
         return .none                            // Unknown Style
-    }
+    }//end func alert(:,style:)
 
     //---- alertOKCancel - OKCancel dialog box. Returns true if OK
     static private func alertOKCancel(question: String, text: String) -> Bool {
@@ -71,7 +70,7 @@ public class GBox {
         alert.addButton(withTitle: "OK")
         alert.addButton(withTitle: "Cancel")
         return alert.runModal() == .alertFirstButtonReturn
-    }
+    }//end func alertOKCancel
 
     //---- alertYesNo - YesNo dialog box. Returns true? if Yes
     static private func alertYesNo(question: String, text: String) -> Bool {
@@ -82,7 +81,7 @@ public class GBox {
         alert.addButton(withTitle: "Yes")
         alert.addButton(withTitle: "No")
         return alert.runModal() == .alertFirstButtonReturn
-    }
+    }//end func alertYesNo
 
 
     //func showSimpleAlertWithMessage(message: String!) {
@@ -122,6 +121,7 @@ public class GBox {
             return str
         }
         return ""                               // anything else
-    }
-}//end class
+    }//end func inputBox
+    
+}//end class GBox
 

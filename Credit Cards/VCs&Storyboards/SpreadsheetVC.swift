@@ -3,7 +3,7 @@
 //  Credit Cards
 //
 //  Created by George Bauer on 10/2/19.
-//  Copyright © 2019 Lenard Howell. All rights reserved.
+//  Copyright © 2019-2021 George Bauer. All rights reserved.
 //
 
 import Cocoa
@@ -186,10 +186,10 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
             let ascending: Bool
             ascending = (key == SpSheetColID.cardType) // ascending for cardType; descending for the rest.
             let sortDescriptor  = NSSortDescriptor(key: key,  ascending: ascending)
-            print("⬆️ sortDescriptor key: \(sortDescriptor.key ?? "?")   ascending: \(sortDescriptor.ascending)")
+            print("⬆️\(codeFile)#\(#line) sortDescriptor key: \(sortDescriptor.key ?? "?")   ascending: \(sortDescriptor.ascending)")
             column.sortDescriptorPrototype = sortDescriptor
             colWidDict[key] = column.width
-        }
+        }//next column
     }//end func
 
     //---- syncColWidths - Make Summary Column widths = Main Column widths: called by viewDidLoad

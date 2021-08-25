@@ -180,23 +180,23 @@
 				BF992C4722EE56410089DAB8 /* AppDelegate.swift */,
 				CE6F1AE423561C85008CA720 /* VCs&Storyboards */,
 				CEA62D2F2306232C00160DEB /* Alerts.swift */,
+				CE7548122309DC0600FEDAFB /* DescriptionKey.swift */,
 				BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */,
 				CE7E093D2377C3C4004150E6 /* Globals.swift */,
-				BFECDEE022FDBED400F1BF5E /* FileIO.swift */,
 				CE35141123A08E9400158000 /* FileAmazonOrders.swift */,
 				CE0BBCCC23A6D58E003EA6C3 /* FileDeposits.swift */,
 				BFECDEDE22FDBC2F00F1BF5E /* FreeFuncs.swift */,
-				CE7548122309DC0600FEDAFB /* DescriptionKey.swift */,
+				BFECDEE022FDBED400F1BF5E /* FileIO.swift */,
 				BFECDEE222FDCBCD00F1BF5E /* HandleCards.swift */,
 				CE90E6E0236E80B400184BEF /* HandleActivity.swift */,
 				BF5D549B22EF458500111875 /* LineItems.swift */,
-				CE95CC9C2336D722008363B7 /* VendorShortNames.swift */,
-				CE90E6DE236DF8F100184BEF /* TableFilter.swift */,
 				CE4A27FC2301BEC500CA5A38 /* Stats.swift */,
+				CE90E6DE236DF8F100184BEF /* TableFilter.swift */,
 				CE5B1E012304E03C00337C2F /* UserDefaults.swift */,
+				CE95CC9C2336D722008363B7 /* VendorShortNames.swift */,
+				CE90E6DC2368D23400184BEF /* MyAccounts.txt */,
 				CE1F7EC723317453004765E7 /* MyCategories.txt */,
 				CE6F1AE22352D576008CA720 /* VendorShortNames.txt */,
-				CE90E6DC2368D23400184BEF /* MyAccounts.txt */,
 				CE9FFEBA2302F3DF00261390 /* Thoughts.rtf */,
 				BF9DD30922F1370200C22E41 /* StringExtension.swift */,
 				BF992C4B22EE56420089DAB8 /* Assets.xcassets */,
@@ -631,14 +631,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 950;
+				CURRENT_PROJECT_VERSION = 954;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.12.0;
+				MARKETING_VERSION = 1.12.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -652,14 +652,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 950;
+				CURRENT_PROJECT_VERSION = 954;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.12.0;
+				MARKETING_VERSION = 1.12.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

@@ -2,8 +2,8 @@
 //  ViewController.swift
 //  Credit Cards
 //
-//  Created by 💪 Lenard Howell on 7/28/19.
-//  Copyright © 2019 Lenard Howell. All rights reserved.
+//  Created by 💪 George Bauer on 7/28/19.
+//  Copyright © 2019-2021 George Bauer. All rights reserved.
 //
 
 import Cocoa
@@ -305,19 +305,19 @@ class ViewController: NSViewController, NSWindowDelegate {
         if gotItem.contains(.dirSupport) {
             var msg = ""
             msg = "custom categories & aliases."
-            if deleteSupportFile(url: gUrl.myCatsFile, fileName: myCatsFilename, msg: msg) {
+            if FileIO.deleteSupportFile(url: gUrl.myCatsFile, fileName: myCatsFilename, msg: msg) {
                 didSomething += 1
             }
             msg = "vendor default categories."
-            if deleteSupportFile(url: gUrl.vendorCatLookupFile, fileName: vendorCatLookupFilename, msg: msg) {
+            if FileIO.deleteSupportFile(url: gUrl.vendorCatLookupFile, fileName: vendorCatLookupFilename, msg: msg) {
                 didSomething += 1
             }
             msg = "custom vendor names."
-            if deleteSupportFile(url: gUrl.vendorShortNamesFile, fileName: vendorShortNameFilename, msg: msg) {
+            if FileIO.deleteSupportFile(url: gUrl.vendorShortNamesFile, fileName: vendorShortNameFilename, msg: msg) {
                 didSomething += 1
             }
             msg = "mods to your transaction files."
-            if deleteSupportFile(url: gUrl.myModifiedTrans, fileName: myModifiedTranFilename, msg: msg) {
+            if FileIO.deleteSupportFile(url: gUrl.myModifiedTrans, fileName: myModifiedTranFilename, msg: msg) {
                 didSomething += 1
             }
         }
@@ -363,11 +363,11 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
     
     @IBAction func mnuHelpSearchForHelpOn_Click(_ sender: Any) {    // Handles mnuHelpSearchForHelpOn.Click
-        MsgBox("Unable to display Help Contents. There is no Help associated with this project.")
+        GBox.alert("Unable to display Help Contents. There is no Help associated with this project.")
     }
 
     @IBAction func mnuHelpContents_Click(_ sender: Any) {           // Handles mnuHelpContents.Click
-        MsgBox("Unable to display Help Contents. There is no Help associated with this project.")
+        GBox.alert("Unable to display Help Contents. There is no Help associated with this project.")
     }
 
 
@@ -495,7 +495,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         outputTranactions(outputFileURL: outputFileURL, lineItemArray: gLineItemArray)
 
         print("\n😋 --- Description-Key algorithms ---")
-        for (key, val) in gDictDescKeyAlgorithm.sorted(by: <) {
+        for (key, val) in DescriptionKey.dictDescKeyAlgorithmCnts.sorted(by: <) {
             print("  \(key.PadRight(40))\(val)")
         }
 

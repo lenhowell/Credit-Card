@@ -2,8 +2,8 @@
 //  FileIO.swift
 //  Credit Cards
 //
-//  Created by Lenard Howell on 8/9/19.
-//  Copyright © 2019 Lenard Howell. All rights reserved.
+//  Created by George Bauer on 8/9/19.
+//  Copyright © 2019-2021 George Bauer. All rights reserved.
 //
 
 import Foundation
@@ -240,23 +240,23 @@ public struct FileIO {
     }
 
 
-}//end struct FileIO
-
-//---- deleteSupportFile -
-func deleteSupportFile(url: URL, fileName: String, msg: String) -> Bool {
-    let fileManager = FileManager.default
-    if fileManager.fileExists(atPath: url.path) {
-        let response = GBox.alert("Do you want to delete \(fileName)?\nYou will loose any\n\(msg)", style: .yesNo)
-        if response == .yes {
-            if url.path.hasSuffix("\(fileName)") {
-                //fileManager.removeItem(at: url)
-                FileIO.saveBackupFile(url: url, addonName: "-Deleted")
-                return true
+    //---- deleteSupportFile -
+    static func deleteSupportFile(url: URL, fileName: String, msg: String) -> Bool {
+        let fileManager = FileManager.default
+        if fileManager.fileExists(atPath: url.path) {
+            let response = GBox.alert("Do you want to delete \(fileName)?\nYou will loose any\n\(msg)", style: .yesNo)
+            if response == .yes {
+                if url.path.hasSuffix("\(fileName)") {
+                    //fileManager.removeItem(at: url)
+                    FileIO.saveBackupFile(url: url, addonName: "-Deleted")
+                    return true
+                }
             }
         }
-    }
-    return false
-}
+        return false
+    }//end func
+
+}//end struct FileIO
 
 
 //MARK: FileAttributes struct

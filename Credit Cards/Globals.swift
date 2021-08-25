@@ -3,16 +3,16 @@
 //  Credit Cards
 //
 //  Created by George Bauer on 11/9/19.
-//  Copyright © 2019 Lenard Howell. All rights reserved.
+//  Copyright © 2019-2021 George Bauer. All rights reserved.
 //
 
 import Foundation
 
-public let gAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
-public let gAppBuild   = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion")            as? String ?? "0"
 
 public struct Const {
     // Global Constants
+    static let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
+    static let appBuild   = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion")            as? String ?? "0"
     static let maxCardTypeLen = 10
     static let descKeyLength  = 24
     static let maxDollar = 999_999_999.0

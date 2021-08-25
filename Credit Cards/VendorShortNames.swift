@@ -3,7 +3,7 @@
 //  Credit Cards
 //
 //  Created by George Bauer on 9/21/19.
-//  Copyright © 2019 Lenard Howell. All rights reserved.
+//  Copyright © 2019-2021 George Bauer. All rights reserved.
 //
 
 import Cocoa
@@ -114,4 +114,4 @@ func findPrefixMatch(name: String, dictShortNames: [String: String]) -> (prefix:
         }
     }
     return ("","")
-}
+}//end func

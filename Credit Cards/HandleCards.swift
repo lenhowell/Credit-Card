@@ -2,8 +2,8 @@
 //  HandleCards.swift
 //  Credit Cards
 //
-//  Created by Lenard Howell on 8/9/19.
-//  Copyright © 2019 Lenard Howell. All rights reserved.
+//  Created by George Bauer on 8/9/19.
+//  Copyright © 2019-2021 George Bauer. All rights reserved.
 //
 
 import Cocoa    // needed to access NSStoryboard & NSWindowController for segue
@@ -98,7 +98,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
             if lineItem.desc == "CHECK" {
                 // If we have an unmarked check (no # or payee) in CMA Transaction file,
                 // ignore it and hope it's picked up in CheckML-20xx file. ????
-                print("HandleCards#\(#line) ⛔️[\(fileName)] Unrecorded check \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.debit) \(lineItem.rawCat)")
+                print("⛔️ HandleCards#\(#line)[\(fileName)] Unrecorded check \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.debit) \(lineItem.rawCat)")
                 continue
             }
             
@@ -221,11 +221,11 @@ internal func gotaDupe(lineItem: LineItem, idxFromDupe: Int, fileName: String, l
         msg = "Duplicate chkNumber \(chkNum) with dates of \(dateFromTran) & \(dateFromDupe) "
     }
     // fileName: fileName, dataLineNum: lineNum, lineText: lineItem.transText,
-    print("HandleCards#\(#line):[\(fileName)] \(msg)")
+    print("➡️ HandleCards#\(#line):[\(fileName)] \(msg)")
     gLineItemArray[idxFromDupe].cardType = gLineItemArray[idxFromDupe].cardType + "*"
     
     if lineItem.descKey != lineItemFromDupe.descKey ||  lineItem.genCat != lineItemFromDupe.genCat {
-        print("HandleCards#\(#line)[\(fileName)] \(lineItem.descKey) != \(lineItemFromDupe.descKey) ||  \(lineItem.genCat) != \(lineItemFromDupe.genCat)")
+        print("😡 HandleCards#\(#line)[\(fileName)] \(lineItem.descKey) != \(lineItemFromDupe.descKey) ||  \(lineItem.genCat) != \(lineItemFromDupe.genCat)")
         if lineItemFromDupe.genCat == Const.unknown && lineItem.genCat != Const.unknown {
             gLineItemArray[idxFromDupe].genCat  = lineItem.genCat
             gLineItemArray[idxFromDupe].descKey = lineItem.descKey
@@ -276,7 +276,7 @@ internal func makeLineItem(fromTransFileLine:   String,
     if isActivity {
         lineItem = extractTranFromActivity(lineItem: lineItem)
     }
-    let descKey = makeDescKey(from: lineItem.desc, dictVendorShortNames: dictVendorShortNames, fileName: fileName)
+    let descKey = DescriptionKey.makeDescKey(from: lineItem.desc, dictVendorShortNames: dictVendorShortNames, fileName: fileName)
     lineItem.descKey = descKey
 
     // Check for Modified Transaction
@@ -297,7 +297,7 @@ internal func makeLineItem(fromTransFileLine:   String,
     var catFromTran       = gDictMyCatAliases[lineItem.rawCat.uppercased()] ?? lineItem.rawCat + "-?"
     var catItemFromTran   = CategoryItem(category: catFromTran, source: cardType)
 
-    if descKey.contains("WINAN") && lineItem.credit > 38000 {//lineItem.tranDate.contains("20"){
+    if descKey.contains("SKY")  {
         //print("")     //Debug Trap
     }
     
