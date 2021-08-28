@@ -159,7 +159,7 @@ extension LineItem {
                     assignedCat = ""
                 }
                 if assignedCat.trim.isEmpty { assignedCat = Const.unknown }
-                let myCat = gDictMyCatAliases[assignedCat.uppercased()] ?? ""
+                let myCat = gCatagories.dictCatAliases[assignedCat.uppercased()] ?? "" 
                 //self.rawCat = myCat
                 self.rawCat = assignedCat //%%%%%%%
                 self.genCat = myCat

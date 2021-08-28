@@ -19,9 +19,11 @@
 		BFECDEDF22FDBC2F00F1BF5E /* FreeFuncs.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFECDEDE22FDBC2F00F1BF5E /* FreeFuncs.swift */; };
 		BFECDEE122FDBED400F1BF5E /* FileIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFECDEE022FDBED400F1BF5E /* FileIO.swift */; };
 		BFECDEE322FDCBCD00F1BF5E /* HandleCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFECDEE222FDCBCD00F1BF5E /* HandleCards.swift */; };
+		CE07EFAD26D95E2000CF65E5 /* Catagories_UnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE07EFAC26D95E2000CF65E5 /* Catagories_UnitTests.swift */; };
 		CE0A86FC230B4AF500FD1ECD /* MakeDescKeyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0A86FB230B4AF500FD1ECD /* MakeDescKeyTests.swift */; };
 		CE0BBCCD23A6D58E003EA6C3 /* FileDeposits.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0BBCCC23A6D58E003EA6C3 /* FileDeposits.swift */; };
 		CE1F7EC823317453004765E7 /* MyCategories.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE1F7EC723317453004765E7 /* MyCategories.txt */; };
+		CE25CCEC26D8819400B9A7D5 /* Catagories.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE25CCEB26D8819400B9A7D5 /* Catagories.swift */; };
 		CE2924902372235A00F410A4 /* TableFilter_UnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE29248F2372235A00F410A4 /* TableFilter_UnitTests.swift */; };
 		CE35141223A08E9400158000 /* FileAmazonOrders.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE35141123A08E9400158000 /* FileAmazonOrders.swift */; };
 		CE4A27FD2301BEC500CA5A38 /* Stats.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4A27FC2301BEC500CA5A38 /* Stats.swift */; };
@@ -90,9 +92,11 @@
 		BFECDEDE22FDBC2F00F1BF5E /* FreeFuncs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeFuncs.swift; sourceTree = "<group>"; };
 		BFECDEE022FDBED400F1BF5E /* FileIO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileIO.swift; sourceTree = "<group>"; };
 		BFECDEE222FDCBCD00F1BF5E /* HandleCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandleCards.swift; sourceTree = "<group>"; };
+		CE07EFAC26D95E2000CF65E5 /* Catagories_UnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Catagories_UnitTests.swift; sourceTree = "<group>"; };
 		CE0A86FB230B4AF500FD1ECD /* MakeDescKeyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeDescKeyTests.swift; sourceTree = "<group>"; };
 		CE0BBCCC23A6D58E003EA6C3 /* FileDeposits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDeposits.swift; sourceTree = "<group>"; };
 		CE1F7EC723317453004765E7 /* MyCategories.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MyCategories.txt; sourceTree = "<group>"; };
+		CE25CCEB26D8819400B9A7D5 /* Catagories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Catagories.swift; sourceTree = "<group>"; };
 		CE29248F2372235A00F410A4 /* TableFilter_UnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableFilter_UnitTests.swift; sourceTree = "<group>"; };
 		CE35141123A08E9400158000 /* FileAmazonOrders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileAmazonOrders.swift; sourceTree = "<group>"; };
 		CE4A27FC2301BEC500CA5A38 /* Stats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stats.swift; sourceTree = "<group>"; };
@@ -180,6 +184,7 @@
 				BF992C4722EE56410089DAB8 /* AppDelegate.swift */,
 				CE6F1AE423561C85008CA720 /* VCs&Storyboards */,
 				CEA62D2F2306232C00160DEB /* Alerts.swift */,
+				CE25CCEB26D8819400B9A7D5 /* Catagories.swift */,
 				CE7548122309DC0600FEDAFB /* DescriptionKey.swift */,
 				BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */,
 				CE7E093D2377C3C4004150E6 /* Globals.swift */,
@@ -242,6 +247,7 @@
 			isa = PBXGroup;
 			children = (
 				CEB84F272308EB20001485C5 /* Credit_Cards_UnitTests.swift */,
+				CE07EFAC26D95E2000CF65E5 /* Catagories_UnitTests.swift */,
 				CE0A86FB230B4AF500FD1ECD /* MakeDescKeyTests.swift */,
 				CE29248F2372235A00F410A4 /* TableFilter_UnitTests.swift */,
 				CEE86B17239EE04E0062C84F /* UnitTest_Amazon.swift */,
@@ -443,6 +449,7 @@
 				CE7548132309DC0600FEDAFB /* DescriptionKey.swift in Sources */,
 				BFECDEE122FDBED400F1BF5E /* FileIO.swift in Sources */,
 				CE0BBCCD23A6D58E003EA6C3 /* FileDeposits.swift in Sources */,
+				CE25CCEC26D8819400B9A7D5 /* Catagories.swift in Sources */,
 				CE90E6E1236E80B400184BEF /* HandleActivity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -468,6 +475,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE90E6DB235F814900184BEF /* FileIO_UnitTests.swift in Sources */,
+				CE07EFAD26D95E2000CF65E5 /* Catagories_UnitTests.swift in Sources */,
 				CE0A86FC230B4AF500FD1ECD /* MakeDescKeyTests.swift in Sources */,
 				CE2924902372235A00F410A4 /* TableFilter_UnitTests.swift in Sources */,
 				CEB84F282308EB20001485C5 /* Credit_Cards_UnitTests.swift in Sources */,
@@ -631,14 +639,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 955;
+				CURRENT_PROJECT_VERSION = 988;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.12.1;
+				MARKETING_VERSION = 1.12.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -652,14 +660,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 955;
+				CURRENT_PROJECT_VERSION = 988;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.12.1;
+				MARKETING_VERSION = 1.12.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

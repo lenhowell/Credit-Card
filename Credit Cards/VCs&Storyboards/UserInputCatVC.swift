@@ -165,7 +165,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
 
     @IBAction func btnAddCategory(_ sender: Any) {
         let newCat = cboCats.stringValue.trim
-        if gDictMyCatAliases[newCat] == nil {
+        if gCatagories.dictCatAliases[newCat] == nil {
             let response = GBox.alert("Add \(cboCats.stringValue) to category list?", style: .yesNo)
             if response == .yes {
                addCategory(newCat)
@@ -182,12 +182,12 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         // Categories are found in MyCategories.txt, MyModifiedTransactions.txt, VendorCategoryLookup.txt
         // Adding a category should only affect MyCategories.txt
         // Internal:
-        //      gDictMyCatAliases:  [String: String]     alias: catName
-        //      gMyCatNames: [String]                   catName
-        //      gDictMyCatAliasArray: [String: [String]] catName: aliasArray
-        // Must call writeMyCats()
+        //      gCatagories.dictCatAliases:  [String: String]     alias: catName
+        //      gCatagories.catNames: [String]                   catName
+        //      gCatagories.dictCatAliasArray: [String: [String]] catName: aliasArray
+        // Must call gCatagories.writeMyCats()
         let newCat = cboCats.stringValue.trim
-        if gDictMyCatAliases[newCat.uppercased()] == nil {
+        if gCatagories.dictCatAliases[newCat.uppercased()] == nil {
             let response = GBox.alert("\(cboCats.stringValue) is not recognized.\nDo you want to add it to the list?", style: .yesNo)
             if response == .yes {
                addCategory(newCat)
@@ -252,12 +252,12 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
 
     //---- addCategory - Add a new user-input category to MyCategories
     func addCategory(_ newCat: String) {
-        gDictMyCatAliases[newCat.uppercased()] = newCat
-        gDictMyCatAliasArray[newCat] = []
-        gMyCatNames.append(newCat)
-        gMyCatNames.sort()
+        gCatagories.dictCatAliases[newCat.uppercased()] = newCat
+        gCatagories.dictCatAliasArray[newCat] = []
+        gCatagories.catNames.append(newCat)
+        gCatagories.catNames.sort()
         loadComboBoxCats()
-        writeMyCats(url: gUrl.myCatsFile)
+        gCatagories.writeMyCats(url: gUrl.myCatsFile) //?!+
     }
 
     // Sets ComboBox-String and chkQuestionMark.state
@@ -270,7 +270,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
     //------ loadComboBoxCats - load ComboBoxCatss with myCategories
     private func loadComboBoxCats() {
         cboCats.removeAllItems()
-        cboCats.addItems(withObjectValues: gMyCatNames)
+        cboCats.addItems(withObjectValues: gCatagories.catNames)
         //print("🤣(codeFile)#\(#line) cboCats has \(cboCats.numberOfItems) items.")
     }//end func loadComboBoxFiles
 
@@ -288,17 +288,17 @@ extension UserInputCatVC: NSTextFieldDelegate, NSComboBoxDelegate {
         chkQuestionMark.state = cboCats.stringValue.hasSuffix("?") ? .on : .off
         cbo.removeAllItems()
         let cboStr = cbo.stringValue.lowercased()
-        //let smallList = gMyCatNames.filter{$0.lowercased().hasPrefix(cboStr)}
-        //print(gMyCatNames.count, smallList.count)
-        cboCats.addItems(withObjectValues: gMyCatNames.filter{$0.lowercased().contains(cboStr)})
+        //let smallList = gCatagories.catNames.filter{$0.lowercased().hasPrefix(cboStr)}
+        //print(gCatagories.catNames.count, smallList.count)
+        cboCats.addItems(withObjectValues: gCatagories.catNames.filter{$0.lowercased().contains(cboStr)})
 
     }//end func
 
     // Case-Insensitive auto-complete
     func comboBox(_ comboBox: NSComboBox, completedString partialString: String) -> String? {
         if comboBox == cboCats {
-            for idx in 0..<gMyCatNames.count {
-                let testItem = gMyCatNames[idx] as String
+            for idx in 0..<gCatagories.catNames.count {
+                let testItem = gCatagories.catNames[idx] as String
                 if (testItem.commonPrefix(with: partialString, options: .caseInsensitive).count) == partialString.count {
                     return testItem
                 }

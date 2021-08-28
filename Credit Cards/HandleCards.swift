@@ -20,7 +20,7 @@ var usrModTranItemReturned  = ModifiedTransactionItem()
 var usrFixVendor        = true
 var usrIgnoreVendors    = [String: Int]()
 
-//MARK:---- handleCards - 25-187 = 162-lines
+//MARK:---- handleCards - 25-195 = 170-lines
 
 func handleCards(fileName: String, cardType: String, cardArray: [String], acct: Account?) {
     let cardArrayCount = cardArray.count
@@ -242,8 +242,8 @@ internal func gotaDupe(lineItem: LineItem, idxFromDupe: Int, fileName: String, l
     return dateToUse
 }//end func gotaDupe
 
-//MARK: makeLineItem 110-lines
-//---- makeLineItem - Uses support files & possible user-input 225-335 = 110-lines
+//MARK: makeLineItem 116-lines
+//---- makeLineItem - Uses support files & possible user-input 247-362 = 115-lines
 internal func makeLineItem(fromTransFileLine:   String,
                            dictColNums:         [String: Int],
                            dictVendorShortNames:[String: String],
@@ -252,7 +252,7 @@ internal func makeLineItem(fromTransFileLine:   String,
                            fileName:            String,
                            lineNum:             Int,
                            acct:                Account?) -> LineItem {
-    // Uses Globals: gLearnMode, gUserInputMode, gDictModifiedTrans, gDictMyCatAliases
+    // Uses Globals: gLearnMode, gUserInputMode, gDictModifiedTrans, gCatagories 
     // Modifies Gloabals: gDictVendorCatLookup, Stats
 
     // If an "Account" record has been read-in for this item, set signAmount & tran accordingly
@@ -294,7 +294,7 @@ internal func makeLineItem(fromTransFileLine:   String,
     var catItemFromVendor = CategoryItem()
     var catItemPrefered   = CategoryItem()
     var isClearWinner     = false
-    var catFromTran       = gDictMyCatAliases[lineItem.rawCat.uppercased()] ?? lineItem.rawCat + "-?"
+    var catFromTran       = gCatagories.dictCatAliases[lineItem.rawCat.uppercased()] ?? lineItem.rawCat + "-?"
     var catItemFromTran   = CategoryItem(category: catFromTran, source: cardType)
 
     if descKey.contains("SKY")  {
@@ -317,7 +317,7 @@ internal func makeLineItem(fromTransFileLine:   String,
         // If Transaction-Line has a Category, put it in the Vendor file.
         if catFromTran.count < 3 { catFromTran = "" }
 
-        if let catTran = gDictMyCatAliases[catFromTran.uppercased()] {
+        if let catTran = gCatagories.dictCatAliases[catFromTran.uppercased()] {
             catFromTran = catTran
             isClearWinner = !catFromTran.hasSuffix("?") // if no "?", we have a winner
         } else {

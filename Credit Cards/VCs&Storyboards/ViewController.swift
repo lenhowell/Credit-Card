@@ -27,12 +27,9 @@ import Cocoa
 var gUserInitials           = "User"    //  UD (UserInputVC) Initials used for "Category Source" when Cat changed by user.
 var gLineItemArray          = [LineItem]()  // (used here, SpreadsheetVC, + 4 more) Entire list of transactions
 var gTransFilename          = ""            // (UserInputVC.swift-viewDidLoad) Current Transaction Filename
-var gMyCatNames             = [String]()    // (FileIO.loadMyCats, UserInputVC) Category Names (MyCategories.txt)
 var gAccounts               = Accounts()
 
-var gDictMyCatAliases       = [String: String]()        // (LineItems.init, HandleCards, etc) Hash of Category Synonyms
-var gDictMyCatAliasArray    = [String: [String]]()      // (FileIO, UserInputCatVC) Synonyms for each cat name
-var gDictVendorCatLookup    = [String: CategoryItem]()  // (here, HandleCards) Hash for Category Lookup (CategoryLookup.txt)
+var gDictVendorCatLookup    = [String: CategoryItem]()  // (here, HandleCards) for Category Lookup(CategoryLookup.txt)
 var gDictTranDupes          = [String: (Int, String)]() // (clr:main, use:handleCards) to find dupe transactions
 var gDictNoVendrDupes       = [String: (Int, String)]() // (clr:main, use:handleCards)
 var gDictNoDateDupes        = [String: (Int, String)]() // (clr:main, use:handleCards)
@@ -284,7 +281,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     }
 
-@IBAction func radioActivity(_ sender: Any) {
+    @IBAction func radioActivity(_ sender: Any) {
 
     }
 
@@ -625,9 +622,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         if outputPath.isEmpty || !FileIO.folderExists(atPath: outputPath, isPartialPath: true) {
             print("😡  \(codeFile)#\(#line): Output folder: \"\(txtOutputFolder.stringValue)\" doesn't exist.")
             gotItem = gotItem.subtracting(GotItem.dirOutput)
-            } else {
-                gotItem = gotItem.union(GotItem.dirOutput)
-            }
+        } else {
+            gotItem = gotItem.union(GotItem.dirOutput)
+        }
         pathOutputFolder  = outputPath
 
         let transPath = txtTransationFolder.stringValue.trim
@@ -640,7 +637,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         pathTransactionFolder = transPath
     }
 
-    func readSupportFiles() {
+    func readSupportFiles() {   //640-713 = 73-lines
         var errTxt = ""
 
         // --------- "CategoryLookup.txt" -----------
@@ -677,21 +674,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories " + errTxt)
         }
-        gDictMyCatAliases = loadMyCats(myCatsFileURL: gUrl.myCatsFile)
-        if gDictMyCatAliases.count > 0 {
+        gCatagories = Catagories(myCatsFileURL: gUrl.myCatsFile)
+        if gCatagories.dictCatAliases.count > 5 {
             gotItem = [gotItem, .fileMyCategories]
-
-        } else {
-            guard let path = Bundle.main.path(forResource: "MyCategories", ofType: "txt") else {
-                let msg = "Missing starter file - MyCategories.txt"
-                handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
-                return
-            }
-            let bundleCatsFileURL = URL(fileURLWithPath: path)
-            gDictMyCatAliases = loadMyCats(myCatsFileURL: bundleCatsFileURL)
-            writeMyCats(url: gUrl.myCatsFile)    // Save Starter file
-            let msg = "A starter \"MyCategories.txt\" was placed in your support-files folder"
-            handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, errorMsg: msg)
         }
 
         // ---------- "MyAccounts.txt" ------------
@@ -712,7 +697,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             let bundleAccountsFileURL = URL(fileURLWithPath: path)
             gAccounts = Accounts(url: bundleAccountsFileURL)
             gAccounts.url = gUrl.myAccounts
-            gAccounts.writeToFile() //= writeMyCats(url: gUrl.myCatsFile)    // Save Starter file
+            gAccounts.writeToFile()    // Save Starter file
             let msg = "A starter \"MyAccounts.txt\" was placed in your support-files folder"
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, errorMsg: msg)
         }

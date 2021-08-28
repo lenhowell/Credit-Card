@@ -9,31 +9,10 @@
 import Foundation
 
 //MARK:- ReadAmazon
-public struct AmazonItem {
-    var orderNumber:String
-    var orderDate:  String
-    var order$:     Double
-    var orderShipTo:String
-    var itemQuant   = 1
-    var itemName    = ""
-    var personTitle = ""
-    var personName  = ""
-    var itemSoldBy  = ""
-    var item$       = 0.0
-    var itemSerial  = ""
-    var fileLineNum:Int
-    
-    init(orderNumber: String, orderDate: String, order$: Double, orderShipTo: String, fileLineNum: Int) {
-        self.orderNumber = orderNumber
-        self.orderDate   = orderDate
-        self.order$      = order$
-        self.orderShipTo = orderShipTo
-        self.fileLineNum = fileLineNum
-    }
-}//end struct AmazonItem
+
 
 // TODO: Fix returns, crosscheck files/year count.
-//---- readAmazon - Returns dict [DateStr:AmazonItem] 37-366 = 329-lines
+//---- readAmazon - Returns dict [DateStr:AmazonItem] 16-346 = 330-lines
 func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
     enum Expect: String { case none, ordersYear, year,
         orderPlaced, date, totalTitle, total$, shipToTitle, shipTo, orderNumber,
@@ -366,7 +345,7 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
     return amazonItemsByDate
 }//end func readAmazon
 
-func makeDate(_ dateStr: String) -> String {
+func makeDate(_ dateStr: String) -> String {        // 348-389 = 41-lines
     // April 24, 2017 => 2017-04-24
     let comps = dateStr.trim.components(separatedBy: " ")
     if comps.count != 3 {
@@ -408,3 +387,26 @@ func makeDate(_ dateStr: String) -> String {
     }
     return "\(yr)-\(mo)-\(da)"
 }//end func makeDate
+
+public struct AmazonItem {
+    var orderNumber:String
+    var orderDate:  String
+    var order$:     Double
+    var orderShipTo:String
+    var itemQuant   = 1
+    var itemName    = ""
+    var personTitle = ""
+    var personName  = ""
+    var itemSoldBy  = ""
+    var item$       = 0.0
+    var itemSerial  = ""
+    var fileLineNum:Int
+    
+    init(orderNumber: String, orderDate: String, order$: Double, orderShipTo: String, fileLineNum: Int) {
+        self.orderNumber = orderNumber
+        self.orderDate   = orderDate
+        self.order$      = order$
+        self.orderShipTo = orderShipTo
+        self.fileLineNum = fileLineNum
+    }
+}//end struct AmazonItem
