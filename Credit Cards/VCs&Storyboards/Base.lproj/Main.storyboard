@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -223,15 +223,15 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Help" systemMenu="help" id="F2S-fz-NVQ">
                                     <items>
-                                        <menuItem title="Credit Cards Help" keyEquivalent="?" id="FKE-Sm-Kum">
-                                            <connections>
-                                                <action selector="mnuHelpShowHelp:" target="Voe-Tx-rLC" id="VAN-dh-mRo"/>
-                                            </connections>
-                                        </menuItem>
                                         <menuItem title="About Credit Cards" id="16i-Nh-8zy">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="mnuHelpAbout_Click:" target="Voe-Tx-rLC" id="3Mh-Pv-5R6"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Credit Cards Help" keyEquivalent="?" id="FKE-Sm-Kum">
+                                            <connections>
+                                                <segue destination="8kw-Db-4Hk" kind="modal" id="QD0-z8-9uQ"/>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -247,7 +247,7 @@
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="60" y="4"/>
+            <point key="canvasLocation" x="54" y="-406"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="R2V-B0-nI4">
@@ -269,7 +269,7 @@
                 </windowController>
                 <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="60" y="416"/>
+            <point key="canvasLocation" x="53" y="67"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
@@ -572,7 +572,7 @@ DQ
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="60" y="919"/>
+            <point key="canvasLocation" x="54" y="826"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="WXA-f5-FAp">
@@ -594,7 +594,7 @@ DQ
                 </windowController>
                 <customObject id="loe-sO-qLk" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-243" y="1474"/>
+            <point key="canvasLocation" x="-242" y="1428"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="UVc-Rh-z7J">
@@ -615,7 +615,7 @@ DQ
                 </windowController>
                 <customObject id="eLF-75-CaP" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-243" y="1870"/>
+            <point key="canvasLocation" x="-242" y="1859"/>
         </scene>
         <!--User Input Short NameVC-->
         <scene sceneID="eTY-nS-V4R">
@@ -629,7 +629,7 @@ DQ
                                 <rect key="frame" x="20" y="20" width="480" height="20"/>
                                 <subviews>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9hL-6j-6WD">
-                                        <rect key="frame" x="-7" y="-7" width="69" height="32"/>
+                                        <rect key="frame" x="-7" y="-7" width="68" height="32"/>
                                         <buttonCell key="cell" type="push" title="Abort" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ucV-jg-k7V">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -639,7 +639,7 @@ DQ
                                         </connections>
                                     </button>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aV8-cK-PeF">
-                                        <rect key="frame" x="102" y="-7" width="205" height="32"/>
+                                        <rect key="frame" x="101" y="-7" width="205" height="32"/>
                                         <buttonCell key="cell" type="push" title="Ignore - different categories" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="EDx-wW-27M">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -766,7 +766,74 @@ DQ
                 </viewController>
                 <customObject id="kJ1-LG-Q3m" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="374" y="1861"/>
+            <point key="canvasLocation" x="364" y="1849"/>
+        </scene>
+        <!--Help Window Controller-->
+        <scene sceneID="qMo-gJ-Mb4">
+            <objects>
+                <windowController showSeguePresentationStyle="single" id="8kw-Db-4Hk" userLabel="Help Window Controller" sceneMemberID="viewController">
+                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="HKh-my-j0H" userLabel="Help Window">
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="196" y="239" width="480" height="270"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
+                        <view key="contentView" id="gX1-bB-uvO">
+                            <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                        <connections>
+                            <outlet property="delegate" destination="8kw-Db-4Hk" id="0Ur-uJ-vTN"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="XG9-vV-Y30" kind="relationship" relationship="window.shadowedContentViewController" id="o2Y-Di-DOl"/>
+                    </connections>
+                </windowController>
+                <customObject id="w5p-z0-SvT" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="767" y="-98"/>
+        </scene>
+        <!--Help-->
+        <scene sceneID="yF7-RD-G12">
+            <objects>
+                <viewController title="Help" showSeguePresentationStyle="single" id="XG9-vV-Y30" customClass="HelpVC" customModule="Credit_Cards" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="3b3-5f-uaK">
+                        <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <scrollView fixedFrame="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uf1-MW-OVt">
+                                <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <clipView key="contentView" drawsBackground="NO" id="0zf-7i-Bhi">
+                                    <rect key="frame" x="0.0" y="0.0" width="465" height="270"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" spellingCorrection="YES" smartInsertDelete="YES" id="4hL-n3-Duh">
+                                            <rect key="frame" x="0.0" y="0.0" width="465" height="270"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            <size key="minSize" width="465" height="270"/>
+                                            <size key="maxSize" width="471" height="10000000"/>
+                                            <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                        </textView>
+                                    </subviews>
+                                </clipView>
+                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="g3k-MN-wY5">
+                                    <rect key="frame" x="-100" y="-100" width="225" height="15"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="R1g-zL-Bal">
+                                    <rect key="frame" x="465" y="0.0" width="15" height="270"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                        </subviews>
+                    </view>
+                </viewController>
+                <customObject id="2DV-zY-ngS" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1352" y="-123"/>
         </scene>
         <!--User Input CatVC-->
         <scene sceneID="Smz-HM-qbR">
@@ -889,7 +956,7 @@ Gw
                                 </connections>
                             </comboBox>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s1s-Ny-IUT">
-                                <rect key="frame" x="13" y="13" width="69" height="32"/>
+                                <rect key="frame" x="13" y="13" width="68" height="32"/>
                                 <buttonCell key="cell" type="push" title="Abort" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="P54-mJ-H0N">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -955,7 +1022,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5u9-u5-iaU">
-                                <rect key="frame" x="13" y="119" width="131" height="32"/>
+                                <rect key="frame" x="13" y="119" width="130" height="32"/>
                                 <buttonCell key="cell" type="push" title="Add ShortName" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="rEz-81-lBz">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -965,7 +1032,7 @@ Gw
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ete-QH-2EM">
-                                <rect key="frame" x="142" y="119" width="118" height="32"/>
+                                <rect key="frame" x="141" y="119" width="118" height="32"/>
                                 <buttonCell key="cell" type="push" title="Add Category" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="cX6-8H-Qis">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -1092,7 +1159,7 @@ Gw
                 </viewController>
                 <customObject id="Px0-g5-byd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="421" y="1469"/>
+            <point key="canvasLocation" x="422" y="1417"/>
         </scene>
     </scenes>
 </document>

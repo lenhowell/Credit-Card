@@ -124,4 +124,3 @@ public class GBox {
     }//end func inputBox
     
 }//end class GBox
-
