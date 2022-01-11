@@ -12,12 +12,36 @@ class HelpVC: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do view setup here.
+        showHelp()
     }
 
+    @IBOutlet var txvHelp: NSTextView!
 
-    func mnuHelpShowHelp(_ sender: Any) {
-        GBox.alert("Transaction files are in:\n\"Download/Credit Card Tran/...\"\nCARDTYPE-20xx...\nAmazon Orders.txt\nDEPOSITcsv.csv\n\nSupport files are in:\n\"Desktop/CreditCard\"\nMyAccounts.txt\nMyCatagories.txt\nMyModifiedTransactions.txt\nVendorCategoryLookup.txt\nVendorShortNames.txt", title: "Help")
+    func showHelp() {
+
+        //Not Used
+        txvHelp.string =
+"""
+Transaction files are in: \"Downloads/Credit Card Tran/...\"
+    CARDTYPE-20xx...
+    Amazon Orders.txt
+    DEPOSITcsv.csv
+
+Support files for <NAME> are in: "Desktop/CreditCard/<NAME>/..."
+    MyAccounts.txt
+    MyCatagories.txt
+    MyModifiedTransactions.txt
+    VendorCategoryLookup.txt
+    VendorShortNames.txt
+"""
+
+        // load RTFD-file
+        let url = Bundle.main.url(forResource: "CreditCardHelp", withExtension: "rtf")!
+        let options = [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.rtf]
+        let rtfString = try! NSMutableAttributedString(url: url, options: options, documentAttributes: nil)
+
+        txvHelp.textStorage?.setAttributedString(rtfString)
+
     }
 
 }

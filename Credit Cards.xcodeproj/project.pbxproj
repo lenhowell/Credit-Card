@@ -45,6 +45,7 @@
 		CEA62D302306232C00160DEB /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA62D2F2306232C00160DEB /* Alerts.swift */; };
 		CEB315962321607E00D88759 /* UserInputCatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB315942321607E00D88759 /* UserInputCatVC.swift */; };
 		CEB84F282308EB20001485C5 /* Credit_Cards_UnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB84F272308EB20001485C5 /* Credit_Cards_UnitTests.swift */; };
+		CEBF74C4278E148600E6D8DA /* CreditCardHelp.rtf in Resources */ = {isa = PBXBuildFile; fileRef = CEBF74C3278E148500E6D8DA /* CreditCardHelp.rtf */; };
 		CED5662823459C90002DD645 /* Spreadsheet.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CED5662723459C90002DD645 /* Spreadsheet.storyboard */; };
 		CEE86B18239EE04E0062C84F /* UnitTest_Amazon.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE86B17239EE04E0062C84F /* UnitTest_Amazon.swift */; };
 /* End PBXBuildFile section */
@@ -121,6 +122,7 @@
 		CEB84F252308EB20001485C5 /* Credit Cards UnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Credit Cards UnitTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEB84F272308EB20001485C5 /* Credit_Cards_UnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Credit_Cards_UnitTests.swift; sourceTree = "<group>"; };
 		CEB84F292308EB20001485C5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CEBF74C3278E148500E6D8DA /* CreditCardHelp.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = CreditCardHelp.rtf; sourceTree = "<group>"; };
 		CED5662723459C90002DD645 /* Spreadsheet.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Spreadsheet.storyboard; sourceTree = "<group>"; };
 		CEE86B17239EE04E0062C84F /* UnitTest_Amazon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitTest_Amazon.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -206,6 +208,7 @@
 				CE1F7EC723317453004765E7 /* MyCategories.txt */,
 				CE6F1AE22352D576008CA720 /* VendorShortNames.txt */,
 				CE9FFEBA2302F3DF00261390 /* Thoughts.rtf */,
+				CEBF74C3278E148500E6D8DA /* CreditCardHelp.rtf */,
 				BF992C4B22EE56420089DAB8 /* Assets.xcassets */,
 				BF992C5022EE56420089DAB8 /* Info.plist */,
 			);
@@ -396,6 +399,7 @@
 				BF992C4C22EE56420089DAB8 /* Assets.xcassets in Resources */,
 				CE90E6DD2368D23400184BEF /* MyAccounts.txt in Resources */,
 				BF992C4F22EE56420089DAB8 /* Main.storyboard in Resources */,
+				CEBF74C4278E148600E6D8DA /* CreditCardHelp.rtf in Resources */,
 				CE6F1AE32352D576008CA720 /* VendorShortNames.txt in Resources */,
 				CE1F7EC823317453004765E7 /* MyCategories.txt in Resources */,
 				CEA3DF26234B75770021A712 /* SummaryTable.storyboard in Resources */,
@@ -643,14 +647,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 994;
+				CURRENT_PROJECT_VERSION = 996;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.13.1;
+				MARKETING_VERSION = 1.13.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -664,14 +668,14 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 994;
+				CURRENT_PROJECT_VERSION = 996;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.13.1;
+				MARKETING_VERSION = 1.13.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

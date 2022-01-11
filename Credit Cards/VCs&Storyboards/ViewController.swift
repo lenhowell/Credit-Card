@@ -28,7 +28,7 @@ import Cocoa
 
 //MARK:- Global Variables
 
-var gUserInitials           = "User"    //  UD (UserInputVC) Initials used for "Category Source" when Cat changed by user.
+var gUserInitials           = "User" // UD (UserInputVC) Initials used for "Category Source" when Cat changed by user
 var gLineItemArray          = [LineItem]()  // (used here, SpreadsheetVC, + 4 more) Entire list of transactions
 var gTransFilename          = ""            // (UserInputVC.swift-viewDidLoad) Current Transaction Filename
 var gAccounts               = Accounts()
@@ -47,7 +47,7 @@ var gIsUnitTesting          = false     // Not used
 var gLearnMode              = true      // Used here & HandleCards.swift
 var gUserInputMode          = true      // Used here & HandleCards.swift
 
-var gDictVendorShortNames   = [String: String]()        // (VendorShortNames.txt) Hash for VendorShortNames Lookup
+var gDictVendorShortNames   = [String: String]()    // (VendorShortNames.txt) Hash for VendorShortNames Lookup
 
 var gUrl                    = Url()
 
