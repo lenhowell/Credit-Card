@@ -21,7 +21,7 @@ var usrFixVendor        = true
 var usrIgnoreVendors    = [String: Int]()
 
 //MARK:---- handleCards - 25-195 = 170-lines
-
+// Called by: ViewController
 func handleCards(fileName: String, cardType: String, cardArray: [String], acct: Account?) {
     let cardArrayCount = cardArray.count
     //var lineItemArray = [LineItem]()                // Create Array variable(lineItemArray) Type lineItem.
@@ -91,7 +91,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
                     gLineItemArray.append(lineItem)                 // Add new output Record
                 }
                 if Stats.firstDate > dateToUse { Stats.firstDate = dateToUse }
-        	        if Stats.lastDate  < dateToUse { Stats.lastDate  = dateToUse }
+                if Stats.lastDate  < dateToUse { Stats.lastDate  = dateToUse }
                 continue        // We're done here
             }
 
@@ -173,7 +173,11 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
 
                 gLineItemArray.append(lineItem)              // Add new output Record
                 if Stats.firstDate > lineItem.tranDate { Stats.firstDate = lineItem.tranDate }
-                if Stats.lastDate  < lineItem.tranDate { Stats.lastDate  = lineItem.tranDate }
+                if Stats.lastDate  < lineItem.tranDate {
+                    if !lineItem.tranDate.contains("?") {
+                        Stats.lastDate  = lineItem.tranDate
+                    }
+                }
 
                 if lineItem.genCat.hasPrefix("Uncat") {
                     let msg = "Got Uncategorized genCat"
@@ -242,8 +246,9 @@ internal func gotaDupe(lineItem: LineItem, idxFromDupe: Int, fileName: String, l
     return dateToUse
 }//end func gotaDupe
 
-//MARK: makeLineItem 116-lines
-//---- makeLineItem - Uses support files & possible user-input 247-362 = 115-lines
+//MARK: makeLineItem 114-lines
+// Called by: handleCards, readDeposits
+//---- makeLineItem - Uses support files & possible user-input 247-361 = 114-lines
 internal func makeLineItem(fromTransFileLine:   String,
                            dictColNums:         [String: Int],
                            dictVendorShortNames:[String: String],
@@ -364,19 +369,20 @@ internal func makeLineItem(fromTransFileLine:   String,
 
 //---- showUserInputVendorCatForm - Allow User to intervene using the UserInputCat form.
 // Inserts/changes gDictVendorCatLookup or gDictModifiedTrans
+// Called by: makeLineItem, SpreadsheetVC
 func showUserInputVendorCatForm(lineItem: LineItem,
                                 batchMode:          Bool,
                                 catItemFromVendor:  CategoryItem,
                                 catItemFromTran:    CategoryItem,
                                 catItemPrefered:    CategoryItem) -> ModifiedTransactionItem {
-    usrLineItem = lineItem
+    usrLineItem          = lineItem
     usrBatchMode         = batchMode
     usrCatItemFromVendor = catItemFromVendor
     usrCatItemFromTran   = catItemFromTran
     usrCatItemPrefered   = catItemPrefered
-    let catItemToRet  = CategoryItem(category: lineItem.genCat, source: lineItem.catSource)
-    var modTranItemToReturn  = ModifiedTransactionItem(catItem: catItemToRet, memo: lineItem.memo)
-    let storyBoard = NSStoryboard(name: "Main", bundle: nil)
+    let catItemToRet     = CategoryItem(category: lineItem.genCat, source: lineItem.catSource)
+    var modTranItemToReturn = ModifiedTransactionItem(catItem: catItemToRet, memo: lineItem.memo)
+    let storyBoard          = NSStoryboard(name: "Main", bundle: nil)
     guard let userInputWindowController = storyBoard.instantiateController(withIdentifier: "UserInputWindowController") as? NSWindowController else {
         let msg = "Unable to open UserInputWindowController"
         handleError(codeFile: "HandleCards", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
@@ -425,7 +431,9 @@ func showUserInputVendorCatForm(lineItem: LineItem,
 
 //MARK: makeDictColNums
 
-//---- makeDictColNums - Infer which columns have the relevant data based in the Header row. Returns dictColNums
+//---- makeDictColNums - Infer which columns have the relevant data based in the Header row.
+// Called by: handleCards, readDeposits
+// Returns dictColNums
 public func makeDictColNums(file: String, headers: [String]) -> [String: Int] {
     // "Check Number", "Date Written", "Date Cleared", "Payee", "Amount"
     // ML settled-activity: "Trade Date","Settlement Date" "Description 2"
@@ -490,6 +498,7 @@ public func makeDictColNums(file: String, headers: [String]) -> [String: Int] {
 }//end func
 
 //---- findShorterDescKey - Does nothing yet
+// Called by: makeLineItem
 internal func findShorterDescKey(_ descKey: String) {
     let descKeyCount = descKey.count
     for (key, value) in gDictVendorCatLookup {
@@ -509,6 +518,7 @@ internal func findShorterDescKey(_ descKey: String) {
 }//end func
 
 //---- pickTheBestCat - Returns (catItemPrefered, isClearWinner) tuple.
+// Called by: makeLineItem
 internal func pickTheBestCat(catItemVendor: CategoryItem, catItemTransa: CategoryItem) -> (catItem: CategoryItem, isStrong: Bool) {
     let weak    = false
     let strong  = true

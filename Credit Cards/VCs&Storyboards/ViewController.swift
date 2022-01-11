@@ -9,6 +9,10 @@
 import Cocoa
 
 //TODO:
+// Debug Trap: 2019-"xxxxxx9454 Wikipedia Giftxxx-xxx9454" 2016-"xx7880 COLONIAL MALL"
+// Allow 2020 to read 2021 checks & ignore 2019 checks in 2020 folder
+// "Print", or at least allow copy/paste in summary & spreadsheet
+// Bug 2020 Longhorn & Longhorn Steak do not combine in Summary/Food/Restaurant
 // SummaryTableVC:  If 1-Trans or 1 unique vendors & cats, go directly to spreadsheet
 // ErrorHandler:    Append Error message to Error-Log File
 // FileIO:          Tell user about non-qualified filenames & show rules.

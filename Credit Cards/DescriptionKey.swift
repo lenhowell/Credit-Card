@@ -17,7 +17,11 @@ struct DescriptionKey {
     static func makeDescKey(from desc: String, dictVendorShortNames: [String: String], fileName: String = "") -> String {
         var descKeyLong = desc.trim
         var key2 = ""
-        
+
+        if desc.lowercased().contains("lancaster can") {
+            // Debug trap
+        }
+
         //-- Truncate at Double Space -- [TOOJAY'S  OCOEE LLC] -> [TOOJAY'S]
         let posDblSpc = descKeyLong.firstIntIndexOf("  ")
         if posDblSpc >= 0 {
@@ -137,7 +141,7 @@ struct DescriptionKey {
             key2 = descKeyLong.replacingCharacters(in: range, with: "").trim
             //let result = descKeyLong[range]
             //print("[\(key2)] = [\(descKeyLong)] - [\(result)]")
-            descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "14.Truncate @ [ Fx123]")
+//            descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "14.Truncate @ [ Fx123]")
         }
         
         
@@ -165,7 +169,7 @@ struct DescriptionKey {
                 key2 = String(descKeyLong.prefix(posX))
                 descKeyLong = checkDif(newStr: key2, oldStr: descKeyLong, doPrint: false, comment: "16.Truncate @ \"xxx...\"")
             } else {
-                // Debug Trap: Never hit
+                // Debug Trap: 2019->"xxxxxx9454 Wikipedia Giftxxx-xxx9454" 2016->"xx7880 COLONIAL MALL"
             }
         }
         

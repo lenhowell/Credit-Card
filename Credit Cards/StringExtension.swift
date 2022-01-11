@@ -5,7 +5,8 @@
 //  Created by George Bauer on 10/11/17.
 //  Copyright © 2017-2019 GeorgeBauer. All rights reserved.
 
-//  Ver 1.9.0  05/07/2020 Add splitAtLast(char:) to split a String at last occurrence of a Character
+//  Ver 1.9.1  11/30/2021 Add extension String: Error {}  // So you can simply throw strings.
+//      1.9.0  05/07/2020 Add splitAtLast(char:) to split a String at last occurrence of a Character
 //      1.8.0  10/12/2019 Add splitAtFirst(char:) to split a String at 1st occurrence of a Character
 //      1.7.4   8/22/2019 Add out-of-range protection for all Int subscripting
 //      1.7.3   7/09/2019 Add removeEnclosingQuotes()
@@ -28,7 +29,9 @@
 
 import Foundation
 
-// String extensions: 
+extension String: Error {}  // So you can simply throw strings instead of creating custom error types.
+
+// StringProtocol extensions:
 // subscript(i), subscript(range), left(i), right(i), mid(i,len), rightJust(len),
 // indexOf(str), indexOfRev(str), trim, contains(str), containsIgnoringCase(str), pluralize(n)
 extension StringProtocol {
@@ -426,6 +429,6 @@ extension StringProtocol {
         }
     }
 
-}//end extension String
+}//end extension StringProtocol
 
 

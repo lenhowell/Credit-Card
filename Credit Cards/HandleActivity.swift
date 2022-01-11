@@ -85,13 +85,18 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
 
     if lineItem.rawCat == Const.unknown {
         let oldDesc = lineItem.desc
-
+        if oldDesc.uppercased().contains("DUKE") {
+            print("👺HandleActivity#\(#line) \(oldDesc) \(lineItem.debit)")
+            // Debug Trap
+        }
         if oldDesc.hasPrefix("Check") {
             let words = lineItem.desc.components(separatedBy: " ")
             if let lastWord = words.last {
                 let descWords = words.dropFirst().dropLast()   // "Check3519 STEVE BRYAN 3519" -> "STEVE BRYAN"
                 lineItem.desc = descWords.joined(separator: " ")
-                lineItem.chkNumber = lastWord
+                var chkNum = lastWord.suffix(5)
+                if chkNum.hasPrefix("0") { chkNum = chkNum.suffix(4) }
+                lineItem.chkNumber = String(chkNum)
             }
 
         } else if oldDesc.hasPrefix("Deferred") {
@@ -104,16 +109,18 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
 
             if words[0].range(of: #"[a-z]"#, options: .regularExpression) != nil {
                 cat = words[0]
-                skip = 1
-                if words[1].range(of: #"[a-z]"#, options: .regularExpression) != nil {
-                    cat = cat + " " + words[1]
-                    skip = 2
+                if words.count > 1 {
+                    skip = 1
+                    if words[1].range(of: #"[a-z]"#, options: .regularExpression) != nil {
+                        cat = cat + " " + words[1]
+                        skip = 2
+                    }
+                    let descWords = words.dropFirst(skip)
+                    if !cat.isEmpty {
+                        lineItem.rawCat = cat
+                    }
+                    lineItem.desc = descWords.joined(separator: " ")
                 }
-                let descWords = words.dropFirst(skip)
-                if !cat.isEmpty {
-                    lineItem.rawCat = cat
-                }
-                lineItem.desc = descWords.joined(separator: " ")
             }
             //print("😈😈 HandleActivity#\(#line) desc: \"\(oldDesc)\" -> \"\(lineItem.desc)\"")
             //print("😈 HandleActivity#\(#line) rawCat: \"Unknown\" -> \"\(lineItem.rawCat)\"")
@@ -139,18 +146,23 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
     if des.hasPrefix("WIRE") || des.contains("WIRE TR") {
         print("HandleActivity#\(#line) Wire Transfer = \(lineItem.desc)")
         let words = des.components(separatedBy: " ")
-        var newDes = ""
-        var count = 0
-        for word in words.reversed() {
-            count += 1
-            if count >= 3 || count >= words.count - 1 || word.range(of: "[^A-Za-z]", options: .regularExpression) != nil {
-                break
+        var idxOrg = -999
+        var orgName1 = ""
+        var orgName2 = ""
+        for (idx, word) in words.enumerated() {
+            if word.hasPrefix("ORG=") {
+                idxOrg = idx + 1
             }
-            newDes = word + " " + newDes
+            if idx == idxOrg {
+                orgName1 = word
+            }
+            if idx == idxOrg+1 {
+                orgName2 = word
+            }
         }
-        newDes = newDes.trim
-        if !newDes.isEmpty {
-            lineItem.desc = newDes
+        let orgName = (orgName1 + " " + orgName2).trim
+        if !orgName.isEmpty {
+            lineItem.desc = orgName
         }
         known = true
     } else if des.hasSuffix("VISA DEFERRED")                       { //ML DEBITCARD "SXM*SIRIUSXM.COM/ACCT VISA DEFERRED"
