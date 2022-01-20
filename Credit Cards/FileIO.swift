@@ -124,8 +124,21 @@ public struct FileIO {
         print("\n😋 FileIO#\(#line) getTransFileList")
         do {
             let fileURLs = try FileManager.default.contentsOfDirectory(at: transDirURL, includingPropertiesForKeys: [], options:  [.skipsHiddenFiles, .skipsSubdirectoryDescendants])
-            let transURLs = fileURLs.filter{ qualifyTransFileName(url: $0) }
+            let rawTransURLs = fileURLs.filter{ qualifyTransFileName(url: $0) }
 
+            // Now put CHECK files at the top of the list
+            var transURLs = [URL]()
+            for url in rawTransURLs {
+                if url.lastPathComponent.uppercased().contains("CHECK") {
+                    transURLs.append(url)
+                }
+            }
+            for url in rawTransURLs {
+                if !url.lastPathComponent.uppercased().contains("CHECK") {
+                    transURLs.append(url)
+                }
+            }
+            
             print("😋 FileIO#\(#line) \(transURLs.count) Transaction Files found.")
             for url in transURLs {
                 print("    ",url.path)

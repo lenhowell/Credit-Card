@@ -8,7 +8,8 @@
 
 import Foundation
 
-//MARK:extractTranFromActivity
+// Specialized routine OMLY for Merrill Lynch Activity download
+//MARK: - extractTranFromActivity
 func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-lines
     var lineItem = lineItem
     // TRAN, DESC, CATE, AMOU
@@ -83,12 +84,13 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
     var known = false
     var ignore = false
 
+    if lineItem.desc.uppercased().contains("DUKE") {
+        print("👺HandleActivity#\(#line) \(lineItem.desc) \(lineItem.debit)")
+        // Debug Trap
+    }
+
     if lineItem.rawCat == Const.unknown {
         let oldDesc = lineItem.desc
-        if oldDesc.uppercased().contains("DUKE") {
-            print("👺HandleActivity#\(#line) \(oldDesc) \(lineItem.debit)")
-            // Debug Trap
-        }
         if oldDesc.hasPrefix("Check") {
             let words = lineItem.desc.components(separatedBy: " ")
             if let lastWord = words.last {
@@ -165,32 +167,32 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
             lineItem.desc = orgName
         }
         known = true
-    } else if des.hasSuffix("VISA DEFERRED")                       { //ML DEBITCARD "SXM*SIRIUSXM.COM/ACCT VISA DEFERRED"
+    } else if des.hasSuffix("VISA DEFERRED")            { //ML DEBITCARD "SXM*SIRIUSXM.COM/ACCT VISA DEFERRED"
         lineItem.cardType = "MLVISA"
         let items = des.components(separatedBy: " VISA D")
         lineItem.desc = items[0]
-        known = true                                          //             "BRIGHT HOUSE NETWORKS VISA DEFERRED"
+        known = true                                    // "BRIGHT HOUSE NETWORKS VISA DEFERRED"
 
-    } else if des.hasPrefix("REINVESTMENT PROGRAM ")        { // "REINVESTMENT PROGRAM LORD ABBETT INTERMED TAX FREE FD A"
+    } else if des.hasPrefix("REINVESTMENT PROGRAM ")    { // "REINVESTMENT PROGRAM LORD ABBETT INTERMED TAX FREE FD A"
         lineItem.desc = String(des.dropFirst(21))
         known = true
 
-    } else if des.hasPrefix("REINVESTMENT ")                 { // "REINVESTMENT LORD ABBETT INTERMED TAX FREE FD A"
+    } else if des.hasPrefix("REINVESTMENT ")            { // "REINVESTMENT LORD ABBETT INTERMED TAX FREE FD A"
         lineItem.desc = String(des.dropFirst(13))
         known = true
 
-    } else if des.hasPrefix("PRE-AUTHORIZED WITHDRAWA")     { // "PRE-AUTHORIZED WITHDRAWA UNITEDHEALTHCARE"
+    } else if des.hasPrefix("PRE-AUTHORIZED WITHDRAWA") { // "PRE-AUTHORIZED WITHDRAWA UNITEDHEALTHCARE"
         let comps = des.components(separatedBy: " ")
         let slice = comps[2...]
         lineItem.desc = slice.joined(separator: " ")
         lineItem.cardType = "CHECKML"
-        known = true                                          // "PRE-AUTHORIZED WITHDRAWA DUKEENERGY-FL"
+        known = true                                    // "PRE-AUTHORIZED WITHDRAWA DUKEENERGY-FL"
 
-    } else if des.hasPrefix("PRE AUTHDEBIT")                { // CHECKML "PRE AUTHDEBIT DUKEENERGY-FL"
+    } else if des.hasPrefix("PRE AUTHDEBIT")            { // CHECKML "PRE AUTHDEBIT DUKEENERGY-FL"
         lineItem.desc = String(des.dropFirst(14))
         known = true
 
-    } else if des.hasPrefix("CHECK ")                       { // CHECKML    "CHECK 3601 PAYEE UNRECORDE"
+    } else if des.hasPrefix("CHECK ")                   { // CHECKML    "CHECK 3601 PAYEE UNRECORDE"
         lineItem.cardType = "CHECKML"
         let items = des.components(separatedBy: " ")
         if items.count >= 2 {
@@ -202,12 +204,12 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
                 lineItem.chkNumber = items[1]
             }
         }
-        //print("😀 Check ",fromTransFileLine)                //            "CHECK 3633 CHARLES HOWARD"
+        //print("😀 Check ",fromTransFileLine)          //  "CHECK 3633 CHARLES HOWARD"
         known = true
-    } else if des.hasPrefix("WITHDRAWAL ")                  { // CHECKML    "WITHDRAWAL TR TO ML   81217K22"
+    } else if des.hasPrefix("WITHDRAWAL ")              { // CHECKML    "WITHDRAWAL TR TO ML   81217K22"
         lineItem.desc = String(des.dropFirst(11))
         lineItem.rawCat = "Gift"
-        known = true                                          //            "WITHDRAWAL WELLS FARGO BANK"
+        known = true                                    //            "WITHDRAWAL WELLS FARGO BANK"
 
     } else if !colinSplit.rgt.isEmpty && colinSplit.lft.contains("DIV") { // "CDIV:", "DIVIDEND:", "LIQUIDATING DIVIDEND:", "FOREIGN DIVIDEND:"
         known = true
@@ -228,40 +230,40 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
 //    des.hasPrefix("INTEREST:")                { // "INTEREST: ADVISORS DISCIPLINED TR 532 TAX EXEMPT MUN PORT INTERM"
 
 
-    } else if des.hasPrefix("PURCHASE:")                    {   // "PURCHASE: CD BANK WEST SAN FRANCISCO; CA 01.050% DEC XX 2017 WHE"
+    } else if des.hasPrefix("PURCHASE:")                { // "PURCHASE: CD BANK WEST SAN FRANCISCO; CA 01.050% DEC XX 2017 WHE"
         known = true
         lineItem.desc = colinSplit.rgt
-    } else if des.hasPrefix("SALE:")                        {   // "SALE: LORD ABBETT SHORT DURATION INCOME FD A EXCHANGE SELL FRAC"
+    } else if des.hasPrefix("SALE:")                    { // "SALE: LORD ABBETT SHORT DURATION INCOME FD A EXCHANGE SELL FRAC"
         known = true
         lineItem.desc = colinSplit.rgt
-    } else if des.hasPrefix("REDEMPTION:")                  {   // "REDEMPTION: CD BANK WEST SAN FRANCISCO; CA 01.050% DEC XX 2017 P"
+    } else if des.hasPrefix("REDEMPTION:")              { // "REDEMPTION: CD BANK WEST SAN FRANCISCO; CA 01.050% DEC XX 2017 P"
         known = true
         lineItem.desc = colinSplit.rgt
 
-    } else if des.hasPrefix("FOREIGN TAX WITHHOLDING:")     {   // "FOREIGN TAX WITHHOLDING: SASOL LTD  SPONSORED ADR NON-RECLAIMABL"
+    } else if des.hasPrefix("FOREIGN TAX WITHHOLDING:") { // "FOREIGN TAX WITHHOLDING: SASOL LTD  SPONSORED ADR NON-RECLAIMABL"
         known = true
         lineItem.desc = colinSplit.rgt
         lineItem.rawCat = "Tax-Foreign"
 
-    } else if des.hasPrefix("DEPOSITORY BANK (ADR) FEE:")   {   // "DEPOSITORY BANK (ADR) FEE: SASOL LTD  SPONSORED ADR DEPOSITORY B"
+    } else if des.hasPrefix("DEPOSITORY BANK (ADR) FEE:") { // "DEPOSITORY BANK (ADR) FEE: SASOL LTD  SPONSORED ADR DEPOSITORY B"
         known = true
 
-    } else if des.hasPrefix("CASH IN LIEU OF SHARES:")      {   // "CASH IN LIEU OF SHARES: ENBRIDGE INC         COM FORM 1099-B SUB"
+    } else if des.hasPrefix("CASH IN LIEU OF SHARES:")      { // "CASH IN LIEU OF SHARES: ENBRIDGE INC         COM FORM 1099-B SUB"
         known = true
 
-    } else if des.hasPrefix("PRINCIPAL PAYMENT:")           {   // "PRINCIPAL PAYMENT: ADVISORS DISCIPLINED TR 532 TAX EXEMPT MUN PO"
+    } else if des.hasPrefix("PRINCIPAL PAYMENT:")           { // "PRINCIPAL PAYMENT: ADVISORS DISCIPLINED TR 532 TAX EXEMPT MUN PO"
         known = true
 
-    } else if des.hasPrefix("FUNDS TRANSFER WIRE TRF IN")   {   // FUNDS TRANSFER WIRE TRF IN DXXXXXXX1148 ORG=/XXXX9647 TRUFFLE HO
+    } else if des.hasPrefix("FUNDS TRANSFER WIRE TRF IN")   { // FUNDS TRANSFER WIRE TRF IN DXXXXXXX1148 ORG=/XXXX9647 TRUFFLE HO
         known = true
 
-    } else if des.hasPrefix("WIRE TRANSFER IN WIRE TRF IN") {   // DXXXXXXX0510 ORG=/XXXX9647 TRUFFLE HO
+    } else if des.hasPrefix("WIRE TRANSFER IN WIRE TRF IN") { // DXXXXXXX0510 ORG=/XXXX9647 TRUFFLE HO
         known = true                                        // "WIRE TRANSFER IN WIRE TRF IN DXXXXXXX8663 ORG=/XXXXX8420 COAST TIT"
 
-    } else if des.hasPrefix("WIRE TRANSFER OUT WIRE TRF OUT"){  // "WIRE TRANSFER OUT WIRE TRF OUTPXXXXXXX2527"
+    } else if des.hasPrefix("WIRE TRANSFER OUT WIRE TRF OUT"){ // "WIRE TRANSFER OUT WIRE TRF OUTPXXXXXXX2527"
         known = true
 
-    } else if des.hasPrefix("DIRECT DEPOSIT ")              {   // "DIRECT DEPOSIT SSA  TREAS 310"
+    } else if des.hasPrefix("DIRECT DEPOSIT ")              { // "DIRECT DEPOSIT SSA  TREAS 310"
         lineItem.desc = String(des.dropFirst(15))
         lineItem.rawCat = "Income"
         known = true

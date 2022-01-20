@@ -34,10 +34,11 @@ var gTransFilename          = ""            // (UserInputVC.swift-viewDidLoad) C
 var gAccounts               = Accounts()
 
 var gDictVendorCatLookup    = [String: CategoryItem]()  // (here, HandleCards) for Category Lookup(CategoryLookup.txt)
-var gDictTranDupes          = [String: (Int, String)]() // (clr:main, use:handleCards) to find dupe transactions
+var gDictTranDupes          = [String: (idx: Int, file: String)]() // (clr:main, use:handleCards) to find dupe transactions
 var gDictNoVendrDupes       = [String: (Int, String)]() // (clr:main, use:handleCards)
 var gDictNoDateDupes        = [String: (Int, String)]() // (clr:main, use:handleCards)
 var gDictCheckDupes         = [String: Int]()           // (clr:main, use:handleCards) to find dupe checkNumbers
+var gDictCheck2Dupes        = [String: Int]()           // (clr:main, use:handleCards) to find dupe checkNumbers
 var gDictCreditDupes        = [String: String]()        // (clr:main, use:handleCards) dupe Visa Credits (inconsistant dates)
 var gDictModifiedTrans      = [String: ModifiedTransactionItem]() // (load:here use:HandleCards) user-modified transactions
 var gDictAmazonItemsByDate  = [String: [AmazonItem]]()  // (load:here NOTused)

@@ -179,10 +179,13 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func btnOK(_ sender: Any) {
-        // Categories are found in MyCategories.txt, MyModifiedTransactions.txt, VendorCategoryLookup.txt
+        // Categories are found in:
+        //          MyCategories.txt,
+        //          MyModifiedTransactions.txt,
+        //          VendorCategoryLookup.txt
         // Adding a category should only affect MyCategories.txt
         // Internal:
-        //      gCatagories.dictCatAliases:  [String: String]     alias: catName
+        //      gCatagories.dictCatAliases: [String: String]     alias: catName
         //      gCatagories.catNames: [String]                   catName
         //      gCatagories.dictCatAliasArray: [String: [String]] catName: aliasArray
         // Must call gCatagories.writeMyCats()

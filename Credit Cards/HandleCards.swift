@@ -78,16 +78,18 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
         if !lineItem.desc.isEmpty || !lineItem.postDate.isEmpty || lineItem.debit != 0  || lineItem.credit != 0 {
 
             // Check for Duplicate of a Check-Number
-            let chkNum = lineItem.chkNumber.trim
-            if !chkNum.isEmpty {                        // This IS a Numbered Check
+            let chkNumStr = lineItem.chkNumber.trim
+            if !chkNumStr.isEmpty {                        // This IS a Numbered Check
                 let dateFromTran = lineItem.tranDate
                 var dateToUse = dateFromTran
-                if let idxFromDupe = gDictCheckDupes[chkNum] {
+                if let idxFromDupe = gDictCheckDupes[chkNumStr] {
                     // IS a Dupe
                     dateToUse = gotaDupe(lineItem: lineItem, idxFromDupe: idxFromDupe, fileName: fileName, lineNum: lineNum)
 
-                } else {    // NOT a Dupe
-                    gDictCheckDupes[chkNum] = gLineItemArray.count  // Record its position in array for Dupe check
+                } else {    // NOT a Dupe Chk#
+                    gDictCheckDupes[chkNumStr] = gLineItemArray.count  // Record its position in array for Dupe check
+                    let key2 = lineItem.postDate + "$" + String(format: "%.2f",lineItem.debit)
+                    gDictCheck2Dupes[key2] = gLineItemArray.count   // Tofind dupe w/o Chk# in trans file
                     gLineItemArray.append(lineItem)                 // Add new output Record
                 }
                 if Stats.firstDate > dateToUse { Stats.firstDate = dateToUse }
@@ -95,9 +97,17 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
                 continue        // We're done here
             }
 
+            let signatureNoVendr = lineItem.signature(ignoreVendr: true)
             if lineItem.desc == "CHECK" {
                 // If we have an unmarked check (no # or payee) in CMA Transaction file,
                 // ignore it and hope it's picked up in CheckML-20xx file. ????
+                // ??????
+                let dateStr = lineItem.postDate.isEmpty ? lineItem.tranDate: lineItem.postDate
+                let key2 = dateStr + "$" + String(format: "%.2f",lineItem.debit)
+                if let n = gDictCheck2Dupes[key2] {  // To find dupe w/o Chk# in trans file
+                    Stats.duplicateCount += 1
+                    continue
+                }
                 print("⛔️ HandleCards#\(#line)[\(fileName)] Unrecorded check \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.debit) \(lineItem.rawCat)")
                 continue
             }
@@ -105,7 +115,6 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
             // Check for Duplicate from another file
             let signature1 = lineItem.signature()                   // Signature using TranDate
             let signature2 = lineItem.signature(usePostDate: true)  // Signature using PostDate
-            let signatureNoVendr = lineItem.signature(ignoreVendr: true)
             let signatureNoDate  = lineItem.signature(ignoreDate: true)
             var matchOpt = gDictTranDupes[signature1]
             if matchOpt == nil { matchOpt = gDictTranDupes[signature2] }
@@ -158,7 +167,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
                         //matchOpt = tuple
                     }
                 }
-            }
+            }//end matchOpt == nil
             
             let matchFile = matchOpt?.1 ?? ""
             if matchOpt == nil || matchFile == fileName {
