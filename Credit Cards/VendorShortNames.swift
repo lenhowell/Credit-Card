@@ -8,7 +8,7 @@
 
 import Cocoa
 
-//MARK:- Globals for UserInputs
+//MARK: - Globals for UserInputs
 //TODO: Change to use segue & eliminate globals 1
 // Parameters for UserInputs
 var usrVendrShortName = ""
@@ -17,7 +17,7 @@ var usrVendrLongName = ""
 var usrVendrPrefix = ""
 var usrVendrFullDescKey = ""
 
-//MARK:- findTruncatedDescs
+//MARK: - findTruncatedDescs
 //---- findTruncatedDescs - In "VendorCategoryLookup.txt" find multiple names that are similar
 func findTruncatedDescs(vendorNameDescs: [String]) -> Bool {
     // Sort by length - longest to shortest
@@ -76,7 +76,7 @@ func findTruncatedDescs(vendorNameDescs: [String]) -> Bool {
     return true
 }//end func findTruncatedDescs
 
-//MARK:- Show Input-ShortName Form
+//MARK: - Show Input-ShortName Form
 //---- showUserInputShortNameForm - Present UserInputShortName Window Controller
 //TODO: Change to use segue & eliminate globals 2
 func showUserInputShortNameForm(shortName: String, longName: String) -> NSApplication.ModalResponse {
@@ -104,7 +104,7 @@ func showUserInputShortNameForm(shortName: String, longName: String) -> NSApplic
     return returnVal
 }//end func
 
-//MARK:- findPrefixMatch
+//MARK: - findPrefixMatch
 //---- findPrefixMatch - Go through the ShortName hash to find a match
 func findPrefixMatch(name: String, dictShortNames: [String: String]) -> (prefix: String, fullDescKey: String) {
     for (prefix, fullDescKey) in dictShortNames {

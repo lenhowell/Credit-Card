@@ -8,7 +8,7 @@
 
 import Foundation
 
-//MARK:- Read Deposits
+//MARK: - Read Deposits
 func readDeposits(testData: String = "") {
     // Find the Deposit file
     let pathURL = FileIO.getPossibleParentFolder(myURL: gUrl.transactionFolder)

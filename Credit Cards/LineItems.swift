@@ -79,7 +79,7 @@ public struct LineItem: Equatable, Hashable {
 
 extension LineItem {
 
-    //MARK:- init - 84-207 = 123-lines
+    //MARK: - init - 84-207 = 123-lines
     //TODO: Allow LineItem.init to throw errors
     // Create a LineItem from a Transaction-File line
     init(fromTransFileLine: String, dictColNums: [String: Int], fileName: String, lineNum: Int, signAmount: Double) {

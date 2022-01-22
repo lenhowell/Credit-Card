@@ -8,7 +8,7 @@
 
 import Cocoa    // needed to access NSStoryboard & NSWindowController for segue
 
-//MARK:- Globals for UserInputVendorCatForm
+//MARK: - Globals for UserInputVendorCatForm
 // Parameters for UserInputVendorCatForm
 var usrLineItem          = LineItem()
 var usrCatItemFromVendor = CategoryItem()
@@ -20,7 +20,7 @@ var usrModTranItemReturned  = ModifiedTransactionItem()
 var usrFixVendor        = true
 var usrIgnoreVendors    = [String: Int]()
 
-//MARK:---- handleCards - 25-195 = 170-lines
+//MARK: ---- handleCards - 25-195 = 170-lines
 // Called by: ViewController
 func handleCards(fileName: String, cardType: String, cardArray: [String], acct: Account?) {
     let cardArrayCount = cardArray.count
@@ -392,17 +392,18 @@ func showUserInputVendorCatForm(lineItem: LineItem,
     let catItemToRet     = CategoryItem(category: lineItem.genCat, source: lineItem.catSource)
     var modTranItemToReturn = ModifiedTransactionItem(catItem: catItemToRet, memo: lineItem.memo)
     let storyBoard          = NSStoryboard(name: "Main", bundle: nil)
-    guard let userInputWindowController = storyBoard.instantiateController(withIdentifier: "UserInputWindowController") as? NSWindowController else {
-        let msg = "Unable to open UserInputWindowController"
+    guard let userInputCatWindowController = storyBoard.instantiateController(withIdentifier: "UserInputCatWindowController") as? NSWindowController else {
+        let msg = "Unable to open UserInputCatWindowController"
         handleError(codeFile: "HandleCards", codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
         return ModifiedTransactionItem()
     }
-    if let userInputWindow = userInputWindowController.window {
-        //let userVC = storyBoard.instantiateController(withIdentifier: "UserInput") as! UserInputVC
+    if let userInputCatWindow = userInputCatWindowController.window {
+        let userInputViewController = userInputCatWindow.contentViewController as! UserInputCatVC
+        userInputViewController.myUserInitials = gUserInitials  // experiment
         let application = NSApplication.shared
-        let returnVal = application.runModal(for: userInputWindow) // <=================  UserInputVC
+        let returnVal = application.runModal(for: userInputCatWindow) // <=================  UserInputVC
         // ...and we're back.
-        userInputWindow.close()                     // Return here from userInputWindow
+        userInputCatWindow.close()                     // Return here from userInputWindow
         switch returnVal {
         case .abort:
              exit(101)

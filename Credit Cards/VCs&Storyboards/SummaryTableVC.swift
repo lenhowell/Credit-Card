@@ -8,7 +8,7 @@
 
 import Cocoa
 
-//MARK:- enums, structs, & globals
+//MARK: - enums, structs, & globals
 
 public enum SummaryColID {
     static let name     = "Name"
@@ -67,7 +67,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     var myTableParams = TableParams()
     var selectedRowCount = 0
 
-    //MARK:- IBOutlets
+    //MARK: - IBOutlets
 
     @IBOutlet var radioGroupCategory: NSButton!
     @IBOutlet var radioSubCategory:   NSButton!
@@ -96,7 +96,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
 
     @IBOutlet var btnShowTransactions: NSButton!
 
-    //MARK:- Lifecycle funcs
+    //MARK: - Lifecycle funcs
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -135,7 +135,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         return true
     }
 
-//MARK:- IBActions
+//MARK: - IBActions
 
     @IBAction func btnFilterClick(_ sender: Any) {
         let errMsg = applyFilter()
@@ -218,7 +218,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         loadTableDictsArray(lineItemArray: gLineItemArray, summarizeBy : summarizeBy)
     }
 
-    //MARK:- Regular funcs
+    //MARK: - Regular funcs
 
     private func loadStuffFromCaller(tableParams: TableParams) -> TableParams {
         print("🙂\(codeFile)#\(#line) loadStuffFromCaller", tableParams)
@@ -463,7 +463,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
 
 }//end class
 
-//MARK:- NSTextFieldDelegate
+//MARK: - NSTextFieldDelegate
 // Allow SpreadsheetVC to see when a TextField changes.
 extension SummaryTableVC: NSTextFieldDelegate {
 
@@ -484,7 +484,7 @@ extension SummaryTableVC: NSTextFieldDelegate {
 
 }//end extension ViewController: NSTextFieldDelegate
 
-//MARK:- NSTableViewDataSource
+//MARK: - NSTableViewDataSource
 
 extension SummaryTableVC: NSTableViewDataSource {
 
@@ -506,7 +506,7 @@ extension SummaryTableVC: NSTableViewDataSource {
 
 }//end extension
 
-//MARK:- NSTableViewDelegate
+//MARK: - NSTableViewDelegate
 
 extension SummaryTableVC: NSTableViewDelegate {
 

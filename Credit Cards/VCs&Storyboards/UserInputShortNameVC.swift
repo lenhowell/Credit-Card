@@ -11,7 +11,7 @@ import Cocoa
 class UserInputShortNameVC: NSViewController, NSWindowDelegate {
     let codeFile = "UserInputShortNameVC"   // for error logging
 
-    //MARK:- Overrides & Lifecycle
+    //MARK: - Overrides & Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
@@ -37,7 +37,7 @@ class UserInputShortNameVC: NSViewController, NSWindowDelegate {
         return true
     }
     
-    //MARK:- @IBOutlets
+    //MARK: - @IBOutlets
     @IBOutlet var lblPrefix:        NSTextField!
     @IBOutlet var lblFullDescKey:   NSTextField!
     @IBOutlet var txtPrefix:        NSTextField!
@@ -45,7 +45,7 @@ class UserInputShortNameVC: NSViewController, NSWindowDelegate {
     @IBOutlet var lblPrefixChars:      NSTextField!
     @IBOutlet var lblFullDescKeyChars: NSTextField!
 
-    //MARK:- @IBActions
+    //MARK: - @IBActions
 
     @IBAction func btnAbort(_ sender: Any) {
         let answer = GBox.alert("Do you want to save the results so far", style: .yesNo)

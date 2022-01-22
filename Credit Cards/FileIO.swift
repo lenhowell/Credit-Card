@@ -20,7 +20,7 @@ public struct ModifiedTransactionItem: Equatable {
     var memo    = ""
     var key     = ""
 }
-//MARK:- FileIO struct
+//MARK: - FileIO struct
 
 public struct FileIO {
 
@@ -318,7 +318,7 @@ public struct FileAttributes: Equatable {
 
 
 
-//MARK:- My Modified Transactions
+//MARK: - My Modified Transactions
 
 func loadMyModifiedTrans(myModifiedTranURL: URL) -> [String: ModifiedTransactionItem]  {
     //let dictColNums = ["TRAN":0, "DESC":1, "DEBI":2, "CRED":3, "CATE":4] "NUMBER","POST","CARD","AMOU","MEMO"
@@ -370,7 +370,7 @@ func writeModTransTofile(url: URL, dictModTrans: [String: ModifiedTransactionIte
     }
 }//end func
 
-//MARK:- Vendor Short Names
+//MARK: - Vendor Short Names
 
 func loadVendorShortNames(url: URL) -> [String: String]  {
     var dictVendorShortNames = [String: String]()
@@ -617,7 +617,7 @@ public struct Accounts {
 
 }//end struct Accounts
 
-//MARK:- Vendor Category Lookup
+//MARK: - Vendor Category Lookup
 
 func loadVendorCategories(url: URL) -> [String: CategoryItem]  {
     var dictCat   = [String: CategoryItem]()
@@ -685,7 +685,7 @@ func writeVendorCategoriesToFile(url: URL, dictCat: [String: CategoryItem]) {
     }
 }//end func writeVendorCategoriesToFile
 
-//MARK:- Transaction Files
+//MARK: - Transaction Files
 
 //---- outputTranactions - uses: handleError(F), workingFolderUrl(I)
 func outputTranactions(outputFileURL: URL, lineItemArray: [LineItem]) {
@@ -709,7 +709,7 @@ func outputTranactions(outputFileURL: URL, lineItemArray: [LineItem]) {
 }//end func outputTranactions
 
 
-//MARK:- File Formats 2.0
+//MARK: - File Formats 2.0
 /*
 VendorProfile - Combined VendorCatagoryLookup & VendorShortNames
 DescKey

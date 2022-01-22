@@ -9,10 +9,10 @@
 import Foundation
 
 struct DescriptionKey {
-    //MARK:- Globals
+    //MARK: - Globals
     static var dictDescKeyAlgorithmCnts  = [String: Int]()
     
-    //MARK:- makeDescKey 14-228 = 214-lines
+    //MARK: - makeDescKey 14-228 = 214-lines
     //---- makeDescKey - Make a CategoryLookup key from the transaction "Description"
     static func makeDescKey(from desc: String, dictVendorShortNames: [String: String], fileName: String = "") -> String {
         var descKeyLong = desc.trim
@@ -232,7 +232,7 @@ struct DescriptionKey {
     }//end func makeDescKey
     
     
-    //MARK:- Helper funcs
+    //MARK: - Helper funcs
     
     // if multiple words: remove last word
     // if only one word:

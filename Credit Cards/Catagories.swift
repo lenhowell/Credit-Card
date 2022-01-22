@@ -8,7 +8,7 @@
 
 import Foundation
 
-//MARK:- My Catagories
+//MARK: - My Catagories
 public var gCatagories = Catagories()   // Used: VC, UserInputVC, HandleCards, LineItems
 
 public struct Catagories {

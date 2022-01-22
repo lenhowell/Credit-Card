@@ -10,17 +10,18 @@ import Cocoa
 
 class UserInputCatVC: NSViewController, NSWindowDelegate {
 
-    //MARK:- Instance Variables
+    //MARK: - Instance Variables
 //    weak var delegate: UserInputVcDelegate?          //delegate <— (2)
     let codeFile = "UserInputCatVC"     // for error logging
+    var myUserInitials    = "???"
     var catItemFromVendor = CategoryItem()
     var catItemFromTran   = CategoryItem()
     var catItemPrefered   = CategoryItem()
     var catItemCurrent    = CategoryItem()
     var unlockedSource    = ""
-    var passMe          = ""    // Not used
+    var passMe            = ""    // Not used
 
-    //MARK:- Overrides & Lifecycle
+    //MARK: - Overrides & Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
@@ -76,7 +77,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
     }
 
 
-    //MARK:- @IBOutlets
+    //MARK: - @IBOutlets
     @IBOutlet var lblFile:          NSTextField!
     @IBOutlet var lblLineItem:      NSTextField!
     @IBOutlet var lblDesc:          NSTextField!
@@ -98,7 +99,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
     @IBOutlet var btnCancel:            NSButton!
     @IBOutlet var lblIgnore:         NSTextField!
 
-    //MARK:- @IBActions
+    //MARK: - @IBActions
     
     @IBAction func radioCatChange(_ sender: Any) {
         if radioCatPrefered.state == .on {

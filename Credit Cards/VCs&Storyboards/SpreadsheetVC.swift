@@ -29,7 +29,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     var filtCategor = ""
     var filtVendor  = ""
 
-    //MARK:- IBOutlets
+    //MARK: - IBOutlets
     @IBOutlet var tableView:    NSTableView!
     @IBOutlet var tableViewSum: NSTableView!
     @IBOutlet var btnFilter:    NSButton!
@@ -46,7 +46,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     @IBOutlet var txtVendor:    NSTextField!
 
 
-    //MARK:- Lifecycle funcs
+    //MARK: - Lifecycle funcs
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -91,7 +91,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         return true
     }
 
-    //MARK:- IBActions
+    //MARK: - IBActions
 
     @IBAction func btnFilter(_ sender: Any) {
         let errMsg = setFilter()
@@ -157,7 +157,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     }//end func
 
 
-    //MARK:- Regular funcs
+    //MARK: - Regular funcs
 
     private func loadStuffFromCaller(summaryData: TableParams) {
         print("🙂\(codeFile)#\(#line) loadStuffFromCaller", summaryData)
@@ -337,7 +337,7 @@ public enum SpSheetColID: CaseIterable {
     static let file_LineNum = "File/LineNumber"     // 90    8
 }
 
-//MARK:- NSTextFieldDelegate
+//MARK: - NSTextFieldDelegate
 // Allow SpreadsheetVC to see when a TextField changes.
 extension SpreadsheetVC: NSTextFieldDelegate {
 
@@ -359,7 +359,7 @@ extension SpreadsheetVC: NSTextFieldDelegate {
 
 }//end extension ViewController: NSTextFieldDelegate
 
-//MARK:- NSTableViewDataSource
+//MARK: - NSTableViewDataSource
 
 extension SpreadsheetVC: NSTableViewDataSource {
 
@@ -388,7 +388,7 @@ extension SpreadsheetVC: NSTableViewDataSource {
 
 }//end extension
 
-//MARK:- NSTableViewDelegate
+//MARK: - NSTableViewDelegate
 
 extension SpreadsheetVC: NSTableViewDelegate {
 

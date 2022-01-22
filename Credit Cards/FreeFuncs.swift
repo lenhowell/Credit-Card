@@ -8,7 +8,7 @@
 
 import Cocoa    // Cocoa is needed to recognize NSPasteboard
 
-//MARK:- General purpose funcs
+//MARK: - General purpose funcs
 
 public func copyStringToClipBoard(textToCopy: String) {
     let pasteBoard = NSPasteboard.general
@@ -146,7 +146,7 @@ public func textToDbl(_ str: String) -> Double? {
 
 
 
-//MARK:- Date Extensions
+//MARK: - Date Extensions
 
 extension Date {
 

@@ -26,7 +26,7 @@ import Cocoa
 // TableFilter:     Handle filtering as an object
 // Credit_Cards_UnitTests: The following Unit-Tests need assertions
 
-//MARK:- Global Variables
+//MARK: - Global Variables
 
 var gUserInitials           = "User" // UD (UserInputVC) Initials used for "Category Source" when Cat changed by user
 var gLineItemArray          = [LineItem]()  // (used here, SpreadsheetVC, + 4 more) Entire list of transactions
@@ -52,10 +52,10 @@ var gDictVendorShortNames   = [String: String]()    // (VendorShortNames.txt) Ha
 
 var gUrl                    = Url()
 
-//MARK:- ViewController
+//MARK: - ViewController
 class ViewController: NSViewController, NSWindowDelegate {
     
-    //MARK:- Instance Variables
+    //MARK: - Instance Variables
     
     // Constants
     let codeFile = "ViewController"   // for error logging
@@ -95,7 +95,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         static let requiredElements: GotItem = [.allDirs, .fileTransactions, .fileMyCategories, .userInitials]
     }
 
-    //MARK:- Overrides & Lifecycle
+    //MARK: - Overrides & Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -188,7 +188,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         return true
     }
 
-    //MARK:- Notification Center functions
+    //MARK: - Notification Center functions
 
     // Called by NotificationCenter Observer getting post from handleError. Sets lblErrMsg
     @objc func errorPostedFromNotification(_ notification: Notification) {
@@ -197,7 +197,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         //print ("ErrMsg: \"\(msg)\" received from ErrorHandler via NotificationCenter")
     }
 
-    //MARK:- @IBOutlets
+    //MARK: - @IBOutlets
     
     @IBOutlet var txtTransationFolder: NSTextField!
     @IBOutlet var txtSupportFolder:    NSTextField!
@@ -220,7 +220,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     @IBOutlet var radioActivityNot: NSButton!
     @IBOutlet var cboFiles:     NSComboBox!
 
-    //MARK:- @IBActions
+    //MARK: - @IBActions
 
     @IBAction func btnStartClick(_ sender: Any) {
         main()
@@ -373,7 +373,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
 
-    //MARK:- Main Program 155-lines
+    //MARK: - Main Program 155-lines
     
     func main() {   // 311-466 = 155-lines
         verifyFolders(gotItem: &gotItem)

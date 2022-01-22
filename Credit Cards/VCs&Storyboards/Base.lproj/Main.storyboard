@@ -577,7 +577,7 @@ DQ
         <!--Window Controller-->
         <scene sceneID="WXA-f5-FAp">
             <objects>
-                <windowController storyboardIdentifier="UserInputWindowController" id="ZOo-Fm-v9G" sceneMemberID="viewController">
+                <windowController storyboardIdentifier="UserInputCatWindowController" id="ZOo-Fm-v9G" sceneMemberID="viewController">
                     <window key="window" title="User Category Input" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="8hn-1g-wFW">
                         <windowStyleMask key="styleMask" titled="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
