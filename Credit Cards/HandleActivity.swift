@@ -8,7 +8,9 @@
 
 import Foundation
 
-// Specialized routine OMLY for Merrill Lynch Activity download
+let allowedDirectDeps = ["SSA", "NORTH BEACH", "NORTHBEACH", "NBEACHP", "BCH CV HOA", "BB T GEO"]
+
+// Specialized routine ONLY for Merrill Lynch Activity download
 //MARK: - extractTranFromActivity
 func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-lines
     var lineItem = lineItem
@@ -84,12 +86,8 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
     var known = false
     var ignore = false
 
-    if lineItem.desc.uppercased().contains("DUKE") {
-        print("👺HandleActivity#\(#line) \(lineItem.desc) \(lineItem.debit)")
-        // Debug Trap
-    }
-
-    if lineItem.rawCat == Const.unknown {
+    // Move out%%%
+    if lineItem.rawCat == Const.unknown {   //88-126 = 28-lines
         let oldDesc = lineItem.desc
         if oldDesc.hasPrefix("Check") {
             let words = lineItem.desc.components(separatedBy: " ")
@@ -146,7 +144,7 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
 
     // WIRE TRF  " TRUFFLE HO"
     if des.hasPrefix("WIRE") || des.contains("WIRE TR") {
-        print("HandleActivity#\(#line) Wire Transfer = \(lineItem.desc)")
+        print("🤔 HandleActivity#\(#line) Wire Transfer = \(lineItem.desc)")
         let words = des.components(separatedBy: " ")
         var idxOrg = -999
         var orgName1 = ""
@@ -204,12 +202,12 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
                 lineItem.chkNumber = items[1]
             }
         }
-        //print("😀 Check ",fromTransFileLine)          //  "CHECK 3633 CHARLES HOWARD"
+        //print("😀 HandleActivity#\(#line) Check ",fromTransFileLine)          //  "CHECK 3633 CHARLES HOWARD"
         known = true
     } else if des.hasPrefix("WITHDRAWAL ")              { // CHECKML    "WITHDRAWAL TR TO ML   81217K22"
         lineItem.desc = String(des.dropFirst(11))
         lineItem.rawCat = "Gift"
-        known = true                                    //            "WITHDRAWAL WELLS FARGO BANK"
+        known = true                   // "WITHDRAWAL WELLS FARGO BANK"
 
     } else if !colinSplit.rgt.isEmpty && colinSplit.lft.contains("DIV") { // "CDIV:", "DIVIDEND:", "LIQUIDATING DIVIDEND:", "FOREIGN DIVIDEND:"
         known = true
@@ -221,7 +219,7 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
 //    des.hasPrefix("FOREIGN DIVIDEND:")        { // "FOREIGN DIVIDEND: SASOL LTD  SPONSORED ADR HOLDING 500.0000 PAY"
 //    des.hasPrefix("RPT FGN DIV:")             { // "RPT FGN DIV: MEDTRONIC PLC SHS HOLDING 600.0000 PAY DATE 01/13/2"
 
-    } else if !colinSplit.rgt.isEmpty && colinSplit.lft.contains("INTEREST")                { // "INTEREST:",
+    } else if !colinSplit.rgt.isEmpty && colinSplit.lft.contains("INTEREST") { // "INTEREST:",
         known = true
         lineItem.desc = colinSplit.rgt
         lineItem.rawCat = "Income-Interest"
@@ -248,13 +246,13 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
     } else if des.hasPrefix("DEPOSITORY BANK (ADR) FEE:") { // "DEPOSITORY BANK (ADR) FEE: SASOL LTD  SPONSORED ADR DEPOSITORY B"
         known = true
 
-    } else if des.hasPrefix("CASH IN LIEU OF SHARES:")      { // "CASH IN LIEU OF SHARES: ENBRIDGE INC         COM FORM 1099-B SUB"
+    } else if des.hasPrefix("CASH IN LIEU OF SHARES:")  { // "CASH IN LIEU OF SHARES: ENBRIDGE INC         COM FORM 1099-B SUB"
         known = true
 
-    } else if des.hasPrefix("PRINCIPAL PAYMENT:")           { // "PRINCIPAL PAYMENT: ADVISORS DISCIPLINED TR 532 TAX EXEMPT MUN PO"
+    } else if des.hasPrefix("PRINCIPAL PAYMENT:")       { // "PRINCIPAL PAYMENT: ADVISORS DISCIPLINED TR 532 TAX EXEMPT MUN PO"
         known = true
 
-    } else if des.hasPrefix("FUNDS TRANSFER WIRE TRF IN")   { // FUNDS TRANSFER WIRE TRF IN DXXXXXXX1148 ORG=/XXXX9647 TRUFFLE HO
+    } else if des.hasPrefix("FUNDS TRANSFER WIRE TRF IN") { // FUNDS TRANSFER WIRE TRF IN DXXXXXXX1148 ORG=/XXXX9647 TRUFFLE HO
         known = true
 
     } else if des.hasPrefix("WIRE TRANSFER IN WIRE TRF IN") { // DXXXXXXX0510 ORG=/XXXX9647 TRUFFLE HO
@@ -263,11 +261,18 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
     } else if des.hasPrefix("WIRE TRANSFER OUT WIRE TRF OUT"){ // "WIRE TRANSFER OUT WIRE TRF OUTPXXXXXXX2527"
         known = true
 
-    } else if des.hasPrefix("DIRECT DEPOSIT ")              { // "DIRECT DEPOSIT SSA  TREAS 310"
+    } else if des.hasPrefix("DIRECT DEPOSIT ")          { // "DIRECT DEPOSIT SSA  TREAS 310"
         lineItem.desc = String(des.dropFirst(15))
         lineItem.rawCat = "Income"
         known = true
-        if !lineItem.desc.hasPrefix("SSA") {
+        var gotit = false
+        for allowed in allowedDirectDeps {
+            if lineItem.desc.hasPrefix(allowed) {
+                gotit = true
+                break
+            }
+        }
+        if !gotit {
             print("❓HandleActivity#\(#line) Non-SSA Direct Deposit on \(lineItem.tranDate) from \(lineItem.desc) for $\(lineItem.credit)")
             // Debug Trap - Non-SSA Direct-Deposit
         }
@@ -285,7 +290,7 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
         //
     }
     if !ignore && lineItem.debit == 0.0 && lineItem.credit == 0.0 {
-        print("😡 HandleActivity#\(#line) Zero Amount: ",lineItem.transText)
+        //print("😡 HandleActivity#\(#line) Zero Amount: ",lineItem.transText)
         //
     }
     return lineItem

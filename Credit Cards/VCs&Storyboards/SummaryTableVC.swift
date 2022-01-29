@@ -130,7 +130,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     }
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {
-        print("✅(codeFile)#\(#line) windowShouldClose")
+        print("✅ (codeFile)#\(#line) windowShouldClose")
         NSApplication.shared.stopModal()
         return true
     }
@@ -174,7 +174,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     @IBAction func btnShowTransactionsClick(_ sender: Any) {
 
         if tableView.selectedRow >= 0 {
-            //print("tableView.selectedRow = \(tableView.selectedRow)")
+            //print("🙂 \(codeFile)#\(#line) tableView.selectedRow = \(tableView.selectedRow)")
             prepareCall(calledByBtn: true)
             return
         }
@@ -221,7 +221,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     //MARK: - Regular funcs
 
     private func loadStuffFromCaller(tableParams: TableParams) -> TableParams {
-        print("🙂\(codeFile)#\(#line) loadStuffFromCaller", tableParams)
+        print("🙂 \(codeFile)#\(#line) loadStuffFromCaller", tableParams)
         switch tableParams.summarizeBy {
         case .cardType:
             radioCardType.state = .on
@@ -320,7 +320,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         txtCountTotal.stringValue   = String(totalCount)
 
         if tableView.selectedRow >= 0 {
-            print("tableView.selectedRow = \(tableView.selectedRow)")
+            print("🙂 \(codeFile)#\(#line) tableView.selectedRow = \(tableView.selectedRow)")
         }
         btnShowTransactions.isEnabled = (totalCount < 20)
 
@@ -470,7 +470,7 @@ extension SummaryTableVC: NSTextFieldDelegate {
     //---- controlTextDidChange - Called when a textField (with SpreadsheetVC as its delegate) changes.
     func controlTextDidChange(_ obj: Notification) {
         guard let _ = obj.object as? NSTextField else { return } // Not a TextFiled
-        //print("🙂\(codeFile)#\(#line) \(textView.stringValue)")
+        //print("🙂 \(codeFile)#\(#line) \(textView.stringValue)")
         btnFilter.keyEquivalent = "\r"
         let allEmpty = txtDate1.stringValue.isEmpty &&
         txtDate2.stringValue.isEmpty &&
@@ -490,7 +490,7 @@ extension SummaryTableVC: NSTableViewDataSource {
 
     //---- numberOfRows -
     func numberOfRows(in tableView: NSTableView) -> Int {
-        print("🙂\(codeFile)#\(#line) tableDicts.count = \(tableDicts.count)")
+        print("🙂 \(codeFile)#\(#line) tableDicts.count = \(tableDicts.count)")
         return tableDicts.count
     }
 
@@ -517,7 +517,7 @@ extension SummaryTableVC: NSTableViewDelegate {
         //var image: NSImage?
 
         guard let colID = tableColumn?.identifier.rawValue else {
-            print("⛔️ Table Column nil")
+            print("⛔️ \(codeFile)#\(#line) Table Column nil")
             return nil
         }
         guard let text = dict[colID] else {
@@ -562,7 +562,7 @@ extension SummaryTableVC: NSTableViewDelegate {
         let rowDict = tableDicts[tableView.selectedRow]
         let idxStr = rowDict["idx"] ?? ""
         let idx = Int(idxStr) ?? -1
-        print("🙂\(codeFile)#\(#line) DoubleClicked on Row # \(tableView.selectedRow).  idx = \(idx)")
+        print("🙂 \(codeFile)#\(#line) DoubleClicked on Row # \(tableView.selectedRow).  idx = \(idx)")
 
         var filterDate1     = txtDate1.stringValue.trim
         var filterDate2     = txtDate2.stringValue.trim

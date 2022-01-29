@@ -84,7 +84,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     }
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {
-        print("✅ windowShouldClose")
+        print("✅ \(codeFile)#\(#line) windowShouldClose")
         let application = NSApplication.shared
         application.stopModal()
         //dismiss(self) //does not work
@@ -142,7 +142,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         }
         if let summaryWindow = summaryWindowController.window {
             //let summaryTableVC = storyBoard.instantiateController(withIdentifier: "SummaryTableVC") as! SummaryTableVC
-            print("btnSummaries", gPassToNextTable)
+            print("🙂 \(codeFile)#\(#line) btnSummaries", gPassToNextTable)
             let application = NSApplication.shared
             _ = application.runModal(for: summaryWindow) // <=================  UserInputVC
 
@@ -196,7 +196,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     private func syncColWidths() {
         for (idx, column) in tableView.tableColumns.enumerated() {
             tableViewSum.tableColumns[idx].width = column.width
-            print("Set Column \(idx) \(column.title) to width of \(column.width)")
+            print("🙂 \(codeFile)#\(#line) Set Column \(idx) \(column.title) to width of \(column.width)")
         }
     }
 
@@ -450,7 +450,7 @@ extension SpreadsheetVC: NSTableViewDelegate {
 
             let idxStr = rowDict["idx"] ?? ""
             let idx = Int(idxStr) ?? -1
-            //print("Selected Row # \(tableView.selectedRow).  idx = \(idx)")
+            //print("🙂 \(codeFile)#\(#line) Selected Row # \(tableView.selectedRow).  idx = \(idx)")
             let lineItem = gLineItemArray[idx]
 
             var id = rowDict[SpSheetColID.chkNumber] ?? ""
@@ -468,12 +468,12 @@ extension SpreadsheetVC: NSTableViewDelegate {
     //---- tableViewColumnDidMove - When user moves a column, also move the "totals" column.
     func tableViewColumnDidMove(_ notification: Notification) {
         if notification.object as? NSTableView == self.tableView {
-            print("tableViewColumnDidMove")
+            print("🙂 \(codeFile)#\(#line) tableViewColumnDidMove")
             guard let oldIdx = notification.userInfo?["NSOldColumn"] as? Int else { return }
             guard let newIdx = notification.userInfo?["NSNewColumn"] as? Int else { return }
             //let column = tableView.tableColumns[newIdx]
             //let title = column.title
-            print("↔️ Moved \(tableView.tableColumns[newIdx].title) from pos#\(oldIdx) to pos#\(newIdx)")
+            print("↔️ \(codeFile)#\(#line) Moved \(tableView.tableColumns[newIdx].title) from pos#\(oldIdx) to pos#\(newIdx)")
             tableViewSum.moveColumn(oldIdx, toColumn: newIdx)
         }//tableView
     }
@@ -485,7 +485,7 @@ extension SpreadsheetVC: NSTableViewDelegate {
             guard let column = notification.userInfo?["NSTableColumn"] as? NSTableColumn else { return }
             let id = column.identifier
             let idx = tableView.column(withIdentifier: id)
-            print("↔️ tableViewColumnDidResize Col#\(idx): \(id.rawValue) to a width of \(column.width)")
+            print("↔️ \(codeFile)#\(#line) tableViewColumnDidResize Col#\(idx): \(id.rawValue) to a width of \(column.width)")
             tableViewSum.tableColumns[idx].width = column.width
         }//is a tableView
     }//end func

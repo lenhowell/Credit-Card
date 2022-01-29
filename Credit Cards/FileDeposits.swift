@@ -103,7 +103,7 @@ func readDeposits(testData: String = "") {
             if lineItem.tranDate >= firstDate && lineItem.tranDate <= lastDate {
                 gLineItemArray.append(lineItem)
                 if lineItem.descKey.contains("WINAN") {
-                    //print("")     //Debug Trap
+                    //print("FileDeposits#\(#line) ")     //Debug Trap
                 }
             }
             calcSum += credit

@@ -146,7 +146,7 @@ public struct FileIO {
             print()
             return transURLs
         } catch {
-            print("FileIO#\(#line) \(error.localizedDescription)")
+            print("⛔️ FileIO#\(#line) \(error.localizedDescription)")
         }
         return []
     }//end func

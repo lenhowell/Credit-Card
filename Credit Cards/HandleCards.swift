@@ -121,14 +121,14 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
 
             // Special handling for Credits that might have differing dates
             if lineItem.rawCat.uppercased().contains("CREDIT") && lineItem.credit > 0 {
-                print("\(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat)")
+                print("🤔 HandleCards#\(#line) \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat)")
                 let vendr   = lineItem.descKey.prefix(4)
                 let credit  = String(format: "%.2f", lineItem.credit)
                 let signature = vendr + "|" + credit
                 if let dateFromDupe = gDictCreditDupes[signature] {
                     let daysDif = dateDif(dateStr1: lineItem.tranDate, dateStr2: dateFromDupe)
                     if abs(daysDif) <= 4 {
-                        print("HandleCards#\(#line) \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat)")
+                        print("🤔 HandleCards#\(#line) \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat)")
                     }
                 } else {
                     gDictCreditDupes[signature] = lineItem.tranDate
@@ -143,8 +143,8 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
                     let idx  = tuple.0
                     let file = tuple.1
                     if file != fileName {
-                        print("HandleCards#\(#line) 🔹 \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat) - Dupe in \(file)")
-                        print("HandleCards#\(#line)     descKey \"\(lineItem.descKey)\" vs \"\(gLineItemArray[idx].descKey)\" both $\(lineItem.debit), $\(lineItem.credit) on \(lineItem.tranDate)")
+                        print("🔹 HandleCards#\(#line) \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat) - Dupe in \(file)")
+                        print("  HandleCards#\(#line)     descKey \"\(lineItem.descKey)\" vs \"\(gLineItemArray[idx].descKey)\" both $\(lineItem.debit), $\(lineItem.credit) on \(lineItem.tranDate)")
                         if lineItem.descKey.prefix(3) == gLineItemArray[idx].descKey.prefix(3) {
                             matchOpt = tuple
                         } else {
@@ -162,8 +162,8 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
                     let daysDif = dateDif(dateStr1: date1, dateStr2: date2)
                     let file = tuple.1
                     if abs(daysDif) <= 2 && file != fileName {
-                        print("HandleCards#\(#line) 🔹 \(date1) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat) - Dupe in \(file)")
-                        print("HandleCards#\(#line)     Close dates \"\(lineItem.descKey)\" \(date1) vs \"\(gLineItemArray[tuple.0].descKey)\" \(date2) both $\(lineItem.debit), $\(lineItem.credit)")
+                        print("🔹 HandleCards#\(#line) \(date1) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat) - Dupe in \(file)")
+                        print("  HandleCards#\(#line)     Close dates \"\(lineItem.descKey)\" \(date1) vs \"\(gLineItemArray[tuple.0].descKey)\" \(date2) both $\(lineItem.debit), $\(lineItem.credit)")
                         //matchOpt = tuple
                     }
                 }
@@ -234,11 +234,16 @@ internal func gotaDupe(lineItem: LineItem, idxFromDupe: Int, fileName: String, l
         msg = "Duplicate chkNumber \(chkNum) with dates of \(dateFromTran) & \(dateFromDupe) "
     }
     // fileName: fileName, dataLineNum: lineNum, lineText: lineItem.transText,
-    print("➡️ HandleCards#\(#line):[\(fileName)] \(msg)")
+    print("➡️ HandleCards#\(#line)[\(fileName)] \(msg)")
     gLineItemArray[idxFromDupe].cardType = gLineItemArray[idxFromDupe].cardType + "*"
     
     if lineItem.descKey != lineItemFromDupe.descKey ||  lineItem.genCat != lineItemFromDupe.genCat {
-        print("😡 HandleCards#\(#line)[\(fileName)] \(lineItem.descKey) != \(lineItemFromDupe.descKey) ||  \(lineItem.genCat) != \(lineItemFromDupe.genCat)")
+        if lineItem.descKey != lineItemFromDupe.descKey {
+            print("😡 HandleCards#\(#line)[\(fileName)] desKey: \(lineItem.descKey) != \(lineItemFromDupe.descKey)")
+        }
+        if lineItem.genCat != lineItemFromDupe.genCat {
+            print("😡 HandleCards#\(#line)[\(fileName)] genCat: \(lineItem.genCat) != \(lineItemFromDupe.genCat)")
+        }
         if lineItemFromDupe.genCat == Const.unknown && lineItem.genCat != Const.unknown {
             gLineItemArray[idxFromDupe].genCat  = lineItem.genCat
             gLineItemArray[idxFromDupe].descKey = lineItem.descKey
@@ -339,7 +344,7 @@ internal func makeLineItem(fromTransFileLine:   String,
                 lineItem.rawCat = Const.unknown
                 lineItem.genCat = ""
             }
-            print("HandleCards#\(#line): Unknown Category: \"\(lineItem.rawCat)\" from \(descKey) (line#\(lineNum) in \(fileName))")
+            print("😡 HandleCards#\(#line): Unknown Category: \"\(lineItem.rawCat)\" from \(descKey) (line#\(lineNum) in \(fileName))")
             isClearWinner = false
         }
         catItemFromTran = CategoryItem(category: catFromTran, source: cardType)
@@ -429,7 +434,7 @@ func showUserInputVendorCatForm(lineItem: LineItem,
             gUserInputMode =  false
 
         default:                                    // Except for .cancel, we should not be here
-            print("HandleCards#\(#line) Unknown return value \(returnVal)")
+            print("⛔️ HandleCards#\(#line) Unknown return value \(returnVal)")
         }//end switch
 
     } else {

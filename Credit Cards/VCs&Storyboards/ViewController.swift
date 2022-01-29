@@ -73,27 +73,27 @@ class ViewController: NSViewController, NSWindowDelegate {
     var pathOutputFolder        = "Desktop/CreditCard"
 
     var outputFileURL           = FileManager.default.homeDirectoryForCurrentUser
-    var gotItem: GotItem        = .empty
+    var gotItems: GotItem        = .empty    // all zeros
 
     //---- GotItem - Bitmap to record what required items are accounted for
     struct GotItem: OptionSet {
         let rawValue: Int
-        static let empty        = GotItem([])
-        static let dirSupport   = GotItem(rawValue: 1 << 0)     // bit 0 (=1) if got Support folder
-        static let dirOutput    = GotItem(rawValue: 1 << 1)     // bit 1 (=2) if got Output folder
-        static let dirTrans     = GotItem(rawValue: 1 << 2)     // bit 2 (=4) if got Transaction folder
 
-        static let fileTransactions     = GotItem(rawValue: 1 << 3) // bit 3 if got at least 1 Transaction file
-        static let fileVendorShortNames = GotItem(rawValue: 1 << 4) // bit 4 if got VendorShortNames file
-        static let fileMyCategories     = GotItem(rawValue: 1 << 5)
-        static let fileMyModifiedTrans  = GotItem(rawValue: 1 << 6)
-        static let fileMyAccounts       = GotItem(rawValue: 1 << 7)
+        static let empty                = GotItem([])
+        static let dirSupport           = GotItem(rawValue: 1 << 0) // bit 0  (1) got Support folder
+        static let dirOutput            = GotItem(rawValue: 1 << 1) // bit 1  (2) got Output folder
+        static let dirTrans             = GotItem(rawValue: 1 << 2) // bit 2  (4) got Transaction folder
+        static let fileTransactions     = GotItem(rawValue: 1 << 3) // bit 3  (8) got at least 1 Transaction file
+        static let fileVendorShortNames = GotItem(rawValue: 1 << 4) // bit 4 (16) got VendorShortNames file
+        static let fileMyCategories     = GotItem(rawValue: 1 << 5) // bit 5 (32) got MyCategories file
+        static let fileMyModifiedTrans  = GotItem(rawValue: 1 << 6) // bit 6 (64) got MyModifiedTrans file
+        static let fileMyAccounts       = GotItem(rawValue: 1 << 7) // bit7 (128) got MyAccounts file
 
-        static let userInitials         = GotItem(rawValue: 1 << 9)
+        static let userInitials         = GotItem(rawValue: 1 << 9) // bit9 (512) got userInitials
 
-        static let allDirs: GotItem     = [.dirSupport, .dirOutput, .dirTrans]
+        static let allDirs: GotItem     = [.dirSupport, .dirOutput, .dirTrans]  // got all required folders
         static let requiredElements: GotItem = [.allDirs, .fileTransactions, .fileMyCategories, .userInitials]
-    }
+    }//end struct GotItem
 
     //MARK: - Overrides & Lifecycle
     
@@ -102,10 +102,11 @@ class ViewController: NSViewController, NSWindowDelegate {
         // Do any additional setup after loading the view.
         
         // Create NotificationCenter Observer to listen for post from handleError
-        NotificationCenter.default.addObserver( self,
-                                                selector: #selector(self.errorPostedFromNotification(_:)),
-                                                name:     NSNotification.Name(NotificationName.errPosted),
-                                                object:   nil
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(self.errorPostedFromNotification(_:)),
+            name:     NSNotification.Name(NotificationName.errPosted),
+            object:   nil
         )
 
         // Set txtTransationFolder.delegate
@@ -119,24 +120,24 @@ class ViewController: NSViewController, NSWindowDelegate {
         if let folder = UserDefaults.standard.string(forKey: UDKey.supportFolder) {     // Support Folder
             pathSupportFolder = folder
             if !folder.isEmpty && FileIO.folderExists(atPath: folder, isPartialPath: true) {
-                gotItem = [gotItem, .dirSupport]
+                gotItems = [gotItems, .dirSupport]  // Add dirSupport-bit to gotItems
             }
         }
         if let folder = UserDefaults.standard.string(forKey: UDKey.outputFolder) {      // Output Folder
             pathOutputFolder = folder
             if !folder.isEmpty && FileIO.folderExists(atPath: folder, isPartialPath: true) {
-                gotItem = [gotItem, .dirOutput]
+                gotItems = [gotItems, .dirOutput]   // Add dirOutput-bit to gotItems
             }
         }
         if let folder = UserDefaults.standard.string(forKey: UDKey.transactionFolder) { // Transactions Folder
             pathTransactionFolder = folder
             if !folder.isEmpty && FileIO.folderExists(atPath: folder, isPartialPath: true) {
-                gotItem = [gotItem, .dirTrans]
+                gotItems = [gotItems, .dirTrans]    // Add dirTrans-bit to gotItems
             }
         }
         gUserInitials = UserDefaults.standard.string(forKey: UDKey.userInitials) ?? ""  // Users Initials
         if !gUserInitials.isEmpty {
-            gotItem = [gotItem, .userInitials]
+            gotItems = [gotItems, .userInitials]    // Add userInitials-bit to gotItems
         }
 
         // Disable Spreadsheet button until Transactions are read-in
@@ -156,15 +157,15 @@ class ViewController: NSViewController, NSWindowDelegate {
         txtOutputFolder.stringValue     = pathOutputFolder
         txtSupportFolder.stringValue    = pathSupportFolder
         txtTransationFolder.stringValue = pathTransactionFolder
-        verifyFolders(gotItem: &gotItem)
-        if gotItem.contains(GotItem.dirSupport) {
+        verifyFolders(gotItem: &gotItems)
+        if gotItems.contains(GotItem.dirSupport) {
             readSupportFiles()
             let shortCatFilePath = FileIO.removeUserFromPath(gUrl.vendorCatLookupFile.path)
             lblResults.stringValue = "Category Lookup File \"\(shortCatFilePath)\" loaded with \(Stats.origVendrCatCount) items.\n"
         } else {
             lblResults.stringValue = "You will need to create a folder to hold support files before you can proceed."
         }
-        let errMsg = makeMissingItemsMsg(got: gotItem)
+        let errMsg = makeMissingItemsMsg(got: gotItems)
         if !errMsg.isEmpty { handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display,
                                          fileName: "", dataLineNum: 0, lineText: "", errorMsg: errMsg) }
 
@@ -184,6 +185,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     // Terminate program if this window closes
     func windowShouldClose(_ sender: NSWindow) -> Bool {
+        print("😋 \(codeFile)#\(#line) Terminate app when Main Window closed.")
         NSApplication.shared.terminate(self)
         return true
     }
@@ -304,7 +306,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             }
 
         }
-        if gotItem.contains(.dirSupport) {
+        if gotItems.contains(.dirSupport) {
             var msg = ""
             msg = "custom categories & aliases."
             if FileIO.deleteSupportFile(url: gUrl.myCatsFile, fileName: myCatsFilename, msg: msg) {
@@ -347,7 +349,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             }
             if len >= minChars && len <= maxChars && !name.contains(" ") {
                 gUserInitials = name
-                gotItem = gotItem.union(GotItem.userInitials)
+                gotItems = gotItems.union(GotItem.userInitials)
                 UserDefaults.standard.set(gUserInitials,      forKey: UDKey.userInitials)
                 let msg = "Your initials have been changed to \(gUserInitials)."
                 handleError(codeFile: "", codeLineNum: #line, type: .note, action: .alertAndDisplay, errorMsg: msg)
@@ -376,9 +378,9 @@ class ViewController: NSViewController, NSWindowDelegate {
     //MARK: - Main Program 155-lines
     
     func main() {   // 311-466 = 155-lines
-        verifyFolders(gotItem: &gotItem)
-        if !gotItem.contains(GotItem.allDirs) {
-            let errMsg = makeMissingItemsMsg(got: gotItem)
+        verifyFolders(gotItem: &gotItems)
+        if !gotItems.contains(GotItem.allDirs) {
+            let errMsg = makeMissingItemsMsg(got: gotItems)
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .alertAndDisplay, fileName: "", dataLineNum: 0, lineText: "", errorMsg: errMsg)
             return
         }
@@ -405,9 +407,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         pathSupportFolder = txtSupportFolder.stringValue
 
         readSupportFiles()
-        verifyFolders(gotItem: &gotItem)
-        let errMsg = makeMissingItemsMsg(got: gotItem)
-        if !gotItem.contains(GotItem.requiredElements) {
+        verifyFolders(gotItem: &gotItems)
+        let errMsg = makeMissingItemsMsg(got: gotItems)
+        if !gotItems.contains(GotItem.requiredElements) {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .alertAndDisplay, fileName: "", dataLineNum: 0, lineText: "", errorMsg: errMsg)
             return
         }
@@ -496,7 +498,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         outputTranactions(outputFileURL: outputFileURL, lineItemArray: gLineItemArray)
 
-        print("\n😋 --- Description-Key algorithms ---")
+        print("\n😋 --- Description-Key algorithms --- VC#\(#line)")
         for (key, val) in DescriptionKey.dictDescKeyAlgorithmCnts.sorted(by: <) {
             print("  \(key.PadRight(40))\(val)")
         }
@@ -533,7 +535,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         
         let endTime   = CFAbsoluteTimeGetCurrent()
         let runtime = endTime - startTime
-        print(String(format: "Runtime %5.02f sec", runtime))
+        print("⏰ VC#\(#line)", String(format: "Runtime %5.02f sec", runtime))
         lblRunTime.stringValue = String(format: "Runtime %5.02f sec", runtime)
         print()
 
@@ -611,7 +613,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     }//end func loadComboBoxFiles
 
 
-    // Reads Support & Output folder names from textViews, & verifies they exist in gotItem
+    // Reads Support & Output folder names from textViews, & verifies they exist in gotItems
     func verifyFolders(gotItem: inout GotItem) {
 
         let supportPath = txtSupportFolder.stringValue.trim
@@ -660,7 +662,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
         gDictVendorShortNames = loadVendorShortNames(url: gUrl.vendorShortNamesFile)        // Build VendorShortNames Dictionary
         if gDictVendorShortNames.count > 0 {
-            gotItem = [gotItem, .fileVendorShortNames]
+            gotItems = [gotItems, .fileVendorShortNames]  // Add fileVendorShortNames-bit to gotItems
         } else {
             guard let path = Bundle.main.path(forResource: "VendorShortNames", ofType: "txt") else {
                 let msg = "Missing starter file - VendorShortNames.txt"
@@ -681,7 +683,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
         gCatagories = Catagories(myCatsFileURL: gUrl.myCatsFile)
         if gCatagories.dictCatAliases.count > 5 {
-            gotItem = [gotItem, .fileMyCategories]
+            gotItems = [gotItems, .fileMyCategories]  // Add fileMyCategories-bit to gotItems
         }
 
         // ---------- "MyAccounts.txt" ------------
@@ -691,7 +693,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
         gAccounts = Accounts(url: gUrl.myAccounts)
         if gAccounts.dict.count > 0 {
-            gotItem = [gotItem, .fileMyAccounts]
+            gotItems = [gotItems, .fileMyAccounts]  // Add fileMyAccounts-bit to gotItems
 
         } else {
             guard let path = Bundle.main.path(forResource: "MyAccounts", ofType: "txt") else {
@@ -714,7 +716,9 @@ class ViewController: NSViewController, NSWindowDelegate {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyModifiedTransactions " + errTxt)
         }
         gDictModifiedTrans = loadMyModifiedTrans(myModifiedTranURL: gUrl.myModifiedTrans)
-        if gDictModifiedTrans.count > 0 {gotItem = [gotItem, .fileMyModifiedTrans]}
+        if gDictModifiedTrans.count > 0 {
+            gotItems = [gotItems, .fileMyModifiedTrans]  // Add fileMyModifiedTrans-bit to gotItems
+        }
     }//end func
 
     //---- resetUserDefaults - Reset all User Defaults to provide a clean startup
@@ -735,7 +739,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             setButtons(btnDefault: .start, needsRecalc: true, transFolderOK: true)  // btnStart.isEnabled = true etc
             transFileURLs = FileIO.getTransFileList(transDirURL: gUrl.transactionFolder)
             if transFileURLs.count > 0 {
-                gotItem = gotItem.union(GotItem.fileTransactions) // Mark Transaction-Files accounted for
+                gotItems = gotItems.union(GotItem.fileTransactions) // Mark Transaction-Files accounted for
             }
             loadComboBoxFiles(fileURLs: transFileURLs)
             cboFiles.isHidden = false
@@ -750,7 +754,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             cboFiles.isHidden = true
             lblTranFileCount.stringValue = "----"
             lblErrMsg.stringValue = errText
-            gotItem = gotItem.subtracting(GotItem.fileTransactions) // Mark as not there
+            gotItems = gotItems.subtracting(GotItem.fileTransactions) // Mark as not there
         }
         //setButtons(btnDefault: .start, needsRecalc: true, transFolderOK: true)
         //cboFiles.scrollItemAtIndexToVisible(cboFiles.numberOfItems-1) Does not work
