@@ -12,8 +12,6 @@ import Cocoa
 // Debug Trap: 2019-"xxxxxx9454 Wikipedia Giftxxx-xxx9454" 2016-"xx7880 COLONIAL MALL"
 // Allow 2020 to read 2021 checks & ignore 2019 checks in 2020 folder
 // "Print", or at least allow copy/paste in summary & spreadsheet
-// Bug 2020 Longhorn & Longhorn Steak do not combine in Summary/Food/Restaurant
-// SummaryTableVC:  If 1-Trans or 1 unique vendors & cats, go directly to spreadsheet
 // ErrorHandler:    Append Error message to Error-Log File
 // FileIO:          Tell user about non-qualified filenames & show rules.
 // FileIO:          If url is not a file, append default filename 1
@@ -662,13 +660,16 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
         gDictVendorShortNames = loadVendorShortNames(url: gUrl.vendorShortNamesFile)        // Build VendorShortNames Dictionary
         if gDictVendorShortNames.count > 0 {
+            // Found VendorShortNames.txt in support-files folder
             gotItems = [gotItems, .fileVendorShortNames]  // Add fileVendorShortNames-bit to gotItems
         } else {
+            // Not found
             guard let path = Bundle.main.path(forResource: "VendorShortNames", ofType: "txt") else {
                 let msg = "Missing starter file - VendorShortNames.txt"
                 handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay, errorMsg: msg)
-                return
+                return  // Can't even find starter file
             }
+            // starter file found, so use IT.
             let bundleCatsFileURL = URL(fileURLWithPath: path)
             gDictVendorShortNames = loadVendorShortNames(url: bundleCatsFileURL)
             writeVendorShortNames(url: gUrl.vendorShortNamesFile, dictVendorShortNames: gDictVendorShortNames) // Save Starter file

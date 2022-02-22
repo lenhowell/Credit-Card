@@ -36,12 +36,19 @@ Support files for <NAME> are in: "Desktop/CreditCard/<NAME>/..."
 """
 
         // load RTFD-file
-        let url = Bundle.main.url(forResource: "CreditCardHelp", withExtension: "rtf")!
+        guard let url = Bundle.main.url(forResource: "CreditCardHelp", withExtension: "rtf") else {
+            txvHelp.string = "CreditCardHelp.rtf not found"
+            return
+        }
         let options = [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.rtf]
-        let rtfString = try! NSMutableAttributedString(url: url, options: options, documentAttributes: nil)
 
-        txvHelp.textStorage?.setAttributedString(rtfString)
+        do {
+            let rtfString = try NSMutableAttributedString(url: url, options: options, documentAttributes: nil)
+            txvHelp.textStorage?.setAttributedString(rtfString)
+        } catch let err {
+            txvHelp.string = "Error CreditCardHelp.rtf \(err.localizedDescription)"
+        }//end try/catch
 
-    }
+    }//end func showHelp
 
-}
+}//end class HelpVC

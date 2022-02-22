@@ -107,10 +107,19 @@ func showUserInputShortNameForm(shortName: String, longName: String) -> NSApplic
 //MARK: - findPrefixMatch
 //---- findPrefixMatch - Go through the ShortName hash to find a match
 func findPrefixMatch(name: String, dictShortNames: [String: String]) -> (prefix: String, fullDescKey: String) {
+    if name.hasPrefix("WELLS F") {
+        // Debug trap
+    }
     for (prefix, fullDescKey) in dictShortNames {
         // There may be a space at the end of ShortName
         if name.hasPrefix(prefix) || name == prefix.trim {
             return (prefix, fullDescKey)
+        }
+        let length = prefix.count
+        let namePrefix = name.prefix(length)
+        if namePrefix == prefix {
+            print("VendorShortNames#\(#line) \(name) matches \(prefix)")
+                  // Debug Trap
         }
     }
     return ("","")

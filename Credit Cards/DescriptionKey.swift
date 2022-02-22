@@ -18,7 +18,7 @@ struct DescriptionKey {
         var descKeyLong = desc.trim
         var key2 = ""
 
-        if desc.lowercased().contains("lancaster can") {
+        if desc.uppercased().starts(with: "WELLS FARGO BANK") {
             // Debug trap
         }
 

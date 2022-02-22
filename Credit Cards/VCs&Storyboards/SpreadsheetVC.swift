@@ -186,7 +186,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
             let ascending: Bool
             ascending = (key == SpSheetColID.cardType) // ascending for cardType; descending for the rest.
             let sortDescriptor  = NSSortDescriptor(key: key,  ascending: ascending)
-            print("⬆️\(codeFile)#\(#line) sortDescriptor key: \(sortDescriptor.key ?? "?")   ascending: \(sortDescriptor.ascending)")
+            //print("⬆️\(codeFile)#\(#line) sortDescriptor key: \(sortDescriptor.key ?? "?")   ascending: \(sortDescriptor.ascending)")
             column.sortDescriptorPrototype = sortDescriptor
             colWidDict[key] = column.width
         }//next column
@@ -196,7 +196,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
     private func syncColWidths() {
         for (idx, column) in tableView.tableColumns.enumerated() {
             tableViewSum.tableColumns[idx].width = column.width
-            print("🙂 \(codeFile)#\(#line) Set Column \(idx) \(column.title) to width of \(column.width)")
+            //print("🙂 \(codeFile)#\(#line) Set Column \(idx) \(column.title) to width of \(column.width)")
         }
     }
 

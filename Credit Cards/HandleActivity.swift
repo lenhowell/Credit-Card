@@ -252,6 +252,13 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
     } else if des.hasPrefix("PRINCIPAL PAYMENT:")       { // "PRINCIPAL PAYMENT: ADVISORS DISCIPLINED TR 532 TAX EXEMPT MUN PO"
         known = true
 
+    } else if des.hasPrefix("TRANSFER") { //
+        let split = des.components(separatedBy: "N/O")
+        if split.count == 2 {
+            known = true
+            lineItem.desc = split[1].trim
+        }
+
     } else if des.hasPrefix("FUNDS TRANSFER WIRE TRF IN") { // FUNDS TRANSFER WIRE TRF IN DXXXXXXX1148 ORG=/XXXX9647 TRUFFLE HO
         known = true
 
