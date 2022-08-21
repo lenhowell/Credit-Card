@@ -17,8 +17,8 @@ var usrCatItemPrefered   = CategoryItem()
 var usrBatchMode         = true
 // Returns from UserInputVendorCatForm
 var usrModTranItemReturned  = ModifiedTransactionItem()
-var usrFixVendor        = true
-var usrIgnoreVendors    = [String: Int]()
+var usrFixVendor            = true
+var usrIgnoreVendors        = [String: Int]()
 
 //MARK: ---- handleCards - 25-195 = 170-lines
 // Called by: ViewController
@@ -73,7 +73,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
         Stats.lineItemNumber = lineNum
 
         // ---------- Make the basic LineItem ----------
-        let lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: gDictVendorShortNames, cardType: cardType, hasCatHeader: hasCatHeader, fileName: fileName, lineNum: lineNum, acct: acct)
+        let lineItem = makeLineItem(fromTransFileLine: tran, dictColNums: dictColNums, dictVendorShortNames: Glob.dictVendorShortNames, cardType: cardType, hasCatHeader: hasCatHeader, fileName: fileName, lineNum: lineNum, acct: acct)
 
         if !lineItem.desc.isEmpty || !lineItem.postDate.isEmpty || lineItem.debit != 0  || lineItem.credit != 0 {
 
@@ -82,15 +82,15 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
             if !chkNumStr.isEmpty {                        // This IS a Numbered Check
                 let dateFromTran = lineItem.tranDate
                 var dateToUse = dateFromTran
-                if let idxFromDupe = gDictCheckDupes[chkNumStr] {
+                if let idxFromDupe = Glob.dictCheckDupes[chkNumStr] {
                     // IS a Dupe
                     dateToUse = gotaDupe(lineItem: lineItem, idxFromDupe: idxFromDupe, fileName: fileName, lineNum: lineNum)
 
                 } else {    // NOT a Dupe Chk#
-                    gDictCheckDupes[chkNumStr] = gLineItemArray.count  // Record its position in array for Dupe check
+                    Glob.dictCheckDupes[chkNumStr] = Glob.lineItemArray.count  // Record its position in array for Dupe check
                     let key2 = lineItem.postDate + "$" + String(format: "%.2f",lineItem.debit)
-                    gDictCheck2Dupes[key2] = gLineItemArray.count   // Tofind dupe w/o Chk# in trans file
-                    gLineItemArray.append(lineItem)                 // Add new output Record
+                    Glob.dictCheck2Dupes[key2] = Glob.lineItemArray.count   // Tofind dupe w/o Chk# in trans file
+                    Glob.lineItemArray.append(lineItem)                 // Add new output Record
                 }
                 if Stats.firstDate > dateToUse { Stats.firstDate = dateToUse }
                 if Stats.lastDate  < dateToUse { Stats.lastDate  = dateToUse }
@@ -104,7 +104,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
                 // ??????
                 let dateStr = lineItem.postDate.isEmpty ? lineItem.tranDate: lineItem.postDate
                 let key2 = dateStr + "$" + String(format: "%.2f",lineItem.debit)
-                if let n = gDictCheck2Dupes[key2] {  // To find dupe w/o Chk# in trans file
+                if let _ = Glob.dictCheck2Dupes[key2] {  // To find dupe w/o Chk# in trans file
                     Stats.duplicateCount += 1
                     continue
                 }
@@ -116,8 +116,8 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
             let signature1 = lineItem.signature()                   // Signature using TranDate
             let signature2 = lineItem.signature(usePostDate: true)  // Signature using PostDate
             let signatureNoDate  = lineItem.signature(ignoreDate: true)
-            var matchOpt = gDictTranDupes[signature1]
-            if matchOpt == nil { matchOpt = gDictTranDupes[signature2] }
+            var matchOpt = Glob.dictTranDupes[signature1]
+            if matchOpt == nil { matchOpt = Glob.dictTranDupes[signature2] }
 
             // Special handling for Credits that might have differing dates
             if lineItem.rawCat.uppercased().contains("CREDIT") && lineItem.credit > 0 {
@@ -125,27 +125,27 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
                 let vendr   = lineItem.descKey.prefix(4)
                 let credit  = String(format: "%.2f", lineItem.credit)
                 let signature = vendr + "|" + credit
-                if let dateFromDupe = gDictCreditDupes[signature] {
+                if let dateFromDupe = Glob.dictCreditDupes[signature] {
                     let daysDif = dateDif(dateStr1: lineItem.tranDate, dateStr2: dateFromDupe)
                     if abs(daysDif) <= 4 {
                         print("🤔 HandleCards#\(#line) \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat)")
                     }
                 } else {
-                    gDictCreditDupes[signature] = lineItem.tranDate
-                    gLineItemArray.append(lineItem)              // Add new output Record
+                    Glob.dictCreditDupes[signature] = lineItem.tranDate
+                    Glob.lineItemArray.append(lineItem)              // Add new output Record
                 }
                 continue    // Done with this transaction
             }
 
             // See if Match for Dates & $ only
             if matchOpt == nil {
-                if let tuple = gDictNoVendrDupes[signatureNoVendr] {
+                if let tuple = Glob.dictNoVendrDupes[signatureNoVendr] {
                     let idx  = tuple.0
                     let file = tuple.1
                     if file != fileName {
                         print("🔹 HandleCards#\(#line) \(lineItem.tranDate) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat) - Dupe in \(file)")
-                        print("  HandleCards#\(#line)     descKey \"\(lineItem.descKey)\" vs \"\(gLineItemArray[idx].descKey)\" both $\(lineItem.debit), $\(lineItem.credit) on \(lineItem.tranDate)")
-                        if lineItem.descKey.prefix(3) == gLineItemArray[idx].descKey.prefix(3) {
+                        print("  HandleCards#\(#line)     descKey \"\(lineItem.descKey)\" vs \"\(Glob.lineItemArray[idx].descKey)\" both $\(lineItem.debit), $\(lineItem.credit) on \(lineItem.tranDate)")
+                        if lineItem.descKey.prefix(3) == Glob.lineItemArray[idx].descKey.prefix(3) {
                             matchOpt = tuple
                         } else {
                             //
@@ -156,14 +156,14 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
 
             // See if Match for Vendr & approx dates (+/-2)
             if matchOpt == nil {
-                if let tuple = gDictNoDateDupes[signatureNoDate] {
+                if let tuple = Glob.dictNoDateDupes[signatureNoDate] {
                     let date1 = lineItem.tranDate
-                    let date2 = gLineItemArray[tuple.0].tranDate
+                    let date2 = Glob.lineItemArray[tuple.0].tranDate
                     let daysDif = dateDif(dateStr1: date1, dateStr2: date2)
                     let file = tuple.1
                     if abs(daysDif) <= 2 && file != fileName {
                         print("🔹 HandleCards#\(#line) \(date1) \(lineItem.postDate) \(lineItem.descKey) \(lineItem.credit) \(lineItem.rawCat) - Dupe in \(file)")
-                        print("  HandleCards#\(#line)     Close dates \"\(lineItem.descKey)\" \(date1) vs \"\(gLineItemArray[tuple.0].descKey)\" \(date2) both $\(lineItem.debit), $\(lineItem.credit)")
+                        print("  HandleCards#\(#line)     Close dates \"\(lineItem.descKey)\" \(date1) vs \"\(Glob.lineItemArray[tuple.0].descKey)\" \(date2) both $\(lineItem.debit), $\(lineItem.credit)")
                         //matchOpt = tuple
                     }
                 }
@@ -172,15 +172,15 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
             let matchFile = matchOpt?.1 ?? ""
             if matchOpt == nil || matchFile == fileName {
                 // NOT a Dupe
-                let tuple = (gLineItemArray.count, fileName)
-                gDictTranDupes[signature1] = tuple        // mark for dupes check using TranDate
-                gDictTranDupes[signature2] = tuple        // mark for dupes check using PostDate
+                let tuple = (Glob.lineItemArray.count, fileName)
+                Glob.dictTranDupes[signature1] = tuple        // mark for dupes check using TranDate
+                Glob.dictTranDupes[signature2] = tuple        // mark for dupes check using PostDate
                 if lineItem.debit != 0.0 || lineItem.credit != 0.0 {
-                    gDictNoVendrDupes[signatureNoVendr] = tuple
-                    gDictNoDateDupes[signatureNoDate] = tuple
+                    Glob.dictNoVendrDupes[signatureNoVendr] = tuple
+                    Glob.dictNoDateDupes[signatureNoDate] = tuple
                 }
 
-                gLineItemArray.append(lineItem)              // Add new output Record
+                Glob.lineItemArray.append(lineItem)              // Add new output Record
                 if Stats.firstDate > lineItem.tranDate { Stats.firstDate = lineItem.tranDate }
                 if Stats.lastDate  < lineItem.tranDate {
                     if !lineItem.tranDate.contains("?") {
@@ -210,7 +210,7 @@ func handleCards(fileName: String, cardType: String, cardArray: [String], acct: 
 // Returns the TrasactionDate to use for min-max
 internal func gotaDupe(lineItem: LineItem, idxFromDupe: Int, fileName: String, lineNum: Int) -> String {
     // IS a Dupe
-    let lineItemFromDupe = gLineItemArray[idxFromDupe]
+    let lineItemFromDupe = Glob.lineItemArray[idxFromDupe]
     let dateFromDupe     = lineItemFromDupe.tranDate
     let dateFromTran     = lineItem.tranDate
     let chkNum           = lineItem.chkNumber
@@ -225,7 +225,7 @@ internal func gotaDupe(lineItem: LineItem, idxFromDupe: Int, fileName: String, l
      genCat     MyCategory  "Checks-?"
      */
     if lineItemFromDupe.postDate.count < 8 || lineItemFromDupe.desc.contains("UNREC") {
-        gLineItemArray[idxFromDupe] = lineItem  // Replace current lineItem with this one
+        Glob.lineItemArray[idxFromDupe] = lineItem  // Replace current lineItem with this one
     }
     
     if chkNum.isEmpty {
@@ -235,7 +235,7 @@ internal func gotaDupe(lineItem: LineItem, idxFromDupe: Int, fileName: String, l
     }
     // fileName: fileName, dataLineNum: lineNum, lineText: lineItem.transText,
     print("➡️ HandleCards#\(#line)[\(fileName)] \(msg)")
-    gLineItemArray[idxFromDupe].cardType = gLineItemArray[idxFromDupe].cardType + "*"
+    Glob.lineItemArray[idxFromDupe].cardType = Glob.lineItemArray[idxFromDupe].cardType + "*"
     
     if lineItem.descKey != lineItemFromDupe.descKey ||  lineItem.genCat != lineItemFromDupe.genCat {
         if lineItem.descKey != lineItemFromDupe.descKey {
@@ -245,14 +245,14 @@ internal func gotaDupe(lineItem: LineItem, idxFromDupe: Int, fileName: String, l
             print("😡 HandleCards#\(#line)[\(fileName)] genCat: \(lineItem.genCat) != \(lineItemFromDupe.genCat)")
         }
         if lineItemFromDupe.genCat == Const.unknown && lineItem.genCat != Const.unknown {
-            gLineItemArray[idxFromDupe].genCat  = lineItem.genCat
-            gLineItemArray[idxFromDupe].descKey = lineItem.descKey
+            Glob.lineItemArray[idxFromDupe].genCat  = lineItem.genCat
+            Glob.lineItemArray[idxFromDupe].descKey = lineItem.descKey
         } else {
             //
         }
     }
     if dateFromTran < dateFromDupe {
-        gLineItemArray[idxFromDupe].tranDate = dateFromTran // Use older tranDate (newer one is probably a postDate)
+        Glob.lineItemArray[idxFromDupe].tranDate = dateFromTran // Use older tranDate (newer one is probably a postDate)
     } else {
         dateToUse = dateFromDupe
     }
@@ -271,8 +271,8 @@ internal func makeLineItem(fromTransFileLine:   String,
                            fileName:            String,
                            lineNum:             Int,
                            acct:                Account?) -> LineItem {
-    // Uses Globals: gLearnMode, gUserInputMode, gDictModifiedTrans, gCatagories 
-    // Modifies Gloabals: gDictVendorCatLookup, Stats
+    // Uses Globals: Glob.learnMode, Glob.userInputMode, Glob.dictModifiedTrans, gCatagories 
+    // Modifies Gloabals: Glob.dictVendorCatLookup, Stats
 
     // If an "Account" record has been read-in for this item, set signAmount & tran accordingly
     var isActivity = false
@@ -300,7 +300,7 @@ internal func makeLineItem(fromTransFileLine:   String,
 
     // Check for Modified Transaction
     let modTranKey = lineItem.signature()
-    if let modTrans = gDictModifiedTrans[modTranKey] {
+    if let modTrans = Glob.dictModifiedTrans[modTranKey] {
         lineItem.genCat      = modTrans.catItem.category // Found transaction in MyModifiedTransactions.txt
         lineItem.catSource   = modTrans.catItem.source
         lineItem.memo        = modTrans.memo
@@ -320,7 +320,7 @@ internal func makeLineItem(fromTransFileLine:   String,
         //print("")     //Debug Trap
     }
     
-    if let catVend = gDictVendorCatLookup[descKey] {
+    if let catVend = Glob.dictVendorCatLookup[descKey] {
         catItemFromVendor = catVend             // ------ Here if Lookup by Vendor was successful
         (catItemPrefered, isClearWinner) = pickTheBestCat(catItemVendor: catItemFromVendor, catItemTransa: catItemFromTran)
         if lineItem.genCat != catItemPrefered.category {
@@ -350,8 +350,8 @@ internal func makeLineItem(fromTransFileLine:   String,
         catItemFromTran = CategoryItem(category: catFromTran, source: cardType)
         catItemPrefered = catItemFromTran
         lineItem.genCat = catFromTran
-        if gLearnMode {
-            gDictVendorCatLookup[descKey] = CategoryItem(category: catFromTran, source: cardType) //Do Actual Insert
+        if Glob.learnMode {
+            Glob.dictVendorCatLookup[descKey] = CategoryItem(category: catFromTran, source: cardType) //Do Actual Insert
             Stats.addedCatCount += 1
         } else {
             Stats.descWithNoCat += 1
@@ -364,13 +364,13 @@ internal func makeLineItem(fromTransFileLine:   String,
     if usrIgnoreVendors[lineItem.descKey] == nil {
 
         // if in User-Input-Mode && No Clear Winner
-        if gLearnMode {
-            if gUserInputMode && !isClearWinner {
+        if Glob.learnMode {
+            if Glob.userInputMode && !isClearWinner {
                 _ = showUserInputVendorCatForm(lineItem: lineItem, batchMode: true, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemPrefered)
                 // ...and we're back.
                 catItemPrefered = usrModTranItemReturned.catItem
             } else if catItemPrefered.category != catItemFromVendor.category && isClearWinner {
-                gDictVendorCatLookup[descKey] = catItemPrefered  // Do Actual Insert into VendorCategoryLookup
+                Glob.dictVendorCatLookup[descKey] = catItemPrefered  // Do Actual Insert into VendorCategoryLookup
                 Stats.changedVendrCatCount += 1
             }
         }
@@ -382,7 +382,7 @@ internal func makeLineItem(fromTransFileLine:   String,
 //MARK: showUserInputVendorCatForm
 
 //---- showUserInputVendorCatForm - Allow User to intervene using the UserInputCat form.
-// Inserts/changes gDictVendorCatLookup or gDictModifiedTrans
+// Inserts/changes Glob.dictVendorCatLookup or Glob.dictModifiedTrans
 // Called by: makeLineItem, SpreadsheetVC
 func showUserInputVendorCatForm(lineItem: LineItem,
                                 batchMode:          Bool,
@@ -404,7 +404,7 @@ func showUserInputVendorCatForm(lineItem: LineItem,
     }
     if let userInputCatWindow = userInputCatWindowController.window {
         let userInputViewController = userInputCatWindow.contentViewController as! UserInputCatVC
-        userInputViewController.myUserInitials = gUserInitials  // experiment
+        userInputViewController.myUserInitials = Glob.userInitials  // experiment
         let application = NSApplication.shared
         let returnVal = application.runModal(for: userInputCatWindow) // <=================  UserInputVC
         // ...and we're back.
@@ -415,15 +415,15 @@ func showUserInputVendorCatForm(lineItem: LineItem,
 
         case .OK:                                   // .OK - Make changes requested by user
             if usrFixVendor {                       // Fix VendorCategoryLookup value
-                gDictVendorCatLookup[lineItem.descKey] = usrModTranItemReturned.catItem
+                Glob.dictVendorCatLookup[lineItem.descKey] = usrModTranItemReturned.catItem
                 Stats.changedVendrCatCount += 1
                 if !batchMode {
-                    writeVendorCategoriesToFile(url: gUrl.vendorCatLookupFile, dictCat: gDictVendorCatLookup)
+                    writeVendorCategoriesToFile(url: Glob.url.vendorCatLookupFile, dictCat: Glob.dictVendorCatLookup)
                 }
             } else {                                // New category for this transaction only.
                 let transKey = lineItem.signature()
-                gDictModifiedTrans[transKey] = usrModTranItemReturned
-                writeModTransTofile(url: gUrl.myModifiedTrans, dictModTrans: gDictModifiedTrans)
+                Glob.dictModifiedTrans[transKey] = usrModTranItemReturned
+                writeModTransTofile(url: Glob.url.myModifiedTrans, dictModTrans: Glob.dictModifiedTrans)
             }
             modTranItemToReturn = usrModTranItemReturned
 
@@ -431,7 +431,7 @@ func showUserInputVendorCatForm(lineItem: LineItem,
             break
 
         case .continue:                             // .continue - Continue app with no user input
-            gUserInputMode =  false
+            Glob.userInputMode =  false
 
         default:                                    // Except for .cancel, we should not be here
             print("⛔️ HandleCards#\(#line) Unknown return value \(returnVal)")
@@ -516,7 +516,7 @@ public func makeDictColNums(file: String, headers: [String]) -> [String: Int] {
 // Called by: makeLineItem
 internal func findShorterDescKey(_ descKey: String) {
     let descKeyCount = descKey.count
-    for (key, value) in gDictVendorCatLookup {
+    for (key, _) in Glob.dictVendorCatLookup {
         let keyCount = key.count
         if descKeyCount < keyCount && descKeyCount > 3 {
             if key.prefix(descKeyCount) == descKey {

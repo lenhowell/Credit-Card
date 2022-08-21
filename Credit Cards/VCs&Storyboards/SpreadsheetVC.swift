@@ -65,7 +65,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         txtVendor.delegate   = self // Allow ViewController to see when txtVendor changes.
 
         loadStuffFromCaller(summaryData: gPassToNextTable)
-        loadTableDictsArray(lineItemArray: gLineItemArray)
+        loadTableDictsArray(lineItemArray: Glob.lineItemArray)
 
         tableView.target = self
         tableView.doubleAction = #selector(tableViewDoubleClick(_:))
@@ -98,7 +98,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         if errMsg.isEmpty {
             btnFilter.keyEquivalent = ""
             btnSummary.keyEquivalent = "\r"
-            loadTableDictsArray(lineItemArray: gLineItemArray)
+            loadTableDictsArray(lineItemArray: Glob.lineItemArray)
             reloadTableSorted(sortBy: iSortBy, ascending: iAscending)
             //tableViewSum.reloadData()
         } else {
@@ -116,7 +116,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
         txtVendor.stringValue   = ""
         let errMsg = setFilter()
         if errMsg.isEmpty {
-            loadTableDictsArray(lineItemArray: gLineItemArray)
+            loadTableDictsArray(lineItemArray: Glob.lineItemArray)
             reloadTableSorted(sortBy: iSortBy, ascending: iAscending)
             btnClear.isEnabled = false
         }
@@ -152,7 +152,7 @@ class SpreadsheetVC: NSViewController, NSWindowDelegate {
 
     // Not used
     @IBAction func chkShowAllChanged(_ sender: Any) {  // Handles chkShowAll.CheckedChanged
-        loadTableDictsArray(lineItemArray: gLineItemArray)
+        loadTableDictsArray(lineItemArray: Glob.lineItemArray)
         reloadTableSorted(sortBy: iSortBy, ascending: iAscending)
     }//end func
 
@@ -451,7 +451,7 @@ extension SpreadsheetVC: NSTableViewDelegate {
             let idxStr = rowDict["idx"] ?? ""
             let idx = Int(idxStr) ?? -1
             //print("🙂 \(codeFile)#\(#line) Selected Row # \(tableView.selectedRow).  idx = \(idx)")
-            let lineItem = gLineItemArray[idx]
+            let lineItem = Glob.lineItemArray[idx]
 
             var id = rowDict[SpSheetColID.chkNumber] ?? ""
             if !id.isEmpty { id = "  #" + id + "  " }
@@ -502,7 +502,7 @@ extension SpreadsheetVC: NSTableViewDelegate {
         let idxStr = rowDict["idx"] ?? ""
         let idx = Int(idxStr) ?? -1
         print("✅✅ \(codeFile)#\(#line) DoubleClicked on Row # \(tableView.selectedRow).  idx = \(idx)")
-        let lineItem = gLineItemArray[idx]
+        let lineItem = Glob.lineItemArray[idx]
         print("      \(lineItem.tranDate) \(lineItem.descKey) \(lineItem.debit)")
         let catItemFromVendor = CategoryItem(category: lineItem.genCat, source: lineItem.catSource)
         let catItemFromTran   = CategoryItem(category: lineItem.rawCat, source: lineItem.catSource)
@@ -510,12 +510,12 @@ extension SpreadsheetVC: NSTableViewDelegate {
         let modTranItem = showUserInputVendorCatForm(lineItem: lineItem, batchMode: false, catItemFromVendor: catItemFromVendor, catItemFromTran: catItemFromTran, catItemPrefered: catItemFromVendor)
         // ...and we're back.
 
-        gLineItemArray[idx].genCat      = modTranItem.catItem.category
-        gLineItemArray[idx].catSource   = modTranItem.catItem.source
-        gLineItemArray[idx].memo        = modTranItem.memo
-        gLineItemArray[idx].modifiedKey = modTranItem.key
+        Glob.lineItemArray[idx].genCat      = modTranItem.catItem.category
+        Glob.lineItemArray[idx].catSource   = modTranItem.catItem.source
+        Glob.lineItemArray[idx].memo        = modTranItem.memo
+        Glob.lineItemArray[idx].modifiedKey = modTranItem.key
 
-        loadTableDictsArray(lineItemArray: gLineItemArray)
+        loadTableDictsArray(lineItemArray: Glob.lineItemArray)
         reloadTableSorted(sortBy: iSortBy, ascending: iAscending)
         tableView.selectRowIndexes(NSIndexSet(index: selectedRow) as IndexSet, byExtendingSelection: false)
     }//end func

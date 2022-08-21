@@ -43,7 +43,7 @@ public struct Catagories {
         }
         let lines = contentof.components(separatedBy: "\n") // Create var lines containing Entry for each line.
         var lineNum = 0
-        gMyCategoryHeader = ""
+        Glob.myCategoryHeader = ""
         var inHeader = true
         for line in lines {
             lineNum += 1
@@ -51,7 +51,7 @@ public struct Catagories {
             let linetrim = line.trim
             if linetrim.isEmpty || linetrim.hasPrefix("//") || linetrim.hasPrefix("My Name") {
                 if inHeader {
-                    gMyCategoryHeader += line + "\n"
+                    Glob.myCategoryHeader += line + "\n"
                     if linetrim.isEmpty || linetrim.hasPrefix("My Name") {
                         inHeader = false
                     }
@@ -91,7 +91,7 @@ public struct Catagories {
     func writeMyCats(url: URL) {
         FileIO.saveBackupFile(url: url)
         
-        var text = gMyCategoryHeader
+        var text = Glob.myCategoryHeader
         text += "My Name,               alias1,        alias2,    ...\n"
         var prevCat = ""
         for (cat, array) in dictCatAliasArray.sorted(by: {$0.key < $1.key} ) {

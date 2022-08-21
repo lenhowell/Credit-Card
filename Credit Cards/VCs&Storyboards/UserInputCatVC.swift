@@ -28,7 +28,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         chkLockIn.state       = .off
         chkQuestionMark.state = .off
 
-        lblFile.stringValue = gTransFilename + "    " + usrLineItem.chkNumber
+        lblFile.stringValue = Glob.transFilename + "    " + usrLineItem.chkNumber
         let lineItem        = usrLineItem
         let amt             = lineItem.debit - lineItem.credit
         let strDebit        = String(format:"%.2f", amt)
@@ -117,7 +117,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
     @IBAction func cboCatsChange(_ sender: Any) {
         print("\(codeFile)#\(#line) cboCatsChange \(cboCats.stringValue)")
         catItemCurrent.category = cboCats.stringValue
-        catItemCurrent.source = gUserInitials
+        catItemCurrent.source = Glob.userInitials
         updateAfterCatChange(newCatItem: catItemCurrent)
     }
 
@@ -159,8 +159,8 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
     @IBAction func btnAddShortName(_ sender: Any) {
         let returnVal = showUserInputShortNameForm(shortName: usrLineItem.desc.trim, longName: usrLineItem.descKey) //$$$
         if returnVal == .OK {           // OK: Add (prefix,descKey) to list
-            gDictVendorShortNames[usrVendrPrefix] = usrVendrFullDescKey //move to showUserInputShortNameForm?
-            writeVendorShortNames(url: gUrl.vendorShortNamesFile, dictVendorShortNames: gDictVendorShortNames)
+            Glob.dictVendorShortNames[usrVendrPrefix] = usrVendrFullDescKey //move to showUserInputShortNameForm?
+            writeVendorShortNames(url: Glob.url.vendorShortNamesFile, dictVendorShortNames: Glob.dictVendorShortNames)
         }
     }
 
@@ -212,10 +212,10 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         usrModTranItemReturned = ModifiedTransactionItem(catItem: catItemCurrent, memo: txtMemo.stringValue.trim, key: modKey)
         if radioFileVendor.state == .on {       // Change vendor cat
             if chkLockIn.state == .on { //LockIn
-                usrModTranItemReturned.catItem.source = "$" + gUserInitials
+                usrModTranItemReturned.catItem.source = "$" + Glob.userInitials
             }
         } else {                                // Modify this transaction
-            usrModTranItemReturned.catItem.source = "*" + gUserInitials
+            usrModTranItemReturned.catItem.source = "*" + Glob.userInitials
         }
         print("\(codeFile)#\(#line) return \(usrModTranItemReturned.catItem.category) \(usrModTranItemReturned.catItem.source)")
         NSApplication.shared.stopModal(withCode: .OK)
@@ -261,7 +261,7 @@ class UserInputCatVC: NSViewController, NSWindowDelegate {
         gCatagories.catNames.append(newCat)
         gCatagories.catNames.sort()
         loadComboBoxCats()
-        gCatagories.writeMyCats(url: gUrl.myCatsFile) //?!+
+        gCatagories.writeMyCats(url: Glob.url.myCatsFile) //?!+
     }
 
     // Sets ComboBox-String and chkQuestionMark.state

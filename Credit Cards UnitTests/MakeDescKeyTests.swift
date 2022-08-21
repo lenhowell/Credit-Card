@@ -14,15 +14,15 @@ class MakeDescKeyTests: XCTestCase {
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
-        gIsUnitTesting = true
-        gUserInputMode = false
-        gLearnMode = false
+        Glob.isUnitTesting = true
+        Glob.userInputMode = false
+        Glob.learnMode = false
         allowAlerts = false
     }
 
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
-        gIsUnitTesting = false
+        Glob.isUnitTesting = false
         allowAlerts = true
     }
 
@@ -96,7 +96,7 @@ class MakeDescKeyTests: XCTestCase {
         result = DescriptionKey.makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "HUM HUMANN")
 
-        // Without gDictVendorShortNames
+        // Without Glob.dictVendorShortNames
         desc = "VZWRLSS*APOCC VISN"
         result = DescriptionKey.makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "VZWRLSS APOCC VISN")
@@ -112,7 +112,7 @@ class MakeDescKeyTests: XCTestCase {
 
         dictVendorShortNames = [ "VERIZON W": "VERIZON WIRELESS", "VZWRLSS": "VERIZON WIRELESS" ]
 
-        // With gDictVendorShortNames
+        // With Glob.dictVendorShortNames
         desc = "VZWRLSS*APOCC VISN"
         result = DescriptionKey.makeDescKey(from: desc, dictVendorShortNames: dictVendorShortNames)
         XCTAssertEqual(result, "VERIZON WIRELESS")

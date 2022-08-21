@@ -26,7 +26,7 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
     if testData.isEmpty {
         fileName = "Amazon Orders.txt"
         errAction = .alertAndDisplay
-        let pathURL = FileIO.getPossibleParentFolder(myURL: gUrl.transactionFolder)
+        let pathURL = FileIO.getPossibleParentFolder(myURL: Glob.url.transactionFolder)
         let fileURL = pathURL.appendingPathComponent(fileName)
         content = (try? String(contentsOf: fileURL)) ?? ""
         if content.isEmpty {

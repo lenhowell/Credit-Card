@@ -29,3 +29,28 @@ public struct Url {
     var transactionFolder    = FileManager.default.homeDirectoryForCurrentUser
 }
 
+public struct Glob {
+    static var userInitials           = "User"         // UD (UserInputVC) Initials used for "Category Source" when Cat changed by user
+    static var lineItemArray          = [LineItem]()   // (used VC, SpreadsheetVC, + 4 more) Entire list of transactions
+    static var transFilename          = ""             // (UserInputVC.swift-viewDidLoad) Current Transaction Filename
+    static var accounts               = Accounts()
+
+    static var dictVendorCatLookup    = [String: CategoryItem]()   // (VC, HandleCards) for Category Lookup(CategoryLookup.txt)
+    static var dictTranDupes          = [String: (idx: Int, file: String)]() // (clr:main, use:handleCards) to find dupe transactions
+    static var dictNoVendrDupes       = [String: (Int, String)]()  // (clr:main, use:handleCards)
+    static var dictNoDateDupes        = [String: (Int, String)]()  // (clr:main, use:handleCards)
+    static var dictCheckDupes         = [String: Int]()            // (clr:main, use:handleCards) to find dupe checkNumbers
+    static var dictCheck2Dupes        = [String: Int]()            // (clr:main, use:handleCards) to find dupe checkNumbers
+    static var dictCreditDupes        = [String: String]()         // (clr:main, use:handleCards) dupe Visa Credits (inconsistant dates)
+    static var dictModifiedTrans      = [String: ModifiedTransactionItem]() // (load:VC use:HandleCards) user-modified transactions
+    static var dictAmazonItemsByDate  = [String: [AmazonItem]]()   // (load:VC NOTused)
+
+    static var myCategoryHeader       = ""
+    static var isUnitTesting          = false      // Not used
+    static var learnMode              = true       // Used VC & HandleCards.swift
+    static var userInputMode          = true       // Used VC & HandleCards.swift
+
+    static var dictVendorShortNames   = [String: String]()     // (VendorShortNames.txt) Hash for VendorShortNames Lookup
+
+    static var url                    = Url()
+}

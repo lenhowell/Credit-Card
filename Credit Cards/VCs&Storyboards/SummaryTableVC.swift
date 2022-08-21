@@ -140,7 +140,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
     @IBAction func btnFilterClick(_ sender: Any) {
         let errMsg = applyFilter()
         if errMsg.isEmpty {
-            loadTableDictsArray(lineItemArray: gLineItemArray, summarizeBy : summarizeBy)
+            loadTableDictsArray(lineItemArray: Glob.lineItemArray, summarizeBy : summarizeBy)
         }
     }
 
@@ -164,7 +164,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         txtVendor.stringValue   = ""
         let errMsg = setFilter()
         if errMsg.isEmpty {
-            loadTableDictsArray(lineItemArray: gLineItemArray, summarizeBy : summarizeBy)
+            loadTableDictsArray(lineItemArray: Glob.lineItemArray, summarizeBy : summarizeBy)
             //tableView.reloadData()
             //tableViewSum.reloadData()
             btnClear.isEnabled = false
@@ -215,7 +215,7 @@ class SummaryTableVC: NSViewController, NSWindowDelegate {
         } else {
             summarizeBy = .none
         }
-        loadTableDictsArray(lineItemArray: gLineItemArray, summarizeBy : summarizeBy)
+        loadTableDictsArray(lineItemArray: Glob.lineItemArray, summarizeBy : summarizeBy)
     }
 
     //MARK: - Regular funcs

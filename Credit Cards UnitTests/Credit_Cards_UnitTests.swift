@@ -13,15 +13,15 @@ class Credit_Cards_UnitTests: XCTestCase {
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
-        gIsUnitTesting = true
-        gUserInputMode = false
-        gLearnMode = false
+        Glob.isUnitTesting = true
+        Glob.userInputMode = false
+        Glob.learnMode = false
         allowAlerts = false
     }
 
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
-        gIsUnitTesting = false
+        Glob.isUnitTesting = false
         allowAlerts = true
     }
 
@@ -216,31 +216,31 @@ class Credit_Cards_UnitTests: XCTestCase {
     }
 
     func testHandleCards() {
-        gDictVendorShortNames = [:]
-        gDictVendorShortNames = [String: String]()
+        Glob.dictVendorShortNames = [:]
+        Glob.dictVendorShortNames = [String: String]()
 
         // Generates Alert - Move to UITests
         let contentGarbage = "\nGarbage\nGarbage\nGarbage\n"
         let cardArrayGarbage = contentGarbage.components(separatedBy: "\n")
-        gDictVendorShortNames = [String: String]()
-        gLineItemArray = []
+        Glob.dictVendorShortNames = [String: String]()
+        Glob.lineItemArray = []
         handleCards(fileName: "fileName.csv", cardType: "cardType", cardArray: cardArrayGarbage, acct: nil)
-        XCTAssertEqual(gLineItemArray.isEmpty, true)
+        XCTAssertEqual(Glob.lineItemArray.isEmpty, true)
 
         let cardArrayC1R = [
             "Transaction Date,Posted Date,Card No.,Description,Category,Debit,Credit",
             "2018-08-11,2018-08-18,8772,MORRISSEYS FRONT PORCH,Dining,12.14,",
         ]
-        gDictVendorShortNames = [String: String]()
-        gLineItemArray = []
+        Glob.dictVendorShortNames = [String: String]()
+        Glob.lineItemArray = []
         handleCards(fileName: "fileName.csv", cardType: "cardType", cardArray: cardArrayC1R, acct: nil)
-        XCTAssertEqual(gLineItemArray.count, 1)
-        XCTAssertEqual(gLineItemArray[0].tranDate, "2018-08-11")
-        XCTAssertEqual(gLineItemArray[0].postDate, "2018-08-18")
-        XCTAssertEqual(gLineItemArray[0].chkNumber, "")
-        XCTAssertEqual(gLineItemArray[0].desc, "MORRISSEYS FRONT PORCH")
-        XCTAssertEqual(gLineItemArray[0].debit, 12.14)
-        XCTAssertEqual(gLineItemArray[0].credit, 0.00)
+        XCTAssertEqual(Glob.lineItemArray.count, 1)
+        XCTAssertEqual(Glob.lineItemArray[0].tranDate, "2018-08-11")
+        XCTAssertEqual(Glob.lineItemArray[0].postDate, "2018-08-18")
+        XCTAssertEqual(Glob.lineItemArray[0].chkNumber, "")
+        XCTAssertEqual(Glob.lineItemArray[0].desc, "MORRISSEYS FRONT PORCH")
+        XCTAssertEqual(Glob.lineItemArray[0].debit, 12.14)
+        XCTAssertEqual(Glob.lineItemArray[0].credit, 0.00)
         //XCTAssertEqual(gLineItemArray[0].rawCat, "Food-Restaurant") //Note: Depends on MyCategories.txt
 
 
@@ -252,21 +252,21 @@ class Credit_Cards_UnitTests: XCTestCase {
     04/28/2018,04/29/2018,"NEGATIVE - ACCOUNTING",(42.56),"Payments and Credits"
     """
         let cardArrayLHDC = contentLHDC.components(separatedBy: "\n")
-        gDictVendorShortNames = [String: String]()
-        gLineItemArray = []
+        Glob.dictVendorShortNames = [String: String]()
+        Glob.lineItemArray = []
         handleCards(fileName: "fileName.csv", cardType: "cardType", cardArray: cardArrayLHDC, acct: nil)
-        XCTAssertEqual(gLineItemArray.count, 3)
-        XCTAssertEqual(gLineItemArray[0].tranDate, "2018-04-05")
-        XCTAssertEqual(gLineItemArray[0].postDate, "2018-04-06")
-        XCTAssertEqual(gLineItemArray[0].chkNumber, "")
-        //XCTAssertEqual(gLineItemArray[0].desc, "BONEFISH 7027 BOYNTON BEACHFL00422R")
-        XCTAssertEqual(gLineItemArray[0].debit, 32.56)
-        XCTAssertEqual(gLineItemArray[0].credit, 0.00)
-        XCTAssertEqual(gLineItemArray[1].debit, 0.0)
-        XCTAssertEqual(gLineItemArray[1].credit, 32.56)
-        XCTAssertEqual(gLineItemArray[2].debit, 0.0)
-        XCTAssertEqual(gLineItemArray[2].credit, 42.56)
-        //XCTAssertEqual(gLineItemArray[0].rawCat, "Food-Restaurant") //Note: Depends on MyCategories.txt
+        XCTAssertEqual(Glob.lineItemArray.count, 3)
+        XCTAssertEqual(Glob.lineItemArray[0].tranDate, "2018-04-05")
+        XCTAssertEqual(Glob.lineItemArray[0].postDate, "2018-04-06")
+        XCTAssertEqual(Glob.lineItemArray[0].chkNumber, "")
+        //XCTAssertEqual(Glob.lineItemArray[0].desc, "BONEFISH 7027 BOYNTON BEACHFL00422R")
+        XCTAssertEqual(Glob.lineItemArray[0].debit, 32.56)
+        XCTAssertEqual(Glob.lineItemArray[0].credit, 0.00)
+        XCTAssertEqual(Glob.lineItemArray[1].debit, 0.0)
+        XCTAssertEqual(Glob.lineItemArray[1].credit, 32.56)
+        XCTAssertEqual(Glob.lineItemArray[2].debit, 0.0)
+        XCTAssertEqual(Glob.lineItemArray[2].credit, 42.56)
+        //XCTAssertEqual(Glob.lineItemArray[0].rawCat, "Food-Restaurant") //Note: Depends on MyCategories.txt
 
 
         //TODO: The following Unit-Tests need assertions
@@ -280,10 +280,10 @@ class Credit_Cards_UnitTests: XCTestCase {
     Cleared,08/07/2019,"BEACH COVE RESORT F&B N MYRTLE BCH SC",27.59,
     """
         let cardArrayLHCT = contentLHCT.components(separatedBy: "\n")
-        gDictVendorShortNames = [String: String]()
-        gLineItemArray = []
+        Glob.dictVendorShortNames = [String: String]()
+        Glob.lineItemArray = []
         handleCards(fileName: "fileName.csv", cardType: "cardType", cardArray: cardArrayLHCT, acct: nil)
-        XCTAssertEqual(gLineItemArray.count, 2)
+        XCTAssertEqual(Glob.lineItemArray.count, 2)
 
 
         // Test Missing Desc ann comma embedded in quotes, positive "Credit"
@@ -296,10 +296,10 @@ class Credit_Cards_UnitTests: XCTestCase {
     9/2/19,9/3/19,8772,,Dining,9.02,
     """
         let cardArrayLHC1V = contentLHC1V.components(separatedBy: "\n")
-        gDictVendorShortNames = [String: String]()
-        gLineItemArray = []
+        Glob.dictVendorShortNames = [String: String]()
+        Glob.lineItemArray = []
         handleCards(fileName: "fileName.csv", cardType: "cardType", cardArray: cardArrayLHC1V, acct: nil)
-        XCTAssertEqual(gLineItemArray.count, 4)
+        XCTAssertEqual(Glob.lineItemArray.count, 4)
 
 
         //Uses "Original Description" in header
@@ -310,10 +310,10 @@ class Credit_Cards_UnitTests: XCTestCase {
     posted,9/14/18,A&M PIZZA                LEBANON      PA,,Restaurants/Dining,USD,-22.00, , ,Personal,Bank of America - Credit Card - Bank of America Premium Rewards Visa Sig,A&M PIZZA                LEBANON      PA
     """
         let cardArrayGBBA = contentGBBA.components(separatedBy: "\n")
-        gDictVendorShortNames = [String: String]()
-        gLineItemArray = []
+        Glob.dictVendorShortNames = [String: String]()
+        Glob.lineItemArray = []
         handleCards(fileName: "fileName.csv", cardType: "cardType", cardArray: cardArrayGBBA, acct: nil)
-        XCTAssertEqual(gLineItemArray.count, 2)
+        XCTAssertEqual(Glob.lineItemArray.count, 2)
 
 
         let contentGBML =
@@ -326,10 +326,10 @@ class Credit_Cards_UnitTests: XCTestCase {
     "01/15/2018","VZWRLSS*APOCC VISE","800-922-0204  FL","147.32","Other/Unclassified"
     """
         let cardArrayGBML = contentGBML.components(separatedBy: "\n")
-        gDictVendorShortNames = [String: String]()
-        gLineItemArray = []
+        Glob.dictVendorShortNames = [String: String]()
+        Glob.lineItemArray = []
         handleCards(fileName: "fileName.csv", cardType: "cardType", cardArray: cardArrayGBML, acct: nil)
-        XCTAssertEqual(gLineItemArray.count, 3)
+        XCTAssertEqual(Glob.lineItemArray.count, 3)
 
     }//end func testHandleCards
 

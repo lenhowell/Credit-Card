@@ -24,32 +24,6 @@ import Cocoa
 // TableFilter:     Handle filtering as an object
 // Credit_Cards_UnitTests: The following Unit-Tests need assertions
 
-//MARK: - Global Variables
-
-var gUserInitials           = "User" // UD (UserInputVC) Initials used for "Category Source" when Cat changed by user
-var gLineItemArray          = [LineItem]()  // (used here, SpreadsheetVC, + 4 more) Entire list of transactions
-var gTransFilename          = ""            // (UserInputVC.swift-viewDidLoad) Current Transaction Filename
-var gAccounts               = Accounts()
-
-var gDictVendorCatLookup    = [String: CategoryItem]()  // (here, HandleCards) for Category Lookup(CategoryLookup.txt)
-var gDictTranDupes          = [String: (idx: Int, file: String)]() // (clr:main, use:handleCards) to find dupe transactions
-var gDictNoVendrDupes       = [String: (Int, String)]() // (clr:main, use:handleCards)
-var gDictNoDateDupes        = [String: (Int, String)]() // (clr:main, use:handleCards)
-var gDictCheckDupes         = [String: Int]()           // (clr:main, use:handleCards) to find dupe checkNumbers
-var gDictCheck2Dupes        = [String: Int]()           // (clr:main, use:handleCards) to find dupe checkNumbers
-var gDictCreditDupes        = [String: String]()        // (clr:main, use:handleCards) dupe Visa Credits (inconsistant dates)
-var gDictModifiedTrans      = [String: ModifiedTransactionItem]() // (load:here use:HandleCards) user-modified transactions
-var gDictAmazonItemsByDate  = [String: [AmazonItem]]()  // (load:here NOTused)
-
-var gMyCategoryHeader       = ""
-var gIsUnitTesting          = false     // Not used
-var gLearnMode              = true      // Used here & HandleCards.swift
-var gUserInputMode          = true      // Used here & HandleCards.swift
-
-var gDictVendorShortNames   = [String: String]()    // (VendorShortNames.txt) Hash for VendorShortNames Lookup
-
-var gUrl                    = Url()
-
 //MARK: - ViewController
 class ViewController: NSViewController, NSWindowDelegate {
     
@@ -133,8 +107,8 @@ class ViewController: NSViewController, NSWindowDelegate {
                 gotItems = [gotItems, .dirTrans]    // Add dirTrans-bit to gotItems
             }
         }
-        gUserInitials = UserDefaults.standard.string(forKey: UDKey.userInitials) ?? ""  // Users Initials
-        if !gUserInitials.isEmpty {
+        Glob.userInitials = UserDefaults.standard.string(forKey: UDKey.userInitials) ?? ""  // Users Initials
+        if !Glob.userInitials.isEmpty {
             gotItems = [gotItems, .userInitials]    // Add userInitials-bit to gotItems
         }
 
@@ -143,10 +117,10 @@ class ViewController: NSViewController, NSWindowDelegate {
         //btnSpreadsheet.isEnabled = false
 
         // Start off with Learn-mode and user-intervension-mode off
-        gLearnMode            = false
-        gUserInputMode        = false
-        chkLearningMode.state = gLearnMode     ? .on : .off
-        chkUserInput.state    = gUserInputMode ? .on : .off
+        Glob.learnMode            = false
+        Glob.userInputMode        = false
+        chkLearningMode.state = Glob.learnMode     ? .on : .off
+        chkUserInput.state    = Glob.userInputMode ? .on : .off
 
         // Get List of Transaction Files
         gotNewTranactionFolder()
@@ -158,7 +132,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         verifyFolders(gotItem: &gotItems)
         if gotItems.contains(GotItem.dirSupport) {
             readSupportFiles()
-            let shortCatFilePath = FileIO.removeUserFromPath(gUrl.vendorCatLookupFile.path)
+            let shortCatFilePath = FileIO.removeUserFromPath(Glob.url.vendorCatLookupFile.path)
             lblResults.stringValue = "Category Lookup File \"\(shortCatFilePath)\" loaded with \(Stats.origVendrCatCount) items.\n"
         } else {
             lblResults.stringValue = "You will need to create a folder to hold support files before you can proceed."
@@ -227,10 +201,10 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func btnFindTruncatedDescs(_ sender: Any) {
-        let vendorNameDescs = Array(gDictVendorCatLookup.keys)
+        let vendorNameDescs = Array(Glob.dictVendorCatLookup.keys)
         let doWrite = findTruncatedDescs(vendorNameDescs: vendorNameDescs)
         if doWrite {
-            writeVendorShortNames(url: gUrl.vendorShortNamesFile, dictVendorShortNames: gDictVendorShortNames)
+            writeVendorShortNames(url: Glob.url.vendorShortNamesFile, dictVendorShortNames: Glob.dictVendorShortNames)
         }
     }
 
@@ -274,12 +248,12 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func chkLearningModeClick(_ sender: Any) {
-        gLearnMode = chkLearningMode.state == .on
-        print("😋 \(codeFile)#\(#line) learnMode = \(gLearnMode)")
+        Glob.learnMode = chkLearningMode.state == .on
+        print("😋 \(codeFile)#\(#line) learnMode = \(Glob.learnMode)")
     }
     @IBAction func chkUserInputClick(_ sender: Any) {
-        gUserInputMode = chkUserInput.state == .on
-        print("😋 \(codeFile)#\(#line) UserInputMode = \(gUserInputMode)")
+        Glob.userInputMode = chkUserInput.state == .on
+        print("😋 \(codeFile)#\(#line) UserInputMode = \(Glob.userInputMode)")
     }
 
     @IBAction func chkDepositsClick(_ sender: Any) {
@@ -307,19 +281,19 @@ class ViewController: NSViewController, NSWindowDelegate {
         if gotItems.contains(.dirSupport) {
             var msg = ""
             msg = "custom categories & aliases."
-            if FileIO.deleteSupportFile(url: gUrl.myCatsFile, fileName: myCatsFilename, msg: msg) {
+            if FileIO.deleteSupportFile(url: Glob.url.myCatsFile, fileName: myCatsFilename, msg: msg) {
                 didSomething += 1
             }
             msg = "vendor default categories."
-            if FileIO.deleteSupportFile(url: gUrl.vendorCatLookupFile, fileName: vendorCatLookupFilename, msg: msg) {
+            if FileIO.deleteSupportFile(url: Glob.url.vendorCatLookupFile, fileName: vendorCatLookupFilename, msg: msg) {
                 didSomething += 1
             }
             msg = "custom vendor names."
-            if FileIO.deleteSupportFile(url: gUrl.vendorShortNamesFile, fileName: vendorShortNameFilename, msg: msg) {
+            if FileIO.deleteSupportFile(url: Glob.url.vendorShortNamesFile, fileName: vendorShortNameFilename, msg: msg) {
                 didSomething += 1
             }
             msg = "mods to your transaction files."
-            if FileIO.deleteSupportFile(url: gUrl.myModifiedTrans, fileName: myModifiedTranFilename, msg: msg) {
+            if FileIO.deleteSupportFile(url: Glob.url.myModifiedTrans, fileName: myModifiedTranFilename, msg: msg) {
                 didSomething += 1
             }
         }
@@ -337,19 +311,19 @@ class ViewController: NSViewController, NSWindowDelegate {
         let maxChars = 8
         var prompt = "Enter your initials (\(minChars)-\(maxChars) letters)"
         repeat {
-            let response = GBox.inputBox(prompt: prompt, defaultText: gUserInitials, maxChars: maxChars)
+            let response = GBox.inputBox(prompt: prompt, defaultText: Glob.userInitials, maxChars: maxChars)
             let name = response.trim
             let len = name.count
             if name.isEmpty {
-                let msg = "Your initials were not changed from \(gUserInitials)."
+                let msg = "Your initials were not changed from \(Glob.userInitials)."
                 handleError(codeFile: "", codeLineNum: #line, type: .note, action: .alertAndDisplay, errorMsg: msg)
                 isValid = true
             }
             if len >= minChars && len <= maxChars && !name.contains(" ") {
-                gUserInitials = name
+                Glob.userInitials = name
                 gotItems = gotItems.union(GotItem.userInitials)
-                UserDefaults.standard.set(gUserInitials,      forKey: UDKey.userInitials)
-                let msg = "Your initials have been changed to \(gUserInitials)."
+                UserDefaults.standard.set(Glob.userInitials,      forKey: UDKey.userInitials)
+                let msg = "Your initials have been changed to \(Glob.userInitials)."
                 handleError(codeFile: "", codeLineNum: #line, type: .note, action: .alertAndDisplay, errorMsg: msg)
                 isValid = true
             }
@@ -361,7 +335,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
     @IBAction func mnuReadAmazon(_ sender: Any) {
-        gDictAmazonItemsByDate = readAmazon()
+        Glob.dictAmazonItemsByDate = readAmazon()
     }
     
     @IBAction func mnuHelpSearchForHelpOn_Click(_ sender: Any) {    // Handles mnuHelpSearchForHelpOn.Click
@@ -389,7 +363,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         var errTxt = ""
 
         pathTransactionFolder = txtTransationFolder.stringValue
-        (gUrl.transactionFolder, errTxt)  = FileIO.makeFileURL(pathFileDir: pathTransactionFolder, fileName: "")
+        (Glob.url.transactionFolder, errTxt)  = FileIO.makeFileURL(pathFileDir: pathTransactionFolder, fileName: "")
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: "Transaction" + errTxt)
             return
@@ -416,28 +390,28 @@ class ViewController: NSViewController, NSWindowDelegate {
         UserDefaults.standard.set(pathTransactionFolder, forKey: UDKey.transactionFolder)
         UserDefaults.standard.set(pathSupportFolder,     forKey: UDKey.supportFolder)
         UserDefaults.standard.set(pathOutputFolder,      forKey: UDKey.outputFolder)
-        UserDefaults.standard.set(gUserInitials,      forKey: UDKey.userInitials)
-        UserDefaults.standard.set(gUserInputMode,     forKey: UDKey.userInputMode)
-        UserDefaults.standard.set(gLearnMode,         forKey: UDKey.learningMode)
+        UserDefaults.standard.set(Glob.userInitials,      forKey: UDKey.userInitials)
+        UserDefaults.standard.set(Glob.userInputMode,     forKey: UDKey.userInputMode)
+        UserDefaults.standard.set(Glob.learnMode,         forKey: UDKey.learningMode)
 
         Stats.clearAll()        // Clear the Stats
-        gLineItemArray = []     // Clear the global gLineItemArray
+        Glob.lineItemArray = []     // Clear the global Glob.lineItemArray
         usrIgnoreVendors = [String: Int]()  // Clear the "Ignore-Vendor" list
-        gDictVendorCatLookup = loadVendorCategories(url: gUrl.vendorCatLookupFile) // Re-read Categories Dictionary
-        Stats.origVendrCatCount = gDictVendorCatLookup.count
+        Glob.dictVendorCatLookup = loadVendorCategories(url: Glob.url.vendorCatLookupFile) // Re-read Categories Dictionary
+        Stats.origVendrCatCount = Glob.dictVendorCatLookup.count
 
         var fileContents    = ""                        // Where All Transactions in a File go
-        gDictTranDupes      = [:]
-        gDictCheckDupes     = [:]
-        gDictCreditDupes    = [:]
-        gDictNoVendrDupes   = [:]
-        gDictNoDateDupes    = [:]
+        Glob.dictTranDupes      = [:]
+        Glob.dictCheckDupes     = [:]
+        Glob.dictCreditDupes    = [:]
+        Glob.dictNoVendrDupes   = [:]
+        Glob.dictNoDateDupes    = [:]
 
         lblErrMsg.stringValue = ""
         
-        if !FileManager.default.fileExists(atPath: gUrl.transactionFolder.path) {
+        if !FileManager.default.fileExists(atPath: Glob.url.transactionFolder.path) {
             let msg = "Folder does not exist"
-            handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay,  fileName: gUrl.transactionFolder.path, dataLineNum: 0, lineText: "", errorMsg: msg)
+            handleError(codeFile: codeFile, codeLineNum: #line, type: .codeError, action: .alertAndDisplay,  fileName: Glob.url.transactionFolder.path, dataLineNum: 0, lineText: "", errorMsg: msg)
         }
 
         let filesToProcessURLs: [URL]
@@ -446,7 +420,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             filesToProcessURLs = transFileURLs
         } else {
             let nameWithExt = shown
-            let fileURL = gUrl.transactionFolder.appendingPathComponent(nameWithExt)
+            let fileURL = Glob.url.transactionFolder.appendingPathComponent(nameWithExt)
             filesToProcessURLs = [fileURL]
         }
         Stats.transFileCount = filesToProcessURLs.count
@@ -459,7 +433,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         //MARK: Loop through Files
         for (fileNum, fileURL) in filesToProcessURLs.enumerated() {
             let fileName    = fileURL.lastPathComponent
-            gTransFilename  = fileURL.lastPathComponent
+            Glob.transFilename  = fileURL.lastPathComponent
             let nameComps   = fileName.components(separatedBy: "-")
             let cardType    = nameComps[0].uppercased()
             let fileAttributes = FileAttributes.getFileInfo(url: fileURL)
@@ -481,8 +455,8 @@ class ViewController: NSViewController, NSWindowDelegate {
             // Check which Credit Card Transactions we are currently processing
             if cardType.count >= 2 &&  cardType.count <= Const.maxCardTypeLen  {
                 Stats.transFileNumber = fileNum + 1
-                handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray, acct: gAccounts.dict[cardType])
-                chkUserInput.state = gUserInputMode ? .on : .off
+                handleCards(fileName: fileName, cardType: cardType, cardArray: cardArray, acct: Glob.accounts.dict[cardType])
+                chkUserInput.state = Glob.userInputMode ? .on : .off
             } else {
                 //Stats.junkFileCount += 1
             }
@@ -494,7 +468,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
         setButtons(btnDefault: .spreadsheet, needsRecalc: false, transFolderOK: true)
 
-        outputTranactions(outputFileURL: outputFileURL, lineItemArray: gLineItemArray)
+        outputTranactions(outputFileURL: outputFileURL, lineItemArray: Glob.lineItemArray)
 
         print("\n😋 --- Description-Key algorithms --- VC#\(#line)")
         for (key, val) in DescriptionKey.dictDescKeyAlgorithmCnts.sorted(by: <) {
@@ -502,26 +476,26 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
 
         if Stats.addedCatCount > 0 || Stats.changedVendrCatCount > 0 {
-            if gLearnMode {
-                writeVendorCategoriesToFile(url: gUrl.vendorCatLookupFile, dictCat: gDictVendorCatLookup)
+            if Glob.learnMode {
+                writeVendorCategoriesToFile(url: Glob.url.vendorCatLookupFile, dictCat: Glob.dictVendorCatLookup)
             }
         }
-        //writeModTransTofile(url: gUrl.myModifiedTrans, dictModTrans: gDictModifiedTrans)
+        //writeModTransTofile(url: Glob.url.myModifiedTrans, dictModTrans: Glob.dictModifiedTrans)
 
         var statString = ""
 
-        let shortCatFilePath = FileIO.removeUserFromPath(gUrl.vendorCatLookupFile.path)
+        let shortCatFilePath = FileIO.removeUserFromPath(Glob.url.vendorCatLookupFile.path)
         statString += "Category File \"\(shortCatFilePath)\" loaded with \(Stats.origVendrCatCount) items.\n"
 
         if filesToProcessURLs.count == 1 {
             let shortTransFilePath = FileIO.removeUserFromPath(filesToProcessURLs[0].path)
             statString += "\(Stats.transFileCount) File named \"\(shortTransFilePath)/\" Processed."
         } else {
-            let shortTransFilePath = FileIO.removeUserFromPath(gUrl.transactionFolder.path)
+            let shortTransFilePath = FileIO.removeUserFromPath(Glob.url.transactionFolder.path)
             statString += "\(Stats.transFileCount) Files from \"\(shortTransFilePath)/\" Processed."
         }
 
-        statString += "\n \(gLineItemArray.count + Stats.duplicateCount) CREDIT CARD Transactions PROCESSED."
+        statString += "\n \(Glob.lineItemArray.count + Stats.duplicateCount) CREDIT CARD Transactions PROCESSED."
         statString += "\n Of These:"
         statString += "\n(a)\(String(Stats.duplicateCount).rightJust(5)       ) were duplicates.                  ←"
         statString += "\n(b)\(String(Stats.successfulLookupCount).rightJust(5)) were found in Category File.      ←"
@@ -646,20 +620,20 @@ class ViewController: NSViewController, NSWindowDelegate {
         var errTxt = ""
 
         // --------- "CategoryLookup.txt" -----------
-        (gUrl.vendorCatLookupFile, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportFolder, fileName: vendorCatLookupFilename)
+        (Glob.url.vendorCatLookupFile, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportFolder, fileName: vendorCatLookupFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "Category" + errTxt)
         }
-        gDictVendorCatLookup = loadVendorCategories(url: gUrl.vendorCatLookupFile)       // Build Categories Dictionary
-        Stats.origVendrCatCount = gDictVendorCatLookup.count
+        Glob.dictVendorCatLookup = loadVendorCategories(url: Glob.url.vendorCatLookupFile)       // Build Categories Dictionary
+        Stats.origVendrCatCount = Glob.dictVendorCatLookup.count
 
         // -------- "VendorShortNames.txt" ----------
-        (gUrl.vendorShortNamesFile, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportFolder, fileName: vendorShortNameFilename)
+        (Glob.url.vendorShortNamesFile, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportFolder, fileName: vendorShortNameFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "VendorShortNames " + errTxt)
         }
-        gDictVendorShortNames = loadVendorShortNames(url: gUrl.vendorShortNamesFile)        // Build VendorShortNames Dictionary
-        if gDictVendorShortNames.count > 0 {
+        Glob.dictVendorShortNames = loadVendorShortNames(url: Glob.url.vendorShortNamesFile)        // Build VendorShortNames Dictionary
+        if Glob.dictVendorShortNames.count > 0 {
             // Found VendorShortNames.txt in support-files folder
             gotItems = [gotItems, .fileVendorShortNames]  // Add fileVendorShortNames-bit to gotItems
         } else {
@@ -671,29 +645,29 @@ class ViewController: NSViewController, NSWindowDelegate {
             }
             // starter file found, so use IT.
             let bundleCatsFileURL = URL(fileURLWithPath: path)
-            gDictVendorShortNames = loadVendorShortNames(url: bundleCatsFileURL)
-            writeVendorShortNames(url: gUrl.vendorShortNamesFile, dictVendorShortNames: gDictVendorShortNames) // Save Starter file
+            Glob.dictVendorShortNames = loadVendorShortNames(url: bundleCatsFileURL)
+            writeVendorShortNames(url: Glob.url.vendorShortNamesFile, dictVendorShortNames: Glob.dictVendorShortNames) // Save Starter file
             let msg = "A starter \"VendorShortNames.txt\" was placed in your support-files folder"
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, errorMsg: msg)
         }
 
         // ---------- "MyCategories.txt" ------------
-        (gUrl.myCatsFile, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportFolder, fileName: myCatsFilename)
+        (Glob.url.myCatsFile, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportFolder, fileName: myCatsFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories " + errTxt)
         }
-        gCatagories = Catagories(myCatsFileURL: gUrl.myCatsFile)
+        gCatagories = Catagories(myCatsFileURL: Glob.url.myCatsFile)
         if gCatagories.dictCatAliases.count > 5 {
             gotItems = [gotItems, .fileMyCategories]  // Add fileMyCategories-bit to gotItems
         }
 
         // ---------- "MyAccounts.txt" ------------
-        (gUrl.myAccounts, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportFolder, fileName: Accounts.filename)
+        (Glob.url.myAccounts, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportFolder, fileName: Accounts.filename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyCategories " + errTxt)
         }
-        gAccounts = Accounts(url: gUrl.myAccounts)
-        if gAccounts.dict.count > 0 {
+        Glob.accounts = Accounts(url: Glob.url.myAccounts)
+        if Glob.accounts.dict.count > 0 {
             gotItems = [gotItems, .fileMyAccounts]  // Add fileMyAccounts-bit to gotItems
 
         } else {
@@ -703,21 +677,21 @@ class ViewController: NSViewController, NSWindowDelegate {
                 return
             }
             let bundleAccountsFileURL = URL(fileURLWithPath: path)
-            gAccounts = Accounts(url: bundleAccountsFileURL)
-            gAccounts.url = gUrl.myAccounts
-            gAccounts.writeToFile()    // Save Starter file
+            Glob.accounts = Accounts(url: bundleAccountsFileURL)
+            Glob.accounts.url = Glob.url.myAccounts
+            Glob.accounts.writeToFile()    // Save Starter file
             let msg = "A starter \"MyAccounts.txt\" was placed in your support-files folder"
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataWarning, action: .display, errorMsg: msg)
         }
 
 
         // -------- "MyModifiedTransactions" ----------
-        (gUrl.myModifiedTrans, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportFolder, fileName: myModifiedTranFilename)
+        (Glob.url.myModifiedTrans, errTxt)  = FileIO.makeFileURL(pathFileDir: pathSupportFolder, fileName: myModifiedTranFilename)
         if !errTxt.isEmpty {
             handleError(codeFile: codeFile, codeLineNum: #line, type: .dataError, action: .display, errorMsg: "MyModifiedTransactions " + errTxt)
         }
-        gDictModifiedTrans = loadMyModifiedTrans(myModifiedTranURL: gUrl.myModifiedTrans)
-        if gDictModifiedTrans.count > 0 {
+        Glob.dictModifiedTrans = loadMyModifiedTrans(myModifiedTranURL: Glob.url.myModifiedTrans)
+        if Glob.dictModifiedTrans.count > 0 {
             gotItems = [gotItems, .fileMyModifiedTrans]  // Add fileMyModifiedTrans-bit to gotItems
         }
     }//end func
@@ -735,10 +709,10 @@ class ViewController: NSViewController, NSWindowDelegate {
     //---- gotNewTranactionFolder - Try to load the Combo-Box with FileNames
     func gotNewTranactionFolder() {
         var errText = ""
-        (gUrl.transactionFolder, errText)  = FileIO.makeFileURL(pathFileDir: pathTransactionFolder, fileName: "")
+        (Glob.url.transactionFolder, errText)  = FileIO.makeFileURL(pathFileDir: pathTransactionFolder, fileName: "")
         if errText.isEmpty {             // Transaction Folder Exists
             setButtons(btnDefault: .start, needsRecalc: true, transFolderOK: true)  // btnStart.isEnabled = true etc
-            transFileURLs = FileIO.getTransFileList(transDirURL: gUrl.transactionFolder)
+            transFileURLs = FileIO.getTransFileList(transDirURL: Glob.url.transactionFolder)
             if transFileURLs.count > 0 {
                 gotItems = gotItems.union(GotItem.fileTransactions) // Mark Transaction-Files accounted for
             }

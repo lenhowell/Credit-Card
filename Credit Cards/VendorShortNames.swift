@@ -38,14 +38,14 @@ func findTruncatedDescs(vendorNameDescs: [String]) -> Bool {
             let shortLen  = descShort.count
             if descLong.prefix(shortLen) == descShort {
                 let truncLong = descLong.dropFirst(shortLen)
-                let match = findPrefixMatch(name: descShort, dictShortNames: gDictVendorShortNames)
+                let match = findPrefixMatch(name: descShort, dictShortNames: Glob.dictVendorShortNames)
 
                 if match.fullDescKey.isEmpty {
                     if (shortLen > 9 || truncLong.hasPrefix(" ")) {
                         //print("😡 VendorShortNames#\(#line): Possible dupe \"\(descShort)\"(\(shortLen)) is part of \"\(descLong)\"(\(longLen))")
                         let returnVal = showUserInputShortNameForm(shortName: descShort, longName: descLong)
                         if returnVal == .OK {           // OK: Add (prefix,descKey) to list
-                            gDictVendorShortNames[usrVendrPrefix] = usrVendrFullDescKey //move to showUserInputShortNameForm?
+                            Glob.dictVendorShortNames[usrVendrPrefix] = usrVendrFullDescKey //move to showUserInputShortNameForm?
                         } else if returnVal == .cancel {// Ignore: Do nothing
                             // do nothing
                         } else if returnVal == .stop {  // Abort, but save the results so far
@@ -69,8 +69,8 @@ func findTruncatedDescs(vendorNameDescs: [String]) -> Bool {
 
         }//next i
     }//next desc
-    print("\n😋 VendorShortNames#\(#line) gDictVendorShortNames.count = \(gDictVendorShortNames.count) ")
-    for (key,val) in gDictVendorShortNames.sorted(by: <) {
+    print("\n😋 VendorShortNames#\(#line) gDictVendorShortNames.count = \(Glob.dictVendorShortNames.count) ")
+    for (key,val) in Glob.dictVendorShortNames.sorted(by: <) {
         print("\(val.PadRight(23, truncate: false)) <==    \(key)")
     }
     return true

@@ -11,7 +11,7 @@ import Foundation
 //MARK: - Read Deposits
 func readDeposits(testData: String = "") {
     // Find the Deposit file
-    let pathURL = FileIO.getPossibleParentFolder(myURL: gUrl.transactionFolder)
+    let pathURL = FileIO.getPossibleParentFolder(myURL: Glob.url.transactionFolder)
     let fileURL = pathURL.appendingPathComponent("DEPOSITcsv.csv")
     let content = (try? String(contentsOf: fileURL)) ?? ""
     if content.isEmpty {
@@ -97,11 +97,11 @@ func readDeposits(testData: String = "") {
                 print("😡 FileDeposits#\(#line) Deposit.csv line \(idx+1) Bad Date: \"\(items[1])\",  \(line)")//(idx+1,desc,chkDate,credit)
                 errorCount += 1
             }
-            var lineItem = makeLineItem(fromTransFileLine: line, dictColNums: dictColNums, dictVendorShortNames: gDictVendorShortNames, cardType: "DEPOSIT", hasCatHeader: true, fileName: "DepositCsv.csv", lineNum: idx+1, acct: acct)
+            var lineItem = makeLineItem(fromTransFileLine: line, dictColNums: dictColNums, dictVendorShortNames: Glob.dictVendorShortNames, cardType: "DEPOSIT", hasCatHeader: true, fileName: "DepositCsv.csv", lineNum: idx+1, acct: acct)
             lineItem.postDate = postDate
 
             if lineItem.tranDate >= firstDate && lineItem.tranDate <= lastDate {
-                gLineItemArray.append(lineItem)
+                Glob.lineItemArray.append(lineItem)
                 if lineItem.descKey.contains("WINAN") {
                     //print("FileDeposits#\(#line) ")     //Debug Trap
                 }

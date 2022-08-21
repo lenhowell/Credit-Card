@@ -32,9 +32,6 @@ class FileIO__UnitTests: XCTestCase {
         path = "/Desktop/"
         result = FileIO.folderExists(atPath: path, isPartialPath: true)
         XCTAssertEqual(result, true)
-        path = "/Users/georgebauer/Desktop"
-        result = FileIO.folderExists(atPath: path, isPartialPath: false)
-        XCTAssertEqual(result, true)
     }
 
     func test_makeBackupFilePath() {
@@ -86,9 +83,9 @@ class FileIO__UnitTests: XCTestCase {
         var url = urlHome
         var msg = ""
         (url, msg) = FileIO.makeFileURL(pathFileDir: "xxx", fileName: "xxx")
-        XCTAssertEqual(msg, "Folder \"/Users/georgebauer/xxx\" does NOT exist!")
-        XCTAssertEqual(url.path, "/Users/georgebauer/xxx")
-
+        XCTAssertEqual(msg.hasPrefix("Folder \"/Users/"), true)
+        XCTAssertEqual(msg.hasSuffix("/xxx\" does NOT exist!"), true)
+        XCTAssertEqual(url.path, urlHome.path + "/xxx")
     }
 
     func test_VendorShortNames() {
