@@ -191,11 +191,11 @@
 				CE25CCEB26D8819400B9A7D5 /* Catagories.swift */,
 				CE7548122309DC0600FEDAFB /* DescriptionKey.swift */,
 				BFA770DE22FD10BE00BA15B6 /* ErrorHandler.swift */,
-				CE7E093D2377C3C4004150E6 /* Globals.swift */,
 				CE35141123A08E9400158000 /* FileAmazonOrders.swift */,
 				CE0BBCCC23A6D58E003EA6C3 /* FileDeposits.swift */,
 				BFECDEDE22FDBC2F00F1BF5E /* FreeFuncs.swift */,
 				BFECDEE022FDBED400F1BF5E /* FileIO.swift */,
+				CE7E093D2377C3C4004150E6 /* Globals.swift */,
 				BFECDEE222FDCBCD00F1BF5E /* HandleCards.swift */,
 				CE90E6E0236E80B400184BEF /* HandleActivity.swift */,
 				BF5D549B22EF458500111875 /* LineItems.swift */,
@@ -647,7 +647,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1003;
+				CURRENT_PROJECT_VERSION = 1005;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
@@ -655,7 +655,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.13.7;
+				MARKETING_VERSION = 1.13.8;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -669,7 +669,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1003;
+				CURRENT_PROJECT_VERSION = 1005;
 				DEVELOPMENT_TEAM = XD8UZ6484B;
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				INFOPLIST_FILE = "Credit Cards/Info.plist";
@@ -677,7 +677,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.13.7;
+				MARKETING_VERSION = 1.13.8;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.len.howell.Credit-Cards";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

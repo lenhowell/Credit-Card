@@ -95,7 +95,7 @@ extension LineItem {
 
         let columnCount = columns.count
         if columnCount != expectedColumnCount {
-            let msg = "\(columnCount) in transaction; should be \(expectedColumnCount)"
+            let msg = "\(columnCount) column(s) in transaction; should be \(expectedColumnCount)"
             handleError(codeFile: "LineItems", codeLineNum: #line, type: .dataError, action: .display,  fileName: fileName, dataLineNum: lineNum, lineText: fromTransFileLine, errorMsg: msg)
         }
 

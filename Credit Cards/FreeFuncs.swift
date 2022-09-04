@@ -28,7 +28,7 @@ public func getStringFromClipBoard() -> String {
 public func sendSummaryToClipBoard(tableDicts: [[String : String]]) {
     // List of names from SummaryTable + "Other"
     let headers = ["Tax","Investment","Barbara","EveManbeck","AndrewWhitehill",
-                   "Auto","Aviation","BeachCove","Home","Travel","Merchandise",
+                   "Auto","Aviation","BeachCove","NorthBeachTower","Home","Travel","Merchandise",
                    "Cable/Internet","Healthcare","Charity","Phone","Food",
                    "Insurance","Computer","Entertainment","Professional","Income",
                    "Unknown","Other"]
@@ -38,10 +38,13 @@ public func sendSummaryToClipBoard(tableDicts: [[String : String]]) {
     }
     var catNet = [String: Double]()
     for tableDict in tableDicts {
-        let str = sortStr(tableDict[SummaryColID.netCredit] ?? "0")
-        let val = Double(str) ?? 0.0
+        let str  = sortStr(tableDict[SummaryColID.netCredit] ?? "0")
+        let val  = Double(str) ?? 0.0
         let name = tableDict[SummaryColID.name] ?? "Other"
-        let cat = headerDict[name] ?? "Other"
+        let cat  = headerDict[name] ?? "Other"
+        if name == "Other" || cat == "Other" {
+            print("👹 FreeFuncs#\(#line) \(SummaryColID.name) -> \(name) -> Other $\(val)")
+        }
         catNet[cat, default: 0.0] += val
     }
     let line1 = "1stDate\tLastDate\t" + headers.joined(separator: "\t")

@@ -3,13 +3,52 @@
 //  Credit Cards
 //
 //  Created by George Bauer on 12/10/19.
-//  Copyright © 2019-2021 George Bauer. All rights reserved.
+//  Copyright © 2019-2022 George Bauer. All rights reserved.
 //
 
 import Foundation
 
 //MARK: - ReadAmazon
 
+/*
+ --New--
+ ORDER PLACED                           "ORDER PLACED"
+ December 29, 2019                      Date
+ TOTAL                                  "TOTAL"
+ $19.93                                 Total $
+ SHIP TO                                "SHIP TO"
+ BARBARA BAUER                          ShipTo person
+ ORDER # 113-2233275-0152253            "ORDER #" ###-#######-#######
+ View order details   View invoice      "View order details   View invoice"
+
+ Mac Book Pro Charger, 60W T-Tip Magsafe 2 Replacement, Power Adapter Compatible with Mac Book Charger/Mac Book air (Made After Late 2012)
+ Return window closed on Jan 23, 2020
+ View your item
+
+ iCarez [Tempered Glass + Tray Installation] Screen Protector for iPhone 11 (2019) iPhone XR 6.1-Inch (Case Friendly) Easy Apply [ 3-Pack 0.33MM 9H 2.5D Clear]
+ Return window closed on Jan 23, 2020
+ Buy it again
+
+ View your item
+ Write a product review
+ Archive order
+
+
+ --Old--
+ ORDER PLACED                           "ORDER PLACED"
+ January 18, 2001                       Date
+ TOTAL                                  "TOTAL"
+ $46.48                                 Total $
+ SHIP TO                                "SHIP TO"
+ George Bauer                           ShipTo person
+ ORDER # 107-1564814-2691752            "ORDER #" ###-#######-#######
+
+ Bowes & Church's Food Values of Portions Commonly Used
+ Jean A. T., Ph.D. Pennington
+ Sold by: Amazon.com Services, Inc
+ $42.00
+
+ */
 
 // TODO: Fix returns, crosscheck files/year count.
 //---- readAmazon - Returns dict [DateStr:AmazonItem] 16-346 = 330-lines
@@ -103,6 +142,7 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
     var amazonOrder = AmazonItem(orderNumber: "", orderDate: "", order$: 0.0, orderShipTo: "", fileLineNum: 0)
     var amazonItem  = amazonOrder
     var orderRemaining$ = 0.0
+    var prevLine = "??"
     for (idx, line) in lines.enumerated(){
         if line.hasPrefix("EOF-") { break }
         if idx == 3099 {
@@ -117,7 +157,6 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
             }
         }
         if ignoreMe { continue }
-
         //print("\(codeFile)#\(#line) line#\(idx+1): \(line)")
 
         var abort = false
@@ -158,6 +197,7 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
                     let yr = Int(yrStr) ?? 0
                     if yr >= 1980 && yr < 2099 {
                         yearExpected = yr                   // covering what year?
+                        print("\n✅ \(codeFile)#\(#line) \(line)")
                         expect = .orderPlaced
                     } else {
                         expect = .year                      // Year was missing: get from next line
@@ -168,6 +208,7 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
             let yr = Int(line) ?? 0
             if yr >= 1980 && yr < 2099 {
                 yearExpected = yr                           // Year from ordersYear
+                print("\n✅ \(codeFile)#\(#line) \(orderCountExpected) orders in \(yr)")
             } else {
                 yearExpected = 0
             }
@@ -175,6 +216,7 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
 
         case .orderPlaced:
             if line.hasPrefix("ORDER PLACED") {             // Start of new Order
+                print("📝 \(codeFile)#\(#line)  line#\(idx+1): \"\(line)\" preceded by \"\(prevLine)\"")
                 newOrder()
             }
 
@@ -224,7 +266,7 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
 
             //--------- Items ---------
 
-        case .itemName:                                 // Expecting $amount, got:
+        case .itemName:                                 // Expecting possible ItemName, got:
             if line.hasPrefix("ORDER PLACED") {                 // "ORDER PLACED"
                 let sum = order$ - orderRemaining$
                 let absRemaining = abs(orderRemaining$)
@@ -234,11 +276,15 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
                     let o$  = String(format: "%.2f",sum)
                     let pct = String(format: "%.1f", pctOff*100)
                     if orderRemaining$ > 0 {
-                        print("⚠️ FileAmazonOrders#\(#line) \(amazonItem.orderDate) Tax & Shipping of $\(r$) on $\(o$) = \(pct)%  line \(amazonItem.fileLineNum)")
+                        print("⚠️ \(codeFile)#\(#line) \(amazonItem.orderDate) Tax & Shipping of $\(r$) on $\(o$) = \(pct)%  line \(amazonItem.fileLineNum)")
                     } else {
-                        print("⚠️ FileAmazonOrders#\(#line) \(amazonItem.orderDate) Hidden Discount of at least $\(r$) on $\(o$) = \(pct)%  line \(amazonItem.fileLineNum)")
+                        print("⚠️ \(codeFile)#\(#line) \(amazonItem.orderDate) Hidden Discount of at least $\(r$) on $\(o$) = \(pct)%  line \(amazonItem.fileLineNum)")
                     }
                     warningCount += 1
+                }
+                if prevLine.starts(with: "$") == false {
+                    print("📝 \(codeFile)#\(#line)  line#\(idx+1): \"\(line)\" preceded by \"\(prevLine)\"")
+
                 }
                 newOrder()
 
@@ -249,12 +295,12 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
                 let r$  = String(format: "%.2f",orderRemaining$)
                 let o$  = String(format: "%.2f",order$)
                 let pct = String(format: "%.1f", orderRemaining$/order$*100)//(orderRemaining$/order$*100)
-                print("⛔️ \(amazonItem.orderDate) Not shown: $\(r$) on $\(o$) = \(pct)%  line \(amazonItem.fileLineNum)")
+                print("⛔️ \(codeFile)#\(#line) \(amazonItem.orderDate) Not shown: $\(r$) on $\(o$) = \(pct)%  line \(amazonItem.fileLineNum)")
                 print()
             } else if line.hasPrefix("Amount Serial") {         // "Amount Serial number(s)"
                 expect = .itemSerial
 
-            } else {
+            } else {                            // Must be an addition ItemName
                 amazonItem = amazonOrder
                 amazonItem.itemQuant = 1
                 amazonItem.itemName = line
@@ -335,6 +381,7 @@ func readAmazon(testData: String = "") -> [String: [AmazonItem]] {
             errorCount += 1
             print("\(codeFile)#\(#line) line#\(idx+1): \(line)")
         }
+        prevLine = line
 //
     }//next line
     if errorCount + warningCount == 0 {
