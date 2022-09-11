@@ -159,6 +159,9 @@ extension LineItem {
                     assignedCat = ""
                 }
                 if assignedCat.trim.isEmpty { assignedCat = Const.unknown }
+                if assignedCat.lowercased().contains("gifts") {
+                    // Debug Trap gifts
+                }
                 let myCat = gCatagories.dictCatAliases[assignedCat.uppercased()] ?? "" 
                 //self.rawCat = myCat
                 self.rawCat = assignedCat //%%%%%%%

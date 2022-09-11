@@ -87,6 +87,9 @@ func extractTranFromActivity(lineItem: LineItem) -> LineItem {  // 12-201 = 189-
     var ignore = false
 
     // Move out%%%
+    if lineItem.rawCat.lowercased().contains("gifts") {
+        // Debug Trap gifts
+    }
     if lineItem.rawCat == Const.unknown {   //88-126 = 28-lines
         let oldDesc = lineItem.desc
         if oldDesc.hasPrefix("Check") {

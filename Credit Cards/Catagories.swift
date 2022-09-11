@@ -67,7 +67,6 @@ public struct Catagories {
             
             for myCatAliasRaw in myCatsArray {
                 let myCatAlias = myCatAliasRaw.trim.removeEnclosingQuotes()
-                
                 if myCatAlias.count >= 3 {
                     if myCatAlias != myCat {
                         aliases.append(myCatAlias)

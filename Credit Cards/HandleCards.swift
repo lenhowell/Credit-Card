@@ -292,8 +292,14 @@ internal func makeLineItem(fromTransFileLine:   String,
 
     // Add descKey & cardType
     lineItem.cardType = cardType
+    if lineItem.rawCat.lowercased().contains("gifts") {
+        // Debug Trap gifts
+    }
     if isActivity {
         lineItem = extractTranFromActivity(lineItem: lineItem)
+        if lineItem.rawCat.contains("ifts") {
+            // Debug Trap gifts
+        }
     }
     let descKey = DescriptionKey.makeDescKey(from: lineItem.desc, dictVendorShortNames: dictVendorShortNames, fileName: fileName)
     lineItem.descKey = descKey
@@ -306,6 +312,9 @@ internal func makeLineItem(fromTransFileLine:   String,
         lineItem.memo        = modTrans.memo
         lineItem.modifiedKey = modTranKey
         Stats.userModTransUsed += 1
+        if lineItem.rawCat.lowercased().contains("gifts") {
+            // Debug Trap gifts
+        }
         return lineItem                         // Use User-Modified .genCat & .catSource without looking further
     }
     if descKey.isEmpty { return lineItem }      // Missing descKey
@@ -316,8 +325,8 @@ internal func makeLineItem(fromTransFileLine:   String,
     var catFromTran       = gCatagories.dictCatAliases[lineItem.rawCat.uppercased()] ?? lineItem.rawCat + "-?"
     var catItemFromTran   = CategoryItem(category: catFromTran, source: cardType)
 
-    if descKey.contains("SKY")  {
-        //print("")     //Debug Trap
+    if lineItem.genCat.lowercased().contains("gifts")  {
+        // Debug Trap gifts
     }
     
     if let catVend = Glob.dictVendorCatLookup[descKey] {
@@ -561,6 +570,9 @@ internal func pickTheBestCat(catItemVendor: CategoryItem, catItemTransa: Categor
     if catVendor.contains("Unkno")                          {   // "Unknown"
         return (catItemTransa, weak)
     }    //      "
+    if catItemTransa.category.lowercased().contains("gifts") {
+        // Debug Trap gifts
+    }
     return (catItemTransa, weak)
 }
 
