@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -374,7 +374,7 @@ DQ
                                 </textFieldCell>
                             </textField>
                             <comboBox verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bRm-TN-6sx">
-                                <rect key="frame" x="373" y="229" width="423" height="25"/>
+                                <rect key="frame" x="372" y="230" width="424" height="23"/>
                                 <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="fileName" drawsBackground="YES" completes="NO" numberOfVisibleItems="7" id="Nqw-uu-5Go">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -398,7 +398,7 @@ DQ
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GY1-RP-4M3">
-                                <rect key="frame" x="18" y="172" width="250" height="18"/>
+                                <rect key="frame" x="18" y="171" width="250" height="18"/>
                                 <buttonCell key="cell" type="check" title="Allow app to modify CategoryLookup" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="HIY-gI-iXJ">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -408,7 +408,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2vy-a1-kio">
-                                <rect key="frame" x="18" y="112" width="177" height="18"/>
+                                <rect key="frame" x="18" y="111" width="177" height="18"/>
                                 <buttonCell key="cell" type="check" title="Requre user intervension" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="J3Z-Vs-b0C">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -448,7 +448,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cQ1-Em-Iu7">
-                                <rect key="frame" x="371" y="196" width="70" height="18"/>
+                                <rect key="frame" x="371" y="195" width="70" height="18"/>
                                 <buttonCell key="cell" type="radio" title="Normal" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="8ff-K5-Xsw">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -458,7 +458,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1el-ts-FwV">
-                                <rect key="frame" x="371" y="172" width="129" height="18"/>
+                                <rect key="frame" x="371" y="171" width="129" height="18"/>
                                 <buttonCell key="cell" type="radio" title="Activity files only" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="diT-Sp-oX8">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -468,7 +468,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4wF-3s-4Er">
-                                <rect key="frame" x="371" y="148" width="205" height="18"/>
+                                <rect key="frame" x="371" y="147" width="205" height="18"/>
                                 <buttonCell key="cell" type="radio" title="Check &amp; CreditCard files only" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="4wY-ER-W8q">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -478,7 +478,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EcD-zG-Ty0">
-                                <rect key="frame" x="371" y="112" width="196" height="18"/>
+                                <rect key="frame" x="371" y="111" width="196" height="18"/>
                                 <buttonCell key="cell" type="check" title="Include external DepositCsv" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="QCu-kb-vxM">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -945,7 +945,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <comboBox verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DP0-U9-YMZ">
-                                <rect key="frame" x="394" y="205" width="203" height="25"/>
+                                <rect key="frame" x="393" y="206" width="204" height="23"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="200" id="J7E-08-Fpn"/>
                                 </constraints>
@@ -984,7 +984,7 @@ Gw
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="WBO-u6-2d6">
-                                <rect key="frame" x="392" y="180" width="137" height="18"/>
+                                <rect key="frame" x="392" y="179" width="137" height="18"/>
                                 <buttonCell key="cell" type="check" title="&quot;?&quot; Question Mark" bezelStyle="regularSquare" imagePosition="left" inset="2" id="IFr-Xg-VG6">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -1066,7 +1066,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5vi-kI-JnO">
-                                <rect key="frame" x="392" y="152" width="113" height="18"/>
+                                <rect key="frame" x="392" y="151" width="113" height="18"/>
                                 <buttonCell key="cell" type="check" title="&quot;$&quot; to Lock in " bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="pXa-e4-GnB">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
