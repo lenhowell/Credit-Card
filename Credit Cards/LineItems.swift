@@ -82,7 +82,8 @@ extension LineItem {
     //MARK: - init - 84-207 = 123-lines
     //TODO: Allow LineItem.init to throw errors
     // Create a LineItem from a Transaction-File line
-    init(fromTransFileLine: String, dictColNums: [String: Int], fileName: String, lineNum: Int, signAmount: Double) {
+    init(fromTransFileLine: String, dictColNums: [String: Int], fileName: String, lineNum: Int, signAmount: Double, acct
+         : Account?) {
         let expectedColumnCount = dictColNums.count
 
         self.transText = fromTransFileLine.trim // TRANSACTION TEXT
@@ -187,10 +188,14 @@ extension LineItem {
                     handleError(codeFile: LineItem.codeFile, codeLineNum: #line, type: .dataError, action: .alertAndDisplay, errorMsg: msg)
                 }
 
-                if amount*signAmount < 0 {
-                    self.credit = abs(amount)
+                if acct?.type == .check {           // 2023-12-20 Check file for 2023 has minus numbers
+                    self.debit = abs(amount)        // Only allow debits on Checks
                 } else {
-                    self.debit = abs(amount)
+                    if amount*signAmount < 0 {
+                        self.credit = abs(amount)
+                    } else {
+                        self.debit = abs(amount)
+                    }
                 }
             }
         }

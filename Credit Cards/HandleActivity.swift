@@ -8,7 +8,7 @@
 
 import Foundation
 
-let allowedDirectDeps = ["SSA", "NORTH BEACH", "NORTHBEACH", "NBEACHP", "BCH CV HOA", "BB T GEO"]
+let allowedDirectDeps = ["SSA", "NORTH BEACH", "NORTHBEACH", "NBEACHP", "BCH CV HOA", "BEACH COVE", "BB T GEO"]
 
 // Specialized routine ONLY for Merrill Lynch Activity download
 //MARK: - extractTranFromActivity

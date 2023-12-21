@@ -288,7 +288,7 @@ internal func makeLineItem(fromTransFileLine:   String,
     }
 
     // Use LineItem.init to tranlate the transaction entry to a LineItem.
-    var lineItem = LineItem(fromTransFileLine: fromTransFileLine, dictColNums: dictColNums, fileName: fileName, lineNum: lineNum, signAmount: signAmount)
+    var lineItem = LineItem(fromTransFileLine: fromTransFileLine, dictColNums: dictColNums, fileName: fileName, lineNum: lineNum, signAmount: signAmount, acct: acct)
 
     // Add descKey & cardType
     lineItem.cardType = cardType

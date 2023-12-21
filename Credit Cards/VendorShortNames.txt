@@ -2,6 +2,7 @@
 // ShortName (prefix),   Full Description Key
 "AMAZON"                , AMAZON
 "AMZN"                  , AMAZON
+"NETFLIX"               , NETFLIX
 "PUBLIX"                , PUBLIX
 "VERIZON WRL"           , VERIZON WIRELESS
 "VZWRLSS"               , VERIZON WIRELESS
