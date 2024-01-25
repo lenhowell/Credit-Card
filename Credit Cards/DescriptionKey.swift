@@ -196,7 +196,7 @@ struct DescriptionKey {
         
         if !ccPrefix.isEmpty {
             if descKeyLong.count < 9 {
-                print("⚠️ DescriptionKey#\(#line) \(desc) -> \(ccPrefix) + \(descKeyLong)   Short @\(descKeyLong.count) chars")
+                print("⚠️ DescriptionKey#\(#line) \(desc) -> \(ccPrefix) + \"\(descKeyLong)\"   Short @\(descKeyLong.count) chars")
                 key2 = ccPrefix + " " + descKeyLong
                 //"SWA EARLYBRD", "ALG AIR", "HUM HUMANN"
             } else if ccPrefix == "PAYPAL" {

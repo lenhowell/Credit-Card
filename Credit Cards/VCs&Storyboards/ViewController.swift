@@ -23,6 +23,8 @@ import Cocoa
 // VendorShortNames: Change to use segue & eliminate globals 2
 // TableFilter:     Handle filtering as an object
 // Credit_Cards_UnitTests: The following Unit-Tests need assertions
+// DescriptionKey#199 "PAYPAL *CHIRP"  -  Remove "PAYPAL *" & Lookup Name
+
 
 //MARK: - ViewController
 class ViewController: NSViewController, NSWindowDelegate {
@@ -466,7 +468,7 @@ class ViewController: NSViewController, NSWindowDelegate {
             readDeposits()
         }
 
-        setButtons(btnDefault: .spreadsheet, needsRecalc: false, transFolderOK: true)
+        setButtons(btnDefault: .summary, needsRecalc: false, transFolderOK: true)
 
         outputTranactions(outputFileURL: outputFileURL, lineItemArray: Glob.lineItemArray)
 
